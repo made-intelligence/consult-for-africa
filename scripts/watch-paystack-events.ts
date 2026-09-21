@@ -97,14 +97,18 @@ async function main() {
       // Reaching this database blips now and then, and the watch rides that
       // out without losing anything: the cursor only moves on a successful
       // read, so whatever arrived during an outage is picked up afterwards.
-      // So stay quiet through a blip and speak up only once it has lasted
-      // long enough to mean something, roughly three minutes. Silence still
-      // has to be earned, though: an outage that persists is indistinguishable
-      // from no payments arriving, and that is worth interrupting for.
+      //
+      // Three minutes turned out to be too eager. Four separate episodes ran
+      // past it and every one healed itself, with production answering in
+      // 20-40ms throughout, so each warning cost an interruption and told the
+      // reader nothing they would act on. Ten minutes is past anything seen
+      // so far. Silence still has to be earned, though: an outage that really
+      // persists is indistinguishable from no payments arriving, and that is
+      // worth interrupting for.
       //
       // Prisma puts the useful part of its message last, so report the tail
       // rather than the boilerplate preamble.
-      if (consecutiveErrors === 10 && !warnedAboutErrors) {
+      if (consecutiveErrors === 30 && !warnedAboutErrors) {
         warnedAboutErrors = true;
         const msg = err instanceof Error ? err.message.trim() : "unknown";
         const detail = msg.split("\n").filter(Boolean).pop() ?? msg;
