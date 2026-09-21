@@ -220,6 +220,31 @@ export const PRO_PRICE_NGN = 1500;
  * Falls back to the list price only when the event carries no usable amount,
  * which is the case for events that are not themselves a charge.
  */
+/**
+ * Whether a charge should move the billing period, and to when.
+ *
+ * The period must not be reset just because the handler ran again. Paystack
+ * retries, and a replay is run on purpose days later to repair something; both
+ * re-deliver the original charge. Resetting then would move a paid-up period
+ * to a month from today, quietly taking time the subscriber has already paid
+ * for, and would zero their usage counter into the bargain.
+ *
+ * So a subscriber whose period is still running keeps it. A new subscriber, or
+ * one whose period has lapsed, gets a fresh month: that is a genuine renewal.
+ */
+export function subscriptionPeriod(
+  prior: { status?: string | null; currentPeriodEnd?: Date | null } | null,
+  now: Date
+): { start: Date; end: Date } | null {
+  const runningUntil = prior?.currentPeriodEnd;
+  if (prior?.status === "ACTIVE" && runningUntil && runningUntil.getTime() > now.getTime()) {
+    return null; // leave the period alone
+  }
+  const end = new Date(now);
+  end.setMonth(end.getMonth() + 1);
+  return { start: now, end };
+}
+
 export function subscriptionAmountNGN(amountKobo: unknown): number {
   if (typeof amountKobo !== "number" || !Number.isFinite(amountKobo) || amountKobo <= 0) {
     return PRO_PRICE_NGN;
@@ -236,18 +261,18 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
     if (!professionalId) return;
 
     const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setMonth(periodEnd.getMonth() + 1);
-
     const chargedNGN = subscriptionAmountNGN(event.data.amount);
 
     // Read before writing so a retry or a deliberate replay does not send a
     // second welcome. The upsert itself is safely repeatable; the email is not.
     const prior = await prisma.cadreSubscription.findUnique({
       where: { professionalId },
-      select: { plan: true, status: true },
+      select: { plan: true, status: true, currentPeriodEnd: true },
     });
     const alreadyPro = prior?.plan === "PRO" && prior.status === "ACTIVE";
+    const period = subscriptionPeriod(prior, now);
+    // A create is always a new subscriber, so it always starts a period.
+    const freshPeriod = period ?? subscriptionPeriod(null, now)!;
 
     await prisma.cadreSubscription.upsert({
       where: { professionalId },
@@ -255,10 +280,16 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
         plan: "PRO",
         status: "ACTIVE",
         amountNGN: chargedNGN,
-        currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
-        aiMessagesThisMonth: 0,
-        aiMessagesResetAt: now,
+        // Only on a real renewal. Re-running for a period already paid for
+        // would shorten it and wipe the usage counter.
+        ...(period
+          ? {
+              currentPeriodStart: period.start,
+              currentPeriodEnd: period.end,
+              aiMessagesThisMonth: 0,
+              aiMessagesResetAt: now,
+            }
+          : {}),
         paystackCustomerCode: customer?.customer_code || undefined,
       },
       create: {
@@ -266,8 +297,8 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
         plan: "PRO",
         status: "ACTIVE",
         amountNGN: chargedNGN,
-        currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
+        currentPeriodStart: freshPeriod.start,
+        currentPeriodEnd: freshPeriod.end,
         paystackCustomerCode: customer?.customer_code || undefined,
       },
     });
@@ -284,8 +315,8 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
           person: professional,
           amountKobo: event.data.amount ?? 0,
           reference: event.data.reference ?? "",
-          periodStart: now,
-          periodEnd,
+          periodStart: freshPeriod.start,
+          periodEnd: freshPeriod.end,
         }).catch((err) => {
           console.error("[paystack] cadre pro welcome email failed:", err);
         });
