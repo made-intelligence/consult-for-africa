@@ -3,6 +3,23 @@ import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 
+const AVAILABILITY_VALUES = [
+  "ACTIVELY_LOOKING",
+  "OPEN_TO_OFFERS",
+  "DOING_LOCUM",
+  "NOT_LOOKING",
+];
+
+const OPEN_TO_VALUES = [
+  "PERMANENT",
+  "LOCUM",
+  "CONSULTING",
+  "INTERNATIONAL",
+  "SHORT_MISSION",
+  "MEDEVAC",
+  "REMOTE",
+];
+
 export const GET = handler(async function GET() {
   try {
     const session = await getCadreSession();
@@ -45,6 +62,10 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
       city,
       isDiaspora,
       diasporaCountry,
+      availability,
+      openTo,
+      noticePeriodWeeks,
+      availableFrom,
     } = body;
 
     const updateData: Record<string, unknown> = {};
@@ -71,6 +92,38 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
     }
     if (state !== undefined) updateData.state = state || null;
     if (city !== undefined) updateData.city = city?.trim() || null;
+
+    // Availability. Until this endpoint accepted these, nothing in the product
+    // ever wrote them: the field was set on 30 records out of 10,229, and
+    // employer search filtered on it, so the other 10,199 were invisible to
+    // every hospital on the platform. `openTo` was worth 5 points of profile
+    // completeness with no input anywhere, capping everyone below 100.
+    if (availability !== undefined) {
+      updateData.availability = AVAILABILITY_VALUES.includes(availability)
+        ? availability
+        : null;
+      updateData.availabilityUpdatedAt = new Date();
+    }
+    if (openTo !== undefined) {
+      updateData.openTo = Array.isArray(openTo)
+        ? openTo.filter((v: unknown): v is string =>
+            typeof v === "string" && OPEN_TO_VALUES.includes(v),
+          )
+        : [];
+    }
+    if (noticePeriodWeeks !== undefined) {
+      const parsed =
+        noticePeriodWeeks != null && noticePeriodWeeks !== ""
+          ? parseInt(noticePeriodWeeks)
+          : NaN;
+      updateData.noticePeriodWeeks =
+        Number.isFinite(parsed) && parsed >= 0 && parsed <= 104 ? parsed : null;
+    }
+    if (availableFrom !== undefined) {
+      const date = availableFrom ? new Date(availableFrom) : null;
+      updateData.availableFrom =
+        date && !Number.isNaN(date.getTime()) ? date : null;
+    }
     if (isDiaspora !== undefined) updateData.isDiaspora = !!isDiaspora;
     if (diasporaCountry !== undefined)
       updateData.diasporaCountry = diasporaCountry?.trim() || null;
@@ -113,6 +166,7 @@ async function recomputeCompleteness(professionalId: string) {
       state: true,
       isDiaspora: true,
       openTo: true,
+      availability: true,
       salaryReportedAt: true,
       credentials: { select: { id: true } },
       qualifications: { select: { id: true } },
@@ -128,7 +182,8 @@ async function recomputeCompleteness(professionalId: string) {
   if (prof.subSpecialty) completeness += 5;
   if (prof.yearsOfExperience != null && prof.yearsOfExperience >= 0) completeness += 5;
   if (prof.state || prof.isDiaspora) completeness += 5;
-  if (prof.openTo && prof.openTo.length > 0) completeness += 5;
+  if (prof.openTo && prof.openTo.length > 0) completeness += 3;
+  if (prof.availability) completeness += 2;
   if (prof.credentials.length > 0) completeness += 15;
   if (prof.qualifications.length > 0) completeness += 10;
   if (prof.cpdEntries.length > 0) completeness += 10;

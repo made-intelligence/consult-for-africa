@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { auth } from "@/auth";
+import { getCadreEmployerContext } from "@/lib/cadreEmployerAuth";
+
+const STAFF_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
+
+/**
+ * Who may run the matcher against a role.
+ *
+ * This endpoint had no authentication of any kind. Anyone who knew or guessed a
+ * mandate id could write fifty match rows against it and flip the role's status,
+ * unauthenticated, from anywhere.
+ *
+ * Staff can run it for any mandate, including the ones we run ourselves out of
+ * admin. An employer can run it only against a role their own organisation owns.
+ */
+async function authoriseMatch(mandateId: string): Promise<boolean> {
+  const staff = await auth();
+  if (staff && STAFF_ROLES.includes(staff.user.role)) return true;
+
+  const ctx = await getCadreEmployerContext();
+  if (!ctx) return false;
+
+  const owned = await prisma.cadreMandate.findFirst({
+    where: { id: mandateId, employerOrgId: ctx.org.id },
+    select: { id: true },
+  });
+  return !!owned;
+}
 
 // Compute a basic match score (0-100) based on multiple factors
 function computeMatchScore(
@@ -146,6 +174,10 @@ export const POST = handler(async function POST(
   try {
     const { id } = await params;
 
+    if (!(await authoriseMatch(id))) {
+      return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+    }
+
     const mandate = await prisma.cadreMandate.findUnique({
       where: { id },
     });
@@ -159,6 +191,10 @@ export const POST = handler(async function POST(
       where: {
         cadre: mandate.cadre,
         accountStatus: { not: "SUSPENDED" },
+        // The null branch matters: Prisma renders `not` as a plain inequality,
+        // which is false for a null column, so without it this would only ever
+        // consider the handful of people who have answered the question.
+        AND: [{ OR: [{ availability: null }, { availability: { not: "NOT_LOOKING" } }] }],
       },
       include: {
         qualifications: { select: { name: true } },
@@ -192,7 +228,11 @@ export const POST = handler(async function POST(
           matchScore: m.score,
           matchExplanation: m.explanation,
           rank: i + 1,
-          status: "MATCHED",
+          // We surfaced these people. They have not applied and have not been
+          // approached, and the employer's board keeps them well apart from the
+          // candidates who did apply and are owed an answer.
+          source: "SOURCED",
+          status: "NEW",
         })),
         skipDuplicates: true,
       });

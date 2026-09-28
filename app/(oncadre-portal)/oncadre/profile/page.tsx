@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import Link from "next/link";
 import ProfilePersonalInfo from "./ProfilePersonalInfo";
+import ProfileAvailability from "./ProfileAvailability";
 import ProfileCredentials from "./ProfileCredentials";
 import ProfileQualifications from "./ProfileQualifications";
 import ProfileCPD from "./ProfileCPD";
@@ -195,18 +196,30 @@ export default async function ProfilePage() {
         }}
       />
 
-      {/* Section 2: Credentials */}
+      {/* Section 2: Availability. Sits directly under identity because it is the
+          one answer that decides whether this profile is any use to a hospital. */}
+      <ProfileAvailability
+        initial={{
+          availability: professional.availability,
+          availabilityUpdatedAt:
+            professional.availabilityUpdatedAt?.toISOString() ?? null,
+          openTo: professional.openTo,
+          noticePeriodWeeks: professional.noticePeriodWeeks,
+        }}
+      />
+
+      {/* Section 3: Credentials */}
       <ProfileCredentials
         initialCredentials={serializedCredentials}
         cadre={professional.cadre}
       />
 
-      {/* Section 3: Qualifications */}
+      {/* Section 4: Qualifications */}
       <ProfileQualifications
         initialQualifications={serializedQualifications}
       />
 
-      {/* Section 4: CPD Tracker */}
+      {/* Section 5: CPD Tracker */}
       <ProfileCPD
         initialEntries={serializedCPD}
         initialSummary={{
@@ -217,7 +230,7 @@ export default async function ProfilePage() {
         }}
       />
 
-      {/* Section 5: Work History */}
+      {/* Section 6: Work History */}
       <ProfileWorkHistory initialHistory={serializedWorkHistory} />
     </div>
   );
