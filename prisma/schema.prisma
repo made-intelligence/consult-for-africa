@@ -426,7 +426,20 @@ model User {
   commTemplatesCreated    CommunicationTemplate[]    @relation("CreatedTemplates")
   cvUploadsForConsultants ConsultantProfile[]        @relation("CvUploader")
   pilotMandatesOwned      CadreMandate[]             @relation("PilotOwner")
+  cadreEmployersVerified  CadreEmployerOrg[]         @relation("CadreEmployerVerifier")
   adminNotificationsRead  AdminNotification[]        @relation("AdminNotificationReader")
+  surveysClosed           SurveyClosure[]            @relation("SurveyClosedBy")
+
+  // Estate management. The office keeps the books; the ground team and the
+  // tenants act through their own link-scoped records, not through User.
+  estateRunsRecorded       EstateGeneratorRun[]     @relation("EstateRunRecorder")
+  estateDeliveriesRecorded EstateDieselDelivery[]   @relation("EstateDeliveryRecorder")
+  estateLedgerEntries      EstateLedgerEntry[]      @relation("EstateLedgerRecorder")
+  estateIssueUpdates       EstateIssueUpdate[]      @relation("EstateIssueUpdateUser")
+  estateExpensesRecorded   EstateExpense[]          @relation("EstateExpenseRecorder")
+  estateNoticesWritten     EstateNotice[]           @relation("EstateNoticeAuthor")
+  estateRateChanges        EstateRateChange[]       @relation("EstateRateChanger")
+  estateServicesRecorded   EstateGeneratorService[] @relation("EstateServiceRecorder")
 }
 
 model ConsultantProfile {
@@ -1983,8 +1996,25 @@ enum MaarovaModuleType {
   VALUES_DRIVERS
   EMOTIONAL_INTEL
   CILTI
+  PLTI // Professional-to-Leadership Identity: the non-clinical twin of CILTI
   THREE_SIXTY
   CULTURE_TEAM
+}
+
+/// Which track an item or module is written for. Most items are role neutral
+/// and stay BOTH. A clinical item and its non-clinical twin carry the same
+/// dimension mapping and differ only in the scenario, so they score alike.
+enum MaarovaAudience {
+  BOTH
+  CLINICAL
+  NON_CLINICAL
+}
+
+/// How someone came into leadership. This is the question the identity module
+/// actually measures, and it decides which form of the assessment is served.
+enum MaarovaTrack {
+  CLINICAL
+  NON_CLINICAL
 }
 
 enum MaarovaReportStatus {
@@ -2084,6 +2114,10 @@ model MaarovaUser {
   yearsInRole        Int?
   yearsInHealthcare  Int?
   clinicalBackground String?
+  /// Null until asked. clinicalBackground cannot serve here: it is free text
+  /// naming a discipline and is null for most users, where null means
+  /// unanswered rather than non-clinical.
+  track              MaarovaTrack?
   managerId          String?
   manager            MaarovaUser?        @relation("ManagerReports", fields: [managerId], references: [id])
   directReports      MaarovaUser[]       @relation("ManagerReports")
@@ -2184,6 +2218,7 @@ model MaarovaCoach {
 model MaarovaModule {
   id               String            @id @default(cuid())
   type             MaarovaModuleType
+  audience         MaarovaAudience   @default(BOTH)
   name             String
   slug             String            @unique
   description      String            @db.Text
@@ -2220,6 +2255,10 @@ model MaarovaQuestion {
   id           String                @id @default(cuid())
   groupId      String
   group        MaarovaQuestionGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  audience     MaarovaAudience       @default(BOTH)
+  /// Links a twin to the item it parallels, so the pair can be compared when
+  /// there is enough data to test whether the two forms really are equivalent.
+  twinOfId     String?
   format       MaarovaQuestionFormat
   text         String                @db.Text
   options      Json
@@ -2243,6 +2282,7 @@ model MaarovaAssessmentSession {
   status           MaarovaAssessmentStatus @default(NOT_STARTED)
   sessionType      String                  @default("full")
   stream           MaarovaStream
+  track            MaarovaTrack            @default(CLINICAL)
   startedAt        DateTime?
   completedAt      DateTime?
   expiresAt        DateTime
@@ -2514,6 +2554,7 @@ model MaarovaNormativeData {
   country      String?
   sectorType   String?
   roleLevel    String?
+  track        MaarovaTrack?
   sampleSize   Int
   mean         Decimal           @db.Decimal(6, 2)
   stdDev       Decimal           @db.Decimal(6, 2)
@@ -2521,7 +2562,7 @@ model MaarovaNormativeData {
   updatedAt    DateTime          @updatedAt
   createdAt    DateTime          @default(now())
 
-  @@unique([moduleType, dimension, subDimension, country, sectorType, roleLevel])
+  @@unique([moduleType, dimension, subDimension, country, sectorType, roleLevel, track])
   @@index([moduleType, dimension])
 }
 
@@ -4336,8 +4377,15 @@ model CadreProfessional {
   lastLoginAt DateTime?
 
   // Status
-  accountStatus     CadreAccountStatus @default(UNVERIFIED)
-  availability      CadreAvailability?
+  accountStatus CadreAccountStatus @default(UNVERIFIED)
+
+  /// What the member has said about being approached. Left null for anyone who
+  /// has not said, which is most of the register: employer search ranks on this
+  /// rather than filtering on it, so an unanswered question does not delete
+  /// someone from the product.
+  availability          CadreAvailability?
+  availabilityUpdatedAt DateTime?
+
   openTo            CadreOpenTo[]
   noticePeriodWeeks Int?
   availableFrom     DateTime?
@@ -4417,6 +4465,8 @@ model CadreProfessional {
   subscription         CadreSubscription?
   coachingSessions     CadreCoachingSession[]
   mezoInterest         CadreMezoInterest?
+  shortlistEntries     CadreShortlistEntry[]
+  contactRequests      CadreContactRequest[]
 
   // Profile analytics
   profileViews Int       @default(0)
@@ -4611,12 +4661,12 @@ model CadreFacility {
   situationImprovingPct Decimal? @db.Decimal(5, 2)
 
   // Relations
-  reviews         CadreFacilityReview[]
-  salaryReports   CadreSalaryReport[]
-  workHistories   CadreWorkHistory[]
-  currentStaff    CadreProfessional[]   @relation("CurrentStaff")
-  mandates        CadreMandate[]
-  employerAccount CadreEmployerAccount?
+  reviews       CadreFacilityReview[]
+  salaryReports CadreSalaryReport[]
+  workHistories CadreWorkHistory[]
+  currentStaff  CadreProfessional[]   @relation("CurrentStaff")
+  mandates      CadreMandate[]
+  employerOrg   CadreEmployerOrg?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -4629,27 +4679,163 @@ model CadreFacility {
 
 // ─── CadreHealth: Employer Accounts ───
 
-model CadreEmployerAccount {
+/// The hiring organisation. This is the tenancy boundary: roles, shortlists and
+/// contact requests belong to an org, never to the person who happened to create
+/// them, so a hospital does not lose its pipeline when a recruiter leaves.
+///
+/// Before this existed, a role was scoped by comparing `facilityName` to the
+/// session's `companyName` string, which meant two accounts that typed the same
+/// hospital name saw each other's applicants.
+model CadreEmployerOrg {
   id         String         @id @default(cuid())
+  name       String
   facilityId String?        @unique
   facility   CadreFacility? @relation(fields: [facilityId], references: [id])
 
-  companyName  String
+  // Verification is what unlocks contact with a professional, so it is an
+  // explicit admin act with a named actor, not a flag anyone can set.
+  isVerified   Boolean   @default(false)
+  verifiedAt   DateTime?
+  verifiedById String?
+  verifiedBy   User?     @relation("CadreEmployerVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
+  verifiedNote String?   @db.Text
+
+  members         CadreEmployerAccount[]
+  mandates        CadreMandate[]
+  shortlists      CadreShortlist[]
+  contactRequests CadreContactRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isVerified])
+}
+
+enum CadreEmployerRole {
+  OWNER // created the org, can invite and remove
+  RECRUITER // can post roles, search, move the pipeline
+  VIEWER // can see the pipeline, cannot act on it
+}
+
+model CadreEmployerAccount {
+  id    String            @id @default(cuid())
+  orgId String
+  org   CadreEmployerOrg  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  role  CadreEmployerRole @default(OWNER)
+
+  companyName  String // denormalised from the org for display; org.name is authoritative
   contactName  String
   contactEmail String  @unique
   contactPhone String?
   passwordHash String
 
+  /// Mirror of org.isVerified, kept so existing reads do not break. The org is
+  /// the authority; anything gating on verification must read the org.
   isVerified Boolean @default(false)
+
+  // Team invitations
+  invitedById String?
+  invitedAt   DateTime?
+  acceptedAt  DateTime?
+
+  lastLoginAt DateTime?
 
   // Password reset
   passwordResetToken  String?
   passwordResetExpiry DateTime?
 
+  shortlistEntries CadreShortlistEntry[]
+  contactRequests  CadreContactRequest[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([contactEmail])
+  @@index([orgId])
+}
+
+/// A named list an employer builds while searching. The real unit of hiring work
+/// is "build me a list of ten consultant paediatricians", which previously had
+/// nowhere to live: search results vanished on reload and the only way to keep a
+/// candidate was to have them apply.
+model CadreShortlist {
+  id    String           @id @default(cuid())
+  orgId String
+  org   CadreEmployerOrg @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  name      String
+  notes     String?       @db.Text
+  /// Optional link to the role this list is for. A shortlist can exist without
+  /// one: employers build lists before they write the job.
+  mandateId String?
+  mandate   CadreMandate? @relation(fields: [mandateId], references: [id], onDelete: SetNull)
+
+  entries CadreShortlistEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([mandateId])
+}
+
+model CadreShortlistEntry {
+  id          String         @id @default(cuid())
+  shortlistId String
+  shortlist   CadreShortlist @relation(fields: [shortlistId], references: [id], onDelete: Cascade)
+
+  professionalId String
+  professional   CadreProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  note      String?               @db.Text
+  addedById String?
+  addedBy   CadreEmployerAccount? @relation(fields: [addedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@unique([shortlistId, professionalId])
+  @@index([shortlistId])
+  @@index([professionalId])
+}
+
+enum CadreContactRequestStatus {
+  PENDING // the professional has been asked and has not answered
+  ACCEPTED // they agreed; contact details are released to the org
+  DECLINED // they said no; we do not ask again for this org
+  EXPIRED // no answer inside the window
+}
+
+/// The consent record that sits between an employer and a professional's contact
+/// details. 9,300 people on the register were imported and never asked whether
+/// hospitals could approach them, so the employer side never hands over an email
+/// or a phone number without one of these coming back ACCEPTED.
+model CadreContactRequest {
+  id    String           @id @default(cuid())
+  orgId String
+  org   CadreEmployerOrg @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  professionalId String
+  professional   CadreProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  /// The role this is about, when there is one. An approach that names a real
+  /// job gets answered more often than a bare request to make contact.
+  mandateId String?
+  mandate   CadreMandate? @relation(fields: [mandateId], references: [id], onDelete: SetNull)
+
+  message     String?                   @db.Text
+  status      CadreContactRequestStatus @default(PENDING)
+  respondedAt DateTime?
+  expiresAt   DateTime?
+
+  requestedById String?
+  requestedBy   CadreEmployerAccount? @relation(fields: [requestedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, professionalId, mandateId])
+  @@index([professionalId, status])
+  @@index([orgId, status])
 }
 
 // ─── CadreHealth: Facility Reviews (Glassdoor model) ───
@@ -4827,6 +5013,12 @@ model CadreMandate {
   facilityName  String? // if facility not in system yet
   clientContact String?
 
+  /// Who owns this role. Null for the mandates we run ourselves out of admin.
+  /// Everything on the employer side scopes on this; nothing scopes on
+  /// facilityName, which is display text and is not unique.
+  employerOrgId String?
+  employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: Cascade)
+
   // Requirements
   cadre                   CadreProfessionalCadre
   subSpecialty            String?
@@ -4890,11 +5082,14 @@ model CadreMandate {
   caseStudyQuote        String?   @db.Text
 
   // Relations
-  matches CadreMandateMatch[]
+  matches         CadreMandateMatch[]
+  shortlists      CadreShortlist[]
+  contactRequests CadreContactRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([employerOrgId, status])
   @@index([status])
   @@index([cadre])
   @@index([type])
@@ -4914,12 +5109,22 @@ model CadreMandateMatch {
   professional   CadreProfessional @relation(fields: [professionalId], references: [id])
 
   // Matching
-  matchScore       Int? // 0-100 AI-computed
+  matchScore       Int? // 0-100, computed by lib/cadreHealth/matchScore.ts
   matchExplanation String? @db.Text
   rank             Int?
 
-  // Pipeline
-  status      String    @default("MATCHED") // MATCHED, CONTACTED, INTERESTED, INTERVIEWING, OFFERED, PLACED, DECLINED, WITHDRAWN
+  /// How this person arrived. An applicant is owed a reply; someone we surfaced
+  /// is owed an approach. Holding both in one undifferentiated list meant the
+  /// one real applicant sat among fifty swept in by the matcher, and the
+  /// applicant count on the dashboard could not be trusted.
+  source CadreMatchSource @default(SOURCED)
+
+  // Pipeline. Values are defined once in lib/cadreHealth/matchStages.ts; do not
+  // write a literal here. They previously lived in three places (the API
+  // allow-list, the employer dropdown and the apply route) and diverged: the
+  // apply route wrote "APPLIED", which no reader recognised, so every portal
+  // application rendered to the employer as "Matched".
+  status      String    @default("NEW")
   contactedAt DateTime?
   respondedAt DateTime?
   response    String? // INTERESTED, NOT_INTERESTED, NO_RESPONSE
@@ -4929,9 +5134,16 @@ model CadreMandateMatch {
   updatedAt DateTime @updatedAt
 
   @@unique([mandateId, professionalId])
+  @@index([mandateId, source])
   @@index([mandateId])
   @@index([professionalId])
   @@index([status])
+}
+
+enum CadreMatchSource {
+  APPLIED // the professional applied to this role
+  SOURCED // we surfaced them; they have not been approached yet
+  INVITED // the employer approached them and they accepted contact
 }
 
 // ─── CadreHealth: Outreach & Engagement ──────────────────────────────────────
@@ -6424,4 +6636,739 @@ model AuditUpload {
 
   @@index([engagement, section])
   @@index([engagement, createdAt])
+}
+
+/// Freeze on close.
+///
+/// A survey stays open until someone closes it. Closing stamps the response
+/// count at that moment, so a figure quoted in a client report cannot drift
+/// afterwards: if a late response arrives, the archive shows both the frozen
+/// count the report was written against and the live one. Nothing is deleted
+/// and nothing is blocked, because a survey that silently rejected a late
+/// respondent would be worse than one whose numbers moved.
+///
+/// Keyed by the registry slug rather than a foreign key: the surveys live in
+/// three different tables and several have no responses at all yet.
+model SurveyClosure {
+  id     String @id @default(cuid())
+  survey String @unique
+
+  closedAt    DateTime @default(now())
+  closedById  String?
+  closedBy    User?    @relation("SurveyClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  /// Responses held at the moment of closing. The number the report may quote.
+  frozenCount Int
+  /// Why it was closed, and anything a later reader needs to know.
+  note        String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([closedAt])
+}
+
+// ─── Estate management ───────────────────────────────────────────────────────
+//
+// A family portfolio of let residences: three buildings, twelve units. Tenants
+// pay a service charge and a diesel deposit; the office spends those funds on
+// security, water, repairs and fuel, and owes the tenants an account of it.
+//
+// Two ideas carry the whole section. The first is that a generator run is the
+// billable event: somebody starts the machine, somebody stops it, and the
+// minutes between the two are the only honest basis for splitting a fuel bill.
+// The second is that every unit keeps a ledger rather than a balance, because a
+// balance that cannot be explained line by line is exactly what a tenant
+// disputes.
+
+/// Where a building sits. Kept as an enum rather than free text because the
+/// three locations are fixed and get used for grouping on every screen.
+enum EstateArea {
+  BANANA_ISLAND
+  OSBORNE_FORESHORE
+}
+
+enum EstateUnitStatus {
+  OCCUPIED
+  VACANT
+  /// Lived in by the family. Carries its diesel share like any other unit, so
+  /// the burn reconciles, but is never chased for money.
+  OWNER_OCCUPIED
+  /// Off the schedule entirely: building works, long-term refurbishment.
+  OUT_OF_SERVICE
+}
+
+/// How the naira-per-litre a tenant is billed at gets decided.
+enum EstateDieselPricingMode {
+  /// The rate the office sets by hand. What the family asked for, and what the
+  /// tenancies are written against.
+  MANUAL_RATE
+  /// The average price actually paid across the fuel currently in the tank.
+  /// The only method where what is billed sums to what was spent.
+  WEIGHTED_AVERAGE
+}
+
+enum EstateServiceChargeCadence {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+/// One of the three buildings, and the rate card that prices its fuel.
+///
+/// The rate card lives here rather than in a settings table because the two
+/// numbers genuinely differ by building: the generators are different sizes and
+/// the diesel is bought on different days at different prices. Changing either
+/// number is a forward-looking act only. Every generator run copies the rates it
+/// was priced at onto its own row, so a correction made in October can never
+/// quietly restate what a tenant was charged in June.
+model EstateBuilding {
+  id      String     @id @default(cuid())
+  /// House style as the family says it: "H18", "502 Close", "Osborne Foreshore".
+  name    String
+  /// URL segment for the tenant and ground-team links. Stable once issued.
+  slug    String     @unique
+  area    EstateArea
+  address String
+  notes   String?    @db.Text
+
+  // ── Diesel rate card ──
+  /// What the generator burns at, in litres per hour. The estate works to a
+  /// flat figure (10 for most sets) rather than a load curve, because nobody is
+  /// metering load. Treat it as a tariff the tenants have agreed, not a physical
+  /// measurement, and reconcile it against deliveries and tank dips.
+  litresPerHour         Decimal                 @default(10) @db.Decimal(6, 2)
+  /// Naira per litre currently being charged on. Moved by hand when the pump
+  /// price moves, or set from the last delivery.
+  dieselPricePerLitre   Decimal                 @db.Decimal(10, 2)
+  /// Manual by default, because a tenancy is written against a rate the family
+  /// set, not against a formula. The weighted average is computed either way and
+  /// shown beside it, so the office can see what the manual rate is costing them.
+  dieselPricingMode     EstateDieselPricingMode @default(MANUAL_RATE)
+  /// How the split was explained to the tenants, in their words. Printed on
+  /// every statement. The Lagos research is blunt that residents dispute
+  /// opacity far more than they dispute the amount.
+  allocationNote        String?                 @db.Text
+  /// Below this naira balance a unit's diesel deposit is called low and the
+  /// tenant is prompted to top up before the lights are the thing that tells them.
+  dieselLowBalanceNaira Decimal                 @default(50000) @db.Decimal(14, 2)
+  /// Or fewer than this many days of cover left at the unit's own recent burn.
+  /// A naira floor alone is wrong in both directions: it nags a light user and
+  /// it lets a heavy one run dry with the threshold still comfortably clear.
+  dieselLowCoverDays    Int                     @default(7)
+
+  // ── Plant ──
+  generatorLabel String?
+  generatorKva   Int?
+  tankCapacityL  Int?
+
+  /// Running hours between services. The sets are on a 200-hour schedule.
+  serviceIntervalHours  Int       @default(200)
+  /// Set when the approaching-service and service-due notices go out, and
+  /// cleared the moment a service is logged. Two separate stamps because the
+  /// two notices are different messages — one is "book it", the other is "stop
+  /// putting it off" — and because without them every stop past 200 hours would
+  /// send another email until everybody filtered the sender.
+  serviceWarnNotifiedAt DateTime?
+  serviceDueNotifiedAt  DateTime?
+
+  /// Only the two Banana Island houses have one. Kept on the building so a
+  /// tenant at Osborne is never offered "Pool" as something to complain about —
+  /// a category list that includes things the building does not have is how
+  /// complaints end up filed under Other.
+  hasPool Boolean @default(false)
+
+  // ── Service charge ──
+  /// The standing charge per unit per cadence. A unit may override it.
+  serviceChargeNaira   Decimal?                   @db.Decimal(14, 2)
+  serviceChargeCadence EstateServiceChargeCadence @default(ANNUAL)
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  units        EstateUnit[]
+  staff        EstateStaff[]
+  runs         EstateGeneratorRun[]
+  deliveries   EstateDieselDelivery[]
+  tankReadings EstateTankReading[]
+  issues       EstateIssue[]
+  expenses     EstateExpense[]
+  notices      EstateNotice[]
+  rateChanges  EstateRateChange[]
+  services     EstateGeneratorService[]
+
+  @@index([area])
+}
+
+/// A lettable unit, and the share of its building's fuel it carries.
+///
+/// `dieselShare` is a weight, not a percentage: leave every unit on 1 and the
+/// split is equal, set a four-bedroom to 1.5 against a two-bedroom's 1 and the
+/// split follows size. Percentages were rejected because they have to be kept
+/// summing to 100 by hand every time a unit is added.
+model EstateUnit {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  /// "APT 2". Unique within its building.
+  label    String
+  bedrooms Int?
+
+  dieselShare        Decimal          @default(1) @db.Decimal(6, 2)
+  /// Overrides the building's standing charge when this unit was let on
+  /// different terms. Null means follow the building.
+  serviceChargeNaira Decimal?         @db.Decimal(14, 2)
+  status             EstateUnitStatus @default(OCCUPIED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenants EstateTenant[]
+  ledger  EstateLedgerEntry[]
+  issues  EstateIssue[]
+
+  @@unique([buildingId, label])
+  @@index([status])
+}
+
+/// The person paying for a unit, and the link that lets them in.
+///
+/// There is no password. A tenant gets a long unguessable URL, the way every
+/// other private page on this platform is handed out, and the link is the
+/// credential: rotate it to lock somebody out, revoke it when they move. For
+/// twelve units this is the right trade — a password nobody can reset at 11pm
+/// during a blackout is worse than a link that can be reissued in one click.
+model EstateTenant {
+  id     String     @id @default(cuid())
+  unitId String
+  unit   EstateUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  name  String
+  email String?
+  phone String?
+
+  movedInAt  DateTime?
+  movedOutAt DateTime?
+  active     Boolean   @default(true)
+
+  /// The secret in the tenant's URL. Rotating this invalidates the old link.
+  accessToken   String    @unique
+  tokenIssuedAt DateTime  @default(now())
+  lastSeenAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issues       EstateIssue[]
+  issueUpdates EstateIssueUpdate[] @relation("IssueUpdateTenant")
+
+  @@index([unitId, active])
+}
+
+enum EstateStaffRole {
+  SECURITY
+  TECHNICIAN
+  SUPERVISOR
+  CLEANER
+  GARDENER
+  POOL
+  /// Services the generators. Gets the 200-hour reminder.
+  SERVICE_ENGINEER
+}
+
+/// Somebody on the ground: the guard who starts the generator, the technician
+/// who closes a job.
+///
+/// Same link-as-credential idea as the tenant, plus a four-digit PIN. The PIN is
+/// not there to defeat an attacker who already has the URL — it is there because
+/// these phones are shared and left on desks, and the generator log is the one
+/// record that has to survive someone else picking up the handset.
+model EstateStaff {
+  id String @id @default(cuid())
+
+  /// Where this person works, narrowest first.
+  ///
+  /// A building pins them to that one. An area covers every building in it,
+  /// which is the supervisor case — Banana Island is two houses and the person
+  /// who runs both is not the person who runs Osborne. Both null means all
+  /// three. Kept as two nullable columns rather than a join table because the
+  /// estate has three buildings in two areas, and a many-to-many would add a
+  /// join to every read to express something the geography already says.
+  buildingId String?
+  building   EstateBuilding? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+  area       EstateArea?
+
+  name  String
+  phone String?
+  /// Needed for the service reminder. Without it the reminder can only be shown
+  /// on a screen, and a reminder nobody is sent is a reminder nobody acts on.
+  email String?
+  role  EstateStaffRole @default(SECURITY)
+
+  accessToken   String    @unique
+  tokenIssuedAt DateTime  @default(now())
+  /// bcrypt. Null means the link alone gets them in.
+  pinHash       String?
+  lastSeenAt    DateTime?
+  active        Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  runsStarted    EstateGeneratorRun[]     @relation("RunStartedBy")
+  runsEnded      EstateGeneratorRun[]     @relation("RunEndedBy")
+  deliveries     EstateDieselDelivery[]   @relation("DeliveryRecordedBy")
+  tankReadings   EstateTankReading[]      @relation("ReadingRecordedBy")
+  issuesAssigned EstateIssue[]            @relation("IssueAssignee")
+  issueUpdates   EstateIssueUpdate[]      @relation("IssueUpdateStaff")
+  servicesDone   EstateGeneratorService[] @relation("ServicePerformer")
+
+  @@index([buildingId, active])
+  @@index([area, active])
+}
+
+enum EstateRunStatus {
+  /// Started and not yet stopped. Burning fuel right now.
+  RUNNING
+  /// Stopped, costed, not yet pushed to the unit ledgers.
+  STOPPED
+  /// Split across the units. The ledger rows exist and the run is now history.
+  ALLOCATED
+  /// Logged in error. Excluded from every total, kept so the gap is visible.
+  VOID
+}
+
+/// One switch-on to one switch-off. The billable event.
+///
+/// The rates are copied onto the row at the moment of costing, so this record
+/// answers "what was this run charged at" forever, whatever the rate card says
+/// later. `runMinutes`, `litresUsed` and `costNaira` are stored rather than
+/// derived on read for the same reason: an allocated run is a financial record,
+/// and a financial record that recalculates itself is not one.
+model EstateGeneratorRun {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  startedAt DateTime
+  endedAt   DateTime?
+
+  /// Generator's own hour meter, where the set has one. This is the check on
+  /// the manual log: meter hours and logged hours should agree, and when they
+  /// do not, somebody's shift needs a conversation.
+  startMeterHours Decimal? @db.Decimal(10, 1)
+  endMeterHours   Decimal? @db.Decimal(10, 1)
+  startPhotoKey   String?
+  endPhotoKey     String?
+
+  // ── Costed at stop, from the rate card as it stood then ──
+  runMinutes    Int?
+  litresPerHour Decimal? @db.Decimal(6, 2)
+  pricePerLitre Decimal? @db.Decimal(10, 2)
+  litresUsed    Decimal? @db.Decimal(10, 2)
+  costNaira     Decimal? @db.Decimal(14, 2)
+
+  status EstateRunStatus @default(RUNNING)
+
+  startedByStaffId String?
+  startedByStaff   EstateStaff? @relation("RunStartedBy", fields: [startedByStaffId], references: [id], onDelete: SetNull)
+  endedByStaffId   String?
+  endedByStaff     EstateStaff? @relation("RunEndedBy", fields: [endedByStaffId], references: [id], onDelete: SetNull)
+  /// Set when the office logs or corrects a run on the team's behalf.
+  recordedById     String?
+  recordedBy       User?        @relation("EstateRunRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  note           String?   @db.Text
+  allocatedAt    DateTime?
+  /// The part of the cost no tenant carries, because the unit is vacant or the
+  /// family lives in it. The landlord's own share, made explicit instead of
+  /// being spread quietly over the paying tenants.
+  ownerCostNaira Decimal?  @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ledgerEntries EstateLedgerEntry[]
+
+  @@index([buildingId, startedAt])
+  @@index([status])
+}
+
+/// Fuel bought and put into a tank. The other half of the reconciliation.
+model EstateDieselDelivery {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  deliveredAt   DateTime
+  litres        Decimal  @db.Decimal(10, 2)
+  pricePerLitre Decimal  @db.Decimal(10, 2)
+  totalNaira    Decimal  @db.Decimal(14, 2)
+  supplier      String?
+  waybillRef    String?
+  receiptKey    String?
+
+  /// Dip before the truck and after it. Together with `litres` these say whether
+  /// what was paid for is what went in.
+  tankBeforeL Decimal? @db.Decimal(10, 2)
+  tankAfterL  Decimal? @db.Decimal(10, 2)
+
+  recordedByStaffId String?
+  recordedByStaff   EstateStaff? @relation("DeliveryRecordedBy", fields: [recordedByStaffId], references: [id], onDelete: SetNull)
+  recordedById      String?
+  recordedBy        User?        @relation("EstateDeliveryRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses EstateExpense[]
+
+  @@index([buildingId, deliveredAt])
+}
+
+/// A dip of the tank. Cheap, manual, and the only independent check there is.
+model EstateTankReading {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  readAt   DateTime
+  litres   Decimal  @db.Decimal(10, 2)
+  photoKey String?
+
+  recordedByStaffId String?
+  recordedByStaff   EstateStaff? @relation("ReadingRecordedBy", fields: [recordedByStaffId], references: [id], onDelete: SetNull)
+
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([buildingId, readAt])
+}
+
+/// Which pot a ledger row moves.
+enum EstateLedgerAccount {
+  /// Prepaid fuel. Topped up by the tenant, drawn down by generator runs.
+  DIESEL
+  /// Service charge: security, water, cleaning, repairs, the rest.
+  SERVICE_CHARGE
+}
+
+enum EstateLedgerKind {
+  DIESEL_TOPUP
+  DIESEL_USAGE
+  SERVICE_CHARGE_PAYMENT
+  SERVICE_CHARGE_LEVY
+  /// A correction. Always carries a reason.
+  ADJUSTMENT
+  REFUND
+}
+
+/// One movement on one unit's account.
+///
+/// Sign convention, and it holds everywhere: positive puts the tenant in credit,
+/// negative draws it down. A balance is `sum(amount)` and nothing else, which is
+/// why there is no cached balance column anywhere in this section — a cached
+/// balance is a second source of truth, and the tenant will find the day the two
+/// disagree.
+///
+/// Rows are never edited or deleted. A mistake is corrected by a matching
+/// ADJUSTMENT that says what it reverses, so the statement reads as a history
+/// rather than as whatever the office last decided.
+model EstateLedgerEntry {
+  id     String     @id @default(cuid())
+  unitId String
+  unit   EstateUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  account EstateLedgerAccount
+  kind    EstateLedgerKind
+  amount  Decimal             @db.Decimal(14, 2)
+  /// Litres behind a DIESEL_USAGE row, so a tenant can check the arithmetic
+  /// rather than take the naira on trust.
+  litres  Decimal?            @db.Decimal(10, 2)
+
+  occurredAt  DateTime
+  description String
+
+  /// The run this share came from, when it came from one.
+  generatorRunId String?
+  generatorRun   EstateGeneratorRun? @relation(fields: [generatorRunId], references: [id], onDelete: SetNull)
+
+  /// How the money arrived, for the credit rows.
+  paymentMethod    String?
+  paymentReference String?
+  receiptKey       String?
+
+  recordedById String?
+  recordedBy   User?   @relation("EstateLedgerRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([unitId, account, occurredAt])
+  @@index([generatorRunId])
+  @@index([kind])
+}
+
+enum EstateIssueCategory {
+  POWER
+  WATER
+  SECURITY
+  PLUMBING
+  ELECTRICAL
+  AIR_CONDITIONING
+  APPLIANCE
+  STRUCTURAL
+  CLEANING
+  WASTE
+  LIFT
+  PEST
+  POOL
+  INTERNET
+  OTHER
+}
+
+enum EstateIssuePriority {
+  /// Someone is unsafe or the building is being damaged right now.
+  EMERGENCY
+  HIGH
+  NORMAL
+  LOW
+}
+
+enum EstateIssueStatus {
+  SUBMITTED
+  ACKNOWLEDGED
+  SCHEDULED
+  IN_PROGRESS
+  AWAITING_PARTS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+/// A complaint from a tenant, or a job the office raised itself.
+///
+/// `dueBy` is set from the priority at the moment it is acknowledged, not from
+/// the moment it was sent, because the clock the office can actually be held to
+/// is the one that starts when somebody has seen the thing.
+model EstateIssue {
+  id         String         @id @default(cuid())
+  /// Human reference the tenant can quote on the phone: "H18-041".
+  reference  String         @unique
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  unitId     String?
+  unit       EstateUnit?    @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  tenantId   String?
+  tenant     EstateTenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  category    EstateIssueCategory
+  priority    EstateIssuePriority @default(NORMAL)
+  status      EstateIssueStatus   @default(SUBMITTED)
+  title       String
+  description String              @db.Text
+  /// R2 object keys, not URLs. The bucket serves anything whose key is known, so
+  /// the key is the secret and it never goes in a page the way a URL would;
+  /// photos are handed out as short-lived signed links instead.
+  photoKeys   String[]
+
+  assignedStaffId String?      @map("assignedToId")
+  assignedStaff   EstateStaff? @relation("IssueAssignee", fields: [assignedStaffId], references: [id], onDelete: SetNull)
+
+  acknowledgedAt DateTime?
+  /// The two clocks are separate on purpose. A tenant forgives a slow repair
+  /// far more readily than silence, so the response target is the one the office
+  /// is actually held to, and it is reported on its own.
+  respondBy      DateTime?
+  resolveBy      DateTime?
+  resolvedAt     DateTime?
+  closedAt       DateTime?
+  resolutionNote String?   @db.Text
+  /// What fixing it cost, when it cost anything. Mirrored into an expense.
+  costNaira      Decimal?  @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  updates  EstateIssueUpdate[]
+  expenses EstateExpense[]
+
+  @@index([buildingId, status])
+  @@index([status, priority])
+  @@index([unitId])
+  @@index([createdAt])
+}
+
+enum EstateAuthorType {
+  TENANT
+  STAFF
+  OFFICE
+}
+
+/// A line on an issue's thread: a note, a photo, a status move.
+model EstateIssueUpdate {
+  id      String      @id @default(cuid())
+  issueId String
+  issue   EstateIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  authorType EstateAuthorType
+  /// Denormalised so the thread still reads correctly after a tenant moves out
+  /// or a guard leaves and the row behind them is nulled.
+  authorName String
+  tenantId   String?
+  tenant     EstateTenant?    @relation("IssueUpdateTenant", fields: [tenantId], references: [id], onDelete: SetNull)
+  staffId    String?
+  staff      EstateStaff?     @relation("IssueUpdateStaff", fields: [staffId], references: [id], onDelete: SetNull)
+  userId     String?
+  user       User?            @relation("EstateIssueUpdateUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  body            String?            @db.Text
+  photoKeys       String[]
+  statusTo        EstateIssueStatus?
+  /// Lets the office keep a note on the job that the tenant does not see.
+  visibleToTenant Boolean            @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([issueId, createdAt])
+}
+
+enum EstateExpenseCategory {
+  SECURITY
+  DIESEL
+  WATER
+  REPAIRS
+  MAINTENANCE
+  CLEANING
+  WASTE
+  INSURANCE
+  /// Estate/residents' association dues.
+  LEVY
+  /// Money moved out of the operating float into the reserve, against the big
+  /// items that arrive with no warning: a generator rewind, a lift, a roof.
+  /// Carried as a category so that a reserve of zero is a visible zero rather
+  /// than a line nobody drew.
+  RESERVE
+  ADMIN
+  OTHER
+}
+
+/// Money out. What the service charge was actually spent on.
+model EstateExpense {
+  id         String          @id @default(cuid())
+  buildingId String?
+  building   EstateBuilding? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+
+  category    EstateExpenseCategory
+  amount      Decimal               @db.Decimal(14, 2)
+  paidAt      DateTime
+  payee       String
+  description String?               @db.Text
+  receiptKey  String?
+
+  /// Set when the expense is the repair that closed a job, or the fuel on a
+  /// delivery, so no figure in this section has to be typed twice.
+  issueId    String?
+  issue      EstateIssue?          @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  deliveryId String?
+  delivery   EstateDieselDelivery? @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+
+  recordedById String?
+  recordedBy   User?   @relation("EstateExpenseRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buildingId, paidAt])
+  @@index([category])
+}
+
+/// Something the office wants the tenants to read: a water shutdown, a gate
+/// closure, the new diesel rate.
+model EstateNotice {
+  id         String          @id @default(cuid())
+  /// Null posts it to all three buildings.
+  buildingId String?
+  building   EstateBuilding? @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  title       String
+  body        String    @db.Text
+  urgent      Boolean   @default(false)
+  publishedAt DateTime  @default(now())
+  expiresAt   DateTime?
+
+  createdById String?
+  createdBy   User?   @relation("EstateNoticeAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buildingId, publishedAt])
+}
+
+/// A generator service, and the reading it was done at.
+///
+/// `hoursAtService` is how many hours the set had run since its previous
+/// service, recorded so the history reads "serviced at 203 hours" rather than
+/// just a date. The live clock is counted from `servicedAt` forward, which is
+/// why logging a service is what resets it: a service that happened and was
+/// never entered leaves the set reading as permanently overdue, and everybody
+/// learns to ignore the banner.
+///
+/// `meterHoursAtService` is the generator's own hour meter where the set has
+/// one. It is the better number and it is optional, because half the point of
+/// the run log is that it works on sets that have no meter at all.
+model EstateGeneratorService {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  servicedAt          DateTime
+  hoursAtService      Decimal  @db.Decimal(10, 2)
+  meterHoursAtService Decimal? @db.Decimal(10, 1)
+
+  /// Who did it. Free text as well as a link, because it is often a contractor
+  /// rather than somebody on the team.
+  performedBy      String
+  performedById    String?
+  performedByStaff EstateStaff? @relation("ServicePerformer", fields: [performedById], references: [id], onDelete: SetNull)
+
+  costNaira  Decimal? @db.Decimal(14, 2)
+  /// Oil, filters, belts — what was actually changed.
+  workDone   String?  @db.Text
+  receiptKey String?
+
+  recordedById String?
+  recordedBy   User?   @relation("EstateServiceRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([buildingId, servicedAt])
+}
+
+/// Every move of a rate card, kept as its own record.
+///
+/// The rate card on the building says what is charged today. This says who
+/// changed it, when, from what, and why — which is the first thing a tenant asks
+/// when a month costs more than the last one, and the one question a mutable
+/// settings field can never answer.
+model EstateRateChange {
+  id         String         @id @default(cuid())
+  buildingId String
+  building   EstateBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  /// "dieselPricePerLitre" or "litresPerHour".
+  field       String
+  oldValue    Decimal  @db.Decimal(12, 2)
+  newValue    Decimal  @db.Decimal(12, 2)
+  reason      String?  @db.Text
+  effectiveAt DateTime @default(now())
+
+  changedById String?
+  changedBy   User?   @relation("EstateRateChanger", fields: [changedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([buildingId, effectiveAt])
 }
