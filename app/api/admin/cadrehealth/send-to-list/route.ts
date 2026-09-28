@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { sendCadreEmail } from "@/lib/cadreEmail";
 import { logAudit } from "@/lib/audit";
+import { surnameFor } from "@/lib/cadreSalutation";
 
 const ALLOWED_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
 const SEND_DELAY_MS = 250;
@@ -122,7 +123,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       await sendCadreEmail({
         to: pro.email,
         subject,
-        heading: `Dr ${pro.lastName}`,
+        heading: surnameFor(pro.lastName) ? `Dr ${surnameFor(pro.lastName)}` : "Hello",
         body: personalisedBody,
         ctaText: "Sign in to CadreHealth",
         ctaHref: "https://www.consultforafrica.com/oncadre/login",
