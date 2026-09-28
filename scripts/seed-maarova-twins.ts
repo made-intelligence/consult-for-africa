@@ -23,11 +23,18 @@ import type { Twin } from "./maarova-twins/types";
 import { DISC_TWINS } from "./maarova-twins/disc";
 import { VALUES_TWINS } from "./maarova-twins/values";
 import { EMOTIONAL_TWINS } from "./maarova-twins/emotional";
+import { THREE_SIXTY_TWINS, CULTURE_TWINS } from "./maarova-twins/threesixty";
 
 const prisma = new PrismaClient();
 const APPLY = process.argv.includes("--apply");
 
-const ALL_TWINS: Twin[] = [...DISC_TWINS, ...VALUES_TWINS, ...EMOTIONAL_TWINS];
+const ALL_TWINS: Twin[] = [
+  ...DISC_TWINS,
+  ...VALUES_TWINS,
+  ...EMOTIONAL_TWINS,
+  ...THREE_SIXTY_TWINS,
+  ...CULTURE_TWINS,
+];
 
 /** Proportional length gap beyond which two options are not really parallel. */
 const LENGTH_TOLERANCE = 0.6;
