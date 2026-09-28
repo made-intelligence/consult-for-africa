@@ -1,37 +1,76 @@
 import { redirect } from "next/navigation";
-import { getCadreEmployerSession } from "@/lib/cadreEmployerAuth";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getCadreEmployerContext } from "@/lib/cadreEmployerAuth";
+import { prisma } from "@/lib/prisma";
+import { replyOverdueCutoff } from "@/lib/cadreHealth/matchStages";
+
+/**
+ * What needs this hospital today, and nothing else.
+ *
+ * The old dashboard showed two counters that were almost always zero, a stat
+ * card that linked to itself, and a verification panel that said "contact us"
+ * and named nobody. It answered no question a person arriving at work would ask.
+ */
+export const dynamic = "force-dynamic";
 
 export default async function EmployerDashboard() {
-  const session = await getCadreEmployerSession();
-  if (!session) redirect("/oncadre/employer/login");
+  const ctx = await getCadreEmployerContext();
+  if (!ctx) redirect("/oncadre/employer/login");
 
-  // Get employer stats
-  const [activeListings, totalApplications] = await Promise.all([
-    prisma.cadreMandate.count({
+  const overdueBefore = replyOverdueCutoff();
+  const orgWhere = { mandate: { employerOrgId: ctx.org.id } };
+
+  const [
+    newApplicants,
+    overdueApplicants,
+    answeredApproaches,
+    pendingApproaches,
+    liveRoles,
+    rolesWithNobody,
+    registerSize,
+    openToApproach,
+  ] = await Promise.all([
+    prisma.cadreMandateMatch.count({
+      where: { ...orgWhere, source: "APPLIED", status: "NEW" },
+    }),
+    prisma.cadreMandateMatch.count({
       where: {
-        facilityId: session.facilityId || undefined,
-        facilityName: session.facilityId ? undefined : session.companyName,
-        status: "OPEN",
-        isPublished: true,
+        ...orgWhere,
+        source: "APPLIED",
+        status: "NEW",
+        createdAt: { lt: overdueBefore },
       },
     }),
-    prisma.cadreMandate
-      .aggregate({
-        where: {
-          facilityId: session.facilityId || undefined,
-          facilityName: session.facilityId ? undefined : session.companyName,
-          isPublished: true,
-        },
-        _sum: { applicationCount: true },
-      })
-      .then((r) => r._sum.applicationCount || 0),
+    prisma.cadreContactRequest.count({
+      where: { orgId: ctx.org.id, status: "ACCEPTED" },
+    }),
+    prisma.cadreContactRequest.count({
+      where: { orgId: ctx.org.id, status: "PENDING" },
+    }),
+    prisma.cadreMandate.count({
+      where: {
+        employerOrgId: ctx.org.id,
+        status: { in: ["OPEN", "SHORTLISTED", "INTERVIEWING", "OFFER_EXTENDED"] },
+      },
+    }),
+    prisma.cadreMandate.count({
+      where: {
+        employerOrgId: ctx.org.id,
+        status: "OPEN",
+        matches: { none: {} },
+      },
+    }),
+    prisma.cadreProfessional.count({ where: { accountStatus: { not: "SUSPENDED" } } }),
+    prisma.cadreProfessional.count({
+      where: { availability: { in: ["ACTIVELY_LOOKING", "OPEN_TO_OFFERS"] } },
+    }),
   ]);
+
+  const nothingToDo =
+    newApplicants === 0 && answeredApproaches === 0 && rolesWithNobody === 0;
 
   return (
     <div className="space-y-8">
-      {/* Welcome header */}
       <div
         className="relative overflow-hidden rounded-2xl px-6 py-8 sm:px-8 sm:py-10"
         style={{
@@ -40,17 +79,10 @@ export default async function EmployerDashboard() {
         }}
       >
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
-            opacity: 0.035,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            backgroundSize: "180px",
-          }}
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "radial-gradient(ellipse 50% 80% at 90% 20%, rgba(212,175,55,0.12) 0%, transparent 60%)",
+            background:
+              "radial-gradient(ellipse 50% 80% at 90% 20%, rgba(212,175,55,0.12) 0%, transparent 60%)",
           }}
         />
         <div className="relative">
@@ -58,162 +90,180 @@ export default async function EmployerDashboard() {
             className="text-xs font-medium uppercase tracking-[0.2em]"
             style={{ color: "#D4AF37" }}
           >
-            Employer Dashboard
+            {ctx.org.name}
           </p>
           <h1
             className="mt-2 font-bold text-white"
             style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)" }}
           >
-            Welcome, {session.contactName}
+            {nothingToDo
+              ? `Good day, ${ctx.contactName}`
+              : `${newApplicants + answeredApproaches} things need you`}
           </h1>
-          <p className="mt-1 text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-            {session.companyName}
+          <p className="mt-1 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {registerSize.toLocaleString()} professionals on the register,{" "}
+            {openToApproach.toLocaleString()} of them open to an approach right now.
           </p>
         </div>
       </div>
 
-      {/* Stats grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Active Listings"
-          value={activeListings.toString()}
-          subtitle="Published open positions"
-          href="/oncadre/employer/post-role"
-          accent="#0B3C5D"
-        />
-        <StatCard
-          title="Total Applications"
-          value={totalApplications.toString()}
-          subtitle="Across all listings"
-          href="/oncadre/employer/dashboard"
-          accent="#D4AF37"
-        />
-        <StatCard
-          title="Search Professionals"
-          value="Browse"
-          subtitle="Find talent by cadre and specialty"
-          href="/oncadre/employer/search"
-          accent="#10B981"
-        />
-      </div>
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-500">What needs you</h2>
 
-      {/* Quick actions */}
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Link
-          href="/oncadre/employer/post-role"
-          className="group rounded-2xl bg-white p-6 transition-all duration-200 hover:scale-[1.01]"
-          style={{
-            border: "1px solid #E8EBF0",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
-          }}
-        >
+        {nothingToDo ? (
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl"
-            style={{ background: "rgba(11,60,93,0.06)" }}
+            className="rounded-2xl bg-white p-6"
+            style={{
+              border: "1px solid #E8EBF0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
+            }}
           >
-            <svg className="h-6 w-6 text-[#0B3C5D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </div>
-          <h3 className="mt-4 font-semibold text-gray-900 group-hover:text-[#0B3C5D] transition-colors">
-            Post a New Role
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Create a job listing and reach verified healthcare professionals.
-          </p>
-        </Link>
-
-        <Link
-          href="/oncadre/employer/search"
-          className="group rounded-2xl bg-white p-6 transition-all duration-200 hover:scale-[1.01]"
-          style={{
-            border: "1px solid #E8EBF0",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl"
-            style={{ background: "rgba(16,185,129,0.06)" }}
-          >
-            <svg className="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <h3 className="mt-4 font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">
-            Search Professionals
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Find doctors, nurses, pharmacists, and more by specialty, location, and availability.
-          </p>
-        </Link>
-      </div>
-
-      {/* Verification CTA */}
-      {!session.isVerified && (
-        <div
-          className="rounded-2xl p-6 sm:p-8"
-          style={{
-            background: "linear-gradient(135deg, rgba(212,175,55,0.06), rgba(212,175,55,0.02))",
-            border: "1px solid rgba(212,175,55,0.15)",
-          }}
-        >
-          <div className="flex items-start gap-4">
-            <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: "rgba(212,175,55,0.12)" }}
-            >
-              <svg className="h-6 w-6" style={{ color: "#B8941E" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Get Verified
-              </h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Verified employers get priority access to professional profiles and
-                can send direct contact requests. Contact us to verify your facility.
-              </p>
+            <p className="text-sm text-gray-600">
+              Nothing is waiting on you.{" "}
+              {liveRoles === 0
+                ? "You have no live roles, so the next move is either to post one or to go and find people yourself."
+                : "Your live roles are covered. Sourcing is the thing that moves a search on when applications are quiet."}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href="/oncadre/employer/candidates"
+                className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                style={{ background: "#0B3C5D", minHeight: "44px" }}
+              >
+                Search the register
+              </Link>
+              <Link
+                href="/oncadre/employer/roles/new"
+                className="rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:bg-gray-50"
+                style={{ border: "1px solid #E8EBF0", color: "#0B3C5D", minHeight: "44px" }}
+              >
+                Post a role
+              </Link>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-3">
+            {newApplicants > 0 && (
+              <Task
+                href="/oncadre/employer/pipeline"
+                title={`${newApplicants} ${newApplicants === 1 ? "applicant has" : "applicants have"} not been looked at`}
+                body={
+                  overdueApplicants > 0
+                    ? `${overdueApplicants} of them applied more than a week ago. People who hear nothing stop applying.`
+                    : "They came to you. Each one is owed an answer."
+                }
+                urgent={overdueApplicants > 0}
+              />
+            )}
+            {answeredApproaches > 0 && (
+              <Task
+                href="/oncadre/employer/candidates/approaches"
+                title={`${answeredApproaches} ${answeredApproaches === 1 ? "person has" : "people have"} agreed to hear from you`}
+                body="Their contact details are waiting. An approach goes cold quickly."
+              />
+            )}
+            {rolesWithNobody > 0 && (
+              <Task
+                href="/oncadre/employer/roles"
+                title={`${rolesWithNobody} open ${rolesWithNobody === 1 ? "role has" : "roles have"} nobody in the pipeline`}
+                body="Posting and waiting is the slow way. Search the register and approach people directly."
+              />
+            )}
+          </div>
+        )}
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-3">
+        <Figure value={liveRoles} label="live roles" href="/oncadre/employer/roles" />
+        <Figure
+          value={pendingApproaches}
+          label="approaches awaiting an answer"
+          href="/oncadre/employer/candidates/approaches"
+        />
+        <Figure
+          value={openToApproach}
+          label="open to an approach"
+          href="/oncadre/employer/candidates?openOnly=true"
+        />
+      </section>
+
+      {!ctx.org.isVerified && (
+        <Link
+          href="/oncadre/employer/account"
+          className="block rounded-2xl p-6 transition hover:opacity-95 sm:p-8"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(212,175,55,0.07), rgba(212,175,55,0.02))",
+            border: "1px solid rgba(212,175,55,0.2)",
+          }}
+        >
+          <h3 className="text-lg font-semibold text-gray-900">
+            You can search, but you cannot yet approach anyone
+          </h3>
+          <p className="mt-1.5 max-w-2xl text-sm text-gray-600">
+            Approaching a professional puts your name in front of a doctor who did not
+            ask to hear from you, so we check who you are first. It is quick.
+          </p>
+          <span
+            className="mt-4 inline-block text-sm font-semibold"
+            style={{ color: "#B8941E" }}
+          >
+            Start verification
+          </span>
+        </Link>
       )}
     </div>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  subtitle,
+function Task({
   href,
-  accent,
+  title,
+  body,
+  urgent,
 }: {
-  title: string;
-  value: string;
-  subtitle: string;
   href: string;
-  accent: string;
+  title: string;
+  body: string;
+  urgent?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="group rounded-2xl bg-white p-6 transition-all duration-200 hover:scale-[1.01]"
+      className="block rounded-2xl bg-white p-5 transition-all duration-200 hover:shadow-md"
+      style={{
+        border: urgent ? "1px solid rgba(212,175,55,0.4)" : "1px solid #E8EBF0",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
+      }}
+    >
+      <h3 className="font-semibold text-gray-900">{title}</h3>
+      <p className="mt-1 text-sm text-gray-500">{body}</p>
+    </Link>
+  );
+}
+
+function Figure({
+  value,
+  label,
+  href,
+}: {
+  value: number;
+  label: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-2xl bg-white p-5 transition-all duration-200 hover:shadow-md"
       style={{
         border: "1px solid #E8EBF0",
         boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
       }}
     >
-      <div className="flex items-center gap-2.5">
-        <div className="h-2 w-2 rounded-full" style={{ background: accent }} />
-        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+      <div className="text-3xl font-bold" style={{ color: "#0B3C5D" }}>
+        {value.toLocaleString()}
       </div>
-      <div className="mt-3 text-3xl font-bold" style={{ color: accent }}>
-        {value}
-      </div>
-      <p className="mt-1.5 text-sm text-gray-400 group-hover:text-gray-500 transition-colors duration-200">
-        {subtitle}
-      </p>
+      <p className="mt-1 text-sm text-gray-500">{label}</p>
     </Link>
   );
 }

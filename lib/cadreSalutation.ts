@@ -94,3 +94,68 @@ export function greetingFor(person: {
   if (given) return given;
   return "there";
 }
+
+/**
+ * The name to print on a card a hospital is reading.
+ *
+ * `${firstName} ${lastName}` is wrong for 28% of the cohort: the import split
+ * each register row on the first space, so "Dr Patric Temi Adegun" became
+ * firstName "Dr Patric" and lastName "Temi Adegun", and the naive join renders
+ * "Dr Patric Temi Adegun" as a given name plus a middle name plus a surname with
+ * the title welded on. This rebuilds it: title where the cadre earns one, given
+ * name where we have a real one, surname from the final token.
+ *
+ * Where the row supports nothing usable, it returns a description of the person
+ * rather than a mangled name. A hospital reading "Medicine, Lagos" knows it is
+ * looking at an incomplete record; one reading "Dr C" does not.
+ */
+export function displayNameFor(person: {
+  firstName?: string | null;
+  lastName?: string | null;
+  cadre?: string | null;
+}): string {
+  const surname = surnameFor(person.lastName);
+  const given = givenNameFor(person.firstName);
+  const isDoctor = DOCTOR_CADRES.has(person.cadre ?? "");
+  const title = isDoctor ? "Dr " : "";
+
+  if (given && surname) return `${title}${given} ${surname}`;
+  if (surname) return `${title}${surname}`;
+  if (given) return `${title}${given}`;
+  return "Name not on record";
+}
+
+/**
+ * True when the record cannot produce a name we would show to an employer. Used
+ * to push these rows down the ranking rather than hide them: they are real
+ * people, they are just badly imported, and the fix is to ask them.
+ */
+export function nameIsUnusable(person: {
+  firstName?: string | null;
+  lastName?: string | null;
+}): boolean {
+  return !surnameFor(person.lastName) && !givenNameFor(person.firstName);
+}
+
+/**
+ * A full salutation line: "Dear Dr Kodiya," where the data supports one.
+ *
+ * Built on greetingFor so the fallback chain stays in one place. The only thing
+ * it adds is assumeDoctor, for the templates that mail a cohort already known
+ * to be doctors and have no cadre field to hand. Without it those templates
+ * hardcoded "Dear Dr ${lastName}", and lastName is the wrong field: Prof Aliyu
+ * Mohammed Kodiya was imported as lastName "Mohammed Kodiya" and greeted "Dear
+ * Dr Mohammed Kodiya". He wrote in to correct it.
+ */
+export function salutationFor(
+  person: { firstName?: string | null; lastName?: string | null; cadre?: string | null },
+  opts: { assumeDoctor?: boolean } = {},
+): string {
+  if (opts.assumeDoctor) {
+    const surname = surnameFor(person.lastName);
+    if (surname) return `Dear Dr ${surname},`;
+  }
+  const greeting = greetingFor(person);
+  // greetingFor falls back to "there", which reads wrong after "Dear".
+  return greeting === "there" ? "Dear Colleague," : `Dear ${greeting},`;
+}

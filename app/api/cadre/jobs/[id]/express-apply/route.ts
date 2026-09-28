@@ -77,7 +77,10 @@ export const POST = handler(async function POST(
     data: {
       mandateId: id,
       professionalId: professional.id,
-      status: "MATCHED",
+      // They applied. Recording this as MATCHED buried real applicants among
+      // the candidates the matcher had swept in.
+      source: "APPLIED",
+      status: "NEW",
     },
   });
 
