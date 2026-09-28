@@ -13,9 +13,20 @@ export interface Twin {
   /** The twin's stem, same scenario in a non-clinical world. */
   text: string;
   /**
-   * Omit for items whose options are a rating scale rather than mapped
-   * choices. The seeder then copies the original's options, because a Likert
-   * scale does not become clinical or non-clinical, only the stem does.
+   * Replacement option text, in the original's order.
+   *
+   * Prefer plain strings. The seeder then copies every other key from the
+   * option it parallels, so weights, eqDimension and dimension cannot drift:
+   * parity is guaranteed by construction rather than checked after the fact.
+   * That matters because the scoring keys differ by module, and an option
+   * carrying weight 5 replaced by one carrying weight 1 changes the score
+   * without changing anything visible.
+   *
+   * Objects are still accepted, and then every key they do carry is verified
+   * against the original.
+   *
+   * Omit entirely for items whose options are a rating scale: a Likert scale
+   * does not become clinical or non-clinical, only the stem does.
    */
-  options?: TwinOption[];
+  options?: (string | TwinOption)[];
 }

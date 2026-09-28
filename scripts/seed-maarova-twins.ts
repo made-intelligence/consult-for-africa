@@ -22,11 +22,12 @@ import { readsClinically, clinicalTokensIn } from "@/lib/maarova/clinicalVocabul
 import type { Twin } from "./maarova-twins/types";
 import { DISC_TWINS } from "./maarova-twins/disc";
 import { VALUES_TWINS } from "./maarova-twins/values";
+import { EMOTIONAL_TWINS } from "./maarova-twins/emotional";
 
 const prisma = new PrismaClient();
 const APPLY = process.argv.includes("--apply");
 
-const ALL_TWINS: Twin[] = [...DISC_TWINS, ...VALUES_TWINS];
+const ALL_TWINS: Twin[] = [...DISC_TWINS, ...VALUES_TWINS, ...EMOTIONAL_TWINS];
 
 /** Proportional length gap beyond which two options are not really parallel. */
 const LENGTH_TOLERANCE = 0.6;
@@ -78,17 +79,26 @@ async function main() {
       }
       let mismatch = false;
       for (let i = 0; i < twin.options.length; i++) {
-        const a = twin.options[i].dimension ?? null;
-        const b = originalOptions[i].dimension ?? null;
-        if (a !== b) {
-          problems.push({
-            twin: twin.text.slice(0, 70),
-            issue: `option ${i + 1} maps to ${a}, original maps to ${b}`,
-          });
-          mismatch = true;
-          break;
+        const supplied = twin.options[i];
+        const label = typeof supplied === "string" ? supplied : supplied.label;
+
+        // When a twin spells out scoring keys, every one must match. When it
+        // supplies only a label there is nothing to check: the seeder copies
+        // the original's keys wholesale.
+        if (typeof supplied !== "string") {
+          const a = supplied.dimension ?? null;
+          const b = (originalOptions[i] as { dimension?: string }).dimension ?? null;
+          if (a !== b) {
+            problems.push({
+              twin: twin.text.slice(0, 70),
+              issue: `option ${i + 1} maps to ${a}, original maps to ${b}`,
+            });
+            mismatch = true;
+            break;
+          }
         }
-        const la = twin.options[i].label.length;
+
+        const la = label.length;
         const lb = (originalOptions[i].label ?? "").length;
         if (lb > 0 && Math.abs(la - lb) / lb > LENGTH_TOLERANCE) {
           problems.push({
@@ -119,7 +129,13 @@ async function main() {
           twinOfId: original.id,
           format: original.format,
           text: twin.text,
-          options: (twin.options ?? originalOptions) as object,
+          // Replace the wording, keep every scoring key the original carried.
+          options: (twin.options
+            ? originalOptions.map((o, i) => {
+                const supplied = twin.options![i];
+                return { ...o, label: typeof supplied === "string" ? supplied : supplied.label };
+              })
+            : originalOptions) as object,
           dimension: original.dimension,
           subDimension: original.subDimension,
           isReversed: original.isReversed,
