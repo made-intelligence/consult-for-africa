@@ -16,16 +16,34 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const APPLY = process.argv.includes("--apply");
 
-/** Vocabulary that only makes sense if the reader practises clinically. */
+/**
+ * Vocabulary that only makes sense if the reader practises clinically.
+ *
+ * Word boundaries are not optional here. Without them "icu" matches inside
+ * "difficult", "ward" inside "rewarded" and "shift" inside "policy shifts",
+ * which tags role neutral items as clinical and hides them from the people who
+ * could have answered them perfectly well.
+ *
+ * "shift" is deliberately absent: a night shift is clinical, a policy shift is
+ * not, and the word cannot tell them apart. The scenarios that need it say
+ * "on-call" or name the setting anyway.
+ */
+const CLINICAL_TOKENS = [
+  "patient", "patients", "clinical", "clinically", "clinician", "clinicians",
+  "ward", "wards", "nurse", "nurses", "nursing", "doctor", "doctors",
+  "physician", "physicians", "consultant", "consultants", "registrar",
+  "registrars", "theatre", "surgery", "surgical", "rounds", "bedside",
+  "triage", "medication", "medications", "mortality", "morbidity", "scrub",
+  "handover", "on-call", "A&E", "ICU", "NICU", "outpatient", "inpatient",
+  "medicine", "medical", "resuscitation", "vital signs", "care team",
+  "duty of care", "multi-disciplinary", "grand round", "grand rounds",
+];
+
 const CLINICAL = new RegExp(
-  [
-    "patient", "patients", "clinical", "clinician", "clinicians", "ward", "wards",
-    "nurse", "nurses", "nursing", "doctor", "doctors", "physician", "consultant",
-    "registrar", "theatre", "surgery", "surgical", "diagnos\\w*", "rounds",
-    "bedside", "triage", "medication", "prescrib\\w*", "mortality", "morbidity",
-    "scrub", "handover", "on-call", "shift", "A&E", "ICU", "NICU", "outpatient",
-    "inpatient", "medicine", "care team", "duty of care",
-  ].join("|"),
+  "(?:^|[^A-Za-z])(?:" +
+    CLINICAL_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") +
+    "|diagnos[a-z]*|prescrib[a-z]*|prescription[s]?" +
+    ")(?![A-Za-z])",
   "i"
 );
 
