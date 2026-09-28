@@ -94,3 +94,26 @@ export function greetingFor(person: {
   if (given) return given;
   return "there";
 }
+
+/**
+ * A full salutation line: "Dear Dr Kodiya," where the data supports one.
+ *
+ * Built on greetingFor so the fallback chain stays in one place. The only thing
+ * it adds is assumeDoctor, for the templates that mail a cohort already known
+ * to be doctors and have no cadre field to hand. Without it those templates
+ * hardcoded "Dear Dr ${lastName}", and lastName is the wrong field: Prof Aliyu
+ * Mohammed Kodiya was imported as lastName "Mohammed Kodiya" and greeted "Dear
+ * Dr Mohammed Kodiya". He wrote in to correct it.
+ */
+export function salutationFor(
+  person: { firstName?: string | null; lastName?: string | null; cadre?: string | null },
+  opts: { assumeDoctor?: boolean } = {},
+): string {
+  if (opts.assumeDoctor) {
+    const surname = surnameFor(person.lastName);
+    if (surname) return `Dear Dr ${surname},`;
+  }
+  const greeting = greetingFor(person);
+  // greetingFor falls back to "there", which reads wrong after "Dear".
+  return greeting === "there" ? "Dear Colleague," : `Dear ${greeting},`;
+}

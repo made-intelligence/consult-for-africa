@@ -3,6 +3,7 @@ import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ClaimForm from "./ClaimForm";
+import { greetingFor } from "@/lib/cadreSalutation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -48,7 +49,7 @@ export default async function ClaimPage({ params }: Props) {
 
         <div className="max-w-md">
           <h2 className="text-3xl font-bold text-white">
-            Welcome, Dr. {professional.lastName}.
+            Welcome, {greetingFor(professional)}.
           </h2>
           <p className="mt-4 text-lg text-white/70">
             Your {specialty} specialist profile is ready. Set a password to
