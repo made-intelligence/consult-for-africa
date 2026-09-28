@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TopBar from "@/components/platform/TopBar";
 import { MEZO_SURVEY, labelFor } from "@/lib/cadreHealth/mezoSurvey";
+import { ELEVATED_ROLES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,12 @@ const HEADLINE = [
 
 export default async function MezoSurveyPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session) redirect("/login");
+  // Respondent names, emails and what each one would pay. Gated like every
+  // other survey reader rather than to any logged-in account.
+  if (!ELEVATED_ROLES.includes(session.user.role as (typeof ELEVATED_ROLES)[number])) {
+    redirect("/dashboard");
+  }
 
   const rows = await prisma.cadreMezoInterest.findMany({
     orderBy: { createdAt: "desc" },
