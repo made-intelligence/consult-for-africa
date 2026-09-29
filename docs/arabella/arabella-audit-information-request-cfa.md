@@ -29,7 +29,9 @@ Dr Debo Odulana
 
 ## How to send it
 
-Please nominate one point of contact who can chase the rest of the team. Tolu is the obvious choice if that works for her, and it helps us if requests go through one person rather than through you. Create a single shared folder in Google Drive or OneDrive with a sub-folder for each lettered section below, and give us access to it rather than sending attachments, so that nothing is lost in a thread.
+Please nominate one point of contact who can chase the rest of the team. Tolu is the obvious choice if that works for her, and it helps us if requests go through one person rather than through you.
+
+**Everything for this audit lives on one private page: consultforafrica.com/ArabellaProject.** It carries this document, an uploader that takes files straight from a phone or a laptop and tags them to the section they answer, and the four short surveys. Send things as you find them rather than waiting until you have everything, and come back to it as often as you like. The page is not listed anywhere and is not indexed. If you would rather use a shared folder in Google Drive or OneDrive, that is equally fine: make one with a sub-folder per lettered section below and give us access to it, so that nothing is lost in a thread.
 
 Exports from a system beat typed summaries every time. A raw CSV or Excel export from the billing software, the accounting package or the appointment book is worth more to us than a neat table someone had to retype, and it carries no transcription error. Photographs of paper registers are fine and often better than nothing. Read access to a system, even for one week, is better than any export at all.
 
