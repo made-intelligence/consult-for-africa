@@ -12,6 +12,7 @@ const MODULE_LABELS: Record<string, string> = {
   EMOTIONAL_INTEL: "Emotional Intelligence",
   CILTI: "Clinical Leadership Transition",
   THREE_SIXTY: "360-Degree Feedback",
+  PLTI: "Professional Leadership Transition",
   CULTURE_TEAM: "Culture and Team Dynamics",
 };
 
@@ -20,6 +21,9 @@ const DIMENSION_KEYS: Record<string, string[]> = {
   VALUES_DRIVERS: ["theoretical", "economic", "aesthetic", "social", "political", "regulatory"],
   EMOTIONAL_INTEL: ["selfAwareness", "empathy", "socialSkills", "emotionalRegulation", "overallEQ"],
   CILTI: ["clinicalIdentity", "leadershipIdentity", "transitionReadiness", "ciltiComposite"],
+  // PLTI shares CILTI's dimension keys so the two tracks score identically and
+  // stay comparable. Only the prose differs, which the track note below drives.
+  PLTI: ["clinicalIdentity", "leadershipIdentity", "transitionReadiness", "ciltiComposite"],
   CULTURE_TEAM: ["teamEffectiveness"],
 };
 
@@ -101,6 +105,16 @@ export async function generateMaarovaReport(
     (mr) => mr.module.type === "THREE_SIXTY" && mr.status === "COMPLETED",
   );
 
+  // The first identity dimension is keyed clinicalIdentity for both tracks so
+  // the scoring stays shared. For a non-clinical leader that key is an internal
+  // name, not something to repeat back to them: telling an HR director about
+  // her "clinical identity" would be the same mistake as asking her clinical
+  // questions, arriving one step later.
+  const trackNote =
+    assessmentSession.track === "NON_CLINICAL"
+      ? "\n\nTRACK: This leader did not come into leadership from a clinical profession. They lead in a discipline such as human resources, finance, operations, compliance or administration. Never describe them as a clinician and never refer to their clinical identity, clinical practice or clinical expertise. The first identity dimension is their PROFESSIONAL identity, meaning their attachment to the discipline they trained in. Write about that instead."
+      : "";
+
   const demographicContext = [
     user.title ? `Title: ${user.title}` : null,
     user.department ? `Department: ${user.department}` : null,
@@ -115,7 +129,7 @@ export async function generateMaarovaReport(
 
 CRITICAL: You must ONLY reference information explicitly provided in the leader profile and scores below. Do NOT invent, assume, or hallucinate any biographical details such as years of experience, qualifications, certifications, fellowships, specialisations, institutional affiliations, or career history. If a detail is not provided, do not mention it. Base all interpretations solely on the assessment scores provided.`;
 
-  const scoreContext = `LEADER: ${user.name}\n${demographicContext}\n\nSCORES (0-100):\n${scoreLines.join("\n")}`;
+  const scoreContext = `LEADER: ${user.name}\n${demographicContext}${trackNote}\n\nSCORES (0-100):\n${scoreLines.join("\n")}`;
 
   const callA = anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
