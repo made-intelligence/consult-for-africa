@@ -16,7 +16,10 @@ const ONBOARDING_COMPLETE_STATUSES = ["ACTIVE", "ASSESSMENT_COMPLETE", "REVIEW"]
 // WhatsApp. Route paths are case sensitive, so the near-misses need catching,
 // and it has to be done here rather than in next.config: redirect `source`
 // matching is case insensitive there, which sends the canonical path to itself.
-const CASE_FORGIVING = new Map<string, string>([["/osteonproject", "/OsteonProject"]]);
+const CASE_FORGIVING = new Map<string, string>([
+  ["/osteonproject", "/OsteonProject"],
+  ["/arabellaproject", "/ArabellaProject"],
+]);
 
 export default auth((req) => {
   const { nextUrl, auth: session } = req;

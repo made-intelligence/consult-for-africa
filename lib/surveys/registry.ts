@@ -484,6 +484,74 @@ const CLEARVIEW: SurveyDefinition[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Arabella Women's Health. Four instruments fielded with the audit that starts
+// on site 2 October 2026. The referrer instrument is the strategically
+// important one: Arabella has no referrer list, which is itself a finding, so
+// the survey is built to BUILD the list rather than to assume one exists.
+// ---------------------------------------------------------------------------
+const ARABELLA_ENGAGEMENT_ID = "cmumq57x50002spxkklrlzfem";
+
+const ARABELLA: SurveyDefinition[] = [
+  {
+    slug: "arabella-staff-culture",
+    title: "Staff and safety culture",
+    audience: "All staff",
+    client: "Arabella Women's Health",
+    engagementId: ARABELLA_ENGAGEMENT_ID,
+    source: "audit",
+    formPath: "/arabella-staff-survey.html",
+    readerPath: null,
+    anonymous: true,
+    pii: "none",
+    changes: [],
+  },
+  {
+    slug: "arabella-patient-experience",
+    title: "Patient experience",
+    audience: "Patients seen in the last year",
+    client: "Arabella Women's Health",
+    engagementId: ARABELLA_ENGAGEMENT_ID,
+    source: "audit",
+    formPath: "/arabella-patient-survey.html",
+    readerPath: null,
+    anonymous: true,
+    pii: "none",
+    changes: [],
+  },
+  {
+    slug: "arabella-referrer",
+    title: "Referring colleagues",
+    audience: "GPs, physiotherapists and diagnostic centres",
+    client: "Arabella Women's Health",
+    engagementId: ARABELLA_ENGAGEMENT_ID,
+    source: "audit",
+    formPath: "/arabella-referrer-survey.html",
+    // Attributed by design. A referrer's answer is only actionable if we know
+    // which referrer gave it, and the instrument also collects the names of
+    // colleagues they nominate, which is how the referrer list gets built.
+    anonymous: false,
+    pii: "payload",
+    piiKeys: ["respondent", "practice", "contact", "nominee1", "nominee2", "nominee3"],
+    readerPath: null,
+    changes: [],
+  },
+  {
+    slug: "arabella-leadership-direction",
+    title: "Leadership direction",
+    audience: "Dr Chito Nwana and the senior team",
+    client: "Arabella Women's Health",
+    engagementId: ARABELLA_ENGAGEMENT_ID,
+    source: "audit",
+    formPath: "/arabella-leadership-survey.html",
+    readerPath: null,
+    anonymous: false,
+    pii: "payload",
+    piiKeys: ["respondent", "role"],
+    changes: [],
+  },
+];
+
 export const SURVEYS: SurveyDefinition[] = [
   ...STANDALONE,
   ...HAVEN,
@@ -492,6 +560,7 @@ export const SURVEYS: SurveyDefinition[] = [
   ...AESTHETICS,
   ...BELFIORE,
   ...CLEARVIEW,
+  ...ARABELLA,
 ];
 
 export function surveyBySlug(slug: string): SurveyDefinition | undefined {
