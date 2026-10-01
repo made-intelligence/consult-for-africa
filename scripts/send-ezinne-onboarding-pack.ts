@@ -23,20 +23,44 @@ const REPLY_TO = { address: "debo.odulana@consultforafrica.com", name: "Debo Odu
 const FILE = join(process.cwd(), "docs", "office", "ezinne-onboarding-pack-cfa.pdf");
 const NAME = "CFA - Office of the Founding Partner - Onboarding Pack.pdf";
 
-const SUBJECT = "Your onboarding pack, and your platform account";
+const resend = process.argv.includes("--resend");
+
+const SUBJECT = resend
+  ? "Your onboarding pack, updated, and you start tomorrow"
+  : "Your onboarding pack, and your platform account";
+
+const openingHtml = resend
+  ? `<p>Ezinne,</p>
+     <p>This replaces the pack I sent you earlier today. Debo has confirmed you start <strong>tomorrow,
+        Friday 2 October</strong>, which is also day one of the Arabella engagement in Asokoro, so your first
+        day and the largest piece of work the firm has starting begin together.</p>
+     <p>That changes one thing about how to read it. <strong>Read Part Four first, tonight if you can</strong>,
+        because it is the Abuja part and Arabella is most of it. Parts One to Three can wait for the weekend
+        and the start of next week.</p>`
+  : `<p>Ezinne,</p>
+     <p>Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the
+        fastest way to understand what you have joined, because the shape of this firm is not obvious from the
+        outside and you would otherwise spend a month working it out by inference.</p>`;
+
+const openingText = resend
+  ? `Ezinne,
+
+This replaces the pack I sent you earlier today. Debo has confirmed you start tomorrow, Friday 2 October, which is also day one of the Arabella engagement in Asokoro, so your first day and the largest piece of work the firm has starting begin together.
+
+That changes one thing about how to read it. Read Part Four first, tonight if you can, because it is the Abuja part and Arabella is most of it. Parts One to Three can wait for the weekend and the start of next week.`
+  : `Ezinne,
+
+Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the fastest way to understand what you have joined.`;
 
 const html = `
 <div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#1f2937">
-  <p>Ezinne,</p>
-  <p>Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the
-     fastest way to understand what you have joined, because the shape of this firm is not obvious from the
-     outside and you would otherwise spend a month working it out by inference.</p>
-  <p>It opens with a letter from Debo. After that, Parts One to Three cover the firm, your role and the
-     platform, Part Four is Abuja and is the longest part because that is where you are based and where the
-     work that is starting sits, and Parts Five to Seven are the reference you will come back to.</p>
-  <p>Read Parts One to Three first, then Part Four before the end of the week. Part Eight sets out your first
-     ninety days, and the same list is already waiting on your desk on the platform as tasks, each with a brief
-     and a definition of done, which is the standard this office works to in both directions.</p>
+  ${openingHtml}
+  <p>It opens with a letter from Debo. Part Four is Abuja and is the longest part, because that is where you
+     are based and where the work that is starting sits. Parts One to Three cover the firm, your role and the
+     platform, and Parts Five to Seven are the reference you will come back to.</p>
+  <p>Part Eight sets out your first ninety days. The same list is already waiting on your desk on the platform
+     as seven tasks dated across Friday to Thursday, each with a brief and a definition of done, which is the
+     standard this office works to in both directions.</p>
   <p>Your platform account is live. A separate email from us carries your temporary password, and you should
      change it at your first login from Settings. You sign in at
      <a href="https://www.consultforafrica.com/login" style="color:#0B3C5D">www.consultforafrica.com/login</a>
@@ -48,13 +72,11 @@ const html = `
   <p>With best regards,<br/>Consult for Africa</p>
 </div>`;
 
-const text = `Ezinne,
+const text = `${openingText}
 
-Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the fastest way to understand what you have joined.
+It opens with a letter from Debo. Part Four is Abuja and is the longest part, because that is where you are based and where the work that is starting sits. Parts One to Three cover the firm, your role and the platform, and Parts Five to Seven are the reference you will come back to.
 
-It opens with a letter from Debo. Parts One to Three cover the firm, your role and the platform. Part Four is Abuja and is the longest part, because that is where you are based and where the work that is starting sits. Parts Five to Seven are the reference you will come back to.
-
-Read Parts One to Three first, then Part Four before the end of the week. Part Eight sets out your first ninety days, and the same list is already on your desk on the platform as tasks, each with a brief and a definition of done.
+Part Eight sets out your first ninety days. The same list is already on your desk on the platform as seven tasks dated across Friday to Thursday, each with a brief and a definition of done.
 
 Your platform account is live. A separate email carries your temporary password, and you should change it at your first login from Settings. Sign in at https://www.consultforafrica.com/login and you will land on your desk.
 
@@ -67,6 +89,7 @@ Consult for Africa`;
 
 async function main() {
   const apply = process.argv.includes("--apply");
+  if (resend) console.log("RESEND: the note says this replaces the earlier copy.");
   if (!existsSync(FILE)) throw new Error(`Not found: ${FILE}. Run python3 scripts/build-office-onboarding.py first.`);
 
   const buf = readFileSync(FILE);
