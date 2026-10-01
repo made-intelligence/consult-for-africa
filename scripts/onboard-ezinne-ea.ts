@@ -18,8 +18,10 @@
  * 3. Raises her first-week tasks, each with a brief and a definition of done,
  *    because the office cannot ask that of her and not do it for her.
  *
- * Due dates assume a start of Monday 5 October 2026. Pass a different ISO date
- * as argv[1] to shift the whole week.
+ * Due dates are counted in working days from her start date, which is Friday
+ * 2 October 2026. Pass a different ISO date as argv[1] to shift the whole week,
+ * and add --redate to move the dates on tasks that already exist and are still
+ * ASSIGNED, which is what a change of start date actually needs.
  */
 import { PrismaClient } from "@prisma/client";
 
@@ -29,10 +31,19 @@ const EA_EMAIL = "ogeriorji845@gmail.com";
 const PARTNER_EMAIL = "debo.odulana@consultforafrica.com";
 const AA_EMAIL = "abigail.ayomide04@gmail.com";
 
-/** Day offsets from the start Monday. */
+/**
+ * Working-day offsets from the start date, so a start late in the week does not
+ * land half of somebody's first week on a Saturday. Offset 0 is the start date
+ * itself, and each step after it skips the weekend.
+ */
 function day(start: Date, offset: number, hour = 17): Date {
   const d = new Date(start);
-  d.setUTCDate(d.getUTCDate() + offset);
+  let moved = 0;
+  while (moved < offset) {
+    d.setUTCDate(d.getUTCDate() + 1);
+    const dow = d.getUTCDay();
+    if (dow !== 0 && dow !== 6) moved += 1;
+  }
   d.setUTCHours(hour, 0, 0, 0);
   return d;
 }
@@ -120,9 +131,15 @@ const FIRST_WEEK: Seed[] = [
 ];
 
 async function main() {
-  const startArg = process.argv[2];
-  const start = startArg ? new Date(`${startArg}T00:00:00.000Z`) : new Date("2026-10-05T00:00:00.000Z");
+  const args = process.argv.slice(2);
+  const redate = args.includes("--redate");
+  const startArg = args.find((a) => !a.startsWith("--"));
+  const start = new Date(`${startArg ?? "2026-10-02"}T00:00:00.000Z`);
   if (Number.isNaN(start.getTime())) throw new Error(`Bad start date: ${startArg}`);
+  if (start.getUTCDay() === 0 || start.getUTCDay() === 6) {
+    throw new Error(`${start.toISOString().slice(0, 10)} is a weekend. Give a working day as the start date.`);
+  }
+  console.log(`start ${start.toISOString().slice(0, 10)}, working-day offsets${redate ? ", re-dating existing ASSIGNED tasks" : ""}`);
 
   const [ea, partner, aa] = await Promise.all([
     prisma.user.findUnique({ where: { email: EA_EMAIL }, select: { id: true, name: true, role: true } }),
@@ -162,8 +179,9 @@ async function main() {
       select: { id: true, status: true },
     });
     // Re-running reconciles the wording rather than skipping, so an edit to a
-    // brief here reaches a task that is already on her desk. Dates and status
-    // are left alone once the task exists, because she may have moved both.
+    // brief here reaches a task that is already on her desk. Dates are only
+    // moved on --redate, and only while a task is still ASSIGNED, because once
+    // she is working on something the date may be hers rather than ours.
     if (existing) {
       if (existing.status === "ASSIGNED") {
         await prisma.task.update({
@@ -172,6 +190,12 @@ async function main() {
             brief: seed.brief,
             definitionOfDone: seed.definitionOfDone,
             estimatedMinutes: seed.estimatedMinutes,
+            ...(redate
+              ? {
+                  dueDate: day(start, seed.dueOffset),
+                  checkInAt: seed.checkInOffset === undefined ? null : day(start, seed.checkInOffset, 12),
+                }
+              : {}),
           },
         });
         reconciled += 1;

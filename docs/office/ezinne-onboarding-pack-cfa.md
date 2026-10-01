@@ -28,7 +28,7 @@ You are based in Abuja and that is deliberate rather than convenient. Our regist
 
 The last thing is confidentiality, and I am strict about it. Everything in this pack is real, including the money, the client names and the findings, because you cannot hold the follow-up on work you do not understand. None of it leaves the firm. We describe our work by method and lesson, never by client, and in a market this small a combination of harmless details identifies somebody.
 
-You will not absorb all of this at once and I do not expect you to. Read Parts One to Three in your first two days, read Part Four before Friday, and treat Parts Five to Seven as the reference you return to.
+You will not absorb all of this at once and I do not expect you to. You start on Friday 2 October, which is also day one of the Arabella engagement in Asokoro, so read Part Four first and before Friday if you can, then Parts One to Three over the weekend and the start of next week, and treat Parts Five to Seven as the reference you return to.
 
 The natural first step is for you and me to sit down once you have read Part Four, and go through Arabella and the Medbury division in detail, because those two carry the most risk between now and Christmas.
 
@@ -46,7 +46,7 @@ Founding Partner, Consult for Africa
 | 1 | The firm: what we sell, how we are bought, who is here | Day one. Read once, properly. |
 | 2 | Your role, the delegation chain, and how this office runs | Day one, alongside Part One. |
 | 3 | The platform: your surfaces, and the state they are in today | Day two, in front of the screen. |
-| 4 | Abuja: every live and forming piece of work in the city | Before Friday 2 October. |
+| 4 | Abuja: every live and forming piece of work in the city | First, and before Friday 2 October. |
 | 5 | The rest of the book of work, Lagos and the products | Week one, then as reference. |
 | 6 | Money: what is owed, what you chase, what you never touch | Week one. |
 | 7 | How we write, and what never leaves the building | Before you write anything. |
@@ -672,9 +672,11 @@ For a proposal or a pitch to a principal, the deliverable is a landscape deck an
 
 ## Part Eight: Your first ninety days
 
-### Week one
+### Week one, Friday 2 October to Thursday 8 October
 
-The fixed dates in front of you are **Friday 2 October**, when Arabella begins, and **Thursday 8 October**, which is the Medlyfe evening in Lagos.
+You start on **Friday 2 October**, which is also Arabella day one in Asokoro, so your first day and the firm's largest starting engagement begin together. Kola is the one who has to be on site, not you, but read Part Four before Friday rather than after it. The other fixed date in the week is **Thursday 8 October**, which is the Medlyfe evening in Lagos.
+
+The list below is already on your desk on the platform as seven tasks, dated across these five working days, each with a brief and a definition of done.
 
 - [ ] Log in, change your password, read your desk
 - [ ] Get Dr Chito's email and phone, put them on the client record, send the ArabellaProject link to her and to Tolu
