@@ -2483,3 +2483,161 @@ export async function emailReviewsWaiting({
     `)
   );
 }
+
+/**
+ * Chases the engagement manager whose project record has gone stale.
+ *
+ * A dashboard is only ever as current as the last person who typed into it.
+ * Three in-house projects ran a quarter past their end date with every
+ * milestone overdue, which trained everybody to read the red as decoration.
+ * This is the nudge that stops that happening again, and it names the specific
+ * records rather than asking someone to go and look.
+ */
+export async function emailProjectUpdateDue({
+  emEmail,
+  emName,
+  items,
+}: {
+  emEmail: string;
+  emName: string;
+  items: { id: string; name: string; daysSinceUpdate: number | null; overdueMilestones: number; gaps: string[] }[];
+}) {
+  const rows = items
+    .map((i) => {
+      const since =
+        i.daysSinceUpdate === null ? "never updated" : `${i.daysSinceUpdate} days since an update`;
+      const detail = [
+        since,
+        i.overdueMilestones > 0 ? `${i.overdueMilestones} overdue milestone${i.overdueMilestones === 1 ? "" : "s"}` : null,
+        ...i.gaps,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      return `<tr><td style="padding:10px 12px;font-size:13px;border-bottom:1px solid #F3F4F6;">
+          <a href="${BASE_URL}/projects/${esc(i.id)}" style="color:#0F2744;font-weight:600;text-decoration:none;">${esc(i.name)}</a>
+          <div style="color:#6B7280;margin-top:3px;">${esc(detail)}</div>
+        </td></tr>`;
+    })
+    .join("");
+
+  await send(
+    emEmail,
+    `${items.length} project${items.length === 1 ? "" : "s"} need${items.length === 1 ? "s" : ""} updating on the platform`,
+    layout(`
+      ${h1("Your project records have gone quiet")}
+      ${p(`Hi ${emName}, the record on ${items.length === 1 ? "this engagement is" : "these engagements is"} behind the work. A partner reading the dashboard right now would get the wrong answer.`)}
+      <table style="width:100%;border-collapse:collapse;border:1px solid #E5E7EB;border-radius:8px;margin:16px 0;">${rows}</table>
+      ${p("Post an update, mark what is finished, and move or kill the milestones that have passed. A milestone nobody intends to hit should be closed, not carried.")}
+      ${btn("Open your projects", `${BASE_URL}/projects`)}
+    `)
+  );
+}
+
+/**
+ * The escalation. Raised to the partner only once an engagement manager has
+ * been asked and the record is still behind, so it stays rare enough to mean
+ * something.
+ */
+export async function emailPortfolioStale({
+  partnerEmail,
+  partnerName,
+  items,
+}: {
+  partnerEmail: string;
+  partnerName: string;
+  items: { id: string; name: string; emName: string; daysSinceUpdate: number | null }[];
+}) {
+  const rows = items
+    .map(
+      (i) =>
+        `<tr><td style="padding:10px 12px;font-size:13px;border-bottom:1px solid #F3F4F6;">
+           <a href="${BASE_URL}/projects/${esc(i.id)}" style="color:#0F2744;font-weight:600;text-decoration:none;">${esc(i.name)}</a>
+           <span style="color:#6B7280;"> · ${esc(i.emName)}</span>
+         </td>
+         <td style="padding:10px 12px;font-size:13px;font-weight:700;color:#B91C1C;border-bottom:1px solid #F3F4F6;white-space:nowrap;">
+           ${i.daysSinceUpdate === null ? "never" : `${i.daysSinceUpdate}d`}
+         </td></tr>`
+    )
+    .join("");
+
+  await send(
+    partnerEmail,
+    `${items.length} engagement${items.length === 1 ? "" : "s"} still not updated after three weeks`,
+    layout(`
+      ${h1("Escalation: project records three weeks behind")}
+      ${p(`Hi ${partnerName}, the engagement manager on ${items.length === 1 ? "this project has" : "these projects have"} been chased and the record is still behind. This is the point at which the dashboard stops being worth reading.`)}
+      <table style="width:100%;border-collapse:collapse;border:1px solid #E5E7EB;border-radius:8px;margin:16px 0;">${rows}</table>
+      ${btn("Open the portfolio", `${BASE_URL}/projects`)}
+    `)
+  );
+}
+
+/**
+ * Tells the team what changed when the project records were reset, and what is
+ * now expected of them weekly.
+ *
+ * Written as three variants because the three people have three different jobs
+ * in this. The engagement manager has judgement calls waiting that only she can
+ * make; the others have a standing sweep.
+ */
+export async function emailPlatformResetBriefing({
+  toEmail,
+  toName,
+  variant,
+}: {
+  toEmail: string;
+  toName: string;
+  variant: "engagement-manager" | "intake" | "sweep";
+}) {
+  if (variant === "engagement-manager") {
+    await send(
+      toEmail,
+      "The in-house project records have been reset, and four decisions are waiting on you",
+      layout(`
+        ${h1("In-house projects, reset")}
+        ${p(`Hi ${toName}, the three Consult For Africa projects on the platform had drifted far enough that the dashboard could only report them as failure. All three ran past their end date at the end of September with every milestone overdue, CadreHealth carried each of its milestones twice and its growth strategy three times, Consult For Africa Setup had five milestones all called "30 Day Sprint", and no deliverable anywhere was attached to a milestone or carried a due date.`)}
+        ${p("That has been cleaned up. Duplicates are gone, deliverables are attached to the milestones they belong to and all carry dates, and the three engagement windows now run to 15 December. You are the engagement manager on all three.")}
+        ${h1("What was deliberately left to you")}
+        ${p("The structure was safe to fix. What has actually been achieved was not, so every milestone is still PENDING and the new dates are provisional. Four things need your judgement rather than mine:")}
+        <ul style="font-size:14px;color:#374151;line-height:1.7;padding-left:20px;">
+          <li><b>Mark what is done.</b> Some of these were hit months ago and are still sitting open. CadreHealth has well past two thousand registered professionals, for instance, and that milestone is still PENDING.</li>
+          <li><b>Kill what is dead.</b> The WhatsApp Business API milestone and the Twitter launch have been carried since July. If nobody intends to do them, close them rather than letting them roll forward again.</li>
+          <li><b>Confirm or move the new dates.</b> They were spread evenly between 6 October and 15 December to get the records out of permanent overdue. They are a starting point, not a plan.</li>
+          <li><b>Consult For Africa Setup needs a re-scope.</b> Four milestones share one name and twenty deliverables are attached to none of them. There was no honest way to distribute them, so it was left alone. It needs you and the partner to decide what that project now is, or whether it should be closed.</li>
+        </ul>
+        ${p("One CadreHealth deliverable, the Growth Strategy Document, was left unattached on purpose. It underpins the whole engagement rather than any single milestone.")}
+        ${h1("What happens from now on")}
+        ${p("A weekly task will land on your desk each Monday: post an update on every active engagement you manage, and close or re-date any milestone that has passed. If a project record goes fourteen days without an update the platform will chase you, and at twenty-one days it goes to the partner. That is not aimed at you. It is aimed at the fact that nothing in the platform previously made anybody type into these records at all.")}
+        ${btn("Open your projects", `${BASE_URL}/projects`)}
+      `)
+    );
+    return;
+  }
+
+  if (variant === "intake") {
+    await send(
+      toEmail,
+      "New weekly job: getting closed work onto the platform",
+      layout(`
+        ${h1("Closed work needs to reach the platform")}
+        ${p(`Hi ${toName}, the portfolio view had drifted a long way behind what the firm has actually won. Three engagements that were closed weeks ago were not on the platform at all, and four live client engagements have no engagement manager on them.`)}
+        ${p("From this week there is a standing task on your desk each Wednesday. Check what closed since the week before against the platform: the client exists, the engagement exists, and it has a manager, a start and end date, a budget and its milestones.")}
+        ${p("Where you cannot get the commercial terms, raise the record anyway and flag what is missing. A record with a gap in it is worth far more than no record, which is the state these were in.")}
+        ${btn("Open your desk", `${BASE_URL}/desk`)}
+      `)
+    );
+    return;
+  }
+
+  await send(
+    toEmail,
+    "New weekly job: the platform data sweep",
+    layout(`
+      ${h1("The gaps no alert catches")}
+      ${p(`Hi ${toName}, an engagement with no milestones on it cannot be overdue, so it never appears in any alert and can sit untouched for months. That is how Lyfe Place and Arabella went unnoticed. Nine active engagements are in that state right now.`)}
+      ${p("From this week there is a standing task on your desk each Thursday. Go through the active engagements and find the ones that are structurally incomplete rather than merely late: no engagement manager, no end date, no milestones, no deliverables, deliverables with no due date, duplicate milestones.")}
+      ${p("Send the list to the engagement manager responsible and copy the partner. Remove duplicates where you find them.")}
+      ${btn("Open your desk", `${BASE_URL}/desk`)}
+    `)
+  );
+}

@@ -1974,6 +1974,10 @@ enum AuditAction {
   DOWNLOAD
   LOGIN
   AI_GENERATE
+  /// A project record has fallen behind the work and its manager was chased.
+  FRESHNESS_NUDGE
+  /// The chase went unanswered long enough to reach the partner.
+  FRESHNESS_ESCALATION
 }
 
 // ─── Maarova Assessment Platform ──────────────────────────────────────────────
