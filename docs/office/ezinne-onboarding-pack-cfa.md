@@ -4,7 +4,7 @@
 
 Prepared for Ezinne Orji, Executive Assistant to the Founding Partner
 Consult for Africa internal. Not for circulation outside the firm.
-1 October 2026
+2 October 2026
 
 ---
 
@@ -46,7 +46,7 @@ Founding Partner, Consult for Africa
 | 1 | The firm: what we sell, how we are bought, who is here | Day one. Read once, properly. |
 | 2 | Your role, the delegation chain, and how this office runs | Day one, alongside Part One. |
 | 3 | The platform: your surfaces, and the state they are in today | Day two, in front of the screen. |
-| 4 | Abuja: every live and forming piece of work in the city | First, and before Friday 2 October. |
+| 4 | Abuja: every live and forming piece of work in the city | First. Arabella is live from today. |
 | 5 | The rest of the book of work, Lagos and the products | Week one, then as reference. |
 | 6 | Money: what is owed, what you chase, what you never touch | Week one. |
 | 7 | How we write, and what never leaves the building | Before you write anything. |
@@ -95,7 +95,7 @@ The seven published service lines sit on consultforafrica.com and are worth read
 
 ### 1.4 The progression, and why your diary depends on it
 
-There is a pattern that recurs often enough to plan around. A client buys a small diagnostic, the diagnostic finds something larger than the brief, and the next conversation is about a mandate. Arabella is the clearest live example, because the audit starting this week is explicitly the qualification round for a management contract that begins in month three and is worth a multiple of the audit over a year.
+There is a pattern that recurs often enough to plan around. A client buys a small diagnostic, the diagnostic finds something larger than the brief, and the next conversation is about a mandate. Arabella is the clearest live example, because the audit starting this week is explicitly the qualification round for a management contract proposed from month three that is worth a multiple of the audit over a year. The audit is what is sold; the contract is what it is for.
 
 What that means for you is that a diagnostic deadline is never only a deadline. It is an audition, and the client is forming a view of whether we are the people to hand the business to. When you are deciding what to chase first, the work that is being watched beats the work that is merely due.
 
@@ -277,7 +277,7 @@ Debo moves between the two cities. Assume he is in Lagos unless the diary says o
 
 ### 4.2 Arabella Women's Health, Asokoro
 
-**This is the most important thing on your desk and it starts on Friday 2 October.**
+**This is the most important thing on your desk and it began today.**
 
 #### What it is.
 
@@ -285,83 +285,88 @@ Arabella Women's Health is a women's health facility in Asokoro, Abuja, led by *
 
 Arabella is a **new entity with its own CAC registration and RC number**, and it succeeds **Tabitha Medical Centre**. That succession is the single most important fact in the file, because it decides what moved across and what did not, including the patient records, the staff contracts and the health insurance panels.
 
-#### The money.
+#### The scope, and this is the part to get right.
 
-The audit is invoiced as a mobilisation payment, which was received on 28 September, and a balance dated to month two. Invoice CFA-ARA-2026-001 sits on the platform as partially paid, and the engagement runs 2 October to 30 November 2026. Read the amounts there rather than from any document.
+**We are doing the diagnostic audit, and nothing else.** That is Debo's instruction and it is the sentence to hold on to, because the proposals Dr Chito already holds describe a great deal more than an audit.
 
-The audit is not the prize. The revised commercial dated 5 August has exactly two components, which are the audit as a two month foundation phase and then a **management contract charged as a share of monthly revenue from month three, with a floor in the early months**. One number a month, no tiers, no itemised invoice. The audit fee is deliberately light because of what follows it, so every deliverable in the next eight weeks is an audition for the annuity rather than a job of work.
+Those earlier documents set out a two month foundation phase that included a digital marketing strategy and setup, a public relations strategy with press materials, a pharmacy inventory audit with supply onboarding, the deployment of a client records and operations system with all patient facing staff trained inside a fortnight, a successor health insurance introduction programme, a seconded Head of Quality and Clinical Operations, a reactivation campaign against the Tabitha patient database, and a live dashboard refreshed every twenty four hours. **None of that is what we are delivering now.**
 
-There is a commercial gap you should know about, because it will surface in the balance conversation. The revised commercial built this phase from **four named paid items**, which were the digital marketing strategy and setup, the public relations strategy and press materials, the pharmacy inventory audit with supply onboarding, and the clinical secondment induction. Everything else in the phase is complimentary against a stated market value. **What we actually invoiced is less than the sum of those four items**, so ask Debo which of them was renegotiated down, because if none was then we owe the full set of named deliverables against a smaller fee. The figures are in the engagement record and in the commercial document.
+So the single largest risk on this file is not delivery. It is **the gap between what she has read and what we are doing**, because she will reasonably expect the former and nobody has written down that the scope is narrower. Your job is to make sure that gap is closed in writing rather than discovered in week five when she asks where her marketing strategy is. Raise it with Debo in your first conversation, get the in scope list confirmed, and get it to her as a short note rather than letting the proposal stand as the description of the work.
 
-Also confirm, before the balance is discussed, that the invoice Debo sent carries the non refundable term, the free substitution right and the one free reschedule. The platform record carries those terms in its notes; the emailed document was raised outside our systems and may not.
+When she or Tolu refer to something from that list, do not improvise and do not agree to it. Note it, and bring it back.
 
-#### What Friday actually is.
+#### What the audit actually is.
 
-Friday is week one day one of a two month phase, not a site visit. What the proposal commits to in the first fortnight is heavy and specific.
+The audit is a structured diagnostic and it has four moving parts, all of them already built.
 
-- Kola Momodu on site from day one, five days a week physically inside Arabella
-- The client record and operations system configured and deployed in week one, with **all patient facing staff trained by the end of week two**
-- The **information technology and clinical records audit conducted in week one** through an information security lens, with a prioritised roadmap inside fourteen days
-- The **written operations and commercial diagnostic delivered by the end of week two**, covering revenue by payer, billing leakage points, pharmacy stock and formulary gaps, staff task compliance and database quality
-- The successor health insurance provider package submitted
-- The clinical secondment embedded from week one, with client experience training starting in week three
-- The **revenue baseline agreed by both sides**, which matters commercially because the management fee from month three is calculated against it
+- The **information request**, a ten page document with thirteen lettered sections, A to M, and eight priority items at the front. Section A is the succession question and is the one that matters most: the two entities, what moved and what did not, and custody of the patient records.
+- An **uploader** against each section, so a document she sends is tagged to the question it answers rather than landing in a mailbox.
+- **Four survey instruments**, covering staff, patients, referrers and leadership.
+- The **written operations and commercial diagnostic**, covering revenue by payer, billing leakage, pharmacy stock and formulary gaps, staff task compliance and database quality, and then the report.
 
-#### The three things we need from Dr Chito, and nobody has them.
+The sections that are specific to this client rather than generic are worth knowing, because they are where the findings will come from: the embryology laboratory with its cryostorage consents and tank alarms, the obstetric escalation route in writing with the named intensive care and neonatal unit, what a maternity package excludes and what happens commercially on a caesarean or a transfer out, insurance receivables ageing with rejection reasons, and the lawful basis for contacting the Tabitha database.
 
-The proposal names these explicitly, and the insurance workstream cannot start without the first two.
+That last one is the question with the longest reach. The whole growth case rests on reactivating a patient database of over three thousand records, and if there is no lawful basis for contacting those women then the reactivation is not a marketing exercise, it is a data protection problem. It sits in section A for that reason. Gather the answer rather than letting it drift, even though the campaign itself is not ours to run yet.
 
-1. The Arabella certificate of incorporation and RC number
-2. A list of the health insurance panels Tabitha currently holds, with tariff rates where available
-3. Her signed introduction letter as lead clinician, which we draft for her
+#### The money, and the two things to confirm.
 
-Chase these in the room during the first week rather than by email afterwards, because a request made in person on site is answered and the same request by email joins a queue.
+The audit is invoiced as a mobilisation payment, received on 28 September, and a balance dated to month two. Invoice CFA-ARA-2026-001 sits on the platform as partially paid and the engagement runs 2 October to 30 November 2026. Read the amounts there rather than from any document.
 
-#### The hardest promise in the document.
+Two things need confirming and both are quick. **What the fee covers**, in one written list, for the reason set out above. And whether the invoice Debo sent carries **the non refundable term, the free substitution right and the one free reschedule**, because the platform record carries those terms in its notes and the emailed document was raised outside our systems, so it may not. That matters here specifically: a client has asked us for a refund before on an invoice that was silent on the point.
 
-Arabella is a new entity, so it does not inherit Tabitha's insurance panels. We have not promised to apply from scratch. We have promised a **structured successor provider introduction** using clinical continuity documentation plus Debo's direct relationships with medical directors at Hygeia, AXA Mansard, Avon and Reliance, treated as a tariff negotiation moment rather than a cold application, and the document says that in most cases Arabella ends with better tariffs than Tabitha held. That is a strong claim made in writing and it is the one most likely to be tested, so the evidence for it needs assembling early rather than in month two.
+#### Why the audit is worth more than its fee.
 
-#### The growth case, and the question underneath it.
+The forward path, and it is a proposal rather than an agreement, is a **management contract charged as a share of monthly revenue from month three with a floor in the early months**. One number a month, no tiers, no itemised invoice. Against even the conservative revenue case that is worth a multiple of the audit over a year.
 
-Two assets carry it. The first is a **patient database of over three thousand records** from Tabitha, to be segmented by condition, procedure history, recency and spend, then reactivated in a months three to five sprint on a commission per converted patient. The second is **HERcast**, Dr Chito's own podcast, which already has an audience of women interested in women's health and is treated as a clinical authority channel most practices spend months trying to build.
+So the audit is the qualification round. Every deliverable over the next eight weeks is being read by somebody deciding whether to hand us her business, which is why the quality of the report matters more than the size of the invoice, and why a missed deadline on a small piece of work is expensive out of all proportion to it.
 
-The question underneath the first one is the **lawful basis for contacting the Tabitha database**, and the whole reactivation case rests on it. It is section A of the information request for that reason. Do not let it drift, because a reactivation campaign run without it is a data protection problem rather than a marketing success.
+Treat the rest of the commercial as background you understand and do not quote. The insurance successor programme, the reactivation sprint, the secondment and the dashboard all belong to a phase that has not been sold.
 
-The revenue model runs conservative, base and optimistic against the current baseline, built from premium maternity packages, minimally invasive gynaecology, fertility treatment into what the document calls a severely underserved Federal Capital Territory market, Tabitha reactivation, corporate and insurance referrals off the embassy belt and the oil and gas accounts, wellness and nutrition, and a pharmacy inventory uplift. Even the conservative case is a large multiple of where she is today, which is why the management contract matters more than the audit.
+#### What we need from Dr Chito.
 
-#### Two staffing commitments to verify.
+Two documents, and both are audit evidence rather than paperwork.
 
-Kola Momodu is named in the proposal as our on site Project Owner, five days a week, owning the system deployment, the Monday data brief, the week one technology audit and the data infrastructure the fee is calculated against. He is an independent contractor with 5 per cent withholding tax deducted at source and remitted by us. **Confirm he is free for Friday.**
+1. The Arabella **certificate of incorporation and RC number**, which is where the succession question starts
+2. A list of the **health insurance panels Tabitha currently holds**, with tariff rates where available, which is how the payer and receivables picture gets built
 
-The proposal also sells a seconded **Head of Quality and Clinical Operations**, three days a week in months three to six and four days from month seven, reporting to Dr Nwana, described as a specific candidate confirmed and briefed before engagement start. **No candidate is named anywhere.** Establish whether that person exists before the first week is invoiced against.
+A third item, her signed introduction letter as lead clinician, appears in the proposals and belongs to the insurance successor programme. **It is not needed for the audit**, so do not chase it, and if she offers it, park it.
+
+Ask in the room rather than by email, because a request made in person on site is answered and the same request by email joins a queue.
+
+#### Who is on it.
+
+**Kola Momodu** is our named on site Project Owner. He spent nearly nine years at Cedarcrest Abuja, he is certified as a lead auditor in information security, and he is an independent contractor, which means 5 per cent withholding tax is deducted at source and remitted by us.
+
+The proposals commit him to five days a week physically inside Arabella, which was written for the full foundation phase rather than for an audit. **Confirm with Debo what he is actually doing and for how many days**, because the client has read the larger number and will notice if he is there less, and because he should not be committed to five days of a two month phase that is not running.
+
+The seconded Head of Quality and Clinical Operations in the proposals is part of the same unsold phase, so no candidate is needed now. Worth knowing for when it comes back, since the document described that person as confirmed and briefed before engagement start and named nobody.
 
 #### What she has been promised she will see.
 
-A live dashboard showing consultations, maternity packages, revenue attributed, pipeline value and reactivation conversion, refreshed every twenty four hours, plus a **five minute brief by message every Monday** and a monthly review call with Debo.
+A live dashboard showing consultations, maternity packages, revenue attributed, pipeline value and reactivation conversion, refreshed every twenty four hours, plus a short brief by message every Monday and a monthly review call with Debo.
 
-The dashboard route does not exist yet. The mock in the proposal is detailed enough that she will expect the real thing, and because the management fee is explicitly calculated from the revenue it confirms, the dashboard is a billing dependency rather than a nicety. Track it as one.
+The dashboard belongs to the management phase and the route does not exist. Do not promise it and do not let anybody else promise it. What is worth doing inside the audit is the **weekly brief**, because it is cheap, it is the habit the management relationship would run on, and it is the best possible demonstration of what we would be like to work with. Set it up as a standing item.
 
 #### The one link, and the fact that it has not gone out.
 
-Everything the client needs sits at **consultforafrica.com/ArabellaProject**, which is unindexed and was built so that we send one link instead of six attachments. It carries the ten page information request, the eight before Friday priorities, an uploader that tags each file to the section it answers, four surveys, and a week by week view of the first fortnight.
+Everything the client needs sits at **consultforafrica.com/ArabellaProject**, which is unindexed and was built so that we send one link instead of six attachments. It carries the information request, the eight priority items, the uploader, the four surveys and a week by week view of the first fortnight.
 
-It is live in production and was verified there on 30 September. **It has not been sent to her, because her email address is not recorded anywhere.** Getting that address and sending the link is the first thing on your list, and it is overdue from the moment our team is on her site rather than from any date in a plan.
+It is live in production and was verified there on 30 September. **It has not been sent to her, because her email address is not recorded anywhere in our systems.** Debo has her details. Ask him, send the link to her and to Tolu, and log the send.
 
-The four surveys are a staff culture instrument of fifty five scale items across twelve sections, a patient experience instrument of twenty four, a referrer instrument of thirteen plus a hundred point allocation, and a leadership direction instrument of twenty four plus an allocation. The referrer one matters more than its length suggests, because Arabella has no referrer list, which is itself a finding, so the form builds the list as it goes by asking every respondent to name up to three colleagues and asking directly about referring that has fallen or stopped. Responses land on the platform and are read at /admin/surveys.
+The four surveys are a staff culture instrument of fifty five scale items across twelve sections, a patient experience instrument of twenty four, a referrer instrument of thirteen plus a hundred point allocation, and a leadership direction instrument of twenty four plus an allocation. The referrer one matters more than its length suggests, because Arabella has no referrer list, which is itself a finding, so the form builds the list as it goes by asking every respondent to name up to three colleagues and asking directly about referring that has fallen or stopped. Responses land on the platform and are read at /admin/surveys. Check the counts weekly, because the Osteon audit sat at zero responses for two weeks and nobody noticed.
 
 #### Your Arabella chase list
 
-- [ ] Dr Chito's email address and phone number, onto the client record
-- [ ] The ArabellaProject link sent to her and to Tolu
+- [ ] Dr Chito's email address and phone number from Debo, onto the client record
+- [ ] The ArabellaProject link sent to her and to Tolu, and logged
+- [ ] The in scope list confirmed with Debo and put to her in writing
 - [ ] CAC certificate and RC number
 - [ ] Current insurance panel list with tariffs
-- [ ] Signed introduction letter drafted, sent for signature, returned
-- [ ] Kola confirmed on site for Friday and for the following four weeks
-- [ ] The clinical secondment candidate named or the gap escalated
-- [ ] Which of the four paid items was renegotiated, confirmed with Debo
+- [ ] What Kola is actually committed to, confirmed and consistent with what she has been told
 - [ ] Non refundable terms confirmed present on the issued invoice
-- [ ] Monday brief scheduled as a standing item from 5 October
-- [ ] Survey distribution to staff, patients and referrers, with a response count checked weekly
+- [ ] The weekly brief set up as a standing item
+- [ ] Survey distribution to staff, patients and referrers, with response counts checked weekly
+- [ ] Uploads arriving against the priority sections, and the silent ones chased
 - [ ] The month two balance diarised, with the trigger for it confirmed in writing
 
 ### 4.3 Lyfe Place Abuja, and the Medbury division
@@ -467,7 +472,7 @@ Before you draft anything to anybody in this city, ask Debo how he knows them. H
 
 ### 4.9 What good looks like in Abuja by the end of October
 
-The Arabella link has been sent, the surveys have real response counts rather than zeroes, the three outstanding items from Dr Chito are in hand, the operations and commercial diagnostic went out by the end of week two, and the Monday brief has gone every Monday without being chased.
+The Arabella link has been sent, the surveys have real response counts rather than zeroes, the audit scope is confirmed in writing on both sides, the two documents we need from Dr Chito are in hand, the operations and commercial diagnostic went out by the end of week two, and the weekly brief has gone every week without being chased.
 
 The visa medical panel question on Lyfe Place has an answer, the sessional fill contradiction has been reconciled in one document, and the schedule of expected government fees for Lagos and Abuja is with Medbury before the commencement date.
 
@@ -833,4 +838,4 @@ Surveys and their responses sit on the platform under the admin surveys reader r
 
 ---
 
-*Office of the Founding Partner, Consult for Africa. Internal. Prepared 1 October 2026. If anything in this pack turns out to be wrong, say so, and it gets corrected rather than worked around.*
+*Office of the Founding Partner, Consult for Africa. Internal. Prepared 1 October 2026, revised 2 October 2026 to narrow the Arabella scope to the diagnostic audit. If anything in this pack turns out to be wrong, say so, and it gets corrected rather than worked around.*

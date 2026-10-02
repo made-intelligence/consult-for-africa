@@ -58,6 +58,18 @@ type Seed = {
   workedExample?: string;
 };
 
+/**
+ * Seeds are matched by title, so renaming one creates a second task and leaves
+ * the first orphaned on her desk. Retiring the old title here removes it, and
+ * only while it is untouched: once somebody has worked on a task it is theirs
+ * and gets left alone, duplicate or not, for a human to resolve.
+ */
+const RETIRED_TITLES = [
+  // Superseded 2 Oct when Debo narrowed Arabella to the diagnostic audit, by
+  // "The audit scope in writing, and the two documents we need from Dr Chito".
+  "The three things we need from Dr Chito",
+];
+
 const FIRST_WEEK: Seed[] = [
   {
     title: "Read the onboarding pack, then sit with me on Arabella and Medbury",
@@ -72,18 +84,18 @@ const FIRST_WEEK: Seed[] = [
   {
     title: "Dr Chito's contact details, and the Arabella link sent",
     brief:
-      "Arabella is the largest thing starting this month and the audit is the gate to a management contract charged as a share of revenue. Everything the client needs sits on one unindexed page at consultforafrica.com/ArabellaProject, which is live and verified in production and has never been sent, because her email address is not recorded anywhere in our systems. Debo has her details, so ask him directly rather than hunting for them. Our team is on her site today, so this is already late.",
+      "Arabella is the largest thing starting this month, and the diagnostic audit is the gate to a management contract that has been proposed and not yet agreed. Everything the client needs for the audit sits on one unindexed page at consultforafrica.com/ArabellaProject, which is live and verified in production and has never been sent, because her email address is not recorded anywhere in our systems. Debo has her details, so ask him directly rather than hunting for them. Our team is on her site today, so this is already late.",
     definitionOfDone:
       "Dr Chito Nwana's email and phone are on the client record, the link has gone to her and to Tolu her Chief of Staff, and the send is logged in Communications with a next action against it.",
     dueOffset: 0,
     estimatedMinutes: 60,
   },
   {
-    title: "The three things we need from Dr Chito",
+    title: "The audit scope in writing, and the two documents we need from Dr Chito",
     brief:
-      "The proposal names three things we need from her and the health insurance workstream cannot start without the first two: the Arabella certificate of incorporation with its RC number, the list of health insurance panels Tabitha currently holds with tariff rates where available, and her signed introduction letter as lead clinician, which we draft for her. None of them are in hand.",
+      "We are doing the diagnostic audit at Arabella and nothing else, but the proposals Dr Chito already holds describe a full two month foundation phase including marketing, public relations, a records system with staff training, an insurance successor programme, a secondment and a dashboard. She will reasonably expect what she has read, and nobody has written down that the scope is narrower, so the largest risk on this file is the gap between the two rather than delivery. Alongside closing that, the audit needs two documents from her that are evidence rather than paperwork: the Arabella certificate of incorporation with its RC number, which is where the succession question starts, and the list of health insurance panels Tabitha currently holds with tariff rates where available, which is how the payer and receivables picture gets built. The signed introduction letter in the proposals belongs to the unsold phase, so do not chase it.",
     definitionOfDone:
-      "All three are either received and filed against the engagement, or each has a named person and a promised date on the commitment register. The introduction letter has been drafted and sent for signature rather than merely asked for.",
+      "The in scope list is confirmed with Debo and has gone to Dr Chito as a short written note, so the audit scope is agreed on both sides rather than inferred from an older proposal. Both documents are either received and filed against the engagement, or each has a named person and a promised date on the commitment register.",
     dueOffset: 4,
     checkInOffset: 2,
     estimatedMinutes: 120,
@@ -170,7 +182,14 @@ async function main() {
   });
   console.log(`${moved.count} recurring item(s) now reviewed by ${ea.name} rather than ${partner.name}`);
 
-  // 3. Her first week, raised to the standard the office asks of everybody else.
+  // 3. Retire any seed title that has since been renamed, before seeding, so a
+  //    rename does not leave two tasks saying overlapping things.
+  const retired = await prisma.task.deleteMany({
+    where: { assigneeId: ea.id, title: { in: RETIRED_TITLES }, status: "ASSIGNED" },
+  });
+  if (retired.count) console.log(`${retired.count} superseded task(s) removed`);
+
+  // 4. Her first week, raised to the standard the office asks of everybody else.
   let created = 0;
   let reconciled = 0;
   for (const seed of FIRST_WEEK) {

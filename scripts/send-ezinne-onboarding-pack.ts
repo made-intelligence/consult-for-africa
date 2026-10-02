@@ -23,34 +23,71 @@ const REPLY_TO = { address: "debo.odulana@consultforafrica.com", name: "Debo Odu
 const FILE = join(process.cwd(), "docs", "office", "ezinne-onboarding-pack-cfa.pdf");
 const NAME = "CFA - Office of the Founding Partner - Onboarding Pack.pdf";
 
-const resend = process.argv.includes("--resend");
+/**
+ * Only the opening of the note changes between sends, so the variants live in
+ * one place keyed by --note. A correction says plainly that it is a correction:
+ * a second copy arriving with a fresh welcome on it reads as a mistake and
+ * makes the reader distrust both versions.
+ */
+type NoteKey = "welcome" | "startdate" | "scope";
 
-const SUBJECT = resend
-  ? "Your onboarding pack, updated, and you start tomorrow"
-  : "Your onboarding pack, and your platform account";
+const NOTE_ARG = process.argv.find((a) => a.startsWith("--note="));
+const NOTE: NoteKey = (NOTE_ARG?.split("=")[1] as NoteKey) ?? "welcome";
 
-const openingHtml = resend
-  ? `<p>Ezinne,</p>
+const SUBJECTS: Record<NoteKey, string> = {
+  welcome: "Your onboarding pack, and your platform account",
+  startdate: "Your onboarding pack, updated, and you start tomorrow",
+  scope: "Arabella scope correction, and a revised pack",
+};
+
+const OPENINGS_HTML: Record<NoteKey, string> = {
+  welcome: `<p>Ezinne,</p>
+     <p>Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the
+        fastest way to understand what you have joined, because the shape of this firm is not obvious from the
+        outside and you would otherwise spend a month working it out by inference.</p>`,
+  startdate: `<p>Ezinne,</p>
      <p>This replaces the pack I sent you earlier today. Debo has confirmed you start <strong>tomorrow,
         Friday 2 October</strong>, which is also day one of the Arabella engagement in Asokoro, so your first
         day and the largest piece of work the firm has starting begin together.</p>
      <p>That changes one thing about how to read it. <strong>Read Part Four first, tonight if you can</strong>,
         because it is the Abuja part and Arabella is most of it. Parts One to Three can wait for the weekend
-        and the start of next week.</p>`
-  : `<p>Ezinne,</p>
-     <p>Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the
-        fastest way to understand what you have joined, because the shape of this firm is not obvious from the
-        outside and you would otherwise spend a month working it out by inference.</p>`;
+        and the start of next week.</p>`,
+  scope: `<p>Ezinne,</p>
+     <p>A correction on the pack, and it matters today, so please work from the attached copy and discard the
+        one from last night.</p>
+     <p>Debo has confirmed that <strong>at Arabella we are doing the diagnostic audit and nothing else</strong>.
+        The version you have describes the full two month foundation phase from the proposals, which included
+        marketing, public relations, a records system with staff training, an insurance successor programme, a
+        secondment and a live dashboard. We are not delivering any of that, so none of it is yours to chase.</p>
+     <p>Part Four has been rewritten accordingly, and the task on your desk about the documents we need from
+        Dr Chito has changed with it. Two things are worth reading properly rather than skimming. The audit
+        itself, which is the information request with its thirteen sections, the uploads against each one, the
+        four surveys and the report. And the risk, which is not delivery: Dr Chito holds proposals describing
+        much more than we are doing, nobody has written down that the scope is narrower, and closing that in
+        writing is now the first item on the Arabella list.</p>`,
+};
 
-const openingText = resend
-  ? `Ezinne,
+const OPENINGS_TEXT: Record<NoteKey, string> = {
+  welcome: `Ezinne,
 
-This replaces the pack I sent you earlier today. Debo has confirmed you start tomorrow, Friday 2 October, which is also day one of the Arabella engagement in Asokoro, so your first day and the largest piece of work the firm has starting begin together.
+Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the fastest way to understand what you have joined.`,
+  startdate: `Ezinne,
 
-That changes one thing about how to read it. Read Part Four first, tonight if you can, because it is the Abuja part and Arabella is most of it. Parts One to Three can wait for the weekend and the start of next week.`
-  : `Ezinne,
+This replaces the pack I sent you earlier today. Debo has confirmed you start tomorrow, Friday 2 October, which is also day one of the Arabella engagement in Asokoro.
 
-Welcome, and congratulations. Attached is your onboarding pack. It is twenty seven pages and it is the fastest way to understand what you have joined.`;
+Read Part Four first, tonight if you can, because it is the Abuja part and Arabella is most of it.`,
+  scope: `Ezinne,
+
+A correction on the pack, and it matters today, so please work from the attached copy and discard the one from last night.
+
+Debo has confirmed that at Arabella we are doing the diagnostic audit and nothing else. The version you have describes the full two month foundation phase from the proposals, which included marketing, public relations, a records system with staff training, an insurance successor programme, a secondment and a live dashboard. We are not delivering any of that, so none of it is yours to chase.
+
+Part Four has been rewritten accordingly, and the task on your desk about the documents we need from Dr Chito has changed with it. Two things are worth reading properly rather than skimming. The audit itself, which is the information request with its thirteen sections, the uploads against each one, the four surveys and the report. And the risk, which is not delivery: Dr Chito holds proposals describing much more than we are doing, nobody has written down that the scope is narrower, and closing that in writing is now the first item on the Arabella list.`,
+};
+
+const SUBJECT = SUBJECTS[NOTE];
+const openingHtml = OPENINGS_HTML[NOTE];
+const openingText = OPENINGS_TEXT[NOTE];
 
 const html = `
 <div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#1f2937">
@@ -89,7 +126,7 @@ Consult for Africa`;
 
 async function main() {
   const apply = process.argv.includes("--apply");
-  if (resend) console.log("RESEND: the note says this replaces the earlier copy.");
+  if (NOTE !== "welcome") console.log(`NOTE MODE: ${NOTE}. The opening says plainly that this replaces the earlier copy.`);
   if (!existsSync(FILE)) throw new Error(`Not found: ${FILE}. Run python3 scripts/build-office-onboarding.py first.`);
 
   const buf = readFileSync(FILE);
