@@ -72,7 +72,7 @@ const FIRST_WEEK: Seed[] = [
   {
     title: "Dr Chito's contact details, and the Arabella link sent",
     brief:
-      "Arabella is the largest thing starting this month and the audit is the gate to a management contract charged as a share of revenue. Everything the client needs sits on one unindexed page at consultforafrica.com/ArabellaProject, which is live and verified in production and has never been sent, because her email address is not recorded anywhere in our systems. Our team is on her site, so this is already late.",
+      "Arabella is the largest thing starting this month and the audit is the gate to a management contract charged as a share of revenue. Everything the client needs sits on one unindexed page at consultforafrica.com/ArabellaProject, which is live and verified in production and has never been sent, because her email address is not recorded anywhere in our systems. Debo has her details, so ask him directly rather than hunting for them. Our team is on her site today, so this is already late.",
     definitionOfDone:
       "Dr Chito Nwana's email and phone are on the client record, the link has gone to her and to Tolu her Chief of Staff, and the send is logged in Communications with a next action against it.",
     dueOffset: 0,
