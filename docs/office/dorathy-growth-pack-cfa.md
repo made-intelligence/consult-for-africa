@@ -30,7 +30,13 @@ I will give you the relationships. Ask me how I know somebody before you write t
 
 The last thing is confidentiality, which I am strict about. Everything here is real, including the client names, the findings and the shape of the deals, because you cannot sell what you do not understand. None of it leaves the firm. We describe our work by method and lesson, never by client, and in a market this small a combination of harmless details identifies somebody.
 
-Read Parts Four and Five first. Then Three, then the rest. The natural first step after that is for you and me to sit down and settle three things: what we do about the pipeline, whether the products get a campaign or a parking space, and your own terms, which Part Two is honest about being unsettled.
+On timing. You are full time from January, so this pack is deliberately arriving three months early, and that is the best thing about it. Nobody gets to read their firm properly before they start. You do. Read Parts Four and Five first, then Three, then the rest, and do it across the next few weeks rather than the next few days.
+
+What I do not want is for the January start to read as three quiet months. Two things are worth doing now. Tell me where you think I am wrong, because a view formed before you are inside the machine is worth more than one formed after. And keep the Aman engagement moving, because that is already yours and it is the only part of this book you have actually run.
+
+The things in this pack with dates on them are mine until January, not yours. Part Eight says which ones and who is holding each, because a handover list that assumes you are already here would have you worrying in October about work you cannot touch until the new year.
+
+The natural first step is for you and me to sit down and settle three things: what we do about the pipeline between now and January, whether the products get a campaign or a parking space, and your own terms, which Part Two is honest about being unsettled.
 
 Warm regards,
 
@@ -50,14 +56,14 @@ Founding Partner, Consult for Africa
 | 5 | The products, which are yours: Maarova, CadreHealth, Mezo and the rest | **Second.** The longest part, because it is the least understood. |
 | 6 | The growth arithmetic: which lever is worth most | Week one, then again monthly. |
 | 7 | How we sell, how we price, and the rules on writing | Before you send anything to anybody. |
-| 8 | Your first ninety days | Week one, then again at week four. |
+| 8 | What is held by whom until January, and your first ninety days from there | Now, for the handover list. Again in January. |
 | A to E | Directory, glossary, the channels, the checklists, where things live | Whenever you are unsure. |
 
 Two conventions, and one deliberate absence.
 
-Where a fact needs confirming rather than knowing, it says so in the text, and those are flags rather than gaps somebody forgot to fill. Where a number is given, it was read off the live platform on 2 October 2026 and it will have moved by the time you act on it, so check it before you quote it to anyone.
+Where a fact needs confirming rather than knowing, it says so in the text, and those are flags rather than gaps somebody forgot to fill. Where a number is given, it was read off the live platform on 2 October 2026, which is three months before you start, so by January every figure in Part Five in particular will have moved. Treat them as the shape of the problem rather than as its measurements, and re read them off the platform when you arrive.
 
-The absence is money. **This document carries no fees, no rates and no client balances**, because fee structures are the most sensitive commercial information the firm holds and a document travels in a way a login does not. The figures are not being withheld from you, they are being kept out of a mailbox: every one of them is on the platform at **/finance/rate-card**, which exists for this role, and section 1.6 tells you what is on it and why you cannot open it yet. What this pack carries instead is the pricing logic, which is the part that survives a change of number.
+The absence is money. **This document carries no fees, no rates and no client balances**, because fee structures are the most sensitive commercial information the firm holds and a document travels in a way a login does not. The figures are not being withheld from you, they are being kept out of a mailbox: they sit on the platform behind a login, and section 1.6 tells you where and when. What this pack carries instead is the pricing logic, which is the part that survives a change of number and the part you can usefully argue with before January.
 
 ---
 
@@ -145,9 +151,9 @@ The numbers are not in this document. The logic is, and the logic is what you wi
 
 **Performance and success fees are where Debo is taking the firm.** House of Refuge runs a fundraising mandate charged as a share of funds raised. Dennis Ashley is priced as a share of collections. Arabella's forward path is a share of monthly revenue with a floor in the early months. The Medbury division carries a performance share payable only when the board's revenue goal and its margin goal are both met. If you are shaping a new deal, that is the direction of travel and Debo will back you for proposing it.
 
-**Where the figures are.** They are on the platform, at **/finance/rate-card**, which was built for this role. It carries the published day rates by grade, the programme rate, the recruitment position and the one it replaced, the leadership assessment and coaching menu with the coach economics, the member side subscription, the five bases of a build and operate mandate shown as anchor against walk away, the negotiation doctrine, the terms never to concede, and the path to every private concession ladder the firm holds. It also carries the two calibration points that tell you where the floor really is, which matter more than the card itself.
+**Where the figures are.** On the platform, at **/finance/rate-card**, which exists for this role. It carries the published day rates by grade, the programme rate, the recruitment position and the one it replaced, the leadership assessment and coaching menu with the coach economics, the member side subscription, the five bases of a build and operate mandate shown as anchor against walk away, the negotiation doctrine, the terms never to concede, and the path to every private concession ladder the firm holds. It also carries the two calibration points that tell you where the floor really is, which matter more than the card itself.
 
-That page sits behind the elevated roles rather than behind Finance, because the office reads invoice status in order to chase and sees no rates at all. **So you will not reach it while your account still says Consultant**, and that is deliberate rather than an oversight: the role change is the grant. One conversation with Debo settles both.
+**It opens for you in January, with the rest of your access, and there is no need to chase it before then.** The page is gated to the senior roles rather than to Finance, because the office reads invoice status in order to chase and sees no rates at all, and that grant goes with the start rather than ahead of it. Nothing you can usefully do between now and January requires a number off it.
 
 Two things are not on it, on purpose. Client balances and agreed fees, because those live on the engagement record and under Invoices, which is the only place they are ever current, so read a client number there on the day you quote it. And agency pricing, which does not exist yet, covered in Part Five.
 
@@ -168,7 +174,7 @@ Eighty two people hold platform accounts, of which sixty nine are consultants on
 | Ezinne Orji | Executive Assistant to the Founding Partner, Abuja, started 2 October 2026. She owns the Thursday pipeline sweep and the commitment register, so she is the person who will chase what you sell. Abigail Oladejo reports to her. |
 | Kola Momodu | On site Project Owner for Arabella, five days a week in Asokoro. Independent contractor, lead auditor in information security, nearly nine years at Cedarcrest Abuja. |
 
-There are eight directors on the platform, including Matthew Aloba, Dr Adediwura Okeleye, Barr. Osahon Omoruyi, Bukunola Oyedele, Irene Nwaukwa, Olufemi Shonowo, Patience Ugbaja and Tito Ipinmoye. Several hold practice or faculty roles rather than full time posts. Confirming which of them is actually available to you for a client conversation is worth doing in your first fortnight, because a director on a pitch changes how it lands.
+There are eight directors on the platform, including Matthew Aloba, Dr Adediwura Okeleye, Barr. Osahon Omoruyi, Bukunola Oyedele, Irene Nwaukwa, Olufemi Shonowo, Patience Ugbaja and Tito Ipinmoye. Several hold practice or faculty roles rather than full time posts. Confirming which of them is actually available to you for a client conversation is worth doing early in January, because a director on a pitch changes how it lands.
 
 ### 1.8 The wider stable
 
@@ -202,15 +208,17 @@ The title in the firm's own documents is **Director of Business Development and 
 
 **The commercial shape of new deals.** Not setting price, which is Debo's, but proposing structure, because a growth role that cannot shape a deal is a lead generation function with a better title.
 
-### 2.2 What the platform says about you, and why it needs fixing
+### 2.2 What the platform says about you, and what changes in January
 
 You have held a platform account since the fifteenth of May 2026 under your own email address. Your profile records you in Abuja, ten years of experience, tier experienced, primary specialty business development, specialty category strategy, with expertise logged in health insurance, revenue cycle, marketing, content and training. Your bio describes healthcare business development, health insurer partnerships and revenue cycle management, with a track record on corporate partnerships and commercial transformation across hospital networks. That is all correct and it is a good record.
 
-Two things about it are wrong and both are worth raising in your first conversation.
+Three things about it are out of date, and none of them is urgent, which is why they are listed here rather than in the January checklist.
 
-**Your platform role is CONSULTANT, and your recorded title is Business Development Manager.** The firm's own marketing handbook and the Aman strategy both name you as Director of Business Development and Growth. That is not cosmetic, because role is what gates access on this platform: the consultant role reaches the consultant surfaces and not the commercial ones, so as things stand you cannot see the pipeline you are being asked to own, and you cannot reach the rate card either. Debo needs to change it from the admin area, and nobody should do that on his behalf. It is the first thing to settle, because almost everything else in this pack is downstream of it.
+**Your platform role is CONSULTANT and your recorded title is Business Development Manager.** You are Director of Business Development and Growth, which is how the marketing handbook and the Aman strategy both name you, so the record is simply behind. It is worth knowing rather than fixing today, because role is what gates access here: the consultant role reaches the consultant surfaces and not the commercial ones, so the pipeline and the rate card are not open to you yet. That changes when you start, as one act rather than as a series of requests, and it is deliberately tied to the start date rather than run ahead of it.
 
-**No rates are set on your profile and no CV is on file.** Both fields are empty, which matters if you are ever resourced onto a client engagement as a named person on a resourced day schedule, because the schedule prices off the grade.
+What it means in the meantime is practical. If a page tells you that you do not have access, it is the role rather than a fault, so do not spend time on it. The Aman engagement and your consultant surfaces work as they always have.
+
+**No rates are set on your profile and no CV is on file.** Both fields are empty, which matters once you are resourced onto a client engagement as a named person on a resourced day schedule, because the schedule prices off the grade. Worth sending Debo a CV before January so it is not being chased in your first week.
 
 ### 2.3 Who owns what, so you are not negotiating boundaries in month three
 
@@ -236,9 +244,11 @@ He reads on his phone between meetings, often late. Anything that needs a decisi
 
 ### 2.5 What is unsettled, and should be settled early
 
-Your own terms are not recorded anywhere the platform can see, which is the same gap as the missing rates on your profile. Whether you are staff, a director on a practice arrangement, or resourced per engagement changes how you are paid and what you can commit the firm to. Raise it in the first conversation rather than discovering it at the first invoice run.
+Your own terms are not recorded anywhere the platform can see, which is the same gap as the missing rates on your profile. Whether you are staff from January, a director on a practice arrangement, or resourced per engagement changes how you are paid and what you can commit the firm to. Settle it before the start rather than discovering it at the first invoice run, because a January start with unsettled terms turns the first fortnight into an administrative conversation instead of a commercial one.
 
-Separately, there is no business development budget, no sales team, no customer relationship system beyond the platform's own Communications surface, and no agency rate card for the service line you would be selling into the Grandville conversation. None of those is a reason not to start. All of them are things to put in front of Debo as decisions with options rather than as complaints.
+What you are doing between now and then is also worth agreeing explicitly rather than leaving to drift, because the two obvious answers are different sizes. Reading this pack and forming a view is one thing. Carrying the Aman engagement, which is already yours, is another. Picking up anything from Part Eight's held list is a third and it would need a separate arrangement.
+
+Separately, there is no business development budget, no sales team, no customer relationship system beyond the platform's own Communications surface, and no agency rate card for the service line you would be selling into the Grandville conversation. None of those is a reason not to start. All of them are things to put in front of Debo as decisions with options rather than as complaints, and the three months before you start are a better time to do that than the three weeks after.
 
 ---
 
@@ -296,7 +306,7 @@ The payment terms were hardened deliberately, and they are the template Debo now
 
 **The aesthetics venture** is a jointly held vehicle agreed in August with its own name and board, built around Dr Chinwe Kpaduwa, who practises in the United States and leaves Nigeria in November. There is a separate Lagos setup mandate and a management fee structure of a monthly base plus a share of collections and a share of margin.
 
-**Medlyfe Introduces** is a themed evening of a fireside chat, a panel and a cocktail reception on the eighth of October under the Medlyfe brand, with an eight week campaign behind it. It is designed as the first edition of a recurring series rather than a launch, so editions two, three and four inherit the format, the identity, the film library and the guest list on Dr Chinwe's 2027 visits. The evening is in a week and the guest list is a growth asset: it is a room full of exactly the Lagos principals the firm wants, and nobody has planned what we do with it afterwards. That is a concrete opportunity for you in week one.
+**Medlyfe Introduces** is a themed evening of a fireside chat, a panel and a cocktail reception on the eighth of October under the Medlyfe brand, with an eight week campaign behind it. It is designed as the first edition of a recurring series rather than a launch, so editions two, three and four inherit the format, the identity, the film library and the guest list on Dr Chinwe's 2027 visits. The evening is on the eighth of October, so it happens before you start, and the guest list is the growth asset rather than the evening: it is a room full of exactly the Lagos principals the firm wants, and nobody has planned what we do with it afterwards. It is on the held list in section 8.2 for that reason, because the follow up has to be set up before the evening rather than after it.
 
 A fourth strand, the Alameda conversion clinic, has its own business case and cost base.
 
@@ -388,7 +398,7 @@ The one lead came in on the eighteenth of September from a Maarova demo request:
 
 The four draft proposals are for quality and safety auditor recruitment, a SafeCare healthcare quality and patient safety transformation, a healthcare risk management framework, and greenfield healthcare financial modelling and commissioning. Two of them are SafeCare. All were raised in March and April and none was ever sent from the platform, even where a real document went out by email.
 
-So the firm's recorded pipeline is one untouched lead and four six month old drafts, against seventeen clients and twenty one engagements. The pipeline is not thin because demand is thin. It is thin because the pipeline has never been anybody's job, and from today it is yours.
+So the firm's recorded pipeline is one untouched lead and four six month old drafts, against seventeen clients and twenty one engagements. The pipeline is not thin because demand is thin. It is thin because the pipeline has never been anybody's job, and it becomes yours in January. What happens to it between now and then is the first thing to settle with Debo, because three more months of nobody owning it is how the one open lead becomes unanswerable.
 
 ### 4.2 The real pipeline, which lives in Debo's head
 
@@ -478,7 +488,7 @@ The register has grown from roughly six hundred and sixty logged in users at the
 
 The state of it is five employer organisations, four employer accounts, **none verified, none ever logged in**, seven open recruitment mandates, twenty two candidate matches of which every single one came from a candidate applying and not one from us sourcing, zero contact requests and zero shortlists ever created. The seven open mandates are an ecosystem manager, a head of operations for a clinic network, a business manager for supply chain, a chief operating officer for occupational health, a business development manager for medical procurement and healthcare infrastructure, an independent sales partner, and a pharmacist.
 
-So the employer side is a built product with no customers, and the four accounts that do exist are Hartwell Hospital, TowerCare Pharmacy and Novessence Aesthetic Clinic, which was registered twice seventy four seconds apart. Getting those four verified and logged in is a week one job and it is the cheapest possible test of whether the proposition lands.
+So the employer side is a built product with no customers, and the four accounts that do exist are Hartwell Hospital, TowerCare Pharmacy and Novessence Aesthetic Clinic, which was registered twice seventy four seconds apart. Getting those four verified and logged in is a month one job and the cheapest possible test of whether the proposition lands.
 
 **Revenue today and the model in full.** One person has ever paid for a subscription. He is Dr Francis Korie, a diaspora paediatrician in North Carolina chasing a medical science liaison role, who converted himself off a cold list, and he is the single best piece of evidence the firm has about what a paying member actually wants. He is also owed something: he answered the same intake questions four times because of a bug in the advisor history and left with nothing, and the agreed action is to send him the thing he was promised and never received, which is a professional profile and a United States format resume, rather than an apology. That has not been done. Debo wants to see the copy before anything sends.
 
@@ -488,7 +498,7 @@ The full revenue model is placement fees on recruitment, locum margins, employer
 
 **What is most sellable here, in order.** The recruitment service, because it has two warm prospects already asking and a pricing playbook already written. The employer subscription, because it is cheap enough to be an impulse and it seeds the recruitment conversation. And workforce intelligence, because ten thousand records with real salary data is a dataset a ministry, a federation or a multilateral will pay for and nobody has ever offered it to one.
 
-### 5.3 Mezo Health, and the deadline that is nine days away
+### 5.3 Mezo Health, and the deadline that falls before you start
 
 **What it is.** A verified specialist network and a hospital operating stack. A doctor consults at network facilities or by teleconsultation, and Mezo fills the clinic, runs the schedule and collects the payment. It answers a specific and very common problem: a good doctor who wants a private practice does not want to become a landlord, a receptionist, a billing clerk and a claims chaser in order to have one.
 
@@ -522,7 +532,7 @@ The full revenue model is placement fees on recruitment, locum margins, employer
 
 The first is the measurement, which settles an argument. Every one of the doctors who has claimed a place came from the small group who were actually emailed. Cross matching the claimers against everyone ever sent a claim email showed that all of them came from the twenty eight members who went through the survey path and were told, and **zero of the nine hundred and seventy who were never told have claimed anything.** So conversion is roughly sixty eight per cent when a doctor is told they have a place and zero when they are not. The low headline rate is not a product problem or a positioning problem. It is an artefact of never running the campaign.
 
-The second is the deadline. The earliest nine hundred and seventy claim links die on the eleventh of October, which is nine days from today, and re seeding afterwards simply reproduces the same silence. There is a cron that reissues them, so this is recoverable, but it is a decision that has to be taken this week rather than noticed in November.
+The second is the deadline. The earliest nine hundred and seventy claim links die on the eleventh of October, which is before your start date, and re seeding afterwards simply reproduces the same silence. There is a cron that reissues them, so this is recoverable rather than fatal, but the decision belongs to October and not to January, which is why it is the first line on the held list in section 8.2. Whatever is decided, read the position off the platform in January rather than assuming this paragraph still describes it.
 
 The third is a gap. CadreHealth now holds one thousand and twenty four Mezo eligible registered doctors against Mezo's nine hundred and eighty nine, so roughly thirty five newly registered doctors have no place open at all. The backfill is a point in time sweep and needs re running before any send.
 
@@ -596,7 +606,7 @@ The agency is a service line and a real business, run by Nimi, offering position
 
 What exists is the operating brief, which sets out what the agency owns, the service levels it commits to, a three level KPI framework separating agency commercial performance from account delivery performance from our own brands, quality gates described as non negotiable, and a set of standard engagement shapes intended to productise delivery. The pricing section sets out the logic, which is a published rate card, retainer floors, and scope defined tightly enough that a change is visibly a change. The logic is there. The numbers are not.
 
-So the agency is a decision waiting on Debo rather than a product waiting on a market, and forcing that decision is a week one item for you, because you cannot pitch Grandville or anybody else without it.
+So the agency is a decision waiting on Debo rather than a product waiting on a market, and forcing that decision is a month two item, because you cannot pitch Grandville or anybody else without it. It is also the one thing in this pack that could usefully be settled before January, since it needs a conversation rather than a campaign.
 
 One honest point from the brief worth carrying into any agency pitch: in a referral led business, marketing is not judged on inbound volume. It is judged on making the firm findable, giving a referrer something to send, shortening the time from first conversation to signature, and building the standing that makes an owner take the call. Sell the agency on the same basis, because a healthcare provider who expects leads from a brand engagement will be disappointed by a good one.
 
@@ -620,7 +630,9 @@ Worth repeating from Part Three because it is easy to miss. **The Maarova go to 
 
 ### 6.1 What this part is for
 
-You will be offered more opportunities in your first month than you can take, almost all of them real, and the firm has no way of ranking them. This is an attempt at one. It is Debo's view rather than a model, so argue with it.
+You will be offered more opportunities in your first month than you can take, almost all of them real, and the firm has no way of ranking them. This is an attempt at one. It is Debo's view rather than a model, so argue with it, and arguing with it now is more useful than agreeing with it in January.
+
+The ranking is written as at October, so the top two lines will have been resolved one way or another before you arrive. Read the order as the reasoning rather than as the queue: what makes a lever worth pulling here is evidence that the thing already works and that the only missing piece is somebody telling people about it.
 
 ### 6.2 The levers, roughly ranked by what they would produce against what they cost
 
@@ -644,7 +656,7 @@ You will be offered more opportunities in your first month than you can take, al
 
 ### 6.3 What to measure, and what not to
 
-Four numbers would tell Debo more than any report. The number of live qualified opportunities on the pipeline surface, which is currently one. The number of cleared named references, which is currently one. The number of product users who were actually told about the product they are eligible for. And the time from first conversation to signature, which nobody has ever measured here.
+Four numbers would tell Debo more than any report, and the figures beside them are today's rather than January's. The number of live qualified opportunities on the pipeline surface, which is currently one. The number of cleared named references, which is currently one. The number of product users who were actually told about the product they are eligible for. And the time from first conversation to signature, which nobody has ever measured here.
 
 What not to measure is inbound lead volume, because in a referral led business it rewards the wrong activity and it will make a good quarter look bad.
 
@@ -718,38 +730,62 @@ For a proposal or a pitch to a principal, the deliverable is a landscape deck an
 
 ---
 
-## Part Eight: Your first ninety days
+## Part Eight: What is held until January, and your first ninety days from there
 
-### Week one
+### 8.1 Why this part is split
 
-- [ ] Sit with Debo on the pipeline, the products and your own terms, and get the platform role corrected from the admin area
-- [ ] Read Parts Four and Five, then get every name in section 4.2 onto the pipeline surface with a stage, a next action and a date
-- [ ] Reply to Dr Moromoke Ogunko. It is a qualified Maarova development enquiry that has been sitting for a fortnight
-- [ ] Force the Mezo decision before the eleventh of October: campaign, or reissue and campaign later. Engineering in the room
-- [ ] Decide what happens to the four March proposals: sent, rewritten, or closed with a reason
-- [ ] Get the four CadreHealth employer accounts verified and logged in, and find out why none of them ever came back
-- [ ] Settle whether you are at the Medlyfe evening on the eighth, and what the guest list is for afterwards
+You are full time from January, and a good deal of what Part Four and Part Five describe has a date on it before then. So this part separates three things that would otherwise blur: the work that cannot wait and therefore belongs to somebody else for now, the small amount that is genuinely useful for you to do before you start, and the ninety days that begin when you arrive.
 
-### Weeks two to four
+The reason to write the first of those down rather than leave it is that an unowned deadline does not announce itself. If a piece of work in this pack has a date in October and no name against it, it will simply pass, and the most likely outcome is that you inherit it in January as a thing that already failed.
 
-- [ ] Put the Pearl and Osiris recruitment conversations back on the table with a current price, and treat Osiris's partnership ask as a separate parallel track
-- [ ] Build the coaching conversion route: twenty six Maarova reports, four coaches, zero matches. Start with Haven, Duchess and House of Refuge
-- [ ] Chase Duchess to a decision, and Solace to a decision or a written reason
-- [ ] Force the agency rate card decision, then take Grandville forward
-- [ ] Open the rate card once your role is changed, and read the two calibration points on it before you quote anybody
+### 8.2 Held by somebody else until January, with the date
+
+Each of these is live now and none of them is yours. **The purpose of this list is for Debo to put a name against every line, and for you to know in January what was done rather than having to find out.**
+
+| What | When it bites | Why it cannot wait |
+|---|---|---|
+| The Mezo claim links | **11 October 2026** | The earliest of nine hundred and sixty seven links expire that day, and re seeding afterwards reproduces the same silence. The decision is campaign now or reissue and campaign later, and it needs the engineering side in the room because the seeding cron is deliberately silent. |
+| The Medlyfe Introduces evening | **8 October 2026** | A room full of exactly the Lagos principals the firm wants, with no plan for the guest list afterwards. The follow up is worth more than the evening and it has to be set up before, not after. |
+| Dr Moromoke Ogunko | Already a fortnight old | The only lead the firm holds, qualified, with a stated leader count and timeline, unanswered since 18 September. A reply in January is not a reply. |
+| Pearl Oncology and Osiris Health | Already since May | Both asked how to proceed and neither got an answer. Another three months takes it past the point where a polite reopening is available. |
+| Haven instalment three | **22 October 2026** | A receivable, so Ezinne holds the chase, but it belongs in the same view. |
+| The Aman balance | Past due since 27 September | The reconciliation question comes before the chase. This one touches your own engagement, so it is the likeliest candidate to stay with you. |
+| Duchess and Solace | Open now | Both are waiting on a decision rather than on new work, so a chase costs nothing and silence costs the relationship. |
+
+### 8.3 Worth doing before January, and genuinely not more than this
+
+- [ ] Read Parts Four and Five, then Three, then the rest, across the next few weeks
+- [ ] Write down where you think this pack is wrong, and send it. A view formed before you are inside the machine is worth more than one formed after, and it is the only time you will have it
+- [ ] Keep the Aman engagement moving, including the reconciliation question in section 3.6, because that is already yours
+- [ ] Settle your terms with Debo, and what if anything you are picking up between now and the start
+- [ ] Send a CV so the profile gap in section 2.2 is not being chased in your first week
+- [ ] Agree with Debo who holds each line in 8.2, which is a twenty minute conversation and the highest value thing in this part
+
+Everything else can wait, and should. The platform access, the rate card and the pipeline surface all arrive with the start date.
+
+### 8.4 Month one, from January
+
+- [ ] Get every name in section 4.2 onto the pipeline surface with a stage, a next action and a date, and re read Part Five's figures off the platform because they will have moved
+- [ ] Find out what happened to each line in 8.2, and treat anything that lapsed as the first thing to recover
+- [ ] Decide what happens to the four stale proposals: sent, rewritten, or closed with a reason
 - [ ] Agree a qualification standard with Debo and write it down, then apply it to everything in the pipeline
-- [ ] Hold the HealthStack discovery call
-- [ ] Put the four sales agents to work on something, or close the channel
+- [ ] Open the rate card and read the two calibration points on it before you quote anybody
+- [ ] Get the CadreHealth employer accounts verified and logged in, and find out why none of them ever came back
 
-### Month two
+### 8.5 Month two
+
+- [ ] Put the Pearl and Osiris conversations back on the table with a current price, and treat Osiris's partnership ask as a separate parallel track
+- [ ] Build the coaching conversion route: the Maarova reports, the onboarded coaches, and the zero matches between them. Start with Haven, Duchess and House of Refuge
+- [ ] Force the agency rate card decision, then take Grandville forward
+- [ ] Hold the HealthStack discovery call
+- [ ] Put the sales agents to work on something, or close the channel
+- [ ] Start the named reference work with Nimi, because the engagements going well are the ones to ask and the window closes
 
 Own the pipeline rather than rebuild it. By the end of month two the pipeline surface should be the thing the Monday partner meeting runs off, every opportunity on it should have a stage and a next action with a date, and the Thursday sweep should be finding fewer dropped items because fewer are being dropped.
 
-On the products, pick two and go deep rather than touching five. The Mezo campaign and the Maarova coaching conversion are the two with the clearest evidence behind them.
+On the products, pick two and go deep rather than touching five. Whatever the Mezo position is by January, and the Maarova coaching conversion, are the two with the clearest evidence behind them.
 
-Start the named reference work with Nimi, because the engagements that are going well now are the ones to ask, and the window closes.
-
-### Month three
+### 8.6 Month three
 
 Three things should be true. The pipeline forecasts something, because it has stages, dates and a qualification standard applied consistently. At least one product has a running campaign with a number attached that is going in the right direction. And the firm has more than one cleared named reference, which is the thing that makes the next twelve months of selling easier than the last twelve.
 
@@ -757,7 +793,7 @@ Three things should be true. The pipeline forecasts something, because it has st
 
 ## Appendix A: The directory
 
-Confirm titles and reporting lines with Debo in your first fortnight, because some of these are practice or faculty roles rather than full time posts.
+Confirm titles and reporting lines with Debo when you start, because some of these are practice or faculty roles rather than full time posts, and several will have moved by January.
 
 | Person | Role | Contact |
 |---|---|---|
@@ -906,7 +942,7 @@ Every route to market the firm has, and the honest state of each.
 
 Client documents are PDFs in the repository's documents folder, organised by client, each generated by a script so a figure cannot drift between a summary and a full document.
 
-The ones most worth reading in your first fortnight, in this order: the marketing handbook and the marketing operating brief, which cover the four brands and the rules in more depth than Part One does here; the Aman provider strategy, which is your own practice and the best worked example of the reframe; the recruitment pricing memo, remembering that the headline rate moved in September; the Maarova methodology brief and the pricing strategy note; the Medbury division memorandum and its one page summary, for the payment terms Debo now wants everywhere; the Haven growth strategy, as the firm's best turnaround case; and the Mezo handoff note, which is how a doctor actually gets a place.
+The ones most worth reading before January, in this order: the marketing handbook and the marketing operating brief, which cover the four brands and the rules in more depth than Part One does here; the Aman provider strategy, which is your own practice and the best worked example of the reframe; the recruitment pricing memo, remembering that the headline rate moved in September; the Maarova methodology brief and the pricing strategy note; the Medbury division memorandum and its one page summary, for the payment terms Debo now wants everywhere; the Haven growth strategy, as the firm's best turnaround case; and the Mezo handoff note, which is how a doctor actually gets a place.
 
 Client facing project links are single unindexed pages carrying everything a client needs instead of six attachments. Two are live, for Arabella and for Osteon.
 
@@ -916,4 +952,4 @@ Product state is best read off the platform rather than off any document, becaus
 
 ---
 
-*Business Development and Growth, Consult for Africa. Internal. Prepared 2 October 2026, with every figure read off the live platform on that date. If anything in this pack turns out to be wrong, say so, and it gets corrected rather than worked around.*
+*Business Development and Growth, Consult for Africa. Internal. Prepared 2 October 2026 for a January start, with every figure read off the live platform on that date, which means Part Five in particular is a snapshot of a moving thing. Revised the same day to separate what is held until January from what begins when you arrive. If anything in this pack turns out to be wrong, say so, and it gets corrected rather than worked around.*
