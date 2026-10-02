@@ -4704,6 +4704,15 @@ model CadreEmployerOrg {
   verifiedBy   User?     @relation("CadreEmployerVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
   verifiedNote String?   @db.Text
 
+  /// What a professional is told, when the client is not to be named.
+  ///
+  /// A confidential search is only confidential if it is confidential
+  /// everywhere. The job board already carried an anonymous label, but an
+  /// approach said "<real client name> would like to contact you" and handed
+  /// the name straight to the doctor, which threw the whole thing away on the
+  /// first message. Null means the client is named openly.
+  publicName String?
+
   members         CadreEmployerAccount[]
   mandates        CadreMandate[]
   shortlists      CadreShortlist[]
