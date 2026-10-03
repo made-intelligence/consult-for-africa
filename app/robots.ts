@@ -25,6 +25,13 @@ export default function robots(): MetadataRoute.Robots {
           // ilé is live for the founders to test but is not launched.
           // Remove this when the waiting list opens publicly.
           "/ile",
+          // Lyfe is a consumer brand that will move to its own domain. Until
+          // it does, keeping it out of the index stops Google tying a plastic
+          // surgery practice to its management consultant's site, and stops
+          // consultforafrica.com/lyfe becoming the URL people share. Paid and
+          // WhatsApp traffic reach it perfectly well without being indexed.
+          // Remove this the day the domain is pointed.
+          "/lyfe",
         ],
       },
     ],
