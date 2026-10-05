@@ -173,7 +173,7 @@ export default function EnquiryForm({
         </h3>
         <p className="mt-3 leading-relaxed" style={{ color: C.body }}>
           {done === "EVENT_RSVP"
-            ? `We will send the address and the running order closer to ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
+            ? `A member of the team will call to confirm you personally before ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
             : "A coordinator will call you shortly. If you would rather not wait for the phone to ring, message us and we will pick it up straight away."}
         </p>
         <a
@@ -325,7 +325,7 @@ export default function EnquiryForm({
           <Head>{rsvp ? "Tell us who is coming" : "How do we reach you?"}</Head>
           <p className="mt-2.5 text-sm leading-relaxed" style={{ color: C.body }}>
             {rsvp
-              ? `${LYFE_EVENT.date}. ${LYFE_EVENT.time}. We will send the address nearer the day.`
+              ? `${LYFE_EVENT.date}. Cocktails ${LYFE_EVENT.cocktails}, programme ${LYFE_EVENT.programme}. Please reply by ${LYFE_EVENT.rsvpBy}.`
               : "A coordinator calls you, usually the same day. Give us the number you actually answer."}
           </p>
 

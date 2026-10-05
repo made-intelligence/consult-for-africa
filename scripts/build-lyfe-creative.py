@@ -94,12 +94,12 @@ WA_MESSAGE = "Hello, I would like to ask about a consultation."
 CONSULT_FEE = "N50,000"
 
 # The evening. Date and venue move, so they are arguments rather than copy.
-EVENT_NAME = "Medlyfe Introduces"
-EVENT_THEME = "Feel Good Within and Look Better Outward"
-EVENT_DATE = "Saturday 10 October"
-EVENT_TIME = "From 6.30pm"
-EVENT_DRESS = "Cocktail"
-EVENT_VENUE = "Lagos Island"
+EVENT_NAME = "Medlyfe Wellness and Longevity Centre"
+EVENT_THEME = "Feel Good, Look Good, Live Better."
+EVENT_DATE = "Thursday 15 October"
+EVENT_TIME = "Cocktails 6.30pm"
+EVENT_DRESS = "RSVP by 12 October"
+EVENT_VENUE = "Greenhouse, Lagos"
 RSVP_MESSAGE = "Hello, I would like to RSVP to the evening."
 CALL_MESSAGE = "Hello, I would like to book a discovery call."
 
@@ -181,15 +181,15 @@ FEED = [
     },
     {
         "kicker": "AN INVITATION",
-        "head": EVENT_THEME,
+        "head": "You are\ninvited",
         "items": [
-            "A panel on why the woman who sleeps badly, carries weight she cannot shift and dislikes her skin has one problem rather than three.",
-            "A conversation with Dr Chinwe Kpaduwa, under her own title, The Art of Looking Like Yourself.",
-            "The full menu, said out loud, with the prices.",
-            "Questions from the room. The ones people are too polite to ask in a consultation.",
+            "An introduction to what Medlyfe has built across wellness and aesthetics.",
+            "A conversation about how wellbeing, longevity, confidence and appearance connect.",
+            "Dr Chinwe Kpaduwa, MD FACS, on The Art of Looking Like Yourself.",
+            "The services, what each is for, and what to expect when you visit.",
             EVENT_DATE + ". " + EVENT_TIME + ". " + EVENT_VENUE + ". " + EVENT_DRESS + ".",
         ],
-        "foot": "By invitation, and numbers are limited. Message us to RSVP and the address follows.",
+        "foot": "\u201C" + EVENT_THEME + "\u201D. By invitation, and numbers are limited. Message us to RSVP and the address follows.",
         "theme": "dark",
     },
 ]
@@ -316,12 +316,24 @@ def build_feed(url: str):
         f_k = font(SANS, SANS_B_I, 20)
         tracked(d, (M, M), spec["kicker"], f_k, BRONZE if dark else BRONZE_DEEP, track=7)
 
-        # the one dominant message
-        f_h = font(DISPLAY, DISPLAY_I, 82)
+        # The one dominant message. Manual line breaks are honoured, but every
+        # segment is wrapped to the column as well, because a headline that
+        # runs off the right edge is the one mistake this format cannot
+        # survive. Shrinks a step at a time until it fits the space it has.
+        head_size = 82
+        while True:
+            f_h = font(DISPLAY, DISPLAY_I, head_size)
+            head_lines = []
+            for seg in spec["head"].split("\n"):
+                head_lines.extend(wrap(d, seg, f_h, W - 2 * M))
+            if len(head_lines) <= 4 or head_size <= 54:
+                break
+            head_size -= 6
+        lead = int(head_size * 1.12)
         y = M + 74
-        for line in spec["head"].split("\n"):
+        for line in head_lines:
             d.text((M, y), line, font=f_h, fill=head_c)
-            y += 92
+            y += lead
 
         y += 26
         d.rectangle([M, y, M + 76, y + 4], fill=rule_c)
@@ -385,11 +397,19 @@ def build_stories(url: str):
 
         # The block is optically centred in the safe area rather than pinned to
         # the top, which is what left a dead band through the middle before.
-        f_h = font(DISPLAY, DISPLAY_I, 96)
         f_s = font(SANS, SANS_I, 36)
-        head_lines = spec["head"].split("\n")
+        head_size = 96
+        while True:
+            f_h = font(DISPLAY, DISPLAY_I, head_size)
+            head_lines = []
+            for seg in spec["head"].split("\n"):
+                head_lines.extend(wrap(d, seg, f_h, W - 2 * M))
+            if len(head_lines) <= 5 or head_size <= 62:
+                break
+            head_size -= 6
+        head_lead = int(head_size * 1.17)
         sub_lines = wrap(d, spec["sub"], f_s, W - 2 * M)
-        block_h = 112 * len(head_lines) + 30 + 5 + 56 + 50 * len(sub_lines)
+        block_h = head_lead * len(head_lines) + 30 + 5 + 56 + 50 * len(sub_lines)
         qr_px = 240
         cta_h = qr_px + 70
         avail = (H - SAFE_BOTTOM) - SAFE_TOP
@@ -397,7 +417,7 @@ def build_stories(url: str):
 
         for line in head_lines:
             d.text((M, y), line, font=f_h, fill=head_c)
-            y += 112
+            y += head_lead
 
         y += 30
         d.rectangle([M, y, M + 84, y + 5], fill=BRONZE)

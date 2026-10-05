@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   LYFE_AFTERCARE,
   LYFE_BRAND as C,
@@ -13,7 +14,9 @@ import {
   LYFE_PROMISE,
   LYFE_STANDARDS,
   LYFE_SURGICAL_FEE_NOTE,
+  LYFE_SURGEON,
   LYFE_THEME,
+  MEDLYFE_BRAND as MB,
   whatsappLink,
 } from "@/lib/lyfe";
 import EnquiryForm from "./EnquiryForm";
@@ -160,7 +163,7 @@ function Hero() {
           >
             <span className="block text-sm font-semibold">{LYFE_DOORS.EVENT_RSVP.cta}</span>
             <span className="mt-1 block text-[13px] opacity-85">
-              {LYFE_EVENT.date}. {LYFE_EVENT.time}.
+              {LYFE_EVENT.date}. Cocktails {LYFE_EVENT.cocktails}.
             </span>
           </a>
           <a
@@ -193,73 +196,183 @@ function Hero() {
 
 /* ─── the evening ──────────────────────────────────────────────────────────── */
 
+/**
+ * This section wears Medlyfe's colours, not Lyfe's.
+ *
+ * Medlyfe is the trading, licensed, bookable entity and it is the host.
+ * Lyfe Plastics is introduced on the night, which is the billing that keeps
+ * the whole thing proper under Part F. Making the section visibly Medlyfe's
+ * is not decoration, it is the compliance position rendered in colour.
+ */
 function Evening() {
   return (
-    <Section bg={C.groundWarm} id="evening">
-      <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
-        <div>
-          <Eyebrow>{LYFE_EVENT.name}</Eyebrow>
-          <H>{LYFE_EVENT.theme}</H>
-          <p className="mt-5 text-[16px] leading-relaxed">
-            How you feel and how you look are the same appointment, and almost nobody in this
-            city treats them that way. An evening of conversation about that, hosted by the
-            clinic, with {LYFE_NAME} introduced on the night.
-          </p>
+    <section id="evening" style={{ background: MB.blue }}>
+      <div className="mx-auto w-full max-w-5xl px-5 py-16 md:px-8 md:py-24">
+        <div
+          className="rounded-2xl p-6 md:p-10"
+          style={{ border: `1px solid ${MB.lime}66` }}
+        >
+          <div className="grid gap-10 md:grid-cols-[1.15fr_1fr] md:gap-14">
+            <div>
+              <MedlyfeLockup />
+              <p
+                className="mt-7 text-[11px] font-semibold uppercase"
+                style={{ color: MB.lime, letterSpacing: "0.16em" }}
+              >
+                With {LYFE_EVENT.withWhom}
+              </p>
 
-          <dl className="mt-8 space-y-3 text-[15px]">
-            <EventFact k="When" v={`${LYFE_EVENT.date}, ${LYFE_EVENT.time.toLowerCase()}`} />
-            <EventFact k="Where" v={LYFE_EVENT.venue} />
-            <EventFact k="Dress" v={LYFE_EVENT.dress} />
-          </dl>
+              <h2
+                className="mt-4 text-[30px] leading-[1.1] md:text-[44px]"
+                style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
+              >
+                {LYFE_EVENT.tagline}
+              </h2>
+              <p className="mt-4 text-[17px] leading-relaxed" style={{ color: MB.limeSoft }}>
+                {LYFE_EVENT.standfirst}
+              </p>
 
-          <a
-            href="?go=rsvp#enquire"
-            className="mt-8 inline-block rounded-xl px-7 py-4 text-sm font-semibold transition hover:opacity-90"
-            style={{ background: C.ink, color: "#FFFFFF" }}
-          >
-            {LYFE_DOORS.EVENT_RSVP.cta}
-          </a>
-          <p className="mt-3 text-[13px]" style={{ color: C.muted }}>
-            {LYFE_DOORS.EVENT_RSVP.note}
-          </p>
-        </div>
+              <p className="mt-6 max-w-xl text-[15px] leading-relaxed" style={{ color: "#D5E2E6" }}>
+                How you feel and how you look are part of the same conversation. Most of us
+                have been having it in separate rooms: one for sleep, weight and energy,
+                another for skin, appearance and aesthetics. For one evening, Medlyfe brings
+                them together.
+              </p>
 
-        <div>
-          <p className="text-[11px] font-semibold uppercase" style={{ color: C.bronzeDeep, letterSpacing: "0.14em" }}>
-            The evening
-          </p>
-          <div className="mt-5 space-y-5">
-            {LYFE_EVENT_PROGRAMME.map((item) => (
-              <div key={item.title} className="flex gap-4">
-                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: C.bronze }} />
-                <div>
-                  <h3 className="text-[16px] font-semibold" style={{ color: C.ink }}>
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-[14px] leading-relaxed">{item.body}</p>
-                </div>
+              <dl className="mt-8 space-y-2.5 text-[15px]">
+                <EventFact k="Date" v={LYFE_EVENT.date} />
+                <EventFact k="Cocktails" v={LYFE_EVENT.cocktails} />
+                <EventFact k="Programme" v={LYFE_EVENT.programme} />
+                <EventFact k="Close" v={LYFE_EVENT.close} />
+                <EventFact
+                  k="Venue"
+                  v={
+                    LYFE_EVENT.venueAddress
+                      ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
+                      : LYFE_EVENT.venueName
+                  }
+                />
+                <EventFact k="RSVP by" v={LYFE_EVENT.rsvpBy} />
+              </dl>
+
+              <a
+                href="?go=rsvp#enquire"
+                className="mt-9 inline-block rounded-xl px-7 py-4 text-sm font-semibold transition hover:opacity-90"
+                style={{ background: MB.lime, color: MB.blueDeep }}
+              >
+                {LYFE_DOORS.EVENT_RSVP.cta}
+              </a>
+              <p className="mt-3 text-[13px]" style={{ color: MB.blueSoft }}>
+                A member of the team will call to confirm each guest personally.
+              </p>
+            </div>
+
+            <div>
+              <div className="overflow-hidden rounded-2xl" style={{ background: MB.blueDeep }}>
+                <Image
+                  src={LYFE_SURGEON.portrait}
+                  alt={LYFE_SURGEON.name}
+                  width={LYFE_SURGEON.portraitWidth}
+                  height={LYFE_SURGEON.portraitHeight}
+                  className="h-auto w-full"
+                  priority={false}
+                />
               </div>
-            ))}
+              <p className="mt-4 text-[15px] font-semibold" style={{ color: MB.white }}>
+                {LYFE_SURGEON.name}
+              </p>
+              <p className="mt-1 text-[13px] leading-relaxed" style={{ color: MB.blueSoft }}>
+                Leading a conversation titled &ldquo;{LYFE_EVENT.sessionTitle}&rdquo;
+              </p>
+
+              <ul className="mt-5 space-y-2">
+                {LYFE_SURGEON.credentials.map((cr) => (
+                  <li key={cr} className="flex gap-3 text-[13.5px] leading-relaxed" style={{ color: "#D5E2E6" }}>
+                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full" style={{ background: MB.lime }} />
+                    {cr}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="mt-7 rounded-xl p-5" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
-            <p className="text-[14px] leading-relaxed" style={{ color: C.ink }}>
-              Every guest goes home with a short printed piece, &ldquo;{LYFE_EVENT_TAKEAWAY}&rdquo;.
-              It is useful whether or not you ever come to us.
+
+          <div className="mt-12 border-t pt-10" style={{ borderColor: `${MB.lime}44` }}>
+            <p
+              className="text-[11px] font-semibold uppercase"
+              style={{ color: MB.lime, letterSpacing: "0.16em" }}
+            >
+              The programme
+            </p>
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              {LYFE_EVENT_PROGRAMME.map((item) => (
+                <div key={item.title} className="flex gap-4">
+                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: MB.lime }} />
+                  <div>
+                    <h3 className="text-[15.5px] font-semibold" style={{ color: MB.white }}>
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-[14px] leading-relaxed" style={{ color: "#C6D6DB" }}>
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-10 text-[12px]" style={{ color: MB.blueSoft }}>
+              {LYFE_EVENT.footerLine}
             </p>
           </div>
         </div>
       </div>
-    </Section>
+    </section>
+  );
+}
+
+/**
+ * Medlyfe's mark, rebuilt from measured geometry rather than lifted from a
+ * flattened poster: three pill bars with a dot over the middle one. The
+ * wordmark is set in the nearest available pairing, a light serif against a
+ * heavy grotesque. SWAP THIS FOR THE REAL LOGO FILE WHEN IT ARRIVES.
+ */
+function MedlyfeLockup() {
+  return (
+    <div className="flex items-center gap-3.5">
+      <svg width="34" height="42" viewBox="0 0 59 73" fill={MB.white} aria-hidden>
+        <rect x="0" y="12" width="15" height="48" rx="7.5" />
+        <circle cx="29.5" cy="10" r="10.5" />
+        <rect x="22" y="27" width="15" height="46" rx="7.5" />
+        <rect x="44" y="12" width="15" height="47" rx="7.5" />
+      </svg>
+      <div>
+        <div style={{ lineHeight: 1 }}>
+          <span style={{ fontFamily: display, fontWeight: 400, fontSize: 27, color: MB.white, letterSpacing: "-0.01em" }}>
+            med
+          </span>
+          <span style={{ fontFamily: sans, fontWeight: 800, fontSize: 27, color: MB.white, letterSpacing: "-0.02em" }}>
+            LYFE
+          </span>
+        </div>
+        <div
+          className="mt-1 text-[9.5px]"
+          style={{ color: MB.white, letterSpacing: "0.04em", opacity: 0.9 }}
+        >
+          Wellness and Longevity Centre
+        </div>
+      </div>
+    </div>
   );
 }
 
 function EventFact({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex gap-4">
-      <dt className="w-16 shrink-0 text-[13px] font-semibold uppercase" style={{ color: C.bronzeDeep, letterSpacing: "0.08em" }}>
+      <dt
+        className="w-24 shrink-0 text-[12px] font-semibold uppercase"
+        style={{ color: MB.lime, letterSpacing: "0.1em" }}
+      >
         {k}
       </dt>
-      <dd style={{ color: C.ink }}>{v}</dd>
+      <dd style={{ color: MB.white }}>{v}</dd>
     </div>
   );
 }
