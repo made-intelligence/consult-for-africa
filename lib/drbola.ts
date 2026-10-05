@@ -84,7 +84,7 @@ export const CREDENTIALS = [
  * losing the patient, of being judged for a complication, and of a referral
  * that disappears. These answer those three, colleague to colleague.
  */
-export const DOCTOR_HEADLINE = "The case nobody wants? Send it to me.";
+export const DOCTOR_HEADLINE = "Let's solve your difficult cases together.";
 export const DOCTOR_PROMISES = [
   { title: "Yours, returned.", detail: "I treat what you send and hand the patient back, with a letter." },
   { title: "No judgement.", detail: "Complications happen to all of us. Send them early." },

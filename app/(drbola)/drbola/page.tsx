@@ -222,12 +222,7 @@ export default function DrBolaHome() {
         <Container>
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-(--db-gold)">For colleagues</div>
           <h2 style={serif} className="mt-3 max-w-2xl text-3xl font-medium leading-tight text-white sm:text-5xl">
-            {DOCTOR_HEADLINE.split("? ").map((part, i, all) => (
-              <span key={i} className="block">
-                {part}
-                {i < all.length - 1 ? "?" : ""}
-              </span>
-            ))}
+            {DOCTOR_HEADLINE}
           </h2>
           <div className="mt-10 grid gap-8 border-t border-white/15 pt-8 md:grid-cols-3">
             {DOCTOR_PROMISES.map((d) => (
