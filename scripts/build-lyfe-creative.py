@@ -88,10 +88,9 @@ PHONE_DISPLAY = "+234 913 813 8553"
 DEFAULT_URL = None
 WA_MESSAGE = "Hello, I would like to ask about a consultation."
 
-# Didot has no naira glyph and neither do reportlab's base fonts, so the print
-# and social creative spells it with an N, which is ordinary Nigerian usage.
-# The web page, which uses Inter, carries the real symbol.
-CONSULT_FEE = "N50,000"
+# Prices are not shown on any public asset. Kept here only because the
+# education pieces talk about cost as a subject without naming a figure.
+CONSULT_FEE = None
 
 # The evening. Date and venue move, so they are arguments rather than copy.
 EVENT_NAME = "Medlyfe Wellness and Longevity Centre"
@@ -168,15 +167,15 @@ FEED = [
         "theme": "dark",
     },
     {
-        "kicker": "WHAT IT COSTS",
-        "head": "The call is free.\nThe consultation\nis " + CONSULT_FEE + ".",
+        "kicker": "AFTER THE OPERATION",
+        "head": "The surgery is\nnot the hard part.\nGetting better is.",
         "items": [
-            "A discovery call is fifteen minutes on the telephone, costs nothing, and books nothing. We tell you honestly whether we are the right place for what you want.",
-            "The consultation is redeemable in full against any treatment you decide to have.",
-            "Treatment prices are published. You will not have to ask, and you will not be quoted on the day.",
-            "Surgery is quoted individually after an examination, because a price given before anybody has looked at you is a guess.",
+            "Recovery is where most of what goes wrong, goes wrong. Usually because somebody was alone and did not know who to call.",
+            "Ask who is responsible for your recovery, by name, before you agree to anything.",
+            "Ask for a number that is answered at night and at the weekend, and ask what happens if you need more than the clinic can give.",
+            "Ask what is included and what arrives as a separate bill afterwards. Garments, dressings, medication, review appointments, somewhere to stay.",
         ],
-        "foot": "A practice that will not publish a price is managing something other than your expectations.",
+        "foot": "A practice that has thought about your recovery will have answers ready. One that has not will improvise.",
         "theme": "light",
     },
     {
@@ -222,9 +221,9 @@ STORIES = [
         "theme": "light",
     },
     {
-        "head": "The consultation\nis " + CONSULT_FEE + ".\nIt comes off\nyour treatment.",
-        "sub": "Prices published. Written quote after you are examined. Nothing changes without your say so.",
-        "cta": "Tap to book",
+        "head": "A written plan.\nA written price.\nBefore anything\nis booked.",
+        "sub": "You are examined, you are told what is realistic, and nothing changes afterwards without your written agreement.",
+        "cta": "Tap to ask",
         "theme": "dark",
     },
 ]
@@ -556,7 +555,7 @@ def build_flyer_a5(url: str):
     c.drawString(M + 16, y - 26, "Start with a free fifteen minute call")
     c.setFillColor(HexColor(BODY))
     c.setFont("Helvetica", 9)
-    c.drawString(M + 16, y - 42, "The consultation that follows is " + CONSULT_FEE + " and comes off your treatment.")
+    c.drawString(M + 16, y - 42, "No charge, no obligation, and nothing is booked on it.")
     y -= box_h + 24
 
     # the route in

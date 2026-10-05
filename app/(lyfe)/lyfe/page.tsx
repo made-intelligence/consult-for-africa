@@ -6,10 +6,9 @@ import {
   LYFE_DOORS,
   LYFE_EVENT,
   LYFE_EVENT_PROGRAMME,
-  LYFE_EVENT_TAKEAWAY,
+  LYFE_EVENT_TAKEAWAYS,
   LYFE_NAME,
   LYFE_PHONE_DISPLAY,
-  LYFE_PRICING,
   LYFE_STANDARDS,
   LYFE_SURGEON,
   MEDLYFE_BRAND as MB,
@@ -19,9 +18,9 @@ import EnquiryForm from "./EnquiryForm";
 import StickyRsvp from "./StickyRsvp";
 
 export const metadata: Metadata = {
-  title: "Feel Good, Look Good, Live Better",
+  title: "Ageless",
   description:
-    "An evening at Medlyfe Wellness and Longevity Centre with Dr Chinwe Kpaduwa, MD FACS, on Thursday 15 October 2026. One conversation about how you feel and how you look.",
+    "Ageless: a new era of health, beauty and longevity. An evening at MedLYFE with Dr Chinwe Kpaduwa, MD FACS, on Thursday 15 October 2026, on how modern science is changing the way we look, feel, perform and live as we age.",
 };
 
 /**
@@ -76,7 +75,7 @@ export default async function LyfePage({
   const go = sp.go === "call" ? "DISCOVERY_CALL" : sp.go === "rsvp" ? "EVENT_RSVP" : null;
 
   return (
-    <div style={{ background: MB.blue, color: C.body, fontFamily: sans }}>
+    <div style={{ background: MB.green, color: C.body, fontFamily: sans }}>
       <Hero />
       <Evening />
       <Surgeon />
@@ -94,7 +93,7 @@ export default async function LyfePage({
 
 function Section({
   children,
-  bg = MB.blue,
+  bg = MB.green,
   id,
 }: {
   children: React.ReactNode;
@@ -163,7 +162,7 @@ function RsvpButton({ children = "Reserve a place" }: { children?: React.ReactNo
     <a
       href="?go=rsvp#enquire"
       className="inline-block rounded-xl px-9 text-sm font-semibold transition hover:opacity-90"
-      style={{ background: MB.lime, color: MB.blueDeep, paddingTop: 17, paddingBottom: 17 }}
+      style={{ background: MB.lime, color: MB.greenDeep, paddingTop: 17, paddingBottom: 17 }}
     >
       {children}
     </a>
@@ -183,7 +182,7 @@ function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: bo
         style={{
           borderTopLeftRadius: 9999,
           borderTopRightRadius: 9999,
-          background: MB.blueDeep,
+          background: MB.greenDeep,
           WebkitMaskImage: "linear-gradient(to bottom, #000 70%, transparent 99%)",
           maskImage: "linear-gradient(to bottom, #000 70%, transparent 99%)",
           aspectRatio: "0.8",
@@ -209,7 +208,7 @@ function Hero() {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: `linear-gradient(168deg, ${MB.blue} 0%, ${MB.blueDeep} 60%, #13262F 100%)` }}
+      style={{ background: `linear-gradient(168deg, ${MB.green} 0%, ${MB.greenDeep} 60%, #0E1C15 100%)` }}
     >
       <div
         aria-hidden
@@ -225,14 +224,27 @@ function Hero() {
             <Eyebrow>With {LYFE_SURGEON.name}</Eyebrow>
 
             <h1
-              className="mt-5 text-[42px] leading-[1.04] md:text-[64px]"
-              style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.025em" }}
+              className="mt-6 text-[68px] leading-[0.95] md:text-[112px]"
+              style={{
+                fontFamily: display,
+                fontWeight: 500,
+                color: MB.white,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
             >
-              {LYFE_EVENT.tagline}
+              {LYFE_EVENT.theme}
             </h1>
 
             <p
-              className="mt-6 max-w-lg text-[18px] leading-relaxed md:text-[20px]"
+              className="mt-6 text-[20px] leading-snug md:text-[27px]"
+              style={{ fontFamily: display, fontWeight: 500, color: MB.white }}
+            >
+              {LYFE_EVENT.proposition}
+            </p>
+
+            <p
+              className="mt-4 max-w-lg text-[17px] leading-relaxed md:text-[18px]"
               style={{ color: MB.limeSoft, fontFamily: display, fontStyle: "italic" }}
             >
               {LYFE_EVENT.standfirst}
@@ -244,7 +256,7 @@ function Hero() {
 
             <dl className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
               <Fact k="Date" v={LYFE_EVENT.date} />
-              <Fact k="Cocktails" v={LYFE_EVENT.cocktails} />
+              <Fact k="Arrival" v={LYFE_EVENT.arrival} />
               <Fact k="Programme" v={`${LYFE_EVENT.programme}, close ${LYFE_EVENT.close}`} />
               <Fact
                 k="Venue"
@@ -258,12 +270,12 @@ function Hero() {
 
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
               <RsvpButton />
-              <span className="text-[14px]" style={{ color: MB.blueSoft }}>
-                Places are limited. Kindly reply by {LYFE_EVENT.rsvpBy}.
+              <span className="text-[14px]" style={{ color: MB.greenSoft }}>
+                An intimate evening for {LYFE_EVENT.places}. Kindly reply by {LYFE_EVENT.rsvpBy}.
               </span>
             </div>
 
-            <p className="mt-6 text-[13.5px] leading-relaxed" style={{ color: MB.blueSoft }}>
+            <p className="mt-6 text-[13.5px] leading-relaxed" style={{ color: MB.greenSoft }}>
               Not able to come?{" "}
               <a
                 href="?go=call#enquire"
@@ -305,38 +317,55 @@ function Fact({ k, v }: { k: string; v: string }) {
 
 function Evening() {
   return (
-    <Section bg={MB.blueDeep} id="evening">
+    <Section bg={MB.greenDeep} id="evening">
       <div className="max-w-2xl">
         <Eyebrow>The evening</Eyebrow>
         <h2
           className="mt-5 text-[32px] leading-[1.14] md:text-[44px]"
           style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
         >
-          Most of us have been having this conversation in two separate rooms.
+          Ageing is not simply about how we look, or how long we live.
         </h2>
-        <p className="mt-6 text-[17px] leading-relaxed" style={{ color: "#C6D6DB" }}>
-          One room for sleep, weight and energy. Another for skin, appearance and aesthetics. They
-          are the same story: how you feel within and how you show up outwardly. For one evening,
-          Medlyfe brings them together.
+        <p className="mt-6 text-[17px] leading-relaxed" style={{ color: MB.mist }}>
+          It is about how we feel, how we function, how we perform, and how we go on looking and
+          living as we age. Ageless brings health, beauty and longevity into one conversation:
+          metabolic health, hormones, weight, energy, performance, skin, regenerative aesthetics
+          and aesthetic medicine, with the clinicians who work in all of it.
+        </p>
+        <p className="mt-5 text-[17px] leading-relaxed" style={{ color: MB.mist }}>
+          Less a medical conference than an evening salon. Intimate, elegant and conversational,
+          for {LYFE_EVENT.places} guests rather than an auditorium.
         </p>
       </div>
 
-      <ol className="mt-14 grid gap-x-14 gap-y-10 md:grid-cols-2">
+      <ol className="mt-14 border-t" style={{ borderColor: `${MB.lime}33` }}>
         {LYFE_EVENT_PROGRAMME.map((item) => (
-          <li key={item.title}>
-            <h3 className="text-[18px] font-semibold" style={{ color: MB.white }}>
-              {item.title}
-            </h3>
-            <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "#B8CBD2" }}>
-              {item.body}
-            </p>
+          <li
+            key={item.title}
+            className="grid gap-x-8 gap-y-2 border-b py-6 md:grid-cols-[86px_1fr]"
+            style={{ borderColor: `${MB.lime}22` }}
+          >
+            <span
+              className="text-[14px] font-semibold tabular-nums"
+              style={{ color: MB.lime, letterSpacing: "0.02em" }}
+            >
+              {item.time}
+            </span>
+            <div>
+              <h3 className="text-[18px] font-semibold" style={{ color: MB.white }}>
+                {item.title}
+              </h3>
+              <p className="mt-2 max-w-2xl text-[15px] leading-relaxed" style={{ color: "#AFC2B4" }}>
+                {item.body}
+              </p>
+            </div>
           </li>
         ))}
       </ol>
 
-      <div className="mt-16 flex flex-wrap items-center gap-6">
+      <div className="mt-14 flex flex-wrap items-center gap-6">
         <RsvpButton />
-        <span className="text-[14px]" style={{ color: MB.blueSoft }}>
+        <span className="text-[14px]" style={{ color: MB.greenSoft }}>
           {LYFE_EVENT.date} &middot; {LYFE_EVENT.venueName}
         </span>
       </div>
@@ -348,13 +377,13 @@ function Evening() {
 
 function Surgeon() {
   return (
-    <Section bg={MB.blueDeep}>
+    <Section bg={MB.greenDeep}>
       <div className="grid gap-12 md:grid-cols-[1fr_1.3fr] md:gap-16">
         <div className="flex justify-center md:justify-start">
           <ArchPortrait w={300} />
         </div>
         <div>
-          <Eyebrow>In conversation</Eyebrow>
+          <Eyebrow>The featured fireside</Eyebrow>
           <h2
             className="mt-5 text-[30px] leading-[1.14] md:text-[40px]"
             style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
@@ -365,9 +394,11 @@ function Surgeon() {
             {LYFE_SURGEON.name}
           </p>
 
-          <p className="mt-6 text-[16px] leading-relaxed" style={{ color: "#C6D6DB" }}>
-            Thoughtful aesthetic care, natural looking results, and the importance of knowing not
-            only what can be done but what should be done. {LYFE_SURGEON.position}
+          <p className="mt-6 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
+            What good aesthetic work should achieve, natural looking outcomes, and knowing when
+            not to intervene. An open conversation about why people consider plastic surgery, what
+            it can and cannot achieve, and how to approach it safely and with realistic
+            expectations, particularly as faces and bodies change with age. {LYFE_SURGEON.position}
           </p>
 
           <ul className="mt-8 grid gap-2.5">
@@ -375,7 +406,7 @@ function Surgeon() {
               <li
                 key={cr}
                 className="flex gap-3 text-[14.5px] leading-relaxed"
-                style={{ color: "#C6D6DB" }}
+                style={{ color: MB.mist }}
               >
                 <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full" style={{ background: MB.lime }} />
                 {cr}
@@ -390,43 +421,24 @@ function Surgeon() {
 
 /* ─── what you leave with ──────────────────────────────────────────────────── */
 
-const LEAVE_WITH = [
-  {
-    title: "A straight answer, not a pitch",
-    body: "The clinical team is in the room all evening. Ask anybody anything, including whether you should do nothing at all.",
-  },
-  {
-    title: "The prices, said out loud",
-    body: "What each service is for, who it suits, and what it costs. A room that has to ask assumes the worst, so nobody will have to ask.",
-  },
-  {
-    title: "Something worth keeping",
-    body: `A short printed piece, “${LYFE_EVENT_TAKEAWAY}”. Useful whether or not you ever become a patient.`,
-  },
-  {
-    title: "No obligation whatsoever",
-    body: "You can book a consultation on the night if you want one. Nobody will mind in the least if you do not.",
-  },
-];
-
 function WhatYouLeaveWith() {
   return (
-    <Section bg={MB.blueDeep}>
-      <Eyebrow>What you leave with</Eyebrow>
+    <Section bg={MB.greenDeep}>
+      <Eyebrow>What you leave understanding</Eyebrow>
       <h2
         className="mt-5 max-w-2xl text-[30px] leading-[1.14] md:text-[40px]"
         style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
       >
-        An evening of conversation, not a sales floor.
+        The goal is not to become someone else.
       </h2>
 
       <div className="mt-12 grid gap-x-14 gap-y-9 md:grid-cols-2">
-        {LEAVE_WITH.map((l) => (
+        {LYFE_EVENT_TAKEAWAYS.map((l) => (
           <div key={l.title}>
             <h3 className="text-[17px] font-semibold" style={{ color: MB.white }}>
               {l.title}
             </h3>
-            <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "#B8CBD2" }}>
+            <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "#AFC2B4" }}>
               {l.body}
             </p>
           </div>
@@ -446,7 +458,7 @@ function Rsvp({
   initialIntent: "EVENT_RSVP" | "DISCOVERY_CALL" | null;
 }) {
   return (
-    <Section bg={MB.blue} id="enquire">
+    <Section bg={MB.green} id="enquire">
       <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
           <Eyebrow>Reserve a place</Eyebrow>
@@ -456,7 +468,7 @@ function Rsvp({
           >
             We would be glad to have you.
           </h2>
-          <p className="mt-5 text-[16px] leading-relaxed" style={{ color: "#C6D6DB" }}>
+          <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
             A member of the team will call to confirm you personally, and the address follows your
             reply. Kindly let us know by {LYFE_EVENT.rsvpBy}.
           </p>
@@ -469,12 +481,12 @@ function Rsvp({
             <Fact k="Date" v={LYFE_EVENT.date} />
             <Fact
               k="Time"
-              v={`Cocktails ${LYFE_EVENT.cocktails}, programme ${LYFE_EVENT.programme}, close ${LYFE_EVENT.close}`}
+              v={`Arrival ${LYFE_EVENT.arrival}, programme ${LYFE_EVENT.programme}, close ${LYFE_EVENT.close}`}
             />
             <Fact k="Venue" v={LYFE_EVENT.venueName} />
           </dl>
 
-          <p className="mt-10 text-[14px] leading-relaxed" style={{ color: MB.blueSoft }}>
+          <p className="mt-10 text-[14px] leading-relaxed" style={{ color: MB.greenSoft }}>
             Would you rather speak to somebody? Call{" "}
             <a
               href={`tel:${LYFE_PHONE_DISPLAY.replace(/\s/g, "")}`}
@@ -506,7 +518,7 @@ function Rsvp({
 function CannotMakeIt() {
   const d = LYFE_DOORS.DISCOVERY_CALL;
   return (
-    <section style={{ background: MB.blueDeep }}>
+    <section style={{ background: MB.greenDeep }}>
       <div className="mx-auto w-full max-w-5xl px-5 py-14 md:px-8">
         <div className="rounded-2xl p-7 md:p-10" style={{ border: `1px solid ${MB.lime}44` }}>
           <div className="flex flex-wrap items-center justify-between gap-7">
@@ -518,7 +530,7 @@ function CannotMakeIt() {
               >
                 {d.label}
               </h2>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "#B8CBD2" }}>
+              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "#AFC2B4" }}>
                 {d.blurb}
               </p>
             </div>
@@ -573,49 +585,7 @@ function ThePractice() {
           ))}
         </div>
 
-        {/* Prices, because the one Lagos practice that publishes is winning
-            that comparison by default. */}
-        <div className="mt-16">
-          <p
-            className="text-[11px] font-semibold uppercase"
-            style={{ color: C.bronze, letterSpacing: "0.16em" }}
-          >
-            What it costs
-          </p>
-          <div
-            className="mt-5 overflow-hidden rounded-2xl"
-            style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}
-          >
-            {LYFE_PRICING.map((p, i) => (
-              <div
-                key={p.service}
-                className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-6 py-3.5"
-                style={{ borderTop: i === 0 ? "none" : `1px solid ${C.line}` }}
-              >
-                <div>
-                  <span className="text-[15px] font-medium" style={{ color: C.ink }}>
-                    {p.service}
-                  </span>
-                  {p.note && (
-                    <span className="ml-2 text-[13px]" style={{ color: C.muted }}>
-                      {p.note}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[15px] font-semibold tabular-nums" style={{ color: C.ink }}>
-                  {p.price}
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className="mt-4 text-[14px] leading-relaxed" style={{ color: C.muted }}>
-            Indicative, confirmed in writing after your consultation, and not changed afterwards
-            without your written agreement. Surgery is quoted individually after an examination,
-            because a price given before anybody has looked at you is a guess.
-          </p>
-        </div>
-
-        {/* Aftercare, the one piece of open ground nobody in Lagos prices. */}
+        {/* Aftercare, the piece of open ground nobody here has claimed. */}
         <div className="mt-16">
           <p
             className="text-[11px] font-semibold uppercase"
@@ -651,15 +621,15 @@ function ThePractice() {
 
 function Footer() {
   return (
-    <footer style={{ background: MB.blueDeep }}>
+    <footer style={{ background: MB.greenDeep }}>
       <div className="mx-auto w-full max-w-5xl px-5 py-14 pb-28 md:px-8 md:pb-20">
         <Lockup size={0.9} />
         <div
           className="mt-10 grid gap-8 text-[13px] leading-relaxed md:grid-cols-2"
-          style={{ color: MB.blueSoft }}
+          style={{ color: MB.greenSoft }}
         >
           <div>
-            <p style={{ color: "#C6D6DB" }}>
+            <p style={{ color: MB.mist }}>
               {LYFE_EVENT.host}. Consultations and treatment are provided at the clinic by
               clinicians registered with the Medical and Dental Council of Nigeria.
             </p>

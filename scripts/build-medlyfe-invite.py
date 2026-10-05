@@ -57,14 +57,15 @@ PORTRAIT = ROOT / "public" / "lyfe" / "chinwe-portrait.jpg"
 REAL_LOGO = ROOT / "docs" / "brand" / "medlyfe-logo.png"
 
 # ---- Medlyfe palette, sampled from their poster -----------------------------
-BLUE = "#336276"
-BLUE_DEEP = "#1E3C4A"
-BLUE_DARK = "#162C36"
-BLUE_SOFT = "#7F9EA1"
+BLUE = "#1F3A2E"
+BLUE_DEEP = "#15291F"
+BLUE_DARK = "#0F1E17"
+BLUE_SOFT = "#7E9A88"
 LIME = "#C4D7A6"
 LIME_SOFT = "#DCE8C8"
 PAPER = "#FFFFFF"
-MIST = "#D5E2E6"
+MIST = "#D8E3D6"
+MB_WHITE_SOFT = "#EAF1E6"
 
 DISPLAY = "/System/Library/Fonts/Supplemental/Didot.ttc"
 DISPLAY_I = 0
@@ -74,18 +75,19 @@ SANS_R, SANS_B = 0, 1
 # ---- the evening, as written ------------------------------------------------
 HOST = "Medlyfe Wellness and Longevity Centre"
 WITH_WHOM = "Dr Chinwe Kpaduwa, MD FACS"
-TAGLINE = "Feel Good, Look Good, Live Better."
-STANDFIRST = "One evening. One conversation about how you feel and how you look."
+THEME = "Ageless"
+TAGLINE = "A New Era of Health, Beauty and Longevity"
+STANDFIRST = "How modern science is changing the way we look, feel, perform and live as we age."
 SESSION = "The Art of Looking Like Yourself"
 BLURB = ("An evening exploring wellness, longevity, aesthetics and the connection "
          "between feeling well and looking like yourself.")
 DATE = "Thursday, 15 October 2026"
-COCKTAILS = "6:30 PM"
-PROGRAMME = "7:15 PM"
+COCKTAILS = "6:00 PM"
+PROGRAMME = "6:45 PM"
 CLOSE = "9:30 PM"
 VENUE = "Greenhouse, Lagos"
 RSVP_BY = "12 October"
-FOOTER = "Medlyfe introduces Lyfe Plastics & Dermatology."
+FOOTER = "MedLYFE introduces Lyfe Plastics & Dermatology."
 
 WHATSAPP = "2349138138553"
 PHONE_DISPLAY = "+234 913 813 8553"
@@ -358,7 +360,7 @@ def centred_tracked(d, text, f, cx, y, fill, track=5):
     return w
 
 
-def build_png(kind, name, places, out_path):
+def build_png(kind, name, places, out_path, sender=None, size=(1080, 1350)):
     """
     Composed as a formal invitation rather than a poster: centred, generous,
     patterned, with her portrait in an arch.
@@ -368,9 +370,9 @@ def build_png(kind, name, places, out_path):
     the page and hoping the text cleared it is what put the standfirst through
     the arch and the guest's name through the particulars.
     """
-    W, H = 1080, 1350
+    W, H = size
     cx = W // 2
-    M = 96
+    M = 96 if H < 1600 else 104
 
     probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
 
@@ -383,16 +385,19 @@ def build_png(kind, name, places, out_path):
     f_pl = font(SANS, SANS_R, 18)
     f_pn = font(DISPLAY, DISPLAY_I, 37)
 
-    tag_lines = wrap(probe, TAGLINE, f_h, W - 2 * M - 60)
+    f_tag = font(SANS, SANS_R, 27)
+    theme_size = 96 if H < 1600 else 118
+    f_theme = font(DISPLAY, DISPLAY_I, theme_size)
+    tag_lines = wrap(probe, TAGLINE, f_tag, W - 2 * M - 40)
     sf_lines = wrap(probe, STANDFIRST, f_s, int(W * 0.62))
     ses_lines = wrap(probe, "\u201C" + SESSION + "\u201D", f_ses, int(W * 0.72))
     name_lines = wrap(probe, name, f_pn, int(W * 0.72))
 
     # Head: lockup, eyebrow, tagline, standfirst, rule.
-    head_h = 112 + 50 + 76 * len(tag_lines) + 12 + 34 * len(sf_lines) + 30
+    head_h = 112 + 50 + int(theme_size * 1.02) + 22 + 36 * len(tag_lines) + 12 + 34 * len(sf_lines) + 30
     # Below the arch: her conversation, then the personalisation panel.
     conv_h = 26 + 28 + 38 + 42 * len(ses_lines)
-    pers_h = 30 + 26 + 30 + 44 * len(name_lines) + (32 if kind == "group" else 0) + 16
+    pers_h = 30 + 26 + 30 + 44 * len(name_lines) + (32 if kind == "group" else 0) + 16 + (30 if sender else 0)
     foot_h = 164
 
     top = M + 26
@@ -421,9 +426,11 @@ def build_png(kind, name, places, out_path):
     y += 112
     centred_tracked(d, "WITH " + WITH_WHOM.upper(), f_eye, cx, y, LIME, track=5)
     y += 50
+    centred_tracked(d, THEME.upper(), f_theme, cx, y, PAPER, track=int(theme_size * 0.07))
+    y += int(theme_size * 1.02) + 22
     for ln in tag_lines:
-        centred(d, ln, f_h, cx, y, PAPER)
-        y += 76
+        centred(d, ln, f_tag, cx, y, PAPER)
+        y += 36
     y += 12
     for ln in sf_lines:
         centred(d, ln, f_s, cx, y, LIME_SOFT)
@@ -443,8 +450,11 @@ def build_png(kind, name, places, out_path):
     y += 30
     d.line([(cx - 150, y), (cx + 150, y)], fill=LIME + "77", width=1)
     y += 26
+    if sender:
+        centred(d, sender, font(SANS, SANS_B, 19), cx, y, MB_WHITE_SOFT)
+        y += 30
     if kind == "group":
-        centred(d, "Invites", f_pl, cx, y, LIME)
+        centred(d, "invites" if sender else "Invites", f_pl, cx, y, LIME)
         y += 30
         for ln in name_lines:
             centred(d, ln, f_pn, cx, y, PAPER)
@@ -452,7 +462,8 @@ def build_png(kind, name, places, out_path):
         centred(d, f"{places} places reserved by name", f_pl, cx, y + 2, MIST)
         y += 32
     else:
-        centred(d, "Requests the pleasure of the company of", f_pl, cx, y, LIME)
+        centred(d, "requests the pleasure of the company of" if sender
+                else "Requests the pleasure of the company of", f_pl, cx, y, LIME)
         y += 30
         for ln in name_lines:
             centred(d, ln, f_pn, cx, y, PAPER)
@@ -466,7 +477,7 @@ def build_png(kind, name, places, out_path):
     centred(d, DATE, font(SANS, SANS_B, 21), cx, by, PAPER)
     by += 32
     f_dv = font(SANS, SANS_R, 18)
-    centred(d, f"Cocktails {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", f_dv, cx, by, MIST)
+    centred(d, f"Arrival {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", f_dv, cx, by, MIST)
     by += 26
     centred(d, VENUE, f_dv, cx, by, MIST)
     by += 32
@@ -580,12 +591,12 @@ def build_pdf(kind, name, places, out_path):
     bg.convert("RGB").save(btmp)
     c.drawImage(ImageReader(str(btmp)), 0, 0, width=PW, height=PH)
 
-    tag_lines = pdf_wrap(c, TAGLINE, "Times-Roman", 25, PW - 2 * M - 24)
+    tag_lines = pdf_wrap(c, TAGLINE, "Helvetica", 11, PW - 2 * M - 20)
     sf_lines = pdf_wrap(c, STANDFIRST, "Times-Italic", 10, PW * 0.64)
     ses_lines = pdf_wrap(c, "\u201C" + SESSION + "\u201D", "Times-Italic", 13.5, PW * 0.74)
     name_lines = pdf_wrap(c, name, "Times-Roman", 15, PW * 0.74)
 
-    head_h = 46 + 20 + 28 * len(tag_lines) + 6 + 13 * len(sf_lines)
+    head_h = 46 + 20 + 46 + 10 + 15 * len(tag_lines) + 6 + 13 * len(sf_lines)
     conv_h = 12 + 12 + 15 + 16.5 * len(ses_lines)
     pers_h = 14 + 11 + 12 + 18 * len(name_lines) + (12 if kind == "group" else 0) + 8
     foot_h = 78
@@ -620,9 +631,11 @@ def build_pdf(kind, name, places, out_path):
     pdf_centred_tracked(c, "WITH " + WITH_WHOM.upper(), cx, y, "Helvetica-Bold", 6.6, HexColor(LIME), 1.2)
     y -= 26
 
+    pdf_centred_tracked(c, THEME.upper(), cx, y - 26, "Times-Roman", 40, white, 3.2)
+    y -= 56
     for ln in tag_lines:
-        pdf_centred(c, ln, "Times-Roman", 25, cx, y, white)
-        y -= 28
+        pdf_centred(c, ln, "Helvetica", 11, cx, y, white)
+        y -= 15
     y -= 4
     for ln in sf_lines:
         pdf_centred(c, ln, "Times-Italic", 10, cx, y, HexColor(LIME_SOFT))
@@ -665,7 +678,7 @@ def build_pdf(kind, name, places, out_path):
     by = min(M + foot_h, y - 16)
     pdf_centred(c, DATE, "Helvetica-Bold", 9.5, cx, by, white)
     by -= 13
-    pdf_centred(c, f"Cocktails {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", "Helvetica", 8, cx, by, HexColor(MIST))
+    pdf_centred(c, f"Arrival {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", "Helvetica", 8, cx, by, HexColor(MIST))
     by -= 11
     pdf_centred(c, VENUE, "Helvetica", 8, cx, by, HexColor(MIST))
     by -= 14
@@ -686,12 +699,14 @@ def build_pdf(kind, name, places, out_path):
 
 # ===================================================================== main ==
 
-def emit(kind, name, places):
-    tag = slug(name)
-    png = build_png(kind, name, places, OUT / f"invite-{kind}-{tag}.png")
+def emit(kind, name, places, sender=None, stem=None):
+    tag = stem or slug(name)
+    png = build_png(kind, name, places, OUT / f"invite-{kind}-{tag}.png", sender=sender)
+    story = build_png(kind, name, places, OUT / f"invite-{kind}-{tag}-story.png",
+                      sender=sender, size=(1080, 1920))
     pdf = build_pdf(kind, name, places, OUT / f"invite-{kind}-{tag}.pdf")
-    print("  ", png.name)
-    print("  ", pdf.name)
+    for f in (png, story, pdf):
+        print("  ", f.name)
 
 
 def main():
@@ -700,6 +715,8 @@ def main():
     ap.add_argument("--org", help="Organisation name, for the group version")
     ap.add_argument("--places", type=int, default=6, help="Places reserved, group version")
     ap.add_argument("--csv", help="CSV with columns: kind,name,places. One invitation per row.")
+    ap.add_argument("--from", dest="sender",
+                    help='Host sending it personally, eg "Dr Itunu Akinware". Appears above the invitee.')
     args = ap.parse_args()
 
     OUT.mkdir(parents=True, exist_ok=True)
@@ -716,15 +733,16 @@ def main():
             for row in csv.DictReader(fh):
                 emit((row.get("kind") or "individual").strip().lower(),
                      (row.get("name") or "").strip(),
-                     int(row.get("places") or args.places))
+                     int(row.get("places") or args.places),
+                     sender=(row.get("from") or args.sender or None))
     elif args.org:
-        emit("group", args.org, args.places)
+        emit("group", args.org, args.places, sender=args.sender)
     elif args.name:
-        emit("individual", args.name, args.places)
+        emit("individual", args.name, args.places, sender=args.sender)
     else:
         # Specimens, so the design can be signed off before any name is set.
-        emit("individual", "[Guest Name]", args.places)
-        emit("group", "[Organisation Name]", args.places)
+        emit("individual", "[Guest Name]", args.places, sender=args.sender)
+        emit("group", "[Organisation Name]", args.places, sender=args.sender)
     print("Done.")
 
 

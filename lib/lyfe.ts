@@ -93,65 +93,130 @@ export function whatsappLink(message: string): string {
  * palettes are deliberately kept apart.
  */
 export const MEDLYFE_BRAND = {
-  blue: "#336276",
-  blueDeep: "#1E3C4A",
-  blueSoft: "#7F9EA1",
+  // Deep forest ground with the chartreuse accent from Medlyfe's own poster.
+  // The blue that was here came off a photograph in that poster rather than
+  // from the brand, which is the hazard of sampling a flattened composite.
+  green: "#1F3A2E",
+  greenDeep: "#15291F",
+  greenDark: "#0F1E17",
+  greenSoft: "#7E9A88",
   lime: "#C4D7A6",
   limeSoft: "#DCE8C8",
   white: "#FFFFFF",
+  mist: "#D8E3D6",
 } as const;
 
 export const MEDLYFE_NAME = "Medlyfe Wellness and Longevity Centre";
 export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
 
+/** The platform. One word, set large, and the whole of the idea. */
+export const LYFE_EVENT_THEME = "Ageless";
+
 /**
- * The evening, as the client has written it.
+ * AGELESS, from the event brief.
  *
- * Venue address and the RSVP contact are still blank in their copy, so both
- * are environment variables and the page degrades honestly when they are
- * unset rather than inventing a line.
+ * A recurring MedLYFE platform rather than a one-off launch, so the naming is
+ * layered: AGELESS is the platform, "A New Era of Health, Beauty and
+ * Longevity" is the proposition, "From Within, Outward" is the main panel,
+ * and "The Art of Looking Like Yourself" is the featured fireside. Keeping
+ * those four apart is what lets edition two reuse everything but the panel.
+ *
+ * Venue address and the RSVP contact are still blank in the brief, so both
+ * are environment variables and the page degrades honestly rather than
+ * inventing a line.
  */
 export const LYFE_EVENT = {
   host: MEDLYFE_NAME,
   withWhom: "Dr Chinwe Kpaduwa, MD FACS",
+  theme: LYFE_EVENT_THEME,
+  proposition: "A New Era of Health, Beauty and Longevity",
+  standfirst:
+    "How modern science is changing the way we look, feel, perform and live as we age.",
   tagline: MEDLYFE_TAGLINE,
-  standfirst: "One evening. One conversation about how you feel and how you look.",
+  panelTitle: "From Within, Outward",
   sessionTitle: "The Art of Looking Like Yourself",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Thursday, 15 October 2026",
-  cocktails: "6:30 PM",
-  programme: "7:15 PM",
+  arrival: "6:00 PM",
+  programme: "6:45 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Greenhouse, Lagos",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 12 October",
-  footerLine: "Medlyfe introduces Lyfe Plastics and Dermatology.",
+  /// Curated rather than conference scale. The number is in the brief, so the
+  /// scarcity line on the page is a fact rather than a device.
+  places: 130,
+  footerLine: "MedLYFE introduces Lyfe Plastics and Dermatology.",
 } as const;
 
+/** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
-    title: "An introduction to Medlyfe",
-    body: "What has been built across wellness and aesthetics, and what each service is designed to address.",
+    time: "6:00",
+    title: "Arrival and cocktails",
+    body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    title: "The conversation",
-    body: "The connection between wellbeing, longevity, confidence and appearance. We tend to treat sleep, energy and weight as one conversation and skin and appearance as another. They are the same story.",
+    time: "6:45",
+    title: "Welcome and opening film",
+    body: "A short film asking how modern science is changing the way we look, feel, perform and live as we age.",
   },
   {
-    title: "In conversation with Dr Chinwe Kpaduwa, MD FACS",
-    body: "Under her own title, " + "\u201C" + "The Art of Looking Like Yourself" + "\u201D" + ". Thoughtful aesthetic care, natural looking results, and the importance of knowing not only what can be done but what should be done.",
+    time: "6:50",
+    title: "The MedLYFE perspective",
+    body: "The philosophy and the approach to longevity and health optimisation, connecting health and vitality with beauty and aesthetics.",
   },
   {
-    title: "The services, and what to expect",
-    body: "A clear introduction to what Medlyfe offers, who each thing suits, and what a visit to the Centre actually involves.",
+    time: "7:05",
+    title: "The panel: From Within, Outward",
+    body: "Thirty minutes on how metabolic health, hormones, energy, skin and aesthetics come together in the way we age.",
   },
   {
-    title: "Questions, conversation and cocktails",
-    body: "The clinical team is in the room throughout, and available to anyone who would like to speak to somebody personally or book a consultation.",
+    time: "7:35",
+    title: "Fireside: The Art of Looking Like Yourself",
+    body: "An intimate hosted conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
+  },
+  {
+    time: "8:00",
+    title: "What can you actually do?",
+    body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
+  },
+  {
+    time: "8:15",
+    title: "Questions from the room",
+    body: "A moderated conversation with the clinicians and speakers.",
+  },
+  {
+    time: "8:30",
+    title: "Ageless After Hours",
+    body: "Cocktails, music and conversations with the clinicians. Close at 9:30.",
   },
 ] as const;
 
-export const LYFE_EVENT_TAKEAWAY =
-  "What to ask before anybody treats your face, your skin or your hormones";
+/** Section nine of the brief: what a guest should leave understanding. */
+export const LYFE_EVENT_TAKEAWAYS = [
+  {
+    title: "Ageing is multidimensional",
+    body: "How you age is shaped by metabolism, hormones, body composition, sleep, energy, physical function and skin, all of it connected.",
+  },
+  {
+    title: "Longevity is more than lifespan",
+    body: "The goal is not simply to live longer. It is to keep health, function, vitality and independence for as long as possible.",
+  },
+  {
+    title: "Health, performance and appearance are one journey",
+    body: "They are usually approached as three. There is a good argument that they should not be.",
+  },
+  {
+    title: "Modern science lets you act earlier",
+    body: "Better diagnostics, longevity medicine, personalised strategies and advances in regenerative and aesthetic medicine have changed what is possible.",
+  },
+  {
+    title: "The goal is not to become someone else",
+    body: "It is to feel well, function well, perform well, and go on looking recognisably like yourself.",
+  },
+] as const;
+
+export const LYFE_EVENT_TAKEAWAY = "A thoughtfully designed Ageless takeaway";
 
 /** Her portrait and credentials, for the page and the invitations. */
 export const LYFE_SURGEON = {
@@ -213,7 +278,7 @@ export const LYFE_DOORS = {
     label: "Come to the evening",
     short: "An evening on how you feel and how you look, and why those are the same appointment",
     blurb:
-      "An invitation to a conversation rather than a sales floor. A panel, a conversation with Dr Kpaduwa under her own title, the full menu said out loud with the prices, and questions from the room. You can book a consultation on the night if you want one, and nobody will mind if you do not.",
+      "An invitation to a conversation rather than a sales floor. A panel, a conversation with Dr Kpaduwa under her own title, the full menu said out loud, and questions from the room. You can book a consultation on the night if you want one, and nobody will mind if you do not.",
     cta: "RSVP to the evening",
     note: "By invitation. Numbers are limited and the address goes to confirmed guests.",
   },
@@ -230,21 +295,41 @@ export const LYFE_DOORS = {
 /**
  * Published, because a room that has to ask assumes the worst, and because
  * price was the single most common question the March leads asked before they
- * went quiet. Sourced from the benchmark list in the pilot service plan, which
- * is itself marked as a list to firm against local comparables, so the page
- * says "from" and says it is indicative.
+ * went quiet.
+ *
+ * REPRICED October 2026 to sit at the TOP of the Lagos market, which is the
+ * brand this practice is meant to be. Sources: the Lagos competitor sweep
+ * (Hospital & Aesthetic Plastic Surgery Price Comparison, Oct 2026) and Dr
+ * Kpaduwa's Beverly Hills recommended fee schedule in the KPPS pro forma.
+ *
+ * The rule is one line: we price above every Lagos comparator, because we are
+ * the only one of them with a US board-certified plastic surgeon. The nearest
+ * premium comparator is Skye Medical Aesthetics, a medical aesthetics centre
+ * with no plastic surgeon, and an earlier version of this list sat BELOW them
+ * on RF microneedling (NGN 200,000 against their 523,868) and on thread lifts.
+ * A practice that undercuts a medispa is telling the room what it thinks it is
+ * worth.
+ *
+ * The ceiling is the Lagos market, not the Los Angeles one. No line here
+ * reaches a third of her Beverly Hills schedule, which
+ * recommends roughly NGN 1.9m to 2.8m for RF microneedling and NGN 7m to 11.6m
+ * for a thread lift. Highest in Lagos, nowhere near LA, deliberately.
+ *
+ * Skye reference points, Oct 2026: Botox NGN 10,735/unit, hyaluronic fillers
+ * 338,153 to 570,000/syringe, Profhilo 299,936, RF microneedling full face
+ * 523,868, PCL full face thread lift 2,870,839.
  */
 export const LYFE_PRICING = [
-  { service: "Aesthetic consultation", price: "₦50,000", note: "Redeemable against treatment" },
-  { service: "Anti-wrinkle, per area", price: "₦180,000", note: "₦420,000 for the upper face" },
-  { service: "Dermal filler, per syringe", price: "₦450,000", note: "" },
-  { service: "Bio-remodelling, per session", price: "₦450,000", note: "A course is usually two" },
-  { service: "Skin boosters and mesotherapy", price: "₦250,000", note: "" },
-  { service: "PRP, skin or hair", price: "₦250,000", note: "Per session" },
-  { service: "Medical facial", price: "₦90,000", note: "" },
-  { service: "Chemical peel", price: "₦120,000", note: "" },
-  { service: "Microneedling and RF microneedling", price: "₦200,000", note: "" },
-  { service: "Non-surgical lift, PDO threads", price: "from ₦700,000", note: "Doctor only" },
+  { service: "Aesthetic consultation", price: "₦100,000", note: "Redeemable against treatment" },
+  { service: "Anti-wrinkle, per area", price: "₦250,000", note: "₦550,000 for the upper face" },
+  { service: "Dermal filler, per syringe", price: "₦600,000", note: "" },
+  { service: "Bio-remodelling, per session", price: "₦550,000", note: "A course is usually two" },
+  { service: "Skin boosters and mesotherapy", price: "₦350,000", note: "" },
+  { service: "PRP, skin or hair", price: "₦350,000", note: "Per session" },
+  { service: "Medical facial", price: "₦150,000", note: "" },
+  { service: "Chemical peel", price: "₦200,000", note: "" },
+  { service: "Microneedling and RF microneedling", price: "₦600,000", note: "" },
+  { service: "Non-surgical lift, PDO threads", price: "from ₦1,500,000", note: "Doctor only" },
 ] as const;
 
 export const LYFE_SURGICAL_FEE_NOTE =
@@ -274,7 +359,7 @@ export const LYFE_OBJECTIONS = [
   {
     worry: "I do not know what it costs",
     answer:
-      "The list is published on this page. You will get a written quote after your consultation and the price will not move afterwards without you agreeing to it in writing.",
+      "Ask us and we will tell you, on the telephone or at the consultation. You get a written quote afterwards and the price does not move without you agreeing to it in writing.",
   },
   {
     worry: "I am not sure I need anything at all",
@@ -348,7 +433,7 @@ export const LYFE_AFTERCARE = [
   },
   {
     title: "Recovery support, arranged rather than improvised",
-    body: "Massage, nursing visits and somewhere to stay if you are travelling, organised by us at prices we publish. Most of what goes wrong in recovery goes wrong because somebody was alone and did not know who to call.",
+    body: "Massage, nursing visits and somewhere to stay if you are travelling, organised by us and quoted up front. Most of what goes wrong in recovery goes wrong because somebody was alone and did not know who to call.",
   },
 ] as const;
 

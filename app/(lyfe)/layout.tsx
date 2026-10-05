@@ -30,14 +30,14 @@ export const metadata: Metadata = {
     template: "%s | Lyfe Plastics and Dermatology",
   },
   description:
-    "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. Published prices, registered clinicians, and a consultation that will tell you when the answer is no.",
+    "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. Registered clinicians, and a consultation that will tell you when the answer is no.",
   openGraph: {
     type: "website",
     locale: "en_NG",
     siteName: "Lyfe Plastics and Dermatology",
     title: "The Art of Looking Like Yourself",
     description:
-      "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. Published prices and a consultation that will tell you when the answer is no.",
+      "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. A consultation that will tell you when the answer is no.",
   },
 };
 
