@@ -139,7 +139,10 @@ export const LYFE_EVENT = {
   arrival: "6:00 PM",
   programme: "6:45 PM",
   close: "9:30 PM",
-  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Greenhouse, Lagos",
+  // Venue is not settled. An invitation-led evening normally withholds the
+  // address until a guest is confirmed anyway, so this reads as intent rather
+  // than as a gap. Set NEXT_PUBLIC_LYFE_EVENT_VENUE the moment it is booked.
+  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Lagos, address with your confirmation",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 12 October",
   /// Curated rather than conference scale. The number is in the brief, so the
