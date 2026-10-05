@@ -48,7 +48,7 @@ const sans = "var(--lyfe-sans), system-ui, sans-serif";
 /** Medlyfe's mark tiled on a half drop, inline so it costs bytes not a request. */
 const MONOGRAM = `url("data:image/svg+xml,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="118" height="118" viewBox="0 0 118 118">` +
-    `<g fill="#ffffff" fill-opacity="0.05">` +
+    `<g fill="#ffffff" fill-opacity="0.022">` +
     `<g transform="translate(29 22)">` +
     `<rect x="0" y="12" width="15" height="48" rx="7.5"/>` +
     `<circle cx="29.5" cy="10" r="10.5"/>` +
@@ -92,7 +92,7 @@ export default async function LyfePage({
 
 /* ─── brand furniture ──────────────────────────────────────────────────────── */
 
-function Monogrammed({
+function Section({
   children,
   bg = MB.blue,
   id,
@@ -102,10 +102,7 @@ function Monogrammed({
   id?: string;
 }) {
   return (
-    <section
-      id={id}
-      style={{ background: bg, backgroundImage: MONOGRAM, backgroundSize: "118px 118px" }}
-    >
+    <section id={id} style={{ background: bg }}>
       <div className="mx-auto w-full max-w-5xl px-5 py-20 md:px-8 md:py-28">{children}</div>
     </section>
   );
@@ -157,15 +154,8 @@ function Eyebrow({ children, color = MB.lime }: { children: React.ReactNode; col
   );
 }
 
-/** A hairline broken by a small diamond. The page's comma. */
-function Rule({ color = MB.lime, width = 180 }: { color?: string; width?: number }) {
-  return (
-    <div className="flex items-center gap-2" style={{ width, maxWidth: "100%" }}>
-      <span className="h-px flex-1" style={{ background: color, opacity: 0.6 }} />
-      <span className="h-[5px] w-[5px] rotate-45" style={{ background: color }} />
-      <span className="h-px flex-1" style={{ background: color, opacity: 0.6 }} />
-    </div>
-  );
+function Rule({ color = MB.lime, width = 56 }: { color?: string; width?: number }) {
+  return <div className="h-px" style={{ width, background: color, opacity: 0.75 }} />;
 }
 
 function RsvpButton({ children = "Reserve a place" }: { children?: React.ReactNode }) {
@@ -188,20 +178,6 @@ function RsvpButton({ children = "Reserve a place" }: { children?: React.ReactNo
 function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: boolean }) {
   return (
     <div className="relative" style={{ width: w, maxWidth: "100%" }}>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: -11,
-          right: -11,
-          top: -11,
-          bottom: "24%",
-          borderTopLeftRadius: 9999,
-          borderTopRightRadius: 9999,
-          border: `1px solid ${MB.lime}`,
-          borderBottom: "none",
-        }}
-      />
       <div
         className="overflow-hidden"
         style={{
@@ -239,12 +215,6 @@ function Hero() {
         aria-hidden
         className="absolute inset-0"
         style={{ backgroundImage: MONOGRAM, backgroundSize: "118px 118px" }}
-      />
-      {/* The bloom behind the lockup, from their own poster. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[620px] w-[900px] max-w-none -translate-x-1/2"
-        style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.15), transparent)" }}
       />
 
       <div className="relative mx-auto w-full max-w-5xl px-5 pb-16 pt-12 md:px-8 md:pb-24 md:pt-16">
@@ -335,7 +305,7 @@ function Fact({ k, v }: { k: string; v: string }) {
 
 function Evening() {
   return (
-    <Monogrammed bg={MB.blueDeep} id="evening">
+    <Section bg={MB.blueDeep} id="evening">
       <div className="max-w-2xl">
         <Eyebrow>The evening</Eyebrow>
         <h2
@@ -352,20 +322,12 @@ function Evening() {
       </div>
 
       <ol className="mt-14 grid gap-x-14 gap-y-10 md:grid-cols-2">
-        {LYFE_EVENT_PROGRAMME.map((item, i) => (
+        {LYFE_EVENT_PROGRAMME.map((item) => (
           <li key={item.title}>
-            <div className="flex items-baseline gap-4">
-              <span
-                className="text-[12px] font-semibold tabular-nums"
-                style={{ color: MB.lime, letterSpacing: "0.1em" }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="text-[18px] font-semibold" style={{ color: MB.white }}>
-                {item.title}
-              </h3>
-            </div>
-            <p className="mt-2.5 pl-8 text-[15px] leading-relaxed" style={{ color: "#B8CBD2" }}>
+            <h3 className="text-[18px] font-semibold" style={{ color: MB.white }}>
+              {item.title}
+            </h3>
+            <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "#B8CBD2" }}>
               {item.body}
             </p>
           </li>
@@ -378,7 +340,7 @@ function Evening() {
           {LYFE_EVENT.date} &middot; {LYFE_EVENT.venueName}
         </span>
       </div>
-    </Monogrammed>
+    </Section>
   );
 }
 
@@ -386,7 +348,7 @@ function Evening() {
 
 function Surgeon() {
   return (
-    <Monogrammed bg={MB.blue}>
+    <Section bg={MB.blueDeep}>
       <div className="grid gap-12 md:grid-cols-[1fr_1.3fr] md:gap-16">
         <div className="flex justify-center md:justify-start">
           <ArchPortrait w={300} />
@@ -422,7 +384,7 @@ function Surgeon() {
           </ul>
         </div>
       </div>
-    </Monogrammed>
+    </Section>
   );
 }
 
@@ -449,7 +411,7 @@ const LEAVE_WITH = [
 
 function WhatYouLeaveWith() {
   return (
-    <Monogrammed bg={MB.blueDeep}>
+    <Section bg={MB.blueDeep}>
       <Eyebrow>What you leave with</Eyebrow>
       <h2
         className="mt-5 max-w-2xl text-[30px] leading-[1.14] md:text-[40px]"
@@ -470,7 +432,7 @@ function WhatYouLeaveWith() {
           </div>
         ))}
       </div>
-    </Monogrammed>
+    </Section>
   );
 }
 
@@ -484,7 +446,7 @@ function Rsvp({
   initialIntent: "EVENT_RSVP" | "DISCOVERY_CALL" | null;
 }) {
   return (
-    <Monogrammed bg={MB.blue} id="enquire">
+    <Section bg={MB.blue} id="enquire">
       <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
           <Eyebrow>Reserve a place</Eyebrow>
@@ -535,7 +497,7 @@ function Rsvp({
 
         <EnquiryForm utm={utm} initialIntent={initialIntent} />
       </div>
-    </Monogrammed>
+    </Section>
   );
 }
 
@@ -599,17 +561,12 @@ function ThePractice() {
         </p>
 
         <div className="mt-14 grid gap-x-12 gap-y-8 md:grid-cols-2">
-          {LYFE_STANDARDS.slice(0, 4).map((s, i) => (
+          {LYFE_STANDARDS.slice(0, 4).map((s) => (
             <div key={s.title}>
-              <div className="flex items-baseline gap-3">
-                <span className="text-[12px] font-semibold tabular-nums" style={{ color: C.bronze }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-[16.5px] font-semibold" style={{ color: C.ink }}>
-                  {s.title}
-                </h3>
-              </div>
-              <p className="mt-2 pl-7 text-[15px] leading-relaxed" style={{ color: C.body }}>
+              <h3 className="text-[16.5px] font-semibold" style={{ color: C.ink }}>
+                {s.title}
+              </h3>
+              <p className="mt-2 text-[15px] leading-relaxed" style={{ color: C.body }}>
                 {s.body}
               </p>
             </div>

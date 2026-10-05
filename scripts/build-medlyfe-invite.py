@@ -403,23 +403,17 @@ def build_png(kind, name, places, out_path):
     ax = cx - aw // 2
 
     img = gradient((W, H), BLUE, BLUE_DARK).convert("RGBA")
-    img.alpha_composite(monogram_field(W, H, tile=138, alpha=13))
-    img.alpha_composite(halo(W, H, cx, int(H * 0.145), 330, peak=26))
+    img.alpha_composite(monogram_field(W, H, tile=150, alpha=6))
+    img.alpha_composite(halo(W, H, cx, int(H * 0.145), 340, peak=16))
     img.alpha_composite(arched_portrait(aw, ah), (ax, ay))
 
     d = ImageDraw.Draw(img)
 
     # A hairline arch a few pixels proud of the photograph, which is the
     # detail that makes it look set into the page rather than laid on it.
-    pad = 11
-    d.arc([ax - pad, ay - pad, ax + aw + pad, ay + aw + pad], 180, 360, fill=LIME, width=1)
-    d.line([(ax - pad, ay + aw / 2), (ax - pad, ay + ah - int(ah * 0.22))], fill=LIME, width=1)
-    d.line([(ax + aw + pad, ay + aw / 2), (ax + aw + pad, ay + ah - int(ah * 0.22))], fill=LIME, width=1)
 
-    inset = 40
-    d.rectangle([inset, inset, W - inset, H - inset], outline=LIME, width=1)
-    d.rectangle([inset + 7, inset + 7, W - inset - 7, H - inset - 7], outline=LIME + "55", width=1)
-    corner_marks(d, inset, W, H)
+    inset = 44
+    d.rectangle([inset, inset, W - inset, H - inset], outline=LIME + "99", width=1)
 
     # ---- head
     y = top
@@ -484,7 +478,7 @@ def build_png(kind, name, places, out_path):
 
     centred(d, FOOTER, font(SANS, SANS_R, 14), cx, max(H - M + 16, by + 34), BLUE_SOFT)
 
-    img.alpha_composite(grain(W, H, strength=8))
+    img.alpha_composite(grain(W, H, strength=5))
     img.convert("RGB").save(out_path, "PNG", optimize=True)
     return out_path
 
@@ -579,9 +573,9 @@ def build_pdf(kind, name, places, out_path):
     # Ground wash with the monogram field and grain baked in, so the print
     # carries the same texture as the screen version.
     bg = gradient((int(PW * 3), int(PH * 3)), BLUE, BLUE_DARK).convert("RGBA")
-    bg.alpha_composite(monogram_field(bg.width, bg.height, tile=int(138 * 1.1), alpha=13))
-    bg.alpha_composite(halo(bg.width, bg.height, bg.width // 2, int(bg.height * 0.145), int(bg.width * 0.46), peak=26))
-    bg.alpha_composite(grain(bg.width, bg.height, strength=7))
+    bg.alpha_composite(monogram_field(bg.width, bg.height, tile=int(150 * 1.1), alpha=6))
+    bg.alpha_composite(halo(bg.width, bg.height, bg.width // 2, int(bg.height * 0.145), int(bg.width * 0.48), peak=16))
+    bg.alpha_composite(grain(bg.width, bg.height, strength=5))
     btmp = OUT / ".bg-tmp.png"
     bg.convert("RGB").save(btmp)
     c.drawImage(ImageReader(str(btmp)), 0, 0, width=PW, height=PH)
@@ -609,21 +603,8 @@ def build_pdf(kind, name, places, out_path):
 
     # Frame, inner keyline and corner brackets.
     c.setStrokeColor(HexColor(LIME))
-    c.setLineWidth(0.5)
-    c.rect(M * 0.52, M * 0.52, PW - 1.04 * M, PH - 1.04 * M, fill=0, stroke=1)
-    c.setLineWidth(0.3)
-    c.rect(M * 0.52 + 3.2, M * 0.52 + 3.2, PW - 1.04 * M - 6.4, PH - 1.04 * M - 6.4, fill=0, stroke=1)
-    c.setLineWidth(0.5)
-    o = M * 0.52 + 9
-    for (x, y, dx, dy) in [(o, o, 1, 1), (PW - o, o, -1, 1), (o, PH - o, 1, -1), (PW - o, PH - o, -1, -1)]:
-        c.line(x, y, x + dx * 15, y)
-        c.line(x, y, x, y + dy * 15)
-
-    # Arch hairline.
-    c.setLineWidth(0.5)
-    c.arc(cx - aw / 2 - 4, ay_top - aw - 4, cx + aw / 2 + 4, ay_top + 4, 0, 180)
-    c.line(cx - aw / 2 - 4, ay_top - aw / 2, cx - aw / 2 - 4, ay_top - ah + ah * 0.22)
-    c.line(cx + aw / 2 + 4, ay_top - aw / 2, cx + aw / 2 + 4, ay_top - ah + ah * 0.22)
+    c.setLineWidth(0.45)
+    c.rect(M * 0.55, M * 0.55, PW - 1.1 * M, PH - 1.1 * M, fill=0, stroke=1)
 
     # ---- head
     y = top
