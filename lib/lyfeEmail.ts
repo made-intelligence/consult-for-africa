@@ -96,12 +96,12 @@ export async function emailLyfeConfirmation({
        <p style="margin:0 0 14px;">Thank you. You are on the list for the evening at ${esc(LYFE_EVENT.host)}, with ${esc(LYFE_EVENT.withWhom)}, and we are glad you are coming.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
-         <tr><td style="background:${MEDLYFE_BRAND.blue};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
            <strong style="font-size:17px;">${esc(LYFE_EVENT.tagline)}</strong><br>
            <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.standfirst)}</span>
            <br><br>
            <strong>${esc(LYFE_EVENT.date)}</strong><br>
-           Cocktails ${esc(LYFE_EVENT.cocktails)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+           Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
            ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>

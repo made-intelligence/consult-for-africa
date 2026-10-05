@@ -184,7 +184,7 @@ export default function EnquiryForm({
             `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "RSVP'd to the evening" : "asked for a discovery call"} through your website.`,
           )}
           className="mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
-          style={{ background: MB.blueDeep, color: "#FFFFFF" }}
+          style={{ background: MB.greenDeep, color: "#FFFFFF" }}
         >
           Message us on WhatsApp
         </a>
@@ -272,7 +272,7 @@ export default function EnquiryForm({
           <Head>{rsvp ? "Tell us who is coming" : "How do we reach you?"}</Head>
           <p className="mt-2.5 text-sm leading-relaxed" style={{ color: C.body }}>
             {rsvp
-              ? `${LYFE_EVENT.date}. Cocktails ${LYFE_EVENT.cocktails}, programme ${LYFE_EVENT.programme}. Please reply by ${LYFE_EVENT.rsvpBy}.`
+              ? `${LYFE_EVENT.date}. Arrival ${LYFE_EVENT.arrival}, programme ${LYFE_EVENT.programme}. Please reply by ${LYFE_EVENT.rsvpBy}.`
               : "A coordinator calls you, usually the same day. Give us the number you actually answer."}
           </p>
 
@@ -421,7 +421,7 @@ export default function EnquiryForm({
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
               className="mt-1 h-4 w-4 shrink-0 rounded"
-              style={{ accentColor: MB.blueDeep }}
+              style={{ accentColor: MB.greenDeep }}
             />
             <span className="text-sm leading-relaxed" style={{ color: C.body }}>
               {LYFE_CONSENT_TEXT}
@@ -434,7 +434,7 @@ export default function EnquiryForm({
             type="submit"
             disabled={submitting}
             className="mt-6 w-full rounded-xl py-4 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: MB.blueDeep, color: "#FFFFFF" }}
+            style={{ background: MB.greenDeep, color: "#FFFFFF" }}
           >
             {submitting ? "Sending..." : rsvp ? "Confirm my place" : "Book my discovery call"}
           </button>
@@ -456,7 +456,7 @@ export default function EnquiryForm({
                 }
               }}
               className="text-[13px] font-semibold underline underline-offset-4"
-              style={{ color: MB.blueDeep }}
+              style={{ color: MB.greenDeep }}
             >
               {rsvp
                 ? "I cannot make the evening. Book me a call instead"
@@ -481,7 +481,7 @@ function Card({ children }: { children: React.ReactNode }) {
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase" style={{ color: MB.blueDeep, letterSpacing: "0.14em" }}>
+    <p className="text-[11px] font-semibold uppercase" style={{ color: MB.greenDeep, letterSpacing: "0.14em" }}>
       {children}
     </p>
   );
@@ -538,7 +538,7 @@ function Field({
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-semibold uppercase" style={{ color: C.inkSoft, letterSpacing: "0.1em" }}>
-        {label} {required && <span style={{ color: MB.blueDeep }}>*</span>}
+        {label} {required && <span style={{ color: MB.greenDeep }}>*</span>}
       </span>
       {hint && (
         <span className="mb-2 block text-xs" style={{ color: C.muted }}>
@@ -579,7 +579,7 @@ function Choice({
       aria-pressed={checked}
       className="flex items-start gap-3 rounded-xl border p-3.5 text-left text-sm transition"
       style={{
-        borderColor: checked ? MB.blue : C.line,
+        borderColor: checked ? MB.green : C.line,
         background: checked ? "#EEF4F6" : "#FFFFFF",
       }}
     >
@@ -587,8 +587,8 @@ function Choice({
         className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center border"
         style={{
           borderRadius: multi ? 4 : 999,
-          borderColor: checked ? MB.blue : "#CBD5E1",
-          background: checked ? MB.blue : "#FFFFFF",
+          borderColor: checked ? MB.green : "#CBD5E1",
+          background: checked ? MB.green : "#FFFFFF",
         }}
       >
         {checked && (
