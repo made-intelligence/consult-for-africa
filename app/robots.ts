@@ -32,6 +32,9 @@ export default function robots(): MetadataRoute.Robots {
           // WhatsApp traffic reach it perfectly well without being indexed.
           // Remove this the day the domain is pointed.
           "/lyfe",
+          // Dr Bola Akinola's rebuilt site, in preview for him to test. It
+          // moves to bolarinwaakinola.com, so it must never rank here.
+          "/drbola",
         ],
       },
     ],
