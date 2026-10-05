@@ -8,6 +8,7 @@ import {
   LYFE_EVENT,
   LYFE_EVENT_TAKEAWAY,
   LYFE_NAME,
+  MEDLYFE_BRAND,
   LYFE_PHONE_DISPLAY,
   NICOTINE_LABELS,
   PATHWAY_LABELS,
@@ -92,17 +93,20 @@ export async function emailLyfeConfirmation({
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you. You are on the list for ${esc(LYFE_EVENT.name)}, and we are glad you are coming.</p>
+       <p style="margin:0 0 14px;">Thank you. You are on the list for the evening at ${esc(LYFE_EVENT.host)}, with ${esc(LYFE_EVENT.withWhom)}, and we are glad you are coming.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
-         <tr><td style="background:${LYFE_BRAND.bronzeTint};border-left:3px solid ${LYFE_BRAND.bronze};padding:18px 20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.ink};">
-           <strong style="font-size:16px;">${esc(LYFE_EVENT.theme)}</strong><br>
-           ${esc(LYFE_EVENT.date)}<br>
-           ${esc(LYFE_EVENT.time)}<br>
-           ${esc(LYFE_EVENT.dress)}
+         <tr><td style="background:${MEDLYFE_BRAND.blue};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+           <strong style="font-size:17px;">${esc(LYFE_EVENT.tagline)}</strong><br>
+           <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.standfirst)}</span>
+           <br><br>
+           <strong>${esc(LYFE_EVENT.date)}</strong><br>
+           Cocktails ${esc(LYFE_EVENT.cocktails)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+           ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">We will send you the address and the running order closer to the day. It is an evening of conversation rather than a sales floor: a panel, a conversation with Dr Chinwe Kpaduwa, the full menu said out loud with the prices, and questions from the room.</p>
+       <p style="margin:0 0 14px;">A member of the team will call you to confirm personally. The evening opens with an introduction to what Medlyfe has built across wellness and aesthetics, then a conversation about how wellbeing, longevity, confidence and appearance connect, and then Dr Kpaduwa leads a conversation titled &ldquo;${esc(LYFE_EVENT.sessionTitle)}&rdquo;.</p>
+       <p style="margin:0 0 14px;">There will be plenty of time for questions, conversation and cocktails, and the clinical team is in the room throughout if you would like to speak to somebody personally.</p>
        <p style="margin:0 0 14px;">Every guest goes home with a short printed piece, &ldquo;${esc(LYFE_EVENT_TAKEAWAY)}&rdquo;. It is useful whether or not you ever come to us.</p>
        <p style="margin:0 0 14px;">If you would rather speak to somebody before the evening, reply to this note and we will arrange a call.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>

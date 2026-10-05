@@ -85,51 +85,96 @@ export function whatsappLink(message: string): string {
  * written out once here and used everywhere.
  */
 /**
- * The evening.
+ * Medlyfe's own brand, sampled from their poster rather than guessed at.
  *
- * Hosted by the clinic, which is the billing that keeps it proper: the trading,
- * licensed, bookable entity is the host, and Lyfe Plastics is introduced rather
- * than doing the introducing. Venue goes to confirmed guests rather than on the
- * page, which is normal for an invitation led evening and is also how the list
- * stays a list.
+ * The evening is Medlyfe's, not Lyfe Plastics'. Medlyfe is the trading,
+ * licensed, bookable entity and it hosts; Lyfe Plastics is introduced on the
+ * night. So anything to do with the evening wears Medlyfe livery, and the two
+ * palettes are deliberately kept apart.
+ */
+export const MEDLYFE_BRAND = {
+  blue: "#336276",
+  blueDeep: "#1E3C4A",
+  blueSoft: "#7F9EA1",
+  lime: "#C4D7A6",
+  limeSoft: "#DCE8C8",
+  white: "#FFFFFF",
+} as const;
+
+export const MEDLYFE_NAME = "Medlyfe Wellness and Longevity Centre";
+export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
+
+/**
+ * The evening, as the client has written it.
  *
- * Everything here is overridable from the environment so a date or a venue can
- * move without a deploy touching the copy.
+ * Venue address and the RSVP contact are still blank in their copy, so both
+ * are environment variables and the page degrades honestly when they are
+ * unset rather than inventing a line.
  */
 export const LYFE_EVENT = {
-  name: process.env.NEXT_PUBLIC_LYFE_EVENT_NAME || "Medlyfe Introduces",
-  theme: process.env.NEXT_PUBLIC_LYFE_EVENT_THEME || "Feel Good Within and Look Better Outward",
-  date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Saturday 10 October 2026",
-  time: process.env.NEXT_PUBLIC_LYFE_EVENT_TIME || "From 6.30pm",
-  venue: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Lagos Island. The address goes to confirmed guests.",
-  dress: process.env.NEXT_PUBLIC_LYFE_EVENT_DRESS || "Cocktail",
+  host: MEDLYFE_NAME,
+  withWhom: "Dr Chinwe Kpaduwa, MD FACS",
+  tagline: MEDLYFE_TAGLINE,
+  standfirst: "One evening. One conversation about how you feel and how you look.",
+  sessionTitle: "The Art of Looking Like Yourself",
+  date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Thursday, 15 October 2026",
+  cocktails: "6:30 PM",
+  programme: "7:15 PM",
+  close: "9:30 PM",
+  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Greenhouse, Lagos",
+  venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
+  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 12 October",
+  footerLine: "Medlyfe introduces Lyfe Plastics and Dermatology.",
 } as const;
 
 export const LYFE_EVENT_PROGRAMME = [
   {
-    title: "The clinic, presented",
-    body: "What is now offered across both halves of the proposition, the wellness side and the aesthetic side, and who the clinicians are.",
+    title: "An introduction to Medlyfe",
+    body: "What has been built across wellness and aesthetics, and what each service is designed to address.",
   },
   {
-    title: "The panel",
-    body: "Thirty minutes on why the woman who sleeps badly, carries weight she cannot shift and dislikes her skin has one problem rather than three. Argued by the people who treat it.",
+    title: "The conversation",
+    body: "The connection between wellbeing, longevity, confidence and appearance. We tend to treat sleep, energy and weight as one conversation and skin and appearance as another. They are the same story.",
   },
   {
-    title: "In conversation with Dr Chinwe Kpaduwa",
-    body: "Under her own title, " + "\u201C" + "The Art of Looking Like Yourself" + "\u201D" + ". How a surgeon decides who should have something done and who should not, and what she will not have done in this clinic.",
+    title: "In conversation with Dr Chinwe Kpaduwa, MD FACS",
+    body: "Under her own title, " + "\u201C" + "The Art of Looking Like Yourself" + "\u201D" + ". Thoughtful aesthetic care, natural looking results, and the importance of knowing not only what can be done but what should be done.",
   },
   {
-    title: "The services, and what they cost",
-    body: "Said out loud, with the prices, because a room that has to ask assumes the worst.",
+    title: "The services, and what to expect",
+    body: "A clear introduction to what Medlyfe offers, who each thing suits, and what a visit to the Centre actually involves.",
   },
   {
-    title: "Questions from the room",
-    body: "Chaired, and genuinely open. The questions people are too polite to ask in a consultation get asked here.",
+    title: "Questions, conversation and cocktails",
+    body: "The clinical team is in the room throughout, and available to anyone who would like to speak to somebody personally or book a consultation.",
   },
 ] as const;
 
 export const LYFE_EVENT_TAKEAWAY =
   "What to ask before anybody treats your face, your skin or your hormones";
+
+/** Her portrait and credentials, for the page and the invitations. */
+export const LYFE_SURGEON = {
+  name: "Dr Chinwe Kpaduwa, MD FACS",
+  shortName: "Dr Chinwe Kpaduwa",
+  portrait: "/lyfe/chinwe-portrait.jpg",
+  portraitWidth: 682,
+  portraitHeight: 1024,
+  // Verified against her own CV and three directories. "Harvard educated,
+  // California trained" is her own formulation and is the safe phrasing: she
+  // read biochemistry at Harvard, not medicine.
+  credentials: [
+    "Board certified by the American Board of Plastic Surgery",
+    "Fellow of the American College of Surgeons",
+    "Harvard educated, California trained",
+    "Craniofacial fellowship, Nationwide Children's Hospital",
+    "The Aesthetic Society, and the American Society of Plastic Surgeons",
+  ],
+  // Her own published position, in her own words, over two years of writing.
+  // This is why the theme is what it is: we did not invent it.
+  position:
+    "Her argument, made publicly and consistently, is that the best work is the work nobody can point at, that ageing is not a problem to be solved, and that knowing when not to operate matters more than the menu.",
+} as const;
 
 export const LYFE_PATHWAY_COPY = {
   AESTHETIC: {
