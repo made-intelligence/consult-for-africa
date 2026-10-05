@@ -7,7 +7,7 @@ import { OsteonRings } from "@/components/drbola/Osteon";
 export const metadata: Metadata = {
   title: "About Dr Bolarinwa Akinola, FRCS (Tr. & Orth.)",
   description:
-    "Ibadan medical school, UK orthopaedic training on the East of England rotation, fellowships at Groote Schuur, Cape Town and James Cook, Middlesbrough, MPH from LSHTM. Vice President, Arthroplasty Society of Nigeria.",
+    "Ibadan medical school, UK orthopaedic training on the East of England rotation, fellowships at Groote Schuur, Cape Town and James Cook, Middlesbrough, MPH from LSHTM. President, Arthroplasty Society of Nigeria.",
 };
 
 const TRAINING = [
@@ -20,8 +20,8 @@ const TRAINING = [
 ];
 
 const NOW = [
+  "President, Arthroplasty Society of Nigeria",
   "Founder, Osteon Clinics, Lagos",
-  "Vice President, Arthroplasty Society of Nigeria",
   "15+ peer-reviewed papers in Injury, JBJS (Br) and Hip International",
   "Contributor, Orthopaedic Biomechanics Made Easy, Cambridge University Press",
   "Member, AO Spine and EBJIS",

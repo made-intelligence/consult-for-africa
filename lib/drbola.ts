@@ -72,10 +72,10 @@ export const NAV = [
 ] as const;
 
 export const CREDENTIALS = [
+  { title: "President", detail: "Arthroplasty Society of Nigeria" },
   { title: "FRCS (Tr. & Orth.)", detail: "Royal College of Surgeons of Edinburgh" },
   { title: "Fellowships", detail: "Groote Schuur, Cape Town and James Cook, Middlesbrough" },
   { title: "MPH", detail: "London School of Hygiene and Tropical Medicine" },
-  { title: "Vice President", detail: "Arthroplasty Society of Nigeria" },
   { title: "15+ papers", detail: "Injury, JBJS (Br), Hip International" },
 ] as const;
 

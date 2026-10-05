@@ -29,7 +29,7 @@ const schema = {
   image: `${DRBOLA_SITE_URL}/drbola/portrait.webp`,
   medicalSpecialty: ["Orthopedic", "Surgical"],
   description:
-    "Consultant orthopaedic and reconstructive surgeon specialising in revision hip and knee replacement, bone and joint infection and complex trauma in Lagos and Abuja.",
+    "President of the Arthroplasty Society of Nigeria. Consultant orthopaedic and reconstructive surgeon specialising in revision hip and knee replacement, bone and joint infection and complex trauma in Lagos and Abuja.",
   telephone: `+${DRBOLA.whatsapp}`,
   email: DRBOLA.email,
   sameAs: [DRBOLA.linkedin],
@@ -58,8 +58,8 @@ export default function DrBolaHome() {
               I fix what others can&rsquo;t.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-(--db-body)">
-              Failed replacements. Infected joints. Fractures that won&rsquo;t heal. UK trained, twenty years, three
-              countries.
+              Failed replacements. Infected joints. Fractures that won&rsquo;t heal. UK trained. President of the
+              Arthroplasty Society of Nigeria.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button to="/second-opinion">
