@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CREDENTIALS,
+  DOCTOR_HEADLINE,
+  DOCTOR_PROMISES,
   DRBOLA,
   DRBOLA_SITE_URL,
   LOCATIONS,
@@ -217,18 +219,27 @@ export default function DrBolaHome() {
 
       {/* Doctors */}
       <section className="relative overflow-hidden bg-(--db-ink) py-20 text-white" style={{ backgroundImage: OSTEON_FIELD_LIGHT }}>
-        <Container className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-(--db-gold)">For doctors</div>
-            <h2 style={serif} className="mt-3 text-3xl font-medium leading-tight text-white sm:text-4xl">
-              Send me your hardest case.
-            </h2>
-            <p className="mt-4 max-w-lg text-[17px] leading-relaxed text-white/70">
-              Reviewed personally within two working days. Your patient comes back to you, with a letter. Track every
-              referral online.
-            </p>
+        <Container>
+          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-(--db-gold)">For colleagues</div>
+          <h2 style={serif} className="mt-3 max-w-2xl text-3xl font-medium leading-tight text-white sm:text-5xl">
+            {DOCTOR_HEADLINE.split("? ").map((part, i, all) => (
+              <span key={i} className="block">
+                {part}
+                {i < all.length - 1 ? "?" : ""}
+              </span>
+            ))}
+          </h2>
+          <div className="mt-10 grid gap-8 border-t border-white/15 pt-8 md:grid-cols-3">
+            {DOCTOR_PROMISES.map((d) => (
+              <div key={d.title}>
+                <div style={serif} className="text-2xl text-white">
+                  {d.title}
+                </div>
+                <p className="mt-2 text-[15px] leading-relaxed text-white/65">{d.detail}</p>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-wrap gap-3 lg:justify-end">
+          <div className="mt-10 flex flex-wrap gap-3">
             <Link href={href("/refer")} className="rounded-full bg-white px-6 py-3 text-[15px] font-medium text-(--db-ink) hover:bg-(--db-bone)">
               Refer a patient
             </Link>

@@ -79,6 +79,18 @@ export const CREDENTIALS = [
   { title: "15+ papers", detail: "Injury, JBJS (Br), Hip International" },
 ] as const;
 
+/**
+ * What stops a doctor referring is rarely the surgeon's CV. It is the fear of
+ * losing the patient, of being judged for a complication, and of a referral
+ * that disappears. These answer those three, colleague to colleague.
+ */
+export const DOCTOR_HEADLINE = "The case nobody wants? Send it to me.";
+export const DOCTOR_PROMISES = [
+  { title: "Yours, returned.", detail: "I treat what you send and hand the patient back, with a letter." },
+  { title: "No judgement.", detail: "Complications happen to all of us. Send them early." },
+  { title: "No black hole.", detail: "A reply within two working days. Track every referral online." },
+] as const;
+
 export const TESTIMONIAL = {
   quote:
     "Dr. Akinola is an outstanding surgeon. He performed knee replacement surgery on me for which many had recommended amputation. He performed the surgery with the highest professional etiquette.",

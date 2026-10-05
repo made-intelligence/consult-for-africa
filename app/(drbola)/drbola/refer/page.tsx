@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { DRBOLA, href } from "@/lib/drbola";
+import { DOCTOR_HEADLINE, DOCTOR_PROMISES, DRBOLA, href } from "@/lib/drbola";
 import { Container } from "@/components/drbola/ui";
 import { PageHero } from "@/components/drbola/blocks";
 import ReferralForm from "@/components/drbola/ReferralForm";
@@ -14,19 +14,15 @@ export const metadata: Metadata = {
 export default function ReferPage() {
   return (
     <>
-      <PageHero eyebrow="For doctors" title="Send me your hardest case." />
+      <PageHero eyebrow="For colleagues" title={DOCTOR_HEADLINE} />
       <section className="py-14">
         <Container className="grid gap-12 lg:grid-cols-[18rem_1fr]">
           <aside className="space-y-8">
             <ul className="space-y-5">
-              {[
-                ["Two working days", "Every referral reviewed by me, personally."],
-                ["Your patient comes back", "With a letter. I treat what I am asked to treat."],
-                ["Tracked", "Follow every referral online with your reference."],
-              ].map(([t, d]) => (
-                <li key={t}>
-                  <div className="font-medium text-(--db-ink)">{t}</div>
-                  <div className="mt-0.5 text-[14.5px] text-(--db-body)">{d}</div>
+              {DOCTOR_PROMISES.map((d) => (
+                <li key={d.title}>
+                  <div className="font-medium text-(--db-ink)">{d.title}</div>
+                  <div className="mt-0.5 text-[14.5px] text-(--db-body)">{d.detail}</div>
                 </li>
               ))}
             </ul>
