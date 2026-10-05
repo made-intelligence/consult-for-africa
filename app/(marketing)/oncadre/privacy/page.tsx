@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-lg font-bold text-gray-900">1. Introduction</h2>
             <p>
-              CadreHealth is operated by Consult For Africa Limited (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). We are committed to protecting your personal data in compliance with the Nigeria Data Protection Regulation (NDPR) 2019 and the Nigeria Data Protection Act (NDPA) 2023. This policy explains what data we collect, how we use it, and your rights.
+              CadreHealth is operated by Consult for Africa Management Services Limited (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). We are committed to protecting your personal data in compliance with the Nigeria Data Protection Regulation (NDPR) 2019 and the Nigeria Data Protection Act (NDPA) 2023. This policy explains what data we collect, how we use it, and your rights.
             </p>
           </section>
 
