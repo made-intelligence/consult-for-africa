@@ -98,7 +98,7 @@ EVENT_THEME = "Feel Good, Look Good, Live Better."
 EVENT_DATE = "Thursday 15 October"
 EVENT_TIME = "Cocktails 6.30pm"
 EVENT_DRESS = "RSVP by 12 October"
-EVENT_VENUE = "Greenhouse, Lagos"
+EVENT_VENUE = "Lagos"
 RSVP_MESSAGE = "Hello, I would like to RSVP to the evening."
 CALL_MESSAGE = "Hello, I would like to book a discovery call."
 

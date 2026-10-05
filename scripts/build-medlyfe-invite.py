@@ -85,7 +85,7 @@ DATE = "Thursday, 15 October 2026"
 COCKTAILS = "6:00 PM"
 PROGRAMME = "6:45 PM"
 CLOSE = "9:30 PM"
-VENUE = "Greenhouse, Lagos"
+VENUE = "Lagos. The address follows your reply."
 RSVP_BY = "12 October"
 FOOTER = "MedLYFE introduces Lyfe Plastics & Dermatology."
 
