@@ -186,6 +186,119 @@ def draw_lockup(img, d, x, y, mark_h=54):
     return end - x
 
 
+# ---------------------------------------------------------------- ornament ---
+
+def mark_tile(size, colour=(255, 255, 255), alpha=14):
+    """
+    The Medlyfe mark, drawn once into a transparent tile so it can be repeated
+    as a monogram field. Luxury houses pattern their own mark rather than
+    importing an ornament, and Medlyfe already has a mark worth repeating.
+    """
+    t = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(t)
+    h = size * 0.46
+    w = h * 59 / 73
+    draw_mark(d, (size - w) / 2, (size - h) / 2, h, colour=colour + (alpha,))
+    return t
+
+
+def monogram_field(W, H, tile=132, alpha=13):
+    """A half dropped repeat, which reads as cloth rather than as a grid."""
+    field = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    t = mark_tile(tile, alpha=alpha)
+    rows = H // tile + 2
+    cols = W // tile + 2
+    for r in range(rows):
+        off = (tile // 2) if r % 2 else 0
+        for c in range(cols):
+            field.alpha_composite(t, (c * tile - off, r * tile))
+    return field
+
+
+def halo(W, H, cx, cy, radius, colour=(255, 255, 255), peak=30):
+    """
+    The soft bloom behind the lockup on their own poster. Drawn small and
+    scaled up, because a per pixel radial gradient at this size is slow and
+    looks no better.
+    """
+    s = 180
+    g = Image.new("L", (s, s), 0)
+    gd = ImageDraw.Draw(g)
+    for i in range(s // 2, 0, -1):
+        k = 1 - (i / (s / 2))
+        gd.ellipse([s / 2 - i, s / 2 - i, s / 2 + i, s / 2 + i], fill=int(peak * (k ** 2.2)))
+    g = g.resize((radius * 2, radius * 2), Image.BILINEAR)
+    layer = Image.new("RGBA", (W, H), colour + (0,))
+    layer.putalpha(0)
+    tint = Image.new("RGBA", (radius * 2, radius * 2), colour + (255,))
+    tint.putalpha(g)
+    layer.alpha_composite(tint, (int(cx - radius), int(cy - radius)))
+    return layer
+
+
+def grain(W, H, strength=7):
+    """A whisper of noise. Flat digital gradients read cheap when printed."""
+    import random
+    n = Image.new("L", (W // 2, H // 2))
+    px = n.load()
+    rnd = random.Random(7)
+    for y in range(n.height):
+        for x in range(n.width):
+            px[x, y] = rnd.randint(0, strength)
+    n = n.resize((W, H), Image.BILINEAR)
+    layer = Image.new("RGBA", (W, H), (255, 255, 255, 255))
+    layer.putalpha(n)
+    return layer
+
+
+def rule_with_diamond(d, cx, y, half=92, colour=LIME, lw=1):
+    """A centred hairline broken by a small diamond. The invitation's comma."""
+    d.line([(cx - half, y), (cx - 13, y)], fill=colour, width=lw)
+    d.line([(cx + 13, y), (cx + half, y)], fill=colour, width=lw)
+    d.polygon([(cx, y - 5), (cx + 5, y), (cx, y + 5), (cx - 5, y)], fill=colour)
+
+
+def corner_marks(d, inset, W, H, length=34, colour=LIME, lw=1):
+    """Inner corner brackets, set in from the frame. A bookbinding cue."""
+    o = inset + 15
+    for (x, y, dx, dy) in [(o, o, 1, 1), (W - o, o, -1, 1), (o, H - o, 1, -1), (W - o, H - o, -1, -1)]:
+        d.line([(x, y), (x + dx * length, y)], fill=colour, width=lw)
+        d.line([(x, y), (x, y + dy * length)], fill=colour, width=lw)
+
+
+def arched_portrait(w, h):
+    """
+    Her portrait in an arch. A niche reads as a portrait that belongs in the
+    invitation; a rectangle reads as a photograph dropped on top of one.
+    """
+    p = Image.open(PORTRAIT).convert("RGB")
+    tr = w / h
+    nh = int(p.width / tr)
+    if nh <= p.height:
+        top = int((p.height - nh) * 0.06)
+        p = p.crop((0, top, p.width, top + nh))
+    else:
+        nw = int(p.height * tr)
+        p = p.crop(((p.width - nw) // 2, 0, (p.width + nw) // 2, p.height))
+    p = p.resize((w, h), Image.LANCZOS)
+
+    mask = Image.new("L", (w, h), 0)
+    md = ImageDraw.Draw(mask)
+    r = w / 2
+    md.pieslice([0, 0, w, w], 180, 360, fill=255)
+    md.rectangle([0, r, w, h], fill=255)
+    # Soften the foot so she rises out of the ground rather than sitting on it.
+    fb = int(h * 0.26)
+    mpx = mask.load()
+    for y in range(h - fb, h):
+        k = (h - y) / fb
+        k = k * k * (3 - 2 * k)
+        for x in range(w):
+            mpx[x, y] = int(mpx[x, y] * k)
+    p.putalpha(mask)
+    return p
+
+
 def portrait_panel(w, h):
     """
     Her portrait, cropped to fill and feathered into the blue on the left so
@@ -228,99 +341,180 @@ def portrait_panel(w, h):
     return p
 
 
-def build_png(kind, name, places, out_path):
-    W, H = 1080, 1350
-    M = 76
-    img = gradient((W, H), BLUE, BLUE_DARK).convert("RGBA")
+def centred(d, text, f, cx, y, fill):
+    d.text((cx - tw(d, text, f) / 2, y), text, font=f, fill=fill)
 
-    # Her portrait, lower right, under the type.
-    pw, ph = int(W * 0.50), int(H * 0.50)
-    img.alpha_composite(portrait_panel(pw, ph), (W - pw, H - ph - int(H * 0.055)))
+
+def centred_block(d, text, f, cx, y, fill, max_w, lead):
+    for ln in wrap(d, text, f, max_w):
+        centred(d, ln, f, cx, y, fill)
+        y += lead
+    return y
+
+
+def centred_tracked(d, text, f, cx, y, fill, track=5):
+    w = sum(tw(d, ch, f) + track for ch in text) - track
+    tracked(d, (cx - w / 2, y), text, f, fill, track)
+    return w
+
+
+def build_png(kind, name, places, out_path):
+    """
+    Composed as a formal invitation rather than a poster: centred, generous,
+    patterned, with her portrait in an arch.
+
+    Laid out by measuring every block first and giving the arch whatever is
+    left between the head and the foot. Pinning the portrait to a fraction of
+    the page and hoping the text cleared it is what put the standfirst through
+    the arch and the guest's name through the particulars.
+    """
+    W, H = 1080, 1350
+    cx = W // 2
+    M = 96
+
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+
+    f_eye = font(SANS, SANS_B, 17)
+    f_h = font(DISPLAY, DISPLAY_I, 68)
+    f_s = font(DISPLAY, DISPLAY_I + 1, 25)
+    f_lab = font(SANS, SANS_R, 19)
+    f_nm = font(SANS, SANS_B, 23)
+    f_ses = font(DISPLAY, DISPLAY_I + 1, 34)
+    f_pl = font(SANS, SANS_R, 18)
+    f_pn = font(DISPLAY, DISPLAY_I, 37)
+
+    tag_lines = wrap(probe, TAGLINE, f_h, W - 2 * M - 60)
+    sf_lines = wrap(probe, STANDFIRST, f_s, int(W * 0.62))
+    ses_lines = wrap(probe, "\u201C" + SESSION + "\u201D", f_ses, int(W * 0.72))
+    name_lines = wrap(probe, name, f_pn, int(W * 0.72))
+
+    # Head: lockup, eyebrow, tagline, standfirst, rule.
+    head_h = 112 + 50 + 76 * len(tag_lines) + 12 + 34 * len(sf_lines) + 30
+    # Below the arch: her conversation, then the personalisation panel.
+    conv_h = 26 + 28 + 38 + 42 * len(ses_lines)
+    pers_h = 30 + 26 + 30 + 44 * len(name_lines) + (32 if kind == "group" else 0) + 16
+    foot_h = 164
+
+    top = M + 26
+    avail = (H - M - foot_h - 26) - (top + head_h + conv_h + pers_h)
+    ah = max(250, min(int(H * 0.30), avail - 40))
+    aw = int(ah * 0.82)
+    ay = top + head_h + 22
+    ax = cx - aw // 2
+
+    img = gradient((W, H), BLUE, BLUE_DARK).convert("RGBA")
+    img.alpha_composite(monogram_field(W, H, tile=138, alpha=13))
+    img.alpha_composite(halo(W, H, cx, int(H * 0.145), 330, peak=26))
+    img.alpha_composite(arched_portrait(aw, ah), (ax, ay))
 
     d = ImageDraw.Draw(img)
 
-    # The keyline frame, their device.
-    inset = 34
-    d.rectangle([inset, inset, W - inset, H - inset], outline=LIME + "00", width=0)
-    for seg in [((inset, inset), (W - inset, inset)),
-                ((inset, H - inset), (W - inset, H - inset)),
-                ((inset, inset), (inset, H - inset)),
-                ((W - inset, inset), (W - inset, H - inset))]:
-        d.line([seg[0], seg[1]], fill=LIME, width=1)
+    # A hairline arch a few pixels proud of the photograph, which is the
+    # detail that makes it look set into the page rather than laid on it.
+    pad = 11
+    d.arc([ax - pad, ay - pad, ax + aw + pad, ay + aw + pad], 180, 360, fill=LIME, width=1)
+    d.line([(ax - pad, ay + aw / 2), (ax - pad, ay + ah - int(ah * 0.22))], fill=LIME, width=1)
+    d.line([(ax + aw + pad, ay + aw / 2), (ax + aw + pad, ay + ah - int(ah * 0.22))], fill=LIME, width=1)
 
-    y = M + 14
-    draw_lockup(img, d, M, y, mark_h=56)
-    y += 108
+    inset = 40
+    d.rectangle([inset, inset, W - inset, H - inset], outline=LIME, width=1)
+    d.rectangle([inset + 7, inset + 7, W - inset - 7, H - inset - 7], outline=LIME + "55", width=1)
+    corner_marks(d, inset, W, H)
 
-    f_eye = font(SANS, SANS_B, 19)
-    tracked(d, (M + 2, y), "WITH " + WITH_WHOM.upper(), f_eye, LIME, track=4)
-    y += 54
-
-    f_h = font(DISPLAY, DISPLAY_I, 76)
-    for ln in wrap(d, TAGLINE, f_h, W - 2 * M - 40):
-        d.text((M, y), ln, font=f_h, fill=PAPER)
-        y += 84
-    y += 10
-
-    f_s = font(SANS, SANS_R, 27)
-    for ln in wrap(d, STANDFIRST, f_s, int(W * 0.62)):
-        d.text((M, y), ln, font=f_s, fill=LIME_SOFT)
-        y += 37
-
-    y += 26
-    d.line([(M, y), (M + 78, y)], fill=LIME, width=3)
-    y += 34
-
-    f_lab = font(SANS, SANS_R, 21)
-    f_ses = font(DISPLAY, DISPLAY_I, 37)
-    d.text((M, y), "In conversation with " + WITH_WHOM, font=f_lab, fill=MIST)
-    y += 34
-    for ln in wrap(d, SESSION, f_ses, int(W * 0.60)):
-        d.text((M, y), ln, font=f_ses, fill=PAPER)
-        y += 44
-
-    # The personalisation block, which is the whole point of the artwork.
-    y += 34
-    f_pl = font(SANS, SANS_R, 21)
-    f_pn = font(DISPLAY, DISPLAY_I, 40)
-    if kind == "group":
-        d.text((M, y), "Invites", font=f_pl, fill=LIME)
-        y += 32
-        for ln in wrap(d, name, f_pn, int(W * 0.58)):
-            d.text((M, y), ln, font=f_pn, fill=PAPER)
-            y += 47
-        d.text((M, y + 2), f"{places} places reserved by name", font=f_pl, fill=MIST)
+    # ---- head
+    y = top
+    draw_lockup_centred(img, d, cx, y, mark_h=58)
+    y += 112
+    centred_tracked(d, "WITH " + WITH_WHOM.upper(), f_eye, cx, y, LIME, track=5)
+    y += 50
+    for ln in tag_lines:
+        centred(d, ln, f_h, cx, y, PAPER)
+        y += 76
+    y += 12
+    for ln in sf_lines:
+        centred(d, ln, f_s, cx, y, LIME_SOFT)
         y += 34
-    else:
-        d.text((M, y), "Requests the pleasure of the company of", font=f_pl, fill=LIME)
+
+    # ---- below the arch
+    y = ay + ah + 26
+    centred(d, "In conversation with", f_lab, cx, y, MIST)
+    y += 28
+    centred(d, WITH_WHOM, f_nm, cx, y, PAPER)
+    y += 38
+    for ln in ses_lines:
+        centred(d, ln, f_ses, cx, y, LIME)
+        y += 42
+
+    # ---- the personalisation, ruled above and below
+    y += 30
+    d.line([(cx - 150, y), (cx + 150, y)], fill=LIME + "77", width=1)
+    y += 26
+    if kind == "group":
+        centred(d, "Invites", f_pl, cx, y, LIME)
+        y += 30
+        for ln in name_lines:
+            centred(d, ln, f_pn, cx, y, PAPER)
+            y += 44
+        centred(d, f"{places} places reserved by name", f_pl, cx, y + 2, MIST)
         y += 32
-        for ln in wrap(d, name, f_pn, int(W * 0.58)):
-            d.text((M, y), ln, font=f_pn, fill=PAPER)
-            y += 47
+    else:
+        centred(d, "Requests the pleasure of the company of", f_pl, cx, y, LIME)
+        y += 30
+        for ln in name_lines:
+            centred(d, ln, f_pn, cx, y, PAPER)
+            y += 44
+    y += 16
+    d.line([(cx - 150, y), (cx + 150, y)], fill=LIME + "77", width=1)
 
-    # Details, pinned to the bottom left so the portrait keeps the right.
-    by = H - M - 214
-    f_dk = font(SANS, SANS_B, 17)
-    f_dv = font(SANS, SANS_R, 22)
-    for label, value in [("DATE", DATE),
-                         ("TIME", f"Cocktails {COCKTAILS}  /  Programme {PROGRAMME}"),
-                         ("", f"Close {CLOSE}"),
-                         ("VENUE", VENUE)]:
-        if label:
-            tracked(d, (M, by + 4), label, f_dk, LIME, track=3)
-        d.text((M + 104, by), value, font=f_dv, fill=PAPER)
-        by += 32
-
-    by += 12
+    # ---- the particulars, at the foot. Pinned, but never above the flow,
+    # because a closing rule through the date is worse than a tight margin.
+    by = max(H - M - foot_h + 16, y + 34)
+    centred(d, DATE, font(SANS, SANS_B, 21), cx, by, PAPER)
+    by += 32
+    f_dv = font(SANS, SANS_R, 18)
+    centred(d, f"Cocktails {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", f_dv, cx, by, MIST)
+    by += 26
+    centred(d, VENUE, f_dv, cx, by, MIST)
+    by += 32
     rsvp = (f"Please RSVP with attendee names by {RSVP_BY}" if kind == "group"
-            else f"Personal invitation. RSVP by {RSVP_BY}")
-    d.text((M, by), rsvp, font=font(SANS, SANS_R, 20), fill=MIST)
-    d.text((M, by + 28), PHONE_DISPLAY, font=font(SANS, SANS_B, 22), fill=LIME)
+            else f"Personal invitation.  RSVP by {RSVP_BY}")
+    centred(d, rsvp, font(SANS, SANS_R, 17), cx, by, LIME_SOFT)
+    by += 25
+    centred(d, PHONE_DISPLAY, font(SANS, SANS_B, 20), cx, by, LIME)
 
-    d.text((M, H - M - 18), FOOTER, font=font(SANS, SANS_R, 16), fill=BLUE_SOFT)
+    centred(d, FOOTER, font(SANS, SANS_R, 14), cx, max(H - M + 16, by + 34), BLUE_SOFT)
 
+    img.alpha_composite(grain(W, H, strength=8))
     img.convert("RGB").save(out_path, "PNG", optimize=True)
     return out_path
+
+
+def draw_lockup_centred(img, d, cx, y, mark_h=58):
+    """The lockup, measured first so it can be centred rather than guessed at."""
+    if REAL_LOGO.exists():
+        logo = Image.open(REAL_LOGO).convert("RGBA")
+        scale = (mark_h * 1.5) / logo.height
+        logo = logo.resize((round(logo.width * scale), round(logo.height * scale)), Image.LANCZOS)
+        img.paste(logo, (int(cx - logo.width / 2), int(y)), logo)
+        return logo.width
+
+    f_med = font(DISPLAY, DISPLAY_I, int(mark_h * 0.80))
+    f_lyfe = font(SANS, SANS_B, int(mark_h * 0.78))
+    mw = 59 * (mark_h / 73.0)
+    gap = mark_h * 0.34
+    total = mw + gap + tw(d, "med", f_med) + mark_h * 0.03 + tw(d, "LYFE", f_lyfe)
+    x = cx - total / 2
+
+    draw_mark(d, x, y, mark_h)
+    tx = x + mw + gap
+    base = y + mark_h * 0.16
+    d.text((tx, base), "med", font=f_med, fill=PAPER)
+    tx2 = tx + tw(d, "med", f_med) + mark_h * 0.03
+    d.text((tx2, base + mark_h * 0.045), "LYFE", font=f_lyfe, fill=PAPER)
+
+    f_sub = font(SANS, SANS_R, int(mark_h * 0.215))
+    centred_tracked(d, "WELLNESS AND LONGEVITY CENTRE", f_sub, cx, y + mark_h * 1.02, PAPER, track=2.4)
+    return total
 
 
 # ============================================================== print (PDF) ==
@@ -363,131 +557,147 @@ def pdf_mark(c, x, y, h, colour=white):
     return 59 * s
 
 
+def pdf_centred(c, text, f, size, cx, y, colour):
+    c.setFont(f, size)
+    c.setFillColor(colour)
+    c.drawString(cx - c.stringWidth(text, f, size) / 2, y, text)
+
+
+def pdf_centred_tracked(c, text, x_centre, y, f, size, colour, track=1.3):
+    w = sum(c.stringWidth(ch, f, size) + track for ch in text) - track
+    pdf_tracked(c, text, x_centre - w / 2, y, f, size, colour, track)
+
+
 def build_pdf(kind, name, places, out_path):
+    """A5, same composition as the raster, measured the same way."""
     PW, PH = A5
-    M = 34
+    cx = PW / 2
+    M = 38
     c = canvaslib.Canvas(str(out_path), pagesize=A5)
     c.setTitle("Medlyfe, an invitation")
 
-    # Ground: a soft wash, drawn as bands.
-    steps = 120
-    t = tuple(int(BLUE[i:i + 2], 16) for i in (1, 3, 5))
-    b = tuple(int(BLUE_DARK[i:i + 2], 16) for i in (1, 3, 5))
-    for i in range(steps):
-        k = i / (steps - 1)
-        col = tuple((t[j] + (b[j] - t[j]) * k) / 255.0 for j in range(3))
-        c.setFillColorRGB(*col)
-        c.rect(0, PH - (i + 1) * PH / steps, PW, PH / steps + 1, fill=1, stroke=0)
+    # Ground wash with the monogram field and grain baked in, so the print
+    # carries the same texture as the screen version.
+    bg = gradient((int(PW * 3), int(PH * 3)), BLUE, BLUE_DARK).convert("RGBA")
+    bg.alpha_composite(monogram_field(bg.width, bg.height, tile=int(138 * 1.1), alpha=13))
+    bg.alpha_composite(halo(bg.width, bg.height, bg.width // 2, int(bg.height * 0.145), int(bg.width * 0.46), peak=26))
+    bg.alpha_composite(grain(bg.width, bg.height, strength=7))
+    btmp = OUT / ".bg-tmp.png"
+    bg.convert("RGB").save(btmp)
+    c.drawImage(ImageReader(str(btmp)), 0, 0, width=PW, height=PH)
 
-    # Her portrait, bottom right, with a soft left edge.
-    pw, ph = PW * 0.46, PH * 0.40
-    tmp = OUT / ".portrait-tmp.png"
-    portrait_panel(int(pw * 3), int(ph * 3)).save(tmp)
-    c.drawImage(ImageReader(str(tmp)), PW - pw, PH * 0.085, width=pw, height=ph, mask="auto")
+    tag_lines = pdf_wrap(c, TAGLINE, "Times-Roman", 25, PW - 2 * M - 24)
+    sf_lines = pdf_wrap(c, STANDFIRST, "Times-Italic", 10, PW * 0.64)
+    ses_lines = pdf_wrap(c, "\u201C" + SESSION + "\u201D", "Times-Italic", 13.5, PW * 0.74)
+    name_lines = pdf_wrap(c, name, "Times-Roman", 15, PW * 0.74)
 
+    head_h = 46 + 20 + 28 * len(tag_lines) + 6 + 13 * len(sf_lines)
+    conv_h = 12 + 12 + 15 + 16.5 * len(ses_lines)
+    pers_h = 14 + 11 + 12 + 18 * len(name_lines) + (12 if kind == "group" else 0) + 8
+    foot_h = 78
+
+    top = PH - M - 26
+    avail = (top - head_h - conv_h - pers_h) - (M + foot_h)
+    ah = max(96, min(PH * 0.28, avail - 16))
+    aw = ah * 0.82
+
+    # Her portrait, arched.
+    atmp = OUT / ".arch-tmp.png"
+    arched_portrait(int(aw * 4), int(ah * 4)).save(atmp)
+    ay_top = top - head_h - 14
+    c.drawImage(ImageReader(str(atmp)), cx - aw / 2, ay_top - ah, width=aw, height=ah, mask="auto")
+
+    # Frame, inner keyline and corner brackets.
     c.setStrokeColor(HexColor(LIME))
-    c.setLineWidth(0.6)
-    c.rect(M * 0.6, M * 0.6, PW - 1.2 * M, PH - 1.2 * M, fill=0, stroke=1)
+    c.setLineWidth(0.5)
+    c.rect(M * 0.52, M * 0.52, PW - 1.04 * M, PH - 1.04 * M, fill=0, stroke=1)
+    c.setLineWidth(0.3)
+    c.rect(M * 0.52 + 3.2, M * 0.52 + 3.2, PW - 1.04 * M - 6.4, PH - 1.04 * M - 6.4, fill=0, stroke=1)
+    c.setLineWidth(0.5)
+    o = M * 0.52 + 9
+    for (x, y, dx, dy) in [(o, o, 1, 1), (PW - o, o, -1, 1), (o, PH - o, 1, -1), (PW - o, PH - o, -1, -1)]:
+        c.line(x, y, x + dx * 15, y)
+        c.line(x, y, x, y + dy * 15)
 
-    y = PH - M - 34
-    pdf_mark(c, M, y - 6, 30)
+    # Arch hairline.
+    c.setLineWidth(0.5)
+    c.arc(cx - aw / 2 - 4, ay_top - aw - 4, cx + aw / 2 + 4, ay_top + 4, 0, 180)
+    c.line(cx - aw / 2 - 4, ay_top - aw / 2, cx - aw / 2 - 4, ay_top - ah + ah * 0.22)
+    c.line(cx + aw / 2 + 4, ay_top - aw / 2, cx + aw / 2 + 4, ay_top - ah + ah * 0.22)
+
+    # ---- head
+    y = top
+    pdf_mark(c, cx - 48, y - 8, 26)
     c.setFillColor(white)
-    c.setFont("Times-Roman", 20)
-    c.drawString(M + 34, y + 2, "med")
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(M + 34 + c.stringWidth("med", "Times-Roman", 20) + 1, y + 2, "LYFE")
-    c.setFont("Helvetica", 6.4)
-    c.drawString(M + 35, y - 8, "Wellness and Longevity Centre")
+    c.setFont("Times-Roman", 18)
+    c.drawString(cx - 48 + 28, y, "med")
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(cx - 48 + 28 + c.stringWidth("med", "Times-Roman", 18) + 1, y, "LYFE")
+    pdf_centred_tracked(c, "WELLNESS AND LONGEVITY CENTRE", cx, y - 11, "Helvetica", 5.2, HexColor(LIME_SOFT), 0.9)
+    y -= 34
 
-    y -= 52
-    pdf_tracked(c, "WITH " + WITH_WHOM.upper(), M, y, "Helvetica-Bold", 7.2, HexColor(LIME), 1.3)
+    pdf_centred_tracked(c, "WITH " + WITH_WHOM.upper(), cx, y, "Helvetica-Bold", 6.6, HexColor(LIME), 1.2)
+    y -= 26
 
-    y -= 30
-    c.setFillColor(white)
-    c.setFont("Times-Roman", 27)
-    for ln in pdf_wrap(c, TAGLINE, "Times-Roman", 27, PW - 2 * M - 10):
-        c.drawString(M, y, ln)
-        y -= 30
-
+    for ln in tag_lines:
+        pdf_centred(c, ln, "Times-Roman", 25, cx, y, white)
+        y -= 28
     y -= 4
-    c.setFillColor(HexColor(LIME_SOFT))
-    c.setFont("Helvetica", 10)
-    for ln in pdf_wrap(c, STANDFIRST, "Helvetica", 10, PW * 0.60):
-        c.drawString(M, y, ln)
-        y -= 13.5
+    for ln in sf_lines:
+        pdf_centred(c, ln, "Times-Italic", 10, cx, y, HexColor(LIME_SOFT))
+        y -= 13
 
-    y -= 12
-    c.setFillColor(HexColor(LIME))
-    c.rect(M, y, 30, 1.6, fill=1, stroke=0)
-    y -= 22
+    # ---- below the arch
+    y = ay_top - ah - 16
+    pdf_centred(c, "In conversation with", "Helvetica", 8, cx, y, HexColor(MIST))
+    y -= 13
+    pdf_centred(c, WITH_WHOM, "Helvetica-Bold", 10, cx, y, white)
+    y -= 17
+    for ln in ses_lines:
+        pdf_centred(c, ln, "Times-Italic", 13.5, cx, y, HexColor(LIME))
+        y -= 16.5
 
-    c.setFillColor(HexColor(MIST))
-    c.setFont("Helvetica", 8.4)
-    c.drawString(M, y, "In conversation with " + WITH_WHOM)
-    y -= 19
-    c.setFillColor(white)
-    c.setFont("Times-Roman", 15)
-    for ln in pdf_wrap(c, SESSION, "Times-Roman", 15, PW * 0.58):
-        c.drawString(M, y, ln)
-        y -= 18
-
-    y -= 16
-    c.setFillColor(HexColor(LIME))
-    c.setFont("Helvetica", 8.4)
+    # ---- personalisation
+    y -= 13
+    c.setStrokeColor(HexColor(LIME))
+    c.setLineWidth(0.4)
+    c.line(cx - 62, y, cx + 62, y)
+    y -= 13
     if kind == "group":
-        c.drawString(M, y, "Invites")
-        y -= 20
-        c.setFillColor(white)
-        c.setFont("Times-Roman", 16)
-        for ln in pdf_wrap(c, name, "Times-Roman", 16, PW * 0.56):
-            c.drawString(M, y, ln)
-            y -= 19
-        c.setFillColor(HexColor(MIST))
-        c.setFont("Helvetica", 8.4)
-        c.drawString(M, y, f"{places} places reserved by name")
+        pdf_centred(c, "Invites", "Helvetica", 8, cx, y, HexColor(LIME))
+        y -= 17
+        for ln in name_lines:
+            pdf_centred(c, ln, "Times-Roman", 15, cx, y, white)
+            y -= 18
+        pdf_centred(c, f"{places} places reserved by name", "Helvetica", 8, cx, y, HexColor(MIST))
+        y -= 12
     else:
-        c.drawString(M, y, "Requests the pleasure of the company of")
-        y -= 20
-        c.setFillColor(white)
-        c.setFont("Times-Roman", 16)
-        for ln in pdf_wrap(c, name, "Times-Roman", 16, PW * 0.56):
-            c.drawString(M, y, ln)
-            y -= 19
+        pdf_centred(c, "Requests the pleasure of the company of", "Helvetica", 8, cx, y, HexColor(LIME))
+        y -= 17
+        for ln in name_lines:
+            pdf_centred(c, ln, "Times-Roman", 15, cx, y, white)
+            y -= 18
+    y -= 4
+    c.line(cx - 62, y, cx + 62, y)
 
-    by = M + 86
-    for label, value in [("DATE", DATE),
-                         ("TIME", f"Cocktails {COCKTAILS} / Programme {PROGRAMME} / Close {CLOSE}"),
-                         ("VENUE", VENUE)]:
-        pdf_tracked(c, label, M, by, "Helvetica-Bold", 6.4, HexColor(LIME), 1.1)
-        c.setFillColor(white)
-        c.setFont("Helvetica", 8.6)
-        c.drawString(M + 44, by, value)
-        by -= 13
-
-    by -= 6
-    c.setFillColor(HexColor(MIST))
-    c.setFont("Helvetica", 8)
-    c.drawString(M, by, (f"Please RSVP with attendee names by {RSVP_BY}" if kind == "group"
-                         else f"Personal invitation. RSVP by {RSVP_BY}"))
-    c.setFillColor(HexColor(LIME))
-    c.setFont("Helvetica-Bold", 9.5)
-    c.drawString(M, by - 13, PHONE_DISPLAY)
-
-    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=10, border=1)
-    qr.add_data(wa(f"Hello, I would like to RSVP to the evening on {DATE}."))
-    qr.make(fit=True)
-    qimg = qr.make_image(fill_color=BLUE_DARK, back_color=LIME).convert("RGB")
-    qtmp = OUT / ".qr-tmp.png"
-    qimg.save(qtmp)
-    c.drawImage(ImageReader(str(qtmp)), PW - M - 54, M + 30, width=54, height=54, mask="auto")
-
-    c.setFillColor(HexColor(BLUE_SOFT))
-    c.setFont("Helvetica", 6.2)
-    c.drawString(M, M * 0.9, FOOTER)
+    # ---- particulars
+    by = min(M + foot_h, y - 16)
+    pdf_centred(c, DATE, "Helvetica-Bold", 9.5, cx, by, white)
+    by -= 13
+    pdf_centred(c, f"Cocktails {COCKTAILS}   \u00b7   Programme {PROGRAMME}   \u00b7   Close {CLOSE}", "Helvetica", 8, cx, by, HexColor(MIST))
+    by -= 11
+    pdf_centred(c, VENUE, "Helvetica", 8, cx, by, HexColor(MIST))
+    by -= 14
+    pdf_centred(c, (f"Please RSVP with attendee names by {RSVP_BY}" if kind == "group"
+                    else f"Personal invitation.  RSVP by {RSVP_BY}"), "Helvetica", 7.6, cx, by, HexColor(LIME_SOFT))
+    by -= 12
+    pdf_centred(c, PHONE_DISPLAY, "Helvetica-Bold", 9, cx, by, HexColor(LIME))
+    by -= 13
+    pdf_centred(c, FOOTER, "Helvetica", 6, cx, max(M * 0.78, by), HexColor(BLUE_SOFT))
 
     c.showPage()
     c.save()
-    for f in (tmp, qtmp):
+    for f in (btmp, atmp):
         if f.exists():
             f.unlink()
     return out_path

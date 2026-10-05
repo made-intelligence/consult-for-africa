@@ -206,7 +206,26 @@ function Hero() {
  */
 function Evening() {
   return (
-    <section id="evening" style={{ background: MB.blue }}>
+    <section
+      id="evening"
+      style={{
+        background: MB.blue,
+        // Medlyfe's own mark, tiled as a monogram field at low opacity and
+        // dropped on alternate rows so it reads as cloth rather than a grid.
+        // Inline so it costs a few hundred bytes instead of a request.
+        backgroundImage:
+          `url("data:image/svg+xml,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="118" height="118" viewBox="0 0 118 118">` +
+              `<g fill="#ffffff" fill-opacity="0.055" transform="translate(29.5 22.5)">` +
+              `<rect x="0" y="12" width="15" height="48" rx="7.5"/>` +
+              `<circle cx="29.5" cy="10" r="10.5"/>` +
+              `<rect x="22" y="27" width="15" height="46" rx="7.5"/>` +
+              `<rect x="44" y="12" width="15" height="47" rx="7.5"/>` +
+              `</g></svg>`,
+          )}")`,
+        backgroundSize: "118px 118px",
+      }}
+    >
       <div className="mx-auto w-full max-w-5xl px-5 py-16 md:px-8 md:py-24">
         <div
           className="rounded-2xl p-6 md:p-10"
