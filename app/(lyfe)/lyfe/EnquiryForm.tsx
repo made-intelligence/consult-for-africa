@@ -14,6 +14,7 @@ import {
   SOURCE_LABELS,
   TIMING_LABELS,
   WEIGHT_TREND_LABELS,
+  MEDLYFE_BRAND as MB,
   whatsappLink,
 } from "@/lib/lyfe";
 
@@ -62,8 +63,8 @@ export default function EnquiryForm({
   utm: { source: string | null; medium: string | null; campaign: string | null };
   initialIntent: Intent | null;
 }) {
-  const [intent, setIntent] = useState<Intent | null>(initialIntent);
-  const [step, setStep] = useState(0);
+  const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
+  const [step, setStep] = useState(initialIntent === "DISCOVERY_CALL" ? 1 : 2);
   const [pathway, setPathway] = useState<Pathway | "">("");
   const [concerns, setConcerns] = useState<Concern[]>([]);
   const [timing, setTiming] = useState<Timing | "">("");
@@ -96,7 +97,9 @@ export default function EnquiryForm({
   // The hero buttons set ?go=rsvp or ?go=call and scroll here, so the form has
   // to pick the door up from the URL after mount as well as on first render.
   useEffect(() => {
-    if (initialIntent) setIntent(initialIntent);
+    if (!initialIntent) return;
+    setIntent(initialIntent);
+    setStep(initialIntent === "DISCOVERY_CALL" ? 1 : 2);
   }, [initialIntent]);
 
   const toggleConcern = (c: Concern) =>
@@ -181,64 +184,10 @@ export default function EnquiryForm({
             `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "RSVP'd to the evening" : "asked for a discovery call"} through your website.`,
           )}
           className="mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
-          style={{ background: C.green, color: "#FFFFFF" }}
+          style={{ background: MB.blueDeep, color: "#FFFFFF" }}
         >
           Message us on WhatsApp
         </a>
-      </Card>
-    );
-  }
-
-  // ─── Choose a door ─────────────────────────────────────────────────────────
-  if (!intent) {
-    return (
-      <Card>
-        <Kicker>Two ways in</Kicker>
-        <Head>Which would you like?</Head>
-        <p className="mt-2.5 text-sm leading-relaxed" style={{ color: C.body }}>
-          Neither commits you to anything, and you can do both.
-        </p>
-
-        <div className="mt-6 grid gap-3">
-          {(["EVENT_RSVP", "DISCOVERY_CALL"] as Intent[]).map((k) => {
-            const d = LYFE_DOORS[k];
-            return (
-              <button
-                key={k}
-                type="button"
-                onClick={() => {
-                  setIntent(k);
-                  setStep(k === "EVENT_RSVP" ? 2 : 1);
-                }}
-                className="rounded-xl border p-5 text-left transition hover:shadow-sm"
-                style={{ borderColor: C.line, background: C.ground }}
-              >
-                <span className="block text-base font-semibold" style={{ color: C.ink }}>
-                  {d.label}
-                </span>
-                <span className="mt-1 block text-sm leading-relaxed" style={{ color: C.body }}>
-                  {d.short}
-                </span>
-                <span className="mt-2.5 block text-xs font-semibold" style={{ color: C.bronzeDeep }}>
-                  {d.note}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-7 border-t pt-6" style={{ borderColor: C.line }}>
-          <p className="text-sm leading-relaxed" style={{ color: C.muted }}>
-            Would you rather just send a message?
-          </p>
-          <a
-            href={whatsappLink("Hello, I would like to ask about Lyfe Plastics and Dermatology.")}
-            className="mt-3 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
-            style={{ background: C.green, color: "#FFFFFF" }}
-          >
-            WhatsApp us instead
-          </a>
-        </div>
       </Card>
     );
   }
@@ -260,18 +209,16 @@ export default function EnquiryForm({
 
       <div className="flex items-center justify-between">
         <Kicker>{rsvp ? LYFE_DOORS.EVENT_RSVP.label : `Step ${step} of two`}</Kicker>
-        <button
-          type="button"
-          onClick={() => {
-            if (!rsvp && step === 2) return setStep(1);
-            setIntent(null);
-            setStep(0);
-          }}
-          className="text-xs font-semibold underline"
-          style={{ color: C.muted }}
-        >
-          Back
-        </button>
+        {!rsvp && step === 2 ? (
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="text-xs font-semibold underline"
+            style={{ color: C.muted }}
+          >
+            Back
+          </button>
+        ) : null}
       </div>
 
       {/* Discovery call, step one: what it is about */}
@@ -474,7 +421,7 @@ export default function EnquiryForm({
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
               className="mt-1 h-4 w-4 shrink-0 rounded"
-              style={{ accentColor: C.bronze }}
+              style={{ accentColor: MB.blueDeep }}
             />
             <span className="text-sm leading-relaxed" style={{ color: C.body }}>
               {LYFE_CONSENT_TEXT}
@@ -487,13 +434,35 @@ export default function EnquiryForm({
             type="submit"
             disabled={submitting}
             className="mt-6 w-full rounded-xl py-4 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: C.bronze, color: "#FFFFFF" }}
+            style={{ background: MB.blueDeep, color: "#FFFFFF" }}
           >
             {submitting ? "Sending..." : rsvp ? "Confirm my place" : "Book my discovery call"}
           </button>
           <p className="mt-3 text-center text-[11px] leading-relaxed" style={{ color: C.muted }}>
             We will never sell or share your details, and you can ask us to delete them at any time.
           </p>
+
+          <div className="mt-6 border-t pt-5 text-center" style={{ borderColor: C.line }}>
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                if (rsvp) {
+                  setIntent("DISCOVERY_CALL");
+                  setStep(1);
+                } else {
+                  setIntent("EVENT_RSVP");
+                  setStep(2);
+                }
+              }}
+              className="text-[13px] font-semibold underline underline-offset-4"
+              style={{ color: MB.blueDeep }}
+            >
+              {rsvp
+                ? "I cannot make the evening. Book me a call instead"
+                : "Actually, I would like to come to the evening"}
+            </button>
+          </div>
         </>
       )}
     </form>
@@ -512,7 +481,7 @@ function Card({ children }: { children: React.ReactNode }) {
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase" style={{ color: C.bronze, letterSpacing: "0.14em" }}>
+    <p className="text-[11px] font-semibold uppercase" style={{ color: MB.blueDeep, letterSpacing: "0.14em" }}>
       {children}
     </p>
   );
@@ -569,7 +538,7 @@ function Field({
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-semibold uppercase" style={{ color: C.inkSoft, letterSpacing: "0.1em" }}>
-        {label} {required && <span style={{ color: C.bronze }}>*</span>}
+        {label} {required && <span style={{ color: MB.blueDeep }}>*</span>}
       </span>
       {hint && (
         <span className="mb-2 block text-xs" style={{ color: C.muted }}>
@@ -610,16 +579,16 @@ function Choice({
       aria-pressed={checked}
       className="flex items-start gap-3 rounded-xl border p-3.5 text-left text-sm transition"
       style={{
-        borderColor: checked ? C.bronze : C.line,
-        background: checked ? C.bronzeTint : "#FFFFFF",
+        borderColor: checked ? MB.blue : C.line,
+        background: checked ? "#EEF4F6" : "#FFFFFF",
       }}
     >
       <span
         className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center border"
         style={{
           borderRadius: multi ? 4 : 999,
-          borderColor: checked ? C.bronze : "#CBD5E1",
-          background: checked ? C.bronze : "#FFFFFF",
+          borderColor: checked ? MB.blue : "#CBD5E1",
+          background: checked ? MB.blue : "#FFFFFF",
         }}
       >
         {checked && (
