@@ -7,6 +7,7 @@ import {
   LYFE_EVENT,
   LYFE_EVENT_PROGRAMME,
   LYFE_EVENT_TAKEAWAYS,
+  LYFE_PANEL,
   LYFE_NAME,
   LYFE_PHONE_DISPLAY,
   LYFE_STANDARDS,
@@ -79,6 +80,7 @@ export default async function LyfePage({
       <Hero />
       <Evening />
       <Surgeon />
+      <Panel />
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
       <CannotMakeIt />
@@ -414,6 +416,108 @@ function Surgeon() {
             ))}
           </ul>
         </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ─── the panel ────────────────────────────────────────────────────────────── */
+
+/**
+ * An empty seat, drawn rather than left blank. The arch matches the portraits
+ * so the row still reads as a row, and the subject is named so a guest can
+ * see the ground is covered before the name is.
+ */
+function EmptySeat({ w = 190 }: { w?: number }) {
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{
+        width: w,
+        aspectRatio: "0.8",
+        maxWidth: "100%",
+        borderTopLeftRadius: 9999,
+        borderTopRightRadius: 9999,
+        background: `linear-gradient(180deg, ${MB.green} 0%, ${MB.greenDeep} 100%)`,
+        border: `1px solid ${MB.lime}33`,
+        borderBottom: "none",
+      }}
+    >
+      <svg width={w * 0.2} height={w * 0.26} viewBox="0 0 59 73" fill={MB.lime} opacity={0.22} aria-hidden>
+        <rect x="0" y="12" width="15" height="48" rx="7.5" />
+        <circle cx="29.5" cy="10" r="10.5" />
+        <rect x="22" y="27" width="15" height="46" rx="7.5" />
+        <rect x="44" y="12" width="15" height="47" rx="7.5" />
+      </svg>
+    </div>
+  );
+}
+
+function Panel() {
+  return (
+    <Section bg={MB.green}>
+      <div className="max-w-2xl">
+        <Eyebrow>The panel</Eyebrow>
+        <h2
+          className="mt-5 text-[30px] leading-[1.14] md:text-[42px]"
+          style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
+        >
+          {LYFE_EVENT.panelTitle}
+        </h2>
+        <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
+          Experts from both halves of the question, longevity and health optimisation on one side
+          and skin and aesthetics on the other, so the conversation is genuinely integrated rather
+          than two talks in a row.
+        </p>
+      </div>
+
+      <div className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        {LYFE_PANEL.map((seat) => (
+          <div key={seat.seat}>
+            {seat.portrait ? (
+              <div style={{ width: 190, maxWidth: "100%" }}>
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    borderTopLeftRadius: 9999,
+                    borderTopRightRadius: 9999,
+                    background: MB.greenDark,
+                    aspectRatio: "0.8",
+                  }}
+                >
+                  <Image
+                    src={seat.portrait}
+                    alt={seat.name ?? seat.seat}
+                    width={LYFE_SURGEON.portraitWidth}
+                    height={LYFE_SURGEON.portraitHeight}
+                    sizes="190px"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <EmptySeat />
+            )}
+
+            <p
+              className="mt-5 text-[10.5px] font-semibold uppercase"
+              style={{ color: MB.lime, letterSpacing: "0.15em" }}
+            >
+              {seat.seat}
+            </p>
+            <p className="mt-2 text-[17px] font-semibold" style={{ color: MB.white }}>
+              {seat.name ?? "To be announced"}
+            </p>
+            {seat.title && (
+              <p className="mt-1 text-[13.5px] leading-relaxed" style={{ color: MB.mist }}>
+                {seat.title}
+              </p>
+            )}
+            <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: "#AFC2B4" }}>
+              {seat.subject}
+            </p>
+          </div>
+        ))}
       </div>
     </Section>
   );

@@ -195,6 +195,65 @@ export const LYFE_EVENT_PROGRAMME = [
   },
 ] as const;
 
+/**
+ * The panel, From Within, Outward.
+ *
+ * The brief asks for experts representing both longevity and health
+ * optimisation and skin and aesthetics, so the seats are defined by what each
+ * one has to cover rather than by who is in them. Unfilled seats show as
+ * placeholders with the subject named, which is honest and also quietly
+ * useful: a guest reading "hormones and metabolic health, to be announced"
+ * knows the subject is covered.
+ *
+ * Fill a seat by giving it a name, a title and optionally a portrait in
+ * /public/lyfe. Anything without a name renders as a placeholder.
+ */
+export interface LyfePanelSeat {
+  seat: string;
+  subject: string;
+  name: string | null;
+  title: string | null;
+  portrait: string | null;
+}
+
+export const LYFE_PANEL: LyfePanelSeat[] = [
+  {
+    seat: "The featured fireside",
+    subject: "Aesthetics, plastic surgery and looking like yourself",
+    name: "Dr Chinwe Kpaduwa, MD FACS",
+    title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
+    portrait: "/lyfe/chinwe-portrait.jpg",
+  },
+  {
+    seat: "Longevity and health optimisation",
+    subject: "What actually changes in the body as we age, and what can be acted on early",
+    name: null,
+    title: null,
+    portrait: null,
+  },
+  {
+    seat: "Metabolic health and hormones",
+    subject: "Metabolism, weight, body composition, hormonal change, sleep and energy",
+    name: null,
+    title: null,
+    portrait: null,
+  },
+  {
+    seat: "Skin and regenerative medicine",
+    subject: "Skin ageing and regeneration, and where aesthetic medicine helps",
+    name: null,
+    title: null,
+    portrait: null,
+  },
+  {
+    seat: "In the chair",
+    subject: "Moderating the panel and the questions from the room",
+    name: null,
+    title: null,
+    portrait: null,
+  },
+];
+
 /** Section nine of the brief: what a guest should leave understanding. */
 export const LYFE_EVENT_TAKEAWAYS = [
   {
