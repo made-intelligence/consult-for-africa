@@ -29,12 +29,14 @@ We would like an itemised quotation, set out against the lines in section seven,
 
 | | |
 | --- | --- |
-| Preferred shoot date | To be confirmed on acceptance. We are working to a window and will fix the date with you within forty eight hours of your quotation |
-| Recce | The week before the shoot |
+| Shoot date | **Thursday 8 October 2026.** Fixed. Our principal is only in country for a short window and this is the day she has |
+| Recce | Wednesday 7 October, or by video the same day if that is easier |
 | First cuts | Ten working days from the shoot |
 | Final delivery | Twenty working days from the shoot |
 
-If your availability is the binding constraint on the date, say so in your reply and we will work to it.
+**We know that is two days' notice, and we are not pretending otherwise.** If you can crew it, tell us today and we will work to whatever you need from us tonight. If you cannot, tell us today as well, which is almost as useful, and we will come back to you for the next one rather than waste your time.
+
+If the three locations are the problem rather than the date, say so. We can collapse to two sites and four setups without losing much.
 
 ---
 
