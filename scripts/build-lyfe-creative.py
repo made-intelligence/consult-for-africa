@@ -95,10 +95,10 @@ CONSULT_FEE = None
 # The evening. Date and venue move, so they are arguments rather than copy.
 EVENT_NAME = "Medlyfe Wellness and Longevity Centre"
 EVENT_THEME = "Feel Good, Look Good, Live Better."
-EVENT_DATE = "Thursday 15 October"
+EVENT_DATE = "Wednesday 21 October"
 EVENT_TIME = "Cocktails 6.30pm"
-EVENT_DRESS = "RSVP by 12 October"
-EVENT_VENUE = "Lagos"
+EVENT_DRESS = "RSVP by 16 October"
+EVENT_VENUE = "Capital Club, Victoria Island"
 RSVP_MESSAGE = "Hello, I would like to RSVP to the evening."
 CALL_MESSAGE = "Hello, I would like to book a discovery call."
 

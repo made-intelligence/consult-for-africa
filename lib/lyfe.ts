@@ -135,16 +135,15 @@ export const LYFE_EVENT = {
   tagline: MEDLYFE_TAGLINE,
   panelTitle: "From Within, Outward",
   sessionTitle: "The Art of Looking Like Yourself",
-  date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Thursday, 15 October 2026",
+  date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "6:00 PM",
   programme: "6:45 PM",
   close: "9:30 PM",
-  // Venue is not settled. An invitation-led evening normally withholds the
-  // address until a guest is confirmed anyway, so this reads as intent rather
-  // than as a gap. Set NEXT_PUBLIC_LYFE_EVENT_VENUE the moment it is booked.
-  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Lagos, address with your confirmation",
+  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Victoria Island",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
-  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 12 October",
+  // Moved with the date. Five clear working days before, which is what a
+  // curated 130-person room needs to be chased properly. Confirm it.
+  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Friday, 16 October",
   /// Curated rather than conference scale. The number is in the brief, so the
   /// scarcity line on the page is a fact rather than a device.
   places: 130,
