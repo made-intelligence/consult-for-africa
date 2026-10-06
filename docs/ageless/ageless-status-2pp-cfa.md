@@ -19,7 +19,7 @@ AGELESS is a cocktail evening at the Capital Club, Victoria Island, on Wednesday
 
 Medlyfe hosts. It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology to a Lagos audience already spending on how they look and feel, through a conversation about ageing rather than a pitch for surgery. Her window in the country sets the date. The evening is built to run again, and this edition carries the format, identity, film library and guest list that later editions inherit.
 
-Four names do four separate jobs, and they are not interchangeable. AGELESS is the platform, built to recur. A New Era of Health, Beauty and Longevity is the proposition for this edition. From Within, Outward is the panel, and The Art of Looking Like Yourself is Dr Kpaduwa's fireside. The panel also carries a standfirst agreed this week: what changes in your body, brain and skin after 40, and what you can actually do about it.
+Four names do four separate jobs, and they are not interchangeable. AGELESS is the platform, built to recur. A New Era of Health, Beauty and Longevity is the proposition for this edition. The New Science of Ageing Well is the panel, and The Art of Looking Like Yourself is Dr Kpaduwa's fireside. The panel carries a standfirst of its own: what changes in your body, brain and skin after 40, and what you can actually do about it.
 
 ## The running order
 
@@ -28,7 +28,7 @@ Four names do four separate jobs, and they are not interchangeable. AGELESS is t
 | 5:30 | Arrival and cocktails |
 | 6:30 | Welcome from Dr Adedotun Ajelabi, and the opening film |
 | 6:35 | The range. What modern medicine can now do about how we age |
-| 6:50 | The panel, From Within, Outward. Forty five minutes |
+| 6:50 | The panel, The New Science of Ageing Well. Forty five minutes |
 | 7:35 | The fireside, The Art of Looking Like Yourself |
 | 8:00 | What you can actually do |
 | 8:15 | Questions from the room |

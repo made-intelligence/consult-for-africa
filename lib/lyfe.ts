@@ -117,7 +117,7 @@ export const LYFE_EVENT_THEME = "Ageless";
  *
  * A recurring Medlyfe platform rather than a one-off launch, so the naming is
  * layered: AGELESS is the platform, "A New Era of Health, Beauty and
- * Longevity" is the proposition, "From Within, Outward" is the main panel,
+ * Longevity" is the proposition, "The New Science of Ageing Well" is the panel,
  * and "The Art of Looking Like Yourself" is the featured fireside. Keeping
  * those four apart is what lets edition two reuse everything but the panel.
  *
@@ -133,7 +133,7 @@ export const LYFE_EVENT = {
   standfirst:
     "How modern science is changing the way we look, feel, perform and live as we age.",
   tagline: MEDLYFE_TAGLINE,
-  panelTitle: "From Within, Outward",
+  panelTitle: "The New Science of Ageing Well",
   panelStandfirst:
     "What changes in your body, brain and skin after 40, and what you can actually do about it.",
   sessionTitle: "The Art of Looking Like Yourself",
@@ -171,7 +171,7 @@ export const LYFE_EVENT_PROGRAMME = [
   },
   {
     time: "6:50",
-    title: "The panel: From Within, Outward",
+    title: "The panel: The New Science of Ageing Well",
     body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight, sleep, energy and physical function, and how far they carry the way we age.",
   },
   {
@@ -197,7 +197,7 @@ export const LYFE_EVENT_PROGRAMME = [
 ] as const;
 
 /**
- * The panel, From Within, Outward.
+ * The panel, The New Science of Ageing Well.
  *
  * This is the running order, not a cast list, and the page renders it in
  * sequence: the opening address on the range, four seats on the inner, the
