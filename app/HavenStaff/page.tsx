@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/StaffForms";
 import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
+import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffLeave";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -98,12 +99,53 @@ export default async function HavenStaffPage() {
   // nineteen colleagues' personal mobiles and they do not belong on a page
   // anybody with the link can open.
   let people: DirectoryEntry[] = [];
+  let mine: LeaveRow[] = [];
+  let toDecide: LeaveRow[] = [];
+  let entitlement = 20;
+
   if (session) {
-    people = await prisma.staffMember.findMany({
-      where: { clientId: session.clientId, isActive: true },
-      select: { name: true, position: true, department: true, phone: true },
-      orderBy: { name: "asc" },
-    });
+    const [dir, me, leave] = await Promise.all([
+      prisma.staffMember.findMany({
+        where: { clientId: session.clientId, isActive: true },
+        select: { name: true, position: true, department: true, phone: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.staffMember.findUnique({
+        where: { id: session.sub },
+        select: { annualLeaveDays: true },
+      }),
+      prisma.staffLeaveRequest.findMany({
+        where: { staffId: session.sub },
+        orderBy: { startDate: "desc" },
+        take: 12,
+      }),
+    ]);
+    people = dir;
+    entitlement = me?.annualLeaveDays ?? 20;
+    mine = leave.map((l) => ({
+      id: l.id, type: l.type, days: l.days, status: l.status,
+      startDate: l.startDate.toISOString().slice(0, 10),
+      endDate: l.endDate.toISOString().slice(0, 10),
+      decisionNote: l.decisionNote,
+    }));
+
+    if (atLeast(session, "SUPERVISOR")) {
+      const waiting = await prisma.staffLeaveRequest.findMany({
+        where: {
+          status: "REQUESTED",
+          staff: { clientId: session.clientId, isActive: true },
+          NOT: { staffId: session.sub },
+        },
+        include: { staff: { select: { name: true } } },
+        orderBy: { startDate: "asc" },
+      });
+      toDecide = waiting.map((l) => ({
+        id: l.id, type: l.type, days: l.days, status: l.status,
+        startDate: l.startDate.toISOString().slice(0, 10),
+        endDate: l.endDate.toISOString().slice(0, 10),
+        decisionNote: l.decisionNote, reason: l.reason, staffName: l.staff.name,
+      }));
+    }
   }
 
   return (
@@ -134,6 +176,24 @@ export default async function HavenStaffPage() {
             >
               <StaffDirectory people={people} />
             </Section>
+
+            <Section
+              eyebrow="Your leave"
+              title="Time off"
+              lead="Ask from here rather than chasing somebody down a corridor. You will see who else in your area is already off before you pick your dates."
+            >
+              <MyLeave mine={mine} entitlement={entitlement} />
+            </Section>
+
+            {atLeast(session, "SUPERVISOR") && (
+              <Section
+                eyebrow="For you to decide"
+                title="Leave waiting on you"
+                lead="Approve or decline. Nobody can decide their own."
+              >
+                <LeaveToDecide pending={toDecide} />
+              </Section>
+            )}
 
             <Section
               eyebrow="Once a week"

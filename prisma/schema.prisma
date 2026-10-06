@@ -7595,8 +7595,13 @@ model StaffMember {
 
   isActive    Boolean   @default(true)
   lastLoginAt DateTime?
+  /// Annual entitlement in working days. Nigeria's statutory floor is six;
+  /// most hospitals here run well above it, so this is set per person.
+  annualLeaveDays Int     @default(20)
 
   loginTokens StaffLoginToken[]
+  leave          StaffLeaveRequest[] @relation("StaffLeave")
+  leaveDecisions StaffLeaveRequest[] @relation("StaffLeaveDecisions")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7637,4 +7642,52 @@ model StaffLoginToken {
 
   @@index([staffId])
   @@index([expiresAt])
+}
+
+/// Leave, requested from a phone and planned against the rota.
+///
+/// The hospital has no HR function, so this is built to run on a line manager
+/// and a form rather than on an administrator. The useful part is not the
+/// request, which a WhatsApp message already does badly; it is that a decision
+/// can see how many people from the same department are already off on those
+/// days, which is what stops the rota breaking in the high season.
+model StaffLeaveRequest {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation("StaffLeave", fields: [staffId], references: [id], onDelete: Cascade)
+
+  type      StaffLeaveType @default(ANNUAL)
+  startDate DateTime
+  endDate   DateTime
+  /// Working days requested, stated by the person rather than computed, because
+  /// a hospital rota is not a Monday to Friday week.
+  days      Int
+  reason    String?        @db.Text
+
+  status       StaffLeaveStatus @default(REQUESTED)
+  decidedById  String?
+  decidedBy    StaffMember?     @relation("StaffLeaveDecisions", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt    DateTime?
+  decisionNote String?          @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId, startDate])
+  @@index([status, startDate])
+}
+
+enum StaffLeaveType {
+  ANNUAL
+  SICK
+  COMPASSIONATE
+  STUDY
+  UNPAID
+}
+
+enum StaffLeaveStatus {
+  REQUESTED
+  APPROVED
+  DECLINED
+  CANCELLED
 }
