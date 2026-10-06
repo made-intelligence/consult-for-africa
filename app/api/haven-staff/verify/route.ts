@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   const staff = await prisma.staffMember.findFirst({
     where: { clientId: client.id, email, isActive: true },
-    select: { id: true, clientId: true, name: true, tier: true },
+    select: { id: true, clientId: true, name: true, tiers: true },
   });
   if (!staff) return no();
 
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   const res = NextResponse.json({ ok: true });
   res.cookies.set(
     STAFF_COOKIE,
-    signStaffJWT({ sub: staff.id, clientId: staff.clientId, name: staff.name, tier: staff.tier }),
+    signStaffJWT({ sub: staff.id, clientId: staff.clientId, name: staff.name, tiers: staff.tiers }),
     {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

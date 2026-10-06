@@ -7592,10 +7592,19 @@ model StaffMember {
   department String
   position   String
 
-  /// Governs what this person sees. Mirrors the tiers in lib/haven-playbook.ts.
-  /// Deliberately has no tier for an individual's own assessment result: that
-  /// never reaches a shared surface at all, so it is not a permission.
-  tier StaffTier @default(ALL_STAFF)
+  /// What this person holds. A LIST, because at Haven dual roles are the norm
+  /// rather than the exception: Dr Odedina is Chief Medical Director and a
+  /// founder, Dr Shakirah is associate clinical director and a founder. One
+  /// tier each would force a choice between their clinical role and their
+  /// ownership, and either choice is wrong.
+  ///
+  /// Capabilities are the union of what the held tiers grant, so a founder who
+  /// also works clinically reads the ward's notes through LEADERSHIP while a
+  /// non-working owner holding BOARD alone does not.
+  ///
+  /// There is deliberately no tier for an individual's own assessment result.
+  /// That never reaches a shared surface, so it is not a permission.
+  tiers StaffTier[] @default([ALL_STAFF])
 
   isActive    Boolean   @default(true)
   lastLoginAt DateTime?

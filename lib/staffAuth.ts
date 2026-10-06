@@ -33,7 +33,7 @@ export interface StaffSession {
   sub: string; // StaffMember id
   clientId: string;
   name: string;
-  tier: "ALL_STAFF" | "SUPERVISOR" | "LEADERSHIP" | "BOARD";
+  tiers: ("ALL_STAFF" | "SUPERVISOR" | "LEADERSHIP" | "BOARD")[];
 }
 
 export function signStaffJWT(payload: StaffSession): string {
@@ -102,7 +102,7 @@ export function newLoginCode(staffId: string) {
  */
 export type DeliveryChannel = "EMAIL" | "SMS";
 
-export type Tier = StaffSession["tier"];
+export type Tier = StaffSession["tiers"][number];
 
 /**
  * Capabilities, not a ladder.
@@ -166,7 +166,11 @@ const GRANTS: Record<Capability, Tier[]> = {
 };
 
 export function can(session: StaffSession | null, capability: Capability) {
-  return !!session && GRANTS[capability].includes(session.tier);
+  if (!session) return false;
+  // The union of what they hold. A founder who is also the Chief Medical
+  // Director gets the clinical permissions through LEADERSHIP; a founder who
+  // only owns shares holds BOARD alone and does not.
+  return session.tiers.some((t) => GRANTS[capability].includes(t));
 }
 
 /**
@@ -183,6 +187,6 @@ const RANK: Record<Tier, number> = {
 
 export function atLeast(session: StaffSession | null, tier: Tier) {
   if (!session) return false;
-  if (session.tier === "BOARD" || tier === "BOARD") return session.tier === tier;
-  return RANK[session.tier] >= RANK[tier];
+  if (tier === "BOARD") return session.tiers.includes("BOARD");
+  return session.tiers.some((t) => RANK[t] >= RANK[tier]);
 }
