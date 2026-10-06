@@ -7629,6 +7629,7 @@ model StaffMember {
   taskFlags        StaffTaskFlag[]       @relation("TaskFlags")
   flagResolutions  StaffTaskFlag[]       @relation("FlagResolutions")
   scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
+  scoreboardAgreed  ScoreboardEntry[] @relation("ScoreboardAgreements")
   presenting        TrainingSession[]    @relation("TrainingPresenter")
   trainingAttended  TrainingAttendance[] @relation("TrainingAttendance")
 
@@ -7919,6 +7920,26 @@ model ScoreboardEntry {
 
   enteredById String?
   enteredBy   StaffMember? @relation("ScoreboardEntries", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  /// A second person agrees the number is right. Deliberately "agreed" rather
+  /// than "verified" or "vetted": those are words for policing, and in a
+  /// hospital where the whole programme rests on people feeling able to speak
+  /// up, the register of the control matters as much as the control. This is
+  /// two people looking at the same figure and agreeing it, which is also what
+  /// actually happens in the room.
+  ///
+  /// It cannot be the person who entered it. Enforced in the route, because
+  /// comparing two columns in a check constraint is more trouble than it is
+  /// worth and the session is already in the route.
+  ///
+  /// Deliberately NOT applied to task completions. Countersigning every
+  /// handover tick across nineteen people makes the system unusable, and the
+  /// first thing that happens is that people stop ticking. Those are sampled by
+  /// a human instead, which is what the playbook already says.
+  agreedById String?
+  agreedBy   StaffMember? @relation("ScoreboardAgreements", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt   DateTime?
+  agreedNote String?      @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
