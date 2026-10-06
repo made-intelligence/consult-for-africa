@@ -3,6 +3,7 @@ import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ClaimForm from "./ClaimForm";
+import { greetingFor, givenNameFor, surnameFor } from "@/lib/cadreSalutation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -48,7 +49,7 @@ export default async function ClaimPage({ params }: Props) {
 
         <div className="max-w-md">
           <h2 className="text-3xl font-bold text-white">
-            Welcome, Dr. {professional.lastName}.
+            Welcome, {greetingFor(professional)}.
           </h2>
           <p className="mt-4 text-lg text-white/70">
             Your {specialty} specialist profile is ready. Set a password to
@@ -95,12 +96,6 @@ export default async function ClaimPage({ params }: Props) {
           <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-500">Name</span>
-                <span className="text-sm font-medium text-gray-900">
-                  Dr. {professional.firstName} {professional.lastName}
-                </span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Specialty</span>
                 <span className="text-sm font-medium text-gray-900">
                   {specialty}
@@ -117,10 +112,15 @@ export default async function ClaimPage({ params }: Props) {
 
           <div className="mt-6">
             <ClaimForm
-            professionalId={professional.id}
-            cadre={professional.cadre}
-            subSpecialty={professional.subSpecialty}
-          />
+              professionalId={professional.id}
+              cadre={professional.cadre}
+              subSpecialty={professional.subSpecialty}
+              // Cleaned rather than raw: the import welded titles onto the given
+              // name, so the raw value would show her "Dr Patric" in a box
+              // labelled First name and ask her to work out what is wrong.
+              firstName={givenNameFor(professional.firstName) ?? ""}
+              lastName={surnameFor(professional.lastName) ?? professional.lastName ?? ""}
+            />
           </div>
         </div>
       </div>

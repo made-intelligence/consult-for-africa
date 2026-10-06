@@ -29,6 +29,10 @@
       "schedule": "0 7 * * 5"
     },
     {
+      "path": "/api/cron/mezo-backfill",
+      "schedule": "0 */6 * * *"
+    },
+    {
       "path": "/api/cron/mezo-provision-retry",
       "schedule": "0 * * * *"
     },
