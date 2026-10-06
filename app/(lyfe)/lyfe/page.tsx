@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { prisma } from "@/lib/prisma";
 import {
   LYFE_AFTERCARE,
   LYFE_BRAND as C,
+  LYFE_CONSULT,
+  LYFE_CONSULT_SCHEDULE,
   LYFE_DOORS,
+  consultSlots,
   LYFE_EVENT,
   LYFE_EVENT_PROGRAMME,
   LYFE_EVENT_TAKEAWAYS,
@@ -73,7 +77,18 @@ export default async function LyfePage({
     medium: sp.utm_medium?.slice(0, 100) ?? null,
     campaign: sp.utm_campaign?.slice(0, 100) ?? null,
   };
-  const go = sp.go === "call" ? "DISCOVERY_CALL" : sp.go === "rsvp" ? "EVENT_RSVP" : null;
+  const go = sp.go === "call" ? "CONSULTATION" : sp.go === "rsvp" ? "EVENT_RSVP" : null;
+
+  // Her real diary, with what is already sold taken out. Faked scarcity
+  // reverses the effect it is reaching for, so the only number this page says
+  // out loud is one the database can stand behind.
+  const sold = await prisma.lyfeEnquiry
+    .findMany({
+      where: { paidAt: { not: null }, slotAt: { gte: new Date() } },
+      select: { slotAt: true },
+    })
+    .catch(() => []);
+  const slots = consultSlots({ taken: sold.map((r) => r.slotAt!.toISOString()) });
 
   return (
     <div style={{ background: MB.green, color: C.body, fontFamily: sans }}>
@@ -82,8 +97,8 @@ export default async function LyfePage({
       <Surgeon />
       <Panel />
       <WhatYouLeaveWith />
-      <Rsvp utm={utm} initialIntent={go} />
-      <CannotMakeIt />
+      <Rsvp utm={utm} initialIntent={go} slots={slots} />
+      <Consultation slots={slots} />
       <ThePractice />
       <Footer />
       <StickyRsvp />
@@ -278,15 +293,15 @@ function Hero() {
             </div>
 
             <p className="mt-6 text-[13.5px] leading-relaxed" style={{ color: MB.greenSoft }}>
-              Not able to come?{" "}
+              Not able to come? Consult {LYFE_SURGEON.name} directly,{" "}
               <a
                 href="?go=call#enquire"
                 className="font-semibold underline underline-offset-4"
                 style={{ color: MB.limeSoft }}
               >
-                Book a free fifteen minute call
-              </a>{" "}
-              instead.
+                {LYFE_CONSULT.minutes} minutes by video for {LYFE_CONSULT.feeDisplay}
+              </a>
+              .
             </p>
           </div>
 
@@ -465,15 +480,15 @@ function Panel() {
           {LYFE_EVENT.panelTitle}
         </h2>
         <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-          Experts from both halves of the question, longevity and health optimisation on one side
-          and skin and aesthetics on the other, so the conversation is genuinely integrated rather
-          than two talks in a row.
+          The evening opens on the range of what is now possible. The panel then stays with the
+          inner, the metabolic and physical ground everything else is built on, and the fireside
+          turns outward to the face and the body. One argument, carried through the evening.
         </p>
       </div>
 
       <div className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-        {LYFE_PANEL.map((seat) => (
-          <div key={seat.seat}>
+        {LYFE_PANEL.map((seat, i) => (
+          <div key={`${seat.seat}-${seat.name ?? i}`}>
             {seat.portrait ? (
               <div style={{ width: 190, maxWidth: "100%" }}>
                 <div
@@ -557,9 +572,11 @@ function WhatYouLeaveWith() {
 function Rsvp({
   utm,
   initialIntent,
+  slots,
 }: {
   utm: { source: string | null; medium: string | null; campaign: string | null };
-  initialIntent: "EVENT_RSVP" | "DISCOVERY_CALL" | null;
+  initialIntent: "EVENT_RSVP" | "CONSULTATION" | null;
+  slots: ReturnType<typeof consultSlots>;
 }) {
   return (
     <Section bg={MB.green} id="enquire">
@@ -611,7 +628,7 @@ function Rsvp({
           </p>
         </div>
 
-        <EnquiryForm utm={utm} initialIntent={initialIntent} />
+        <EnquiryForm utm={utm} initialIntent={initialIntent} slots={slots} />
       </div>
     </Section>
   );
@@ -619,32 +636,88 @@ function Rsvp({
 
 /* ─── the secondary path ───────────────────────────────────────────────────── */
 
-function CannotMakeIt() {
-  const d = LYFE_DOORS.DISCOVERY_CALL;
+function Consultation({ slots }: { slots: ReturnType<typeof consultSlots> }) {
+  const d = LYFE_DOORS.CONSULTATION;
+  // One per day rather than the first four, which were all the same Tuesday.
+  // Four consecutive half hours read as one morning; four dates read as a
+  // rhythm, which is what the diary actually is.
+  const soon = slots.filter((slot, i, all) => all.findIndex((x) => x.day === slot.day) === i).slice(0, 4);
   return (
-    <section style={{ background: MB.greenDeep }}>
-      <div className="mx-auto w-full max-w-5xl px-5 py-14 md:px-8">
+    <section id="consult" style={{ background: MB.greenDeep }}>
+      <div className="mx-auto w-full max-w-5xl px-5 py-16 md:px-8 md:py-20">
         <div className="rounded-2xl p-7 md:p-10" style={{ border: `1px solid ${MB.lime}44` }}>
-          <div className="flex flex-wrap items-center justify-between gap-7">
-            <div className="max-w-xl">
-              <Eyebrow>If the fifteenth does not suit</Eyebrow>
+          <div className="grid gap-10 md:grid-cols-[1.25fr_1fr] md:gap-14">
+            <div>
+              <Eyebrow>Whether or not you come on the fifteenth</Eyebrow>
               <h2
-                className="mt-4 text-[24px] leading-tight md:text-[30px]"
+                className="mt-4 text-[27px] leading-tight md:text-[34px]"
                 style={{ fontFamily: display, fontWeight: 600, color: MB.white }}
               >
-                {d.label}
+                Half an hour with {LYFE_SURGEON.name}
               </h2>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "#AFC2B4" }}>
+              <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: "#AFC2B4" }}>
                 {d.blurb}
               </p>
+
+              {/* The price is said before it is asked for. A room that has to
+                  ask assumes the worst, and the number is the single most
+                  common question these leads went quiet on. */}
+              <div className="mt-7 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span
+                  className="text-[38px] leading-none md:text-[46px]"
+                  style={{ fontFamily: display, fontWeight: 600, color: MB.lime }}
+                >
+                  {LYFE_CONSULT.feeDisplay}
+                </span>
+                <span className="text-[14px]" style={{ color: MB.greenSoft }}>
+                  for {LYFE_CONSULT.minutes} minutes, by video
+                </span>
+              </div>
+              <p className="mt-3 text-[14px] leading-relaxed" style={{ color: MB.limeSoft }}>
+                {LYFE_CONSULT.redeemable}
+              </p>
             </div>
-            <a
-              href="?go=call#enquire"
-              className="rounded-xl border px-7 py-4 text-sm font-semibold transition hover:bg-white/5"
-              style={{ borderColor: `${MB.lime}88`, color: MB.white }}
-            >
-              {d.cta}
-            </a>
+
+            <div>
+              <p
+                className="text-[11px] font-semibold uppercase"
+                style={{ color: MB.greenSoft, letterSpacing: "0.16em" }}
+              >
+                Her diary
+              </p>
+              <p className="mt-2 text-[15px]" style={{ color: MB.white }}>
+                {LYFE_CONSULT_SCHEDULE}
+              </p>
+              <p className="mt-1 text-[13.5px] leading-relaxed" style={{ color: MB.greenSoft }}>
+                {LYFE_CONSULT.perWeek} consultations a week. That is the whole diary, not a sample of it.
+              </p>
+
+              {soon.length > 0 && (
+                <ul className="mt-5 space-y-1.5">
+                  {soon.map((slot) => (
+                    <li key={slot.iso} className="flex items-baseline gap-2.5 text-[14px]">
+                      <span aria-hidden style={{ color: MB.lime }}>&bull;</span>
+                      <span style={{ color: MB.mist }}>
+                        {slot.day}, {slot.time}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <a
+                href="?go=call#enquire"
+                className="mt-7 inline-block rounded-xl px-7 py-4 text-sm font-semibold transition hover:opacity-90"
+                style={{ background: MB.lime, color: MB.greenDeep }}
+              >
+                {d.cta}
+              </a>
+              <p className="mt-3 text-[12.5px]" style={{ color: MB.greenSoft }}>
+                {slots.length > 0
+                  ? `${slots.length} ${slots.length === 1 ? "time" : "times"} open in the next three weeks.`
+                  : "Fully booked for the next three weeks. Ask us and we will tell you when the next diary opens."}
+              </p>
+            </div>
           </div>
         </div>
       </div>
