@@ -527,6 +527,7 @@ model Client {
   protocols          Protocol[]
   scoreboard         ScoreboardEntry[]
   trainingSessions   TrainingSession[]
+  staffTasks         StaffTask[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7624,6 +7625,9 @@ model StaffMember {
   protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
   observations     ProtocolProgress[] @relation("ProtocolObservations")
   protocolApprovals Protocol[]          @relation("ProtocolApprovals")
+  taskCompletions  StaffTaskCompletion[] @relation("TaskCompletions")
+  taskFlags        StaffTaskFlag[]       @relation("TaskFlags")
+  flagResolutions  StaffTaskFlag[]       @relation("FlagResolutions")
   scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
   presenting        TrainingSession[]    @relation("TrainingPresenter")
   trainingAttended  TrainingAttendance[] @relation("TrainingAttendance")
@@ -7997,4 +8001,101 @@ model TrainingAttendance {
 
   @@unique([sessionId, staffId])
   @@index([staffId])
+}
+
+/// A recurring thing somebody is expected to do, seeded from the playbook.
+/// Rows rather than code, so the hospital can change its own tasks without a
+/// deploy and so what Haven learns is exportable to the real staff app.
+model StaffTask {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  code  String
+  title String
+  /// Matched loosely against position and department. Nineteen people do not
+  /// need a role taxonomy.
+  roles       String[]
+  departments String[]
+
+  cadence StaffTaskCadence
+  /// What is actually captured, so a completion means something.
+  evidence String @db.Text
+  why      String @db.Text
+
+  /// Hours after the day starts before an undone task is chased. A crash
+  /// trolley check and a weekly stock count do not deserve the same patience.
+  graceHours Int       @default(24)
+  flagLevel  FlagLevel @default(NUDGE)
+  /// Position or tier the flag escalates to, in words rather than an id,
+  /// because the postholder changes and the escalation does not.
+  escalatesTo String?
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  completions StaffTaskCompletion[]
+  flags       StaffTaskFlag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, code])
+  @@index([clientId, isActive])
+}
+
+enum StaffTaskCadence {
+  EVERY_SHIFT
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum FlagLevel {
+  NUDGE
+  FLAG
+  ESCALATE
+}
+
+/// One person, one task, one day. forDate rather than a timestamp so a night
+/// shift finishing at seven counts for the day it belongs to.
+model StaffTaskCompletion {
+  id      String      @id @default(cuid())
+  taskId  String
+  task    StaffTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  staffId String
+  staff   StaffMember @relation("TaskCompletions", fields: [staffId], references: [id], onDelete: Cascade)
+
+  forDate     DateTime
+  completedAt DateTime @default(now())
+  note        String?  @db.Text
+
+  @@unique([taskId, staffId, forDate])
+  @@index([staffId, forDate])
+}
+
+/// Raised when a task was not recorded in time. A FACT about a record, never a
+/// judgement about a person: the quality of a handover is sampled by a human
+/// and fed back privately, and conflating the two is how a hospital of nineteen
+/// loses its reporting culture in a fortnight.
+model StaffTaskFlag {
+  id      String      @id @default(cuid())
+  taskId  String
+  task    StaffTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  staffId String
+  staff   StaffMember @relation("TaskFlags", fields: [staffId], references: [id], onDelete: Cascade)
+
+  forDate DateTime
+  level   FlagLevel
+
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   StaffMember? @relation("FlagResolutions", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolution   String?      @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, staffId, forDate, level])
+  @@index([staffId, resolvedAt])
+  @@index([resolvedAt])
 }

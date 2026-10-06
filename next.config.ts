@@ -31,6 +31,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The Haven staff documents are not in public/ on purpose: anything there is
+  // fetchable by URL with no session, and these carry audit findings. They are
+  // streamed by /api/haven-staff/doc after a session check, so the file has to
+  // be traced into that function or it will not exist at runtime.
+  outputFileTracingIncludes: {
+    "/api/haven-staff/doc/[name]": ["./private-assets/haven/**"],
+  },
   serverExternalPackages: ["@react-pdf/renderer"],
   images: {
     remotePatterns: [
