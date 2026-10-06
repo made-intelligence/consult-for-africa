@@ -72,10 +72,12 @@ ${i.detail ? `<div style="color:#64748b;font-size:14px;margin-top:2px">${i.detai
 }
 
 export async function GET(req: NextRequest) {
-  // Vercel sets this header on scheduled invocations. Without the check this is
-  // an open endpoint that will email nineteen people on request.
+  // Fails CLOSED. The first version of this read `if (secret && ...)`, which
+  // meant that with CRON_SECRET unset the endpoint was open to anybody and
+  // would email nineteen people on request. Every other cron in this repo fails
+  // closed, and an auth check whose absence disables it is not an auth check.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -16,6 +16,8 @@ export interface ScoreRow {
   measure: string;
   value: string;
   movedBy: string | null;
+  agreedBy?: string | null;
+  enteredByMe?: boolean;
 }
 
 export default function Scoreboard({
@@ -34,9 +36,24 @@ export default function Scoreboard({
   const [value, setValue] = useState("");
   const [movedBy, setMovedBy] = useState("");
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   const now = Object.fromEntries(thisWeek.map((r) => [r.measure, r]));
   const prev = Object.fromEntries(lastWeek.map((r) => [r.measure, r]));
+
+  async function agree(measure: string) {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/haven-staff/scoreboard", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ measure, period }),
+      });
+      if (res.ok) router.refresh();
+      else setErr((await res.json().catch(() => null))?.error ?? "That did not go through.");
+    } catch { setErr("That did not go through."); }
+    setBusy(false);
+  }
 
   async function save(measure: string) {
     setBusy(true);
@@ -79,6 +96,29 @@ export default function Scoreboard({
               </div>
             </div>
 
+            {cur && (
+              <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                {cur.agreedBy ? (
+                  <span style={{ color: GOOD, fontSize: 13, fontWeight: 650 }}>
+                    Agreed by {cur.agreedBy}
+                  </span>
+                ) : (
+                  <>
+                    <span style={{ color: MUTED, fontSize: 13 }}>Not agreed yet</span>
+                    {canEdit && !cur.enteredByMe && (
+                      <button onClick={() => agree(m.key)} disabled={busy}
+                        style={{ background: "none", border: `1px solid ${LINE}`, borderRadius: 999, color: TEAL, fontWeight: 650, fontSize: 13.5, padding: "6px 14px", cursor: "pointer" }}>
+                        I agree this
+                      </button>
+                    )}
+                    {canEdit && cur.enteredByMe && (
+                      <span style={{ color: MUTED, fontSize: 13 }}>Somebody else has to agree it</span>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
             {cur?.movedBy && (
               <p style={{ background: "#F1F7FA", borderLeft: `3px solid ${TEAL}`, color: "#1F2937", fontSize: 14.5, lineHeight: 1.55, margin: "12px 0 0", padding: "10px 12px", borderRadius: 8 }}>
                 {cur.movedBy}
@@ -109,8 +149,10 @@ export default function Scoreboard({
           </div>
         );
       })}
+      {err && <p style={{ color: BAD, fontSize: 14, margin: 0 }}>{err}</p>}
       <p style={{ color: MUTED, fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-        Week {period.split("-W")[1]}. A dash means nobody has counted it yet this week.
+        Week {period.split("-W")[1]}. A dash means nobody has counted it yet this week. Every figure
+        needs a second person to agree it, and it cannot be whoever typed it in.
       </p>
     </div>
   );

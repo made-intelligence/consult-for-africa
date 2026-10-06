@@ -156,10 +156,20 @@ export default async function HavenStaffPage() {
     });
     const scores = await prisma.scoreboardEntry.findMany({
       where: { clientId: session.clientId, period: { in: [period, previousWeek(period)] } },
-      select: { measure: true, value: true, movedBy: true, period: true },
+      select: {
+        measure: true, value: true, movedBy: true, period: true, enteredById: true,
+        agreedBy: { select: { name: true } },
+      },
     });
-    thisWeek = scores.filter((s) => s.period === period);
-    lastWeek = scores.filter((s) => s.period !== period);
+    const shape = (s: (typeof scores)[number]) => ({
+      measure: s.measure,
+      value: s.value,
+      movedBy: s.movedBy,
+      agreedBy: s.agreedBy?.name ?? null,
+      enteredByMe: s.enteredById === session.sub,
+    });
+    thisWeek = scores.filter((s) => s.period === period).map(shape);
+    lastWeek = scores.filter((s) => s.period !== period).map(shape);
 
     notes = raw.map((n) => ({
       id: n.id,
