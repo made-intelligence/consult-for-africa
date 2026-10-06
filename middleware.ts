@@ -19,6 +19,7 @@ const ONBOARDING_COMPLETE_STATUSES = ["ACTIVE", "ASSESSMENT_COMPLETE", "REVIEW"]
 const CASE_FORGIVING = new Map<string, string>([
   ["/osteonproject", "/OsteonProject"],
   ["/arabellaproject", "/ArabellaProject"],
+  ["/deborahproject", "/DeborahProject"],
 ]);
 
 export default auth((req) => {
