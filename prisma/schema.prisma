@@ -526,6 +526,7 @@ model Client {
   staffNotes         StaffNote[]
   protocols          Protocol[]
   scoreboard         ScoreboardEntry[]
+  trainingSessions   TrainingSession[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7591,13 +7592,27 @@ model StaffMember {
   department String
   position   String
 
-  /// Governs what this person sees. Mirrors the tiers in lib/haven-playbook.ts.
-  /// Deliberately has no tier for an individual's own assessment result: that
-  /// never reaches a shared surface at all, so it is not a permission.
-  tier StaffTier @default(ALL_STAFF)
+  /// What this person holds. A LIST, because at Haven dual roles are the norm
+  /// rather than the exception: Dr Odedina is Chief Medical Director and a
+  /// founder, Dr Shakirah is associate clinical director and a founder. One
+  /// tier each would force a choice between their clinical role and their
+  /// ownership, and either choice is wrong.
+  ///
+  /// Capabilities are the union of what the held tiers grant, so a founder who
+  /// also works clinically reads the ward's notes through LEADERSHIP while a
+  /// non-working owner holding BOARD alone does not.
+  ///
+  /// There is deliberately no tier for an individual's own assessment result.
+  /// That never reaches a shared surface, so it is not a permission.
+  tiers StaffTier[] @default([ALL_STAFF])
 
   isActive    Boolean   @default(true)
   lastLoginAt DateTime?
+  /// May approve clinical content before it reaches a nurse. A person, never a
+  /// tier: Dr Shakirah is a founder and therefore BOARD, which is deliberately
+  /// the weakest tier on anything clinical. Her authority here is that she is a
+  /// doctor supporting the Chief Medical Director, not that she is an owner.
+  canApproveClinical Boolean @default(false)
   /// Annual entitlement in working days. Nigeria's statutory floor is six;
   /// most hospitals here run well above it, so this is set per person.
   annualLeaveDays Int     @default(20)
@@ -7608,7 +7623,10 @@ model StaffMember {
   notes          StaffNote[]         @relation("StaffNotes")
   protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
   observations     ProtocolProgress[] @relation("ProtocolObservations")
+  protocolApprovals Protocol[]          @relation("ProtocolApprovals")
   scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
+  presenting        TrainingSession[]    @relation("TrainingPresenter")
+  trainingAttended  TrainingAttendance[] @relation("TrainingAttendance")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7621,6 +7639,12 @@ enum StaffTier {
   ALL_STAFF
   SUPERVISOR
   LEADERSHIP
+  /// The founders. Above LEADERSHIP for the hospital's numbers and below it for
+  /// anything about a named person. Deliberately not a superset: see
+  /// BOARD_BLIND in lib/staffAuth.ts. A board that can read the ward's own
+  /// notes, or see which nurse failed which test, ends both of those things
+  /// within a month.
+  BOARD
 }
 
 /// Single-use sign-in code. No passwords: nineteen people on personal email,
@@ -7771,6 +7795,13 @@ model Protocol {
   /// Bumped when the content changes, which re-opens the loop for everybody.
   version Int     @default(1)
 
+  /// Nothing reaches a nurse until a clinician has approved it. Cleared when
+  /// version changes, so an edit cannot inherit the previous approval.
+  approvedById String?
+  approvedBy   StaffMember? @relation("ProtocolApprovals", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt   DateTime?
+  approvalNote String?      @db.Text
+
   /// Who this is relevant to. Matched loosely against position and department:
   /// nineteen people do not need a role taxonomy.
   roles       String[]
@@ -7785,6 +7816,7 @@ model Protocol {
 
   questions ProtocolQuestion[]
   progress  ProtocolProgress[]
+  sessions  TrainingSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7876,6 +7908,11 @@ model ScoreboardEntry {
   /// What we did that moved it. Published to the whole team with the number.
   movedBy String? @db.Text
 
+  /// Who may see this figure. Operational measures are ALL_STAFF. Financial
+  /// ones are LEADERSHIP, which the capability map also grants to BOARD for
+  /// viewing. Staff hear a revenue figure as a conversation about their pay.
+  visibility StaffTier @default(ALL_STAFF)
+
   enteredById String?
   enteredBy   StaffMember? @relation("ScoreboardEntries", fields: [enteredById], references: [id], onDelete: SetNull)
 
@@ -7884,4 +7921,80 @@ model ScoreboardEntry {
 
   @@unique([clientId, measure, period])
   @@index([clientId, period])
+}
+
+/// A peer-to-peer training session. Every two weeks, at the facility or
+/// virtually, one person given a topic and presenting it to everyone.
+///
+/// Peer-led on purpose, and the evidence is the reason rather than the budget.
+/// Positive deviance works because the practice arrives from a colleague under
+/// the same constraints, which is credible in a way an outside expert is not:
+/// the nurse presenting has done it on this ward, with this stock, at night.
+/// It also spreads capability instead of concentrating it, which matters in a
+/// hospital where six nurses cover every shift.
+///
+/// Presenting is the strongest form of learning available here, so the rota of
+/// presenters is the point as much as the attendance is.
+model TrainingSession {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  topic       String
+  description String? @db.Text
+  /// Where this sits in the library, when the topic is a protocol.
+  protocolId  String?
+  protocol    Protocol? @relation(fields: [protocolId], references: [id], onDelete: SetNull)
+
+  /// Who is presenting. Null only while the slot is still unassigned.
+  presenterId String?
+  presenter   StaffMember? @relation("TrainingPresenter", fields: [presenterId], references: [id], onDelete: SetNull)
+
+  scheduledAt DateTime
+  mode        TrainingMode @default(ONSITE)
+  /// A room, or a meeting link.
+  whereAt     String?
+
+  status TrainingStatus @default(SCHEDULED)
+  /// What was covered, written after. Becomes the record for anybody absent.
+  notes  String? @db.Text
+
+  /// Set when the invitation went out, so a reminder job cannot double-send.
+  invitedAt  DateTime?
+  remindedAt DateTime?
+
+  attendance TrainingAttendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, scheduledAt])
+}
+
+enum TrainingMode {
+  ONSITE
+  VIRTUAL
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  HELD
+  CANCELLED
+}
+
+/// Who was expected, who came. Expected rows are created when the session is
+/// scheduled, so an absence is visible rather than merely unrecorded.
+model TrainingAttendance {
+  id        String          @id @default(cuid())
+  sessionId String
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  staffId   String
+  staff     StaffMember     @relation("TrainingAttendance", fields: [staffId], references: [id], onDelete: Cascade)
+
+  attended   Boolean?
+  markedById String?
+  markedAt   DateTime?
+
+  @@unique([sessionId, staffId])
+  @@index([staffId])
 }
