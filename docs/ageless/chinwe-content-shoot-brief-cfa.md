@@ -127,7 +127,7 @@ A real choice, and it changes the schedule. Tell us which.
 
 We think the answer is both, split by setting, which is how the day below is built. But if you hate prompters, say so now rather than at eight in the morning.
 
-**Second open question.** Should anyone be on camera with you? We think yes, for one block: you and the clinic's lead clinician, together. It answers "who is actually treating me" far better than you can alone, and it visibly transfers authority to the person who will be in the room when you are not. Itunu, this is partly a question for you, since it means committing a clinician for two hours.
+**Second open question.** Should anyone be on camera with you? We think yes, for one block: you and MedLYFE's physician, together. It answers "who is actually treating me" far better than you can alone, and it visibly transfers authority to the person who will be in the room when you are not. Itunu, this is partly a question for you, since it means committing a clinician for two hours.
 
 ---
 
@@ -202,7 +202,7 @@ Your position pieces. Fastest to shoot because they are closest to what you alre
 
 Conversational. The two-hander and the brainstorm pieces live here.
 
-- **Who treats you when she is not in the country.** Long form, two-hander with the lead clinician
+- **Who treats you when she is not in the country.** Long form, two-hander with MedLYFE's physician
 - **Aftercare: the part nobody quotes for.** Long form, and on our reading the strongest single piece in this shoot
 - **Questions from the hundred and seventy.** Long form, her real questions answered
 - Who is responsible for your recovery, by name
@@ -283,7 +283,7 @@ If the day overruns, the two pieces that must survive are **what actually happen
 | This session held, and the shot list cut to the day | All of us, this week |
 | Every script written and approved, compliance applied before Chinwe sees them | CFA, one week out |
 | Prompter confirmed, and the long-form pieces rehearsed | Crew and Chinwe |
-| The second clinician committed for two hours and briefed | Itunu |
+| MedLYFE's physician committed for two hours and briefed | Itunu |
 | Written confirmation that nothing filmed shows treatment of a patient | The clinic |
 | Three wardrobe changes, one per site | Chinwe |
 | A named owner for the publishing calendar | To assign |

@@ -59,7 +59,7 @@ All locations are provided and cleared by us. Travel between A, B and C is withi
 | | |
 | --- | --- |
 | Principal | Dr Chinwe Kpaduwa, for the full day |
-| Second contributor | One clinician, for approximately two hours in the afternoon, for two seated two-hander conversations |
+| Second contributor | MedLYFE's physician, for approximately two hours in the afternoon, for two seated two-hander conversations |
 | Anybody else | Nobody. No patients, no models, no extras |
 
 ---

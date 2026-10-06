@@ -28,7 +28,7 @@ Every piece is made to be sent to one person. Somebody enquires, goes quiet, and
 | | Who | |
 | --- | --- | --- |
 | Interview, not prompter | Chinwe | The calendar has decided this one. Nobody writes and approves forty scripts in two days, but we can write forty good questions by tomorrow. It also plays to how you already talk |
-| A second clinician on camera | Itunu | Two hours, two conversations with Chinwe. Answers "who is actually treating me" far better than she can alone. The highest value addition on the list |
+| MedLYFE's physician on camera | Itunu | Two hours, two conversations with Chinwe. Answers "who is actually treating me" far better than she can alone. The highest value addition on the list |
 | Three locations | Itunu | Clinic for two setups, a studio for one, a private interior with a terrace for two. We can source the third |
 | Confirm Thursday | Both | Kalkulus are being asked today whether they can crew it at two days. If they cannot, we need a second name by tonight |
 
@@ -38,7 +38,7 @@ Chinwe: the day itself, and ninety minutes **today or tomorrow morning** to cut 
 
 One is yours to refuse. The strongest idea we have is to take the real questions the March enquirers asked, anonymise them, and have you answer the commonest ten on camera. Their words, not invented ones.
 
-Itunu: the second clinician, the locations, and the go-ahead once Kalkulus quote. Nothing else until the day.
+Itunu: MedLYFE's physician for the afternoon, the locations, and the go-ahead once Kalkulus quote. Nothing else until the day.
 
 ## The four rules we work inside
 
