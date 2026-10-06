@@ -81,12 +81,12 @@ STANDFIRST = "How modern science is changing the way we look, feel, perform and 
 SESSION = "The Art of Looking Like Yourself"
 BLURB = ("An evening exploring wellness, longevity, aesthetics and the connection "
          "between feeling well and looking like yourself.")
-DATE = "Thursday, 15 October 2026"
+DATE = "Wednesday, 21 October 2026"
 COCKTAILS = "6:00 PM"
 PROGRAMME = "6:45 PM"
 CLOSE = "9:30 PM"
-VENUE = "Lagos. The address follows your reply."
-RSVP_BY = "12 October"
+VENUE = "Capital Club, Victoria Island"
+RSVP_BY = "16 October"
 FOOTER = "MedLYFE introduces Lyfe Plastics & Dermatology."
 
 WHATSAPP = "2349138138553"
