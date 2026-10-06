@@ -3512,6 +3512,15 @@ model Hospital {
   nhiaAccredited     Boolean @default(false)
   registrationNumber String?
 
+  // Sales directory. The same hospital is a prospect for every product in the
+  // suite, so contacts and per-product stages hang off this one record.
+  city       String?
+  category   String? // Hospital / clinic | Dental | Eye / optical | Diagnostic / lab | ...
+  website    String?
+  /// Normalised name + LGA, so a re-import updates rather than duplicates.
+  importKey  String?   @unique
+  importedAt DateTime?
+
   // Distress scoring (0-100, computed)
   distressScore       Decimal? @db.Decimal(5, 2)
   distressTier        String? // A | B | C | D
@@ -3538,11 +3547,15 @@ model Hospital {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  diagnostics  Diagnostic[]
-  kpiSnapshots TransformKPISnapshot[]
-  dealRecords  DealRecord[]
-  exitDossier  ExitDossier?
-  contactLog   HospitalContactLog[]
+  diagnostics     Diagnostic[]
+  kpiSnapshots    TransformKPISnapshot[]
+  dealRecords     DealRecord[]
+  exitDossier     ExitDossier?
+  contactLog      HospitalContactLog[]
+  contacts        HospitalContact[]
+  productStages   HospitalProductStage[]
+  campaignSends   SalesCampaignSend[]
+  recoveryAccount RecoveryAccount?
 
   @@index([pipelineStage])
   @@index([distressTier])
@@ -7568,4 +7581,259 @@ model LyfeEnquiry {
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+// ─── Hospital sales: one directory, every product ───────────────────────────
+// Claims recovery is the first product sold through this. Each product gets a
+// stage per hospital, and every outbound email is a SalesCampaignSend so the
+// funnel can be read from sent to signed.
+
+model HospitalContact {
+  id         String   @id @default(cuid())
+  hospitalId String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  name       String?
+  role       String?
+  email      String?
+  phone      String?
+  isPrimary  Boolean  @default(false)
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sends SalesCampaignSend[]
+
+  @@unique([hospitalId, email])
+  @@index([email])
+}
+
+/// Where a hospital stands for one product.
+/// TARGET | CONTACTED | ENGAGED | ENQUIRED | SAMPLE | PROPOSAL | WON | LOST | NOT_FIT
+model HospitalProductStage {
+  id         String   @id @default(cuid())
+  hospitalId String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  product    String // key from lib/hospital-sales.ts PRODUCTS
+  stage      String   @default("TARGET")
+  leadId     String?
+  note       String?  @db.Text
+  stageAt    DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([hospitalId, product])
+  @@index([product, stage])
+}
+
+model SalesCampaign {
+  id          String   @id @default(cuid())
+  product     String
+  name        String
+  subject     String
+  /// Plain text with {{hospital}} and {{name}} placeholders. Rendered into the
+  /// house layout with a tracked link and an unsubscribe line.
+  body        String   @db.Text
+  ctaText     String
+  status      String   @default("DRAFT") // DRAFT | SENDING | PAUSED | DONE
+  dailyCap    Int      @default(100)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sends SalesCampaignSend[]
+
+  @@index([product, status])
+}
+
+model SalesCampaignSend {
+  id             String          @id @default(cuid())
+  campaignId     String
+  campaign       SalesCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  hospitalId     String
+  hospital       Hospital        @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  contactId      String
+  contact        HospitalContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  email          String
+  /// Public token for the tracked link and the unsubscribe link.
+  token          String          @unique
+  status         String          @default("QUEUED") // QUEUED | SENT | FAILED | SUPPRESSED
+  sentAt         DateTime?
+  messageId      String?
+  error          String?         @db.Text
+  clickedAt      DateTime?
+  enquiredAt     DateTime?
+  unsubscribedAt DateTime?
+  createdAt      DateTime        @default(now())
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId, status])
+  @@index([hospitalId])
+}
+
+// ─── Claims recovery desk ────────────────────────────────────────────────────
+// What happens after a hospital signs. Claims carry references, payer, dates
+// and amounts, never patient names: enrolleeRef is the plan's member number
+// and serviceSummary is a clinical description with no identifiers.
+// RecoveryActivity and RecoveryPayment are append-only, so every naira and
+// every promise a payer made can be traced.
+
+model RecoveryPayer {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  type            String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | OTHER
+  /// CFA advises this payer (e.g. Aman). Claims against it are recovered only
+  /// with the hospital told in writing, and are never advanced.
+  conflict        Boolean  @default(false)
+  conflictNote    String?
+  advanceEligible Boolean  @default(true)
+  claimsContact   String?
+  claimsEmail     String?
+  claimsPhone     String?
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  claims     RecoveryClaim[]
+  activities RecoveryActivity[]
+}
+
+model RecoveryAccount {
+  id                String    @id @default(cuid())
+  hospitalId        String    @unique
+  hospital          Hospital  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  status            String    @default("SAMPLE") // SAMPLE | ONBOARDING | ACTIVE | PAUSED | EXITED
+  advanceRate       Decimal   @default(0.6) @db.Decimal(5, 4)
+  recoveryFeeRate   Decimal?  @db.Decimal(5, 4)
+  facilityLimit     Decimal?  @db.Decimal(14, 2)
+  maxClaimAgeDays   Int       @default(180)
+  /// No payer above this share of the hospital's advanced book.
+  payerCap          Decimal   @default(0.4) @db.Decimal(5, 4)
+  /// Token for the hospital's private claim upload link.
+  intakeToken       String    @unique
+  agreementSignedAt DateTime?
+  notes             String?   @db.Text
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  batches    RecoveryBatch[]
+  claims     RecoveryClaim[]
+  activities RecoveryActivity[]
+}
+
+model RecoveryBatch {
+  id         String          @id @default(cuid())
+  accountId  String
+  account    RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  reference  String
+  kind       String          @default("LIVE") // SAMPLE | LIVE
+  status     String          @default("RECEIVED") // RECEIVED | VETTING | VETTED | FUNDING | CLOSED
+  receivedAt DateTime        @default(now())
+  vettedAt   DateTime?
+  funder     String?
+  notes      String?         @db.Text
+  createdAt  DateTime        @default(now())
+
+  claims RecoveryClaim[]
+
+  @@index([accountId, status])
+}
+
+model RecoveryClaim {
+  id             String          @id @default(cuid())
+  batchId        String
+  batch          RecoveryBatch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  accountId      String
+  account        RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId        String
+  payer          RecoveryPayer   @relation(fields: [payerId], references: [id])
+  claimRef       String
+  enrolleeRef    String?
+  serviceDate    DateTime?
+  submittedAt    DateTime?
+  serviceSummary String?
+  authCode       String?
+  documentsHeld  String[]
+  billedAmount   Decimal         @db.Decimal(14, 2)
+  tariffAmount   Decimal?        @db.Decimal(14, 2)
+  payerResponse  String? // what the payer has said: queried, cut, rejected, silent
+
+  /// RECEIVED | VETTED | ADVANCED | IN_RECOVERY | PART_PAID | PAID | WRITTEN_OFF
+  status String @default("RECEIVED")
+
+  // Verification (AI first pass, a person confirms)
+  vetVerdict       String? // PASS | REPAIR | FAIL
+  vetLikelihood    Int? // 0-100 chance the payer pays as it stands or after repair
+  vetPayable       Decimal?  @db.Decimal(14, 2)
+  vetIssues        Json?
+  vetRepairs       Json?
+  vetRationale     String?   @db.Text
+  vetModel         String?
+  vettedAt         DateTime?
+  vetConfirmedById String?
+  vetConfirmedAt   DateTime?
+
+  // Decision (rules decide, a person approves)
+  decision        String? // ADVANCE | HOLD | DECLINE
+  decisionAmount  Decimal?  @db.Decimal(14, 2)
+  decisionReasons Json?
+  decidedAt       DateTime?
+  approvedById    String?
+  approvedAt      DateTime?
+
+  // Money
+  advanceAmount   Decimal?  @db.Decimal(14, 2)
+  advancedAt      DateTime?
+  recoveredAmount Decimal   @default(0) @db.Decimal(14, 2)
+  closedAt        DateTime?
+
+  // Recovery queue
+  priority     Int?
+  nextAction   String?
+  nextActionAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities RecoveryActivity[]
+  payments   RecoveryPayment[]
+
+  @@unique([accountId, payerId, claimRef])
+  @@index([accountId, status])
+  @@index([payerId, status])
+  @@index([nextActionAt])
+}
+
+model RecoveryActivity {
+  id          String          @id @default(cuid())
+  accountId   String
+  account     RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  claimId     String?
+  claim       RecoveryClaim?  @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  payerId     String?
+  payer       RecoveryPayer?  @relation(fields: [payerId], references: [id])
+  /// NOTE | CALL | EMAIL | LETTER | PROMISE | ESCALATION | PAYMENT | STATUS | AI_VET | AI_DRAFT | DECISION
+  kind        String
+  summary     String          @db.Text
+  detail      Json?
+  amount      Decimal?        @db.Decimal(14, 2)
+  promisedFor DateTime?
+  createdById String?
+  createdAt   DateTime        @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([claimId])
+  @@index([payerId, kind])
+}
+
+model RecoveryPayment {
+  id           String        @id @default(cuid())
+  claimId      String
+  claim        RecoveryClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  amount       Decimal       @db.Decimal(14, 2)
+  receivedAt   DateTime
+  reference    String?
+  recordedById String?
+  createdAt    DateTime      @default(now())
+
+  @@index([claimId])
 }

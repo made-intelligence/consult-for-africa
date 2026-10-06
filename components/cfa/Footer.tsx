@@ -36,6 +36,7 @@ export default function Footer() {
               { label: "Clinical Governance", href: "/services/clinical-governance" },
               { label: "Digital Health", href: "/services/digital-health" },
               { label: "Healthcare Marketing", href: "/services/healthcare-marketing" },
+              { label: "Claims Recovery", href: "/services/claims-recovery" },
               { label: "Healthcare HR (Maarova\u2122)", href: "/maarova" },
               { label: "Fractional Leadership", href: "/services/fractional-leadership" },
               { label: "Health Systems", href: "/services/health-systems" },
