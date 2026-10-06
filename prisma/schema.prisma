@@ -522,6 +522,7 @@ model Client {
   engagements        Engagement[]
   invoices           Invoice[]
   contacts           ClientContact[]
+  staff              StaffMember[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7561,4 +7562,79 @@ model LyfeEnquiry {
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+/// A member of a CLIENT's own staff, as against a CFA consultant (User) or a
+/// client's commercial contact (ClientContact).
+///
+/// TEMPORARY, AND NOT THE CANONICAL STAFF MODEL. The real staff app is being
+/// built by Matthew into the Mezo Suite and HospitlOS, in their own codebases.
+/// This exists only so the nineteen at Haven have somewhere to sign in during
+/// the transformation, and it is expected to be superseded.
+///
+/// So: do not grow it into a product, and do not let a second client's needs
+/// shape it. What has to survive is the DATA, not this surface. Keep anything
+/// collected here exportable, and agree the shape with Matthew before adding
+/// fields, so what the hospital enters lands in HospitlOS rather than being
+/// re-keyed.
+model StaffMember {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name       String
+  email      String?
+  phone      String?
+  department String
+  position   String
+
+  /// Governs what this person sees. Mirrors the tiers in lib/haven-playbook.ts.
+  /// Deliberately has no tier for an individual's own assessment result: that
+  /// never reaches a shared surface at all, so it is not a permission.
+  tier StaffTier @default(ALL_STAFF)
+
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+
+  loginTokens StaffLoginToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, email])
+  @@index([clientId, isActive])
+}
+
+enum StaffTier {
+  ALL_STAFF
+  SUPERVISOR
+  LEADERSHIP
+}
+
+/// Single-use sign-in code. No passwords: nineteen people on personal email,
+/// mostly on phones mid-shift, and nobody at the hospital to administer resets.
+/// A code beats a link here because links get mangled by email clients and by
+/// forwards, and a code can be read on one screen and typed on another.
+///
+/// Six digits is brute-forceable, so the row counts attempts and dies after
+/// five. What is stored is an HMAC keyed to the staff member, never the code.
+model StaffLoginToken {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  tokenHash String    @unique
+  attempts  Int       @default(0)
+  /// Which channel delivered it, and what they were on. Not needed to sign
+  /// anybody in; needed so L2 and L7 in lib/haven-learning.ts can be answered
+  /// with data rather than with an opinion, and neither can be reconstructed
+  /// after the fact.
+  channel   String?
+  userAgent String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([staffId])
+  @@index([expiresAt])
 }
