@@ -523,6 +523,9 @@ model Client {
   invoices           Invoice[]
   contacts           ClientContact[]
   staff              StaffMember[]
+  staffNotes         StaffNote[]
+  protocols          Protocol[]
+  scoreboard         ScoreboardEntry[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7595,8 +7598,17 @@ model StaffMember {
 
   isActive    Boolean   @default(true)
   lastLoginAt DateTime?
+  /// Annual entitlement in working days. Nigeria's statutory floor is six;
+  /// most hospitals here run well above it, so this is set per person.
+  annualLeaveDays Int     @default(20)
 
   loginTokens StaffLoginToken[]
+  leave          StaffLeaveRequest[] @relation("StaffLeave")
+  leaveDecisions StaffLeaveRequest[] @relation("StaffLeaveDecisions")
+  notes          StaffNote[]         @relation("StaffNotes")
+  protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
+  observations     ProtocolProgress[] @relation("ProtocolObservations")
+  scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7637,4 +7649,239 @@ model StaffLoginToken {
 
   @@index([staffId])
   @@index([expiresAt])
+}
+
+/// Leave, requested from a phone and planned against the rota.
+///
+/// The hospital has no HR function, so this is built to run on a line manager
+/// and a form rather than on an administrator. The useful part is not the
+/// request, which a WhatsApp message already does badly; it is that a decision
+/// can see how many people from the same department are already off on those
+/// days, which is what stops the rota breaking in the high season.
+model StaffLeaveRequest {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation("StaffLeave", fields: [staffId], references: [id], onDelete: Cascade)
+
+  type      StaffLeaveType @default(ANNUAL)
+  startDate DateTime
+  endDate   DateTime
+  /// Working days requested, stated by the person rather than computed, because
+  /// a hospital rota is not a Monday to Friday week.
+  days      Int
+  reason    String?        @db.Text
+
+  status       StaffLeaveStatus @default(REQUESTED)
+  decidedById  String?
+  decidedBy    StaffMember?     @relation("StaffLeaveDecisions", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt    DateTime?
+  decisionNote String?          @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId, startDate])
+  @@index([status, startDate])
+}
+
+enum StaffLeaveType {
+  ANNUAL
+  SICK
+  COMPASSIONATE
+  STUDY
+  UNPAID
+}
+
+enum StaffLeaveStatus {
+  REQUESTED
+  APPROVED
+  DECLINED
+  CANCELLED
+}
+
+/// Team notes: how colleagues co-work here.
+///
+/// Deliberately visible rather than private. Direct messages would make this a
+/// worse WhatsApp, which these nineteen already have and will not leave. A note
+/// posted to your department or to the whole hospital is a different thing: it
+/// is how a shift tells the next shift something, how somebody asks for cover,
+/// and how we close the loop by saying what changed because people spoke up.
+///
+/// Visibility is also the safeguard. People write differently when it is not a
+/// private thread, which matters because the risk in a hospital is patient
+/// detail being typed somewhere that is not the clinical record. The form says
+/// so, and anything clinical belongs in the record rather than here.
+model StaffNote {
+  id       String      @id @default(cuid())
+  clientId String
+  client   Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  authorId String
+  author   StaffMember @relation("StaffNotes", fields: [authorId], references: [id], onDelete: Cascade)
+
+  scope StaffNoteScope @default(DEPARTMENT)
+  /// Set when scope is DEPARTMENT. Null for a note to the whole hospital.
+  department String?
+
+  body String @db.Text
+
+  /// A reply. Replies are one level deep on purpose: a thread of threads in a
+  /// nineteen person hospital is a thing nobody reads.
+  parentId String?
+  parent   StaffNote?  @relation("StaffNoteReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  StaffNote[] @relation("StaffNoteReplies")
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([parentId])
+}
+
+enum StaffNoteScope {
+  DEPARTMENT
+  ALL
+}
+
+/// The process library: where a protocol is documented, and the record of who
+/// has acknowledged, studied and been tested on it.
+///
+/// The audit found the thing this exists for. Procedures exist and are
+/// accessible, almost nobody has been trained on them, supervision is informal
+/// and nobody checks. A protocol nobody has been tested on is a document, not a
+/// control, and in a hospital that is worse than none because it creates the
+/// appearance of one.
+///
+/// `body` and the questions are authored by the hospital's clinical lead, never
+/// by us. Consult for Africa supplies the inventory, the structure and the
+/// chasing. Clinical content is a clinical decision and sits with the Chief
+/// Medical Director. A protocol with an empty body is therefore not a defect in
+/// this table: it is the gap, made visible.
+model Protocol {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Stable key from lib/haven-competency.ts, e.g. "A1". Lets the seed re-run.
+  code    String
+  domain  String
+  title   String
+  /// One line, safe to show in a list.
+  summary String @db.Text
+  /// The documented procedure itself. Empty until the hospital supplies it.
+  body    String? @db.Text
+  /// Bumped when the content changes, which re-opens the loop for everybody.
+  version Int     @default(1)
+
+  /// Who this is relevant to. Matched loosely against position and department:
+  /// nineteen people do not need a role taxonomy.
+  roles       String[]
+  departments String[]
+
+  /// How competence is actually confirmed. Where failure harms a child this is
+  /// OBSERVED or SIMULATION and a passed quiz is not sufficient on its own.
+  method    String
+  frequency String
+
+  isActive Boolean @default(true)
+
+  questions ProtocolQuestion[]
+  progress  ProtocolProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, code])
+  @@index([clientId, isActive])
+}
+
+/// Authored by the clinical lead. Never generated.
+model ProtocolQuestion {
+  id         String   @id @default(cuid())
+  protocolId String
+  protocol   Protocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+
+  question String   @db.Text
+  options  String[]
+  /// Index into options.
+  correct  Int
+  /// Shown after answering, right or wrong. The teaching happens here.
+  because  String?  @db.Text
+  sortOrder Int     @default(0)
+
+  @@index([protocolId])
+}
+
+/// One person against one protocol. The three steps are separate columns rather
+/// than a status enum because somebody can study without being tested, and
+/// knowing which of the three stalled is the whole management question.
+model ProtocolProgress {
+  id         String      @id @default(cuid())
+  protocolId String
+  protocol   Protocol    @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  staffId    String
+  staff      StaffMember @relation("ProtocolProgress", fields: [staffId], references: [id], onDelete: Cascade)
+
+  /// I have seen that this applies to me.
+  acknowledgedAt DateTime?
+  /// I have read it.
+  studiedAt      DateTime?
+  /// I have answered the questions.
+  testedAt       DateTime?
+  score          Int?
+  outOf          Int?
+  passed         Boolean?
+  attempts       Int       @default(0)
+
+  /// Watched doing it, by somebody competent. Required where a quiz cannot
+  /// stand in: a full mark on a neonatal resuscitation paper is not evidence of
+  /// being safe with a flat baby at three in the morning.
+  observedById String?
+  observedBy   StaffMember? @relation("ProtocolObservations", fields: [observedById], references: [id], onDelete: SetNull)
+  observedAt   DateTime?
+
+  /// The version this progress was against. If the protocol is reissued this
+  /// goes stale and the loop re-opens rather than silently counting.
+  againstVersion Int      @default(1)
+  nextDueAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([protocolId, staffId])
+  @@index([staffId])
+}
+
+/// One measure, one week, one number, and what moved it.
+///
+/// The whole system is meant to produce a measurable improvement every week. It
+/// cannot, until something is counted every week, and today nothing at Haven is.
+/// Six measures entered by hand beats sixty instrumented next quarter.
+///
+/// `movedBy` is the point. A number that changes and nobody can say why teaches
+/// the team that the scoreboard is weather. A number with "we fixed the reorder
+/// point on the fast movers" against it teaches them it is theirs.
+model ScoreboardEntry {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Stable key, e.g. "discharges-before-noon".
+  measure String
+  /// ISO week, e.g. "2026-W41". Weekly is the cadence a team can feel.
+  period  String
+
+  /// Held as text: some measures are counts, some percentages, one is a streak.
+  /// Parsing them into a number would force a shape onto six things that do not
+  /// share one.
+  value   String
+  /// What we did that moved it. Published to the whole team with the number.
+  movedBy String? @db.Text
+
+  enteredById String?
+  enteredBy   StaffMember? @relation("ScoreboardEntries", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, measure, period])
+  @@index([clientId, period])
 }

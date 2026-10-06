@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/StaffForms";
 import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
+import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffLeave";
+import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
+import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
+import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -98,12 +102,96 @@ export default async function HavenStaffPage() {
   // nineteen colleagues' personal mobiles and they do not belong on a page
   // anybody with the link can open.
   let people: DirectoryEntry[] = [];
+  let mine: LeaveRow[] = [];
+  let toDecide: LeaveRow[] = [];
+  let entitlement = 20;
+  let notes: NoteRow[] = [];
+  let myDepartment = "";
+  let thisWeek: ScoreRow[] = [];
+  let lastWeek: ScoreRow[] = [];
+  const period = isoWeek();
+
   if (session) {
-    people = await prisma.staffMember.findMany({
-      where: { clientId: session.clientId, isActive: true },
-      select: { name: true, position: true, department: true, phone: true },
-      orderBy: { name: "asc" },
+    const [dir, me, leave] = await Promise.all([
+      prisma.staffMember.findMany({
+        where: { clientId: session.clientId, isActive: true },
+        select: { name: true, position: true, department: true, phone: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.staffMember.findUnique({
+        where: { id: session.sub },
+        select: { annualLeaveDays: true, department: true },
+      }),
+      prisma.staffLeaveRequest.findMany({
+        where: { staffId: session.sub },
+        orderBy: { startDate: "desc" },
+        take: 12,
+      }),
+    ]);
+    people = dir;
+    entitlement = me?.annualLeaveDays ?? 20;
+    myDepartment = me?.department ?? "";
+
+    // Everything addressed to the whole hospital, plus this person's own area.
+    const raw = await prisma.staffNote.findMany({
+      where: {
+        clientId: session.clientId,
+        parentId: null,
+        OR: [{ scope: "ALL" }, { scope: "DEPARTMENT", department: myDepartment }],
+      },
+      include: {
+        author: { select: { name: true, position: true } },
+        replies: {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { name: true } } },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 25,
     });
+    const scores = await prisma.scoreboardEntry.findMany({
+      where: { clientId: session.clientId, period: { in: [period, previousWeek(period)] } },
+      select: { measure: true, value: true, movedBy: true, period: true },
+    });
+    thisWeek = scores.filter((s) => s.period === period);
+    lastWeek = scores.filter((s) => s.period !== period);
+
+    notes = raw.map((n) => ({
+      id: n.id,
+      body: n.body,
+      author: n.author.name,
+      role: n.author.position,
+      scope: n.scope,
+      department: n.department,
+      createdAt: n.createdAt.toISOString(),
+      replies: n.replies.map((r) => ({
+        id: r.id, body: r.body, author: r.author.name, createdAt: r.createdAt.toISOString(),
+      })),
+    }));
+    mine = leave.map((l) => ({
+      id: l.id, type: l.type, days: l.days, status: l.status,
+      startDate: l.startDate.toISOString().slice(0, 10),
+      endDate: l.endDate.toISOString().slice(0, 10),
+      decisionNote: l.decisionNote,
+    }));
+
+    if (atLeast(session, "SUPERVISOR")) {
+      const waiting = await prisma.staffLeaveRequest.findMany({
+        where: {
+          status: "REQUESTED",
+          staff: { clientId: session.clientId, isActive: true },
+          NOT: { staffId: session.sub },
+        },
+        include: { staff: { select: { name: true } } },
+        orderBy: { startDate: "asc" },
+      });
+      toDecide = waiting.map((l) => ({
+        id: l.id, type: l.type, days: l.days, status: l.status,
+        startDate: l.startDate.toISOString().slice(0, 10),
+        endDate: l.endDate.toISOString().slice(0, 10),
+        decisionNote: l.decisionNote, reason: l.reason, staffName: l.staff.name,
+      }));
+    }
   }
 
   return (
@@ -134,6 +222,45 @@ export default async function HavenStaffPage() {
             >
               <StaffDirectory people={people} />
             </Section>
+
+            <Section
+              eyebrow="How we are doing"
+              title="This week"
+              lead="Six things, counted every week. Where a number moved, what moved it is written underneath."
+            >
+              <Scoreboard
+                thisWeek={thisWeek}
+                lastWeek={lastWeek}
+                canEdit={atLeast(session, "SUPERVISOR")}
+                period={period}
+              />
+            </Section>
+
+            <Section
+              eyebrow="The team"
+              title="Notes"
+              lead="Tell your area or the whole hospital something: a handover note, asking for cover, something that needs picking up. Everyone signed in can read it, which is the point."
+            >
+              <StaffNotes notes={notes} myDepartment={myDepartment} />
+            </Section>
+
+            <Section
+              eyebrow="Your leave"
+              title="Time off"
+              lead="Ask from here rather than chasing somebody down a corridor. You will see who else in your area is already off before you pick your dates."
+            >
+              <MyLeave mine={mine} entitlement={entitlement} />
+            </Section>
+
+            {atLeast(session, "SUPERVISOR") && (
+              <Section
+                eyebrow="For you to decide"
+                title="Leave waiting on you"
+                lead="Approve or decline. Nobody can decide their own."
+              >
+                <LeaveToDecide pending={toDecide} />
+              </Section>
+            )}
 
             <Section
               eyebrow="Once a week"
