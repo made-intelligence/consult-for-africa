@@ -7602,15 +7602,20 @@ enum StaffTier {
   LEADERSHIP
 }
 
-/// Single-use sign-in link. No passwords: nineteen people on personal email,
+/// Single-use sign-in code. No passwords: nineteen people on personal email,
 /// mostly on phones mid-shift, and nobody at the hospital to administer resets.
-/// Only the hash is stored, so a leaked table cannot be used to sign in.
+/// A code beats a link here because links get mangled by email clients and by
+/// forwards, and a code can be read on one screen and typed on another.
+///
+/// Six digits is brute-forceable, so the row counts attempts and dies after
+/// five. What is stored is an HMAC keyed to the staff member, never the code.
 model StaffLoginToken {
   id      String      @id @default(cuid())
   staffId String
   staff   StaffMember @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
   tokenHash String    @unique
+  attempts  Int       @default(0)
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())

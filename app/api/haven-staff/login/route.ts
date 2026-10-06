@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
-import { newLoginToken, TOKEN_TTL_MINUTES } from "@/lib/staffAuth";
+import { newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
 
-// Public endpoint. A staff member types their email and gets a single-use link.
+// Public endpoint. A staff member gives their email and gets a six-digit code.
 //
 // The response is identical whether or not the address belongs to anybody, so
 // this cannot be used to find out who works at the hospital. For nineteen named
@@ -16,8 +16,38 @@ export const dynamic = "force-dynamic";
 const CLIENT_NAME = "Haven Paediatric Centre";
 const bodySchema = z.object({ email: z.string().email().max(200) });
 
-function siteUrl() {
-  return (process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com").replace(/\/$/, "");
+/**
+ * Email today. When there is an SMS provider this gains an "SMS" branch and
+ * nothing else in the flow changes: the roster already carries mobile numbers
+ * for all nineteen, and in Nigeria SMS beats email for staff who check personal
+ * mail at home rather than on shift.
+ */
+async function deliver(channel: DeliveryChannel, to: string, firstName: string, code: string) {
+  if (channel !== "EMAIL") throw new Error(`No provider wired for ${channel}`);
+  await sendTransactionalEmail({
+    from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
+    replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
+    to,
+    subject: `${code} is your code for the Haven staff page`,
+    text: `Hello ${firstName},
+
+Your code for the Haven staff page is ${code}
+
+Type it into the page you have open. It lasts ${TOKEN_TTL_MINUTES} minutes and works once.
+
+If you did not ask for this, you can ignore it. The code is no use to anybody without your email address.
+
+Consult for Africa
+hello@consultforafrica.com`,
+    html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.65;color:#1F2937">
+<p>Hello ${firstName},</p>
+<p>Your code for the Haven staff page:</p>
+<p style="font-size:34px;font-weight:700;letter-spacing:.22em;color:#0B3C5D;margin:22px 0">${code}</p>
+<p>Type it into the page you have open. It lasts ${TOKEN_TTL_MINUTES} minutes and works once.</p>
+<p style="color:#6B7280;font-size:14px">If you did not ask for this, you can ignore it. The code is no use to anybody without your email address.</p>
+<p style="color:#6B7280;font-size:14px">Consult for Africa<br>hello@consultforafrica.com</p>
+</div>`,
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -40,14 +70,14 @@ export async function POST(req: NextRequest) {
     });
     if (!staff) return NextResponse.json({ ok: true });
 
-    // Retire any link already outstanding, so the most recent request is the
-    // only one that works and an old email in a shared inbox is inert.
+    // Retire anything already outstanding, so only the newest code works and an
+    // older email sitting in the inbox is inert.
     await prisma.staffLoginToken.updateMany({
       where: { staffId: staff.id, usedAt: null },
       data: { usedAt: new Date() },
     });
 
-    const { raw, hash } = newLoginToken();
+    const { code, hash } = newLoginCode(staff.id);
     await prisma.staffLoginToken.create({
       data: {
         staffId: staff.id,
@@ -56,37 +86,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const link = `${siteUrl()}/api/haven-staff/verify?token=${encodeURIComponent(raw)}`;
-    const firstName = staff.name.split(" ")[0];
-
-    await sendTransactionalEmail({
-      from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
-      replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
-      to: email,
-      subject: "Your link to the Haven staff page",
-      text: `Hello ${firstName},
-
-Here is your link to the Haven staff page. Tap it and you are in. There is no password to remember.
-
-${link}
-
-The link works once and lasts ${TOKEN_TTL_MINUTES} minutes. If it expires, just ask for another one.
-
-If you did not ask for this, you can ignore it. Nobody can use it but you.
-
-Consult for Africa
-hello@consultforafrica.com`,
-      html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.65;color:#1F2937">
-<p>Hello ${firstName},</p>
-<p>Here is your link to the Haven staff page. Tap it and you are in. There is no password to remember.</p>
-<p style="margin:26px 0">
-  <a href="${link}" style="background:#0B3C5D;color:#fff;text-decoration:none;padding:14px 26px;border-radius:10px;font-weight:600;display:inline-block">Open the staff page</a>
-</p>
-<p style="color:#6B7280;font-size:14px">The link works once and lasts ${TOKEN_TTL_MINUTES} minutes. If it expires, just ask for another one.</p>
-<p style="color:#6B7280;font-size:14px">If you did not ask for this, you can ignore it. Nobody can use it but you.</p>
-<p style="color:#6B7280;font-size:14px">Consult for Africa<br>hello@consultforafrica.com</p>
-</div>`,
-    });
+    await deliver("EMAIL", email, staff.name.split(" ")[0], code);
   } catch (err) {
     // Never leak the reason. A failure here must look the same as success, or
     // the error itself becomes the enumeration oracle.
