@@ -45,7 +45,6 @@ The programme runs two hours and After Hours needs its full hour, since that is 
 | Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
 | Panel | Gbemi Giwa, the African Fat Loss Method. Food and body composition |
 | Panel | Joycee Awosika, the ORÍKÌ Group. Vitality and energy |
-| Panel | One seat open. Sleep, energy and physical function |
 | Panel | One seat open. Hormones and the midlife transition |
 | Fireside | Dr Chinwe Kpaduwa, in conversation with Dr Debo Odulana |
 
@@ -53,13 +52,9 @@ The panel is experiential rather than clinical, delivered by people with the cre
 
 ## What is still open
 
-The fourth panel seat covers sleep, energy and physical function, and should go to a man so the row sits at two and two. Dr Olusola Oguntolu of Sleep Inc and Dr Olusesan Awe of Physio-Fit are being checked, and neither has been approached.
+The last seat. It covers hormones and the midlife transition, which is one of the three strands the room most wants and the one nobody else on the stage holds. A shortlist is in hand. Filling it takes the row to four, the right number for forty five minutes.
 
-The panel now runs forty five minutes rather than thirty, which carries five seats at nine minutes each, so hormones has somewhere to sit. That seat is also open. Dr Afokoghene Isiavwe, consultant endocrinologist at Rainbow Specialist in Lekki, is the cleanest fit found so far and has not been approached.
-
-The three named panellists have not all confirmed. Names go on the public page once they have, and not before.
-
-Three things block the invitations: the Capital Club street address, an RSVP name and direct line, and the Medlyfe logo in vector.
+Three practical things block the invitations: the Capital Club street address, an RSVP name and direct line, and the Medlyfe logo in vector.
 
 ## The next ten days
 

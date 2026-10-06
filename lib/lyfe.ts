@@ -172,7 +172,7 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "6:50",
     title: "The panel: The New Science of Ageing Well",
-    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight, sleep, energy and physical function, and how far they carry the way we age.",
+    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
   },
   {
     time: "7:35",
@@ -252,13 +252,6 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
-    portrait: null,
-  },
-  {
-    seat: "The panel, on the inner",
-    subject: "Sleep, energy and physical function. Staying able bodied, not only looking well",
-    name: null,
-    title: null,
     portrait: null,
   },
   {
