@@ -429,3 +429,100 @@ export async function handleCoachingSession(event: PaystackEvent): Promise<void>
 
   console.log(`[paystack] coaching session ${coachingSession.id} paid (${data.reference})`);
 }
+
+
+/**
+ * A paid consultation with Dr Kpaduwa.
+ *
+ * The diary is held by `paidAt` and by nothing else, which is why the slot is
+ * only committed here. Two people can get as far as a Paystack page for the
+ * same half hour; only one of them can have the index.
+ */
+export async function handleLyfeConsultation(event: PaystackEvent): Promise<void> {
+  if (event.event !== "charge.success") return;
+  const meta = event.data?.metadata;
+  if (meta?.type !== "lyfe_consultation") return;
+
+  const reference = event.data?.reference;
+  const enquiryId = typeof meta.enquiryId === "string" ? meta.enquiryId : null;
+  if (!reference && !enquiryId) {
+    console.error("[paystack/lyfe] charge carries neither a reference nor an enquiry id");
+    return;
+  }
+
+  const entry = await prisma.lyfeEnquiry.findFirst({
+    where: reference ? { paymentRef: reference } : { id: enquiryId! },
+    select: { id: true, paidAt: true, slotAt: true, fullName: true, email: true, notes: true },
+  });
+  let keptTheSlot = true;
+  if (!entry) {
+    console.error(`[paystack/lyfe] no enquiry for reference ${reference}`);
+    return;
+  }
+  if (entry.paidAt) return; // Paystack retries; booking twice does not.
+
+  const paidAt = new Date();
+  const amountKobo = typeof event.data?.amount === "number" ? event.data.amount : null;
+
+  try {
+    await prisma.lyfeEnquiry.update({
+      where: { id: entry.id },
+      data: {
+        paidAt,
+        status: "BOOKED",
+        amountKobo: amountKobo ?? undefined,
+        nextAction: "Send the video link and the pre-consultation note.",
+        nextActionAt: new Date(paidAt.getTime() + 24 * 60 * 60 * 1000),
+      },
+    });
+  } catch (err) {
+    // The partial unique index on a paid slot has refused it, so somebody else
+    // paid for this half hour first. The money is real and the slot is not, so
+    // the row keeps the money, loses the slot, and lands on the coordinator's
+    // list saying exactly that.
+    const code = (err as { code?: string })?.code;
+    if (code !== "P2002") throw err;
+    keptTheSlot = false;
+    const wanted = entry.slotAt?.toISOString() ?? "unknown";
+    console.error(`[paystack/lyfe] ${entry.id} paid for a slot already sold (${wanted})`);
+    await prisma.lyfeEnquiry.update({
+      where: { id: entry.id },
+      data: {
+        paidAt,
+        slotAt: null,
+        status: "BOOKED",
+        amountKobo: amountKobo ?? undefined,
+        nextAction: "PAID BUT DOUBLE BOOKED. Offer another time today, or refund.",
+        nextActionAt: paidAt,
+        notes: [entry.notes, `Paid for ${wanted}, which had already gone.`].filter(Boolean).join("\n"),
+      },
+    });
+  }
+
+  // The booking is committed either way, so nothing below is allowed to undo
+  // it. A confirmation that fails to send is a telephone call; a throw here is
+  // a payment Paystack retries and a diary that never settles.
+  try {
+    const { emailLyfeConsultationConfirmed } = await import("@/lib/lyfeEmail");
+    await emailLyfeConsultationConfirmed({
+      to: entry.email,
+      firstName: entry.fullName.trim().split(/\s+/)[0] ?? entry.fullName,
+      slotAt: keptTheSlot ? entry.slotAt : null,
+    });
+  } catch (err) {
+    console.error(`[paystack/lyfe] confirmation email failed for ${entry.id}:`, err);
+  }
+
+  try {
+    const { notifyInternal } = await import("@/lib/email");
+    const when = entry.slotAt ? entry.slotAt.toISOString() : "no slot";
+    await notifyInternal(
+      process.env.LYFE_COORDINATOR_EMAILS?.split(",")[0]?.trim() || "hello@consultforafrica.com",
+      keptTheSlot ? `PAID: ${entry.fullName}, ${when}` : `PAID BUT DOUBLE BOOKED: ${entry.fullName}`,
+      `<p>${entry.fullName} (${entry.email}) has paid for a consultation.</p><p>Slot: ${when}</p>` +
+        (keptTheSlot ? "" : "<p><strong>That half hour had already gone. Offer another time today or refund.</strong></p>"),
+    );
+  } catch (err) {
+    console.error(`[paystack/lyfe] coordinator notice failed for ${entry.id}:`, err);
+  }
+}
