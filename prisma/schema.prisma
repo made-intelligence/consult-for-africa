@@ -523,6 +523,7 @@ model Client {
   invoices           Invoice[]
   contacts           ClientContact[]
   staff              StaffMember[]
+  staffNotes         StaffNote[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7602,6 +7603,7 @@ model StaffMember {
   loginTokens StaffLoginToken[]
   leave          StaffLeaveRequest[] @relation("StaffLeave")
   leaveDecisions StaffLeaveRequest[] @relation("StaffLeaveDecisions")
+  notes          StaffNote[]         @relation("StaffNotes")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7690,4 +7692,46 @@ enum StaffLeaveStatus {
   APPROVED
   DECLINED
   CANCELLED
+}
+
+/// Team notes: how colleagues co-work here.
+///
+/// Deliberately visible rather than private. Direct messages would make this a
+/// worse WhatsApp, which these nineteen already have and will not leave. A note
+/// posted to your department or to the whole hospital is a different thing: it
+/// is how a shift tells the next shift something, how somebody asks for cover,
+/// and how we close the loop by saying what changed because people spoke up.
+///
+/// Visibility is also the safeguard. People write differently when it is not a
+/// private thread, which matters because the risk in a hospital is patient
+/// detail being typed somewhere that is not the clinical record. The form says
+/// so, and anything clinical belongs in the record rather than here.
+model StaffNote {
+  id       String      @id @default(cuid())
+  clientId String
+  client   Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  authorId String
+  author   StaffMember @relation("StaffNotes", fields: [authorId], references: [id], onDelete: Cascade)
+
+  scope StaffNoteScope @default(DEPARTMENT)
+  /// Set when scope is DEPARTMENT. Null for a note to the whole hospital.
+  department String?
+
+  body String @db.Text
+
+  /// A reply. Replies are one level deep on purpose: a thread of threads in a
+  /// nineteen person hospital is a thing nobody reads.
+  parentId String?
+  parent   StaffNote?  @relation("StaffNoteReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  StaffNote[] @relation("StaffNoteReplies")
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([parentId])
+}
+
+enum StaffNoteScope {
+  DEPARTMENT
+  ALL
 }

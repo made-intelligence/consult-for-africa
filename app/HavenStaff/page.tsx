@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/StaffForms";
 import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
 import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffLeave";
+import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -102,6 +103,8 @@ export default async function HavenStaffPage() {
   let mine: LeaveRow[] = [];
   let toDecide: LeaveRow[] = [];
   let entitlement = 20;
+  let notes: NoteRow[] = [];
+  let myDepartment = "";
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -112,7 +115,7 @@ export default async function HavenStaffPage() {
       }),
       prisma.staffMember.findUnique({
         where: { id: session.sub },
-        select: { annualLeaveDays: true },
+        select: { annualLeaveDays: true, department: true },
       }),
       prisma.staffLeaveRequest.findMany({
         where: { staffId: session.sub },
@@ -122,6 +125,37 @@ export default async function HavenStaffPage() {
     ]);
     people = dir;
     entitlement = me?.annualLeaveDays ?? 20;
+    myDepartment = me?.department ?? "";
+
+    // Everything addressed to the whole hospital, plus this person's own area.
+    const raw = await prisma.staffNote.findMany({
+      where: {
+        clientId: session.clientId,
+        parentId: null,
+        OR: [{ scope: "ALL" }, { scope: "DEPARTMENT", department: myDepartment }],
+      },
+      include: {
+        author: { select: { name: true, position: true } },
+        replies: {
+          orderBy: { createdAt: "asc" },
+          include: { author: { select: { name: true } } },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 25,
+    });
+    notes = raw.map((n) => ({
+      id: n.id,
+      body: n.body,
+      author: n.author.name,
+      role: n.author.position,
+      scope: n.scope,
+      department: n.department,
+      createdAt: n.createdAt.toISOString(),
+      replies: n.replies.map((r) => ({
+        id: r.id, body: r.body, author: r.author.name, createdAt: r.createdAt.toISOString(),
+      })),
+    }));
     mine = leave.map((l) => ({
       id: l.id, type: l.type, days: l.days, status: l.status,
       startDate: l.startDate.toISOString().slice(0, 10),
@@ -175,6 +209,14 @@ export default async function HavenStaffPage() {
               lead="The whole team, by department, in your pocket. Tap to call."
             >
               <StaffDirectory people={people} />
+            </Section>
+
+            <Section
+              eyebrow="The team"
+              title="Notes"
+              lead="Tell your area or the whole hospital something: a handover note, asking for cover, something that needs picking up. Everyone signed in can read it, which is the point."
+            >
+              <StaffNotes notes={notes} myDepartment={myDepartment} />
             </Section>
 
             <Section
