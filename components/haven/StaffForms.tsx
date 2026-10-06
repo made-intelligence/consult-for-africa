@@ -244,3 +244,91 @@ export function WhatsBrokenForm() {
 }
 
 export const FORM_ACCENT = GOLD;
+
+/**
+ * The weekly pulse. One tap is a complete answer, and the two optional parts
+ * are below the fold of the thumb.
+ *
+ * Deliberately asks whether they had what they needed rather than whether they
+ * are satisfied. Satisfaction is a mood and moves with things nobody here
+ * controls; "did you have what you needed" is a question about the hospital and
+ * it is actionable on Monday.
+ */
+export function WeeklyPulse() {
+  const { state, send, reset } = useSubmit("haven-weekly-pulse");
+  const [week, setWeek] = useState("");
+  const [hadWhatINeeded, setHad] = useState("");
+  const [say, setSay] = useState("");
+
+  if (state === "done") {
+    return (
+      <Thanks onAgain={() => { setWeek(""); setHad(""); setSay(""); reset(); }}>
+        Thank you. We publish how many people answered each week, and what changed because of it.
+      </Thanks>
+    );
+  }
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    ...field,
+    width: "auto",
+    flex: "1 1 0",
+    cursor: "pointer",
+    textAlign: "center",
+    fontWeight: active ? 700 : 400,
+    borderColor: active ? TEAL : LINE,
+    background: active ? "#F1F7FA" : "#fff",
+    color: active ? NAVY : MUTED,
+    fontSize: 14.5,
+    padding: "12px 8px",
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (week) send({ week, hadWhatINeeded, say });
+      }}
+      style={{ display: "grid", gap: 18 }}
+    >
+      <div>
+        <label style={label}>How has your week been?</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          {["Good", "Alright", "Hard", "Very hard"].map((o) => (
+            <button type="button" key={o} onClick={() => setWeek(o)} style={chip(week === o)}>
+              {o}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label style={label}>
+          Did you have what you needed to do your job?
+          <span style={hint}>Stock, people, equipment, information.</span>
+        </label>
+        <div style={{ display: "flex", gap: 8 }}>
+          {["Yes", "Mostly", "No"].map((o) => (
+            <button type="button" key={o} onClick={() => setHad(o)} style={chip(hadWhatINeeded === o)}>
+              {o}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label style={label}>
+          Anything you want to say?
+          <span style={hint}>Optional. Always anonymous.</span>
+        </label>
+        <textarea rows={2} value={say} onChange={(e) => setSay(e.target.value)} style={{ ...field, resize: "vertical" }} />
+      </div>
+
+      {state === "error" && (
+        <p style={{ color: "#B0392B", fontSize: 14, margin: 0 }}>That did not send. Please try again.</p>
+      )}
+      <button type="submit" disabled={state === "sending" || !week} style={{ ...button, opacity: state === "sending" || !week ? 0.5 : 1 }}>
+        {state === "sending" ? "Sending…" : "Send"}
+      </button>
+    </form>
+  );
+}

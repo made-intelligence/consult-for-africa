@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { NearMissForm, WhatsBrokenForm } from "@/components/haven/StaffForms";
+import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/StaffForms";
+import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
+import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
 // The temporary staff page for Haven Paediatric Centre, standing in for the
@@ -91,6 +93,19 @@ const DOCS = [
 export default async function HavenStaffPage() {
   const session = await getStaffSession();
 
+  // The directory is the one thing here that gives rather than asks, and it is
+  // also the reason to sign in. Loaded only for a signed-in person: these are
+  // nineteen colleagues' personal mobiles and they do not belong on a page
+  // anybody with the link can open.
+  let people: DirectoryEntry[] = [];
+  if (session) {
+    people = await prisma.staffMember.findMany({
+      where: { clientId: session.clientId, isActive: true },
+      select: { name: true, position: true, department: true, phone: true },
+      orderBy: { name: "asc" },
+    });
+  }
+
   return (
     <main style={{ background: "#F8FAFC", minHeight: "100vh", fontFamily: "system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" }}>
       <div style={{ background: DEEP, padding: "52px 20px 56px" }}>
@@ -110,8 +125,46 @@ export default async function HavenStaffPage() {
       </div>
 
       <div style={shell}>
+        {session ? (
+          <>
+            <Section
+              eyebrow={`Signed in as ${session.name.split(" ")[0]}`}
+              title="Everyone's number"
+              lead="The whole team, by department, in your pocket. Tap to call."
+            >
+              <StaffDirectory people={people} />
+            </Section>
+
+            <Section
+              eyebrow="Once a week"
+              title="How has your week been?"
+              lead="One tap is a complete answer. We publish how many people answered, and what changed because of it."
+            >
+              <div style={card}>
+                <WeeklyPulse />
+              </div>
+            </Section>
+          </>
+        ) : (
+          <Section
+            eyebrow="Start here"
+            title="Sign in for the staff directory"
+            lead="Everyone's name, role and number, by department, so you are not scrolling WhatsApp at three in the morning looking for whoever is on. Signing in takes one code to your email. There is no password to remember."
+          >
+            <Link
+              href="/HavenStaff/login"
+              style={{ ...card, display: "block", textDecoration: "none", borderLeft: `4px solid ${GOLD}` }}
+            >
+              <div style={{ color: NAVY, fontSize: 17, fontWeight: 700 }}>Sign in</div>
+              <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.6, margin: "6px 0 0" }}>
+                Everything below works without it, and the forms are anonymous either way.
+              </p>
+            </Link>
+          </Section>
+        )}
+
         <Section
-          eyebrow="Start here"
+          eyebrow="The documents"
           title="The two documents"
           lead="Both were handed out at the town hall. The pack is the one worth twenty minutes."
         >
@@ -149,39 +202,6 @@ export default async function HavenStaffPage() {
             <WhatsBrokenForm />
           </div>
         </Section>
-
-        {session ? (
-          <Section
-            eyebrow={`Signed in as ${session.name.split(" ")[0]}`}
-            title="Your area"
-            lead={
-              atLeast(session, "SUPERVISOR")
-                ? "Your unit's numbers, your team's outstanding tasks and the rota will appear here as each one is built."
-                : "Your tasks, your standards and the rota will appear here as each one is built."
-            }
-          >
-            <div style={{ ...card, color: MUTED, fontSize: 15, lineHeight: 1.65 }}>
-              Nothing to show yet. The scoreboard and the standards are being built now, and this is
-              where they will land for you.
-            </div>
-          </Section>
-        ) : (
-          <Section
-            eyebrow="For more"
-            title="Sign in"
-            lead="The documents and both forms above work without signing in, and the forms stay anonymous either way. Signing in is for the things tied to you: your tasks, your rota, your area's numbers."
-          >
-            <Link
-              href="/HavenStaff/login"
-              style={{ ...card, display: "block", textDecoration: "none", borderLeft: `4px solid ${TEAL}` }}
-            >
-              <div style={{ color: NAVY, fontSize: 17, fontWeight: 700 }}>Sign in with your email</div>
-              <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.6, margin: "6px 0 0" }}>
-                We send you a link. There is no password to remember.
-              </p>
-            </Link>
-          </Section>
-        )}
 
         <Section
           eyebrow="Coming here"
