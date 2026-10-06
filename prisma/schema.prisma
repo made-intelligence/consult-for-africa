@@ -7625,6 +7625,12 @@ model StaffLoginToken {
 
   tokenHash String    @unique
   attempts  Int       @default(0)
+  /// Which channel delivered it, and what they were on. Not needed to sign
+  /// anybody in; needed so L2 and L7 in lib/haven-learning.ts can be answered
+  /// with data rather than with an opinion, and neither can be reconstructed
+  /// after the fact.
+  channel   String?
+  userAgent String?
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())

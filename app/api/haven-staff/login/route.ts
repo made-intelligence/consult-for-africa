@@ -98,16 +98,18 @@ export async function POST(req: NextRequest) {
     });
 
     const { code, hash } = newLoginCode(staff.id);
+    const via = await deliver(email, staff.phone, staff.name.split(" ")[0], code);
+
     await prisma.staffLoginToken.create({
       data: {
         staffId: staff.id,
         tokenHash: hash,
         expiresAt: new Date(Date.now() + TOKEN_TTL_MINUTES * 60 * 1000),
+        // Recorded for the learning questions, not for the sign-in itself.
+        channel: via,
+        userAgent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
       },
     });
-
-    const via = await deliver(email, staff.phone, staff.name.split(" ")[0], code);
-    console.log(`[haven-staff/login] code issued via ${via}`);
   } catch (err) {
     // Never leak the reason. A failure here must look the same as success, or
     // the error itself becomes the enumeration oracle.

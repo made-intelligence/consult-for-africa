@@ -42,6 +42,8 @@ CREATE TABLE "StaffLoginToken" (
     "staffId" TEXT NOT NULL,
     "tokenHash" TEXT NOT NULL,
     "attempts" INTEGER NOT NULL DEFAULT 0,
+    "channel" TEXT,
+    "userAgent" TEXT,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "usedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
