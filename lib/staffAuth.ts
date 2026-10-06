@@ -72,15 +72,35 @@ export async function getStaffSession(): Promise<StaffSession | null> {
   return raw ? verifyStaffToken(raw) : null;
 }
 
-/** The raw token goes in the emailed link; only this hash is ever stored. */
-export function hashLoginToken(raw: string) {
-  return crypto.createHash("sha256").update(raw).digest("hex");
+/**
+ * The code is six digits. Links lose here: email clients mangle them, forwards
+ * break them, and they assume the person reads email on the device they will
+ * use the page on. A code can be read on one screen and typed on another, and
+ * everyone already knows the pattern from their bank.
+ *
+ * Six digits is only a million possibilities, so two things carry the weight.
+ * The stored value is an HMAC keyed to the staff member, which means the same
+ * code issued to two people stores differently and a leaked table cannot be
+ * reversed with a precomputed list. And the row dies after MAX_ATTEMPTS, which
+ * is what actually stops a brute force, because no hash choice can.
+ */
+export const MAX_ATTEMPTS = 5;
+
+export function hashLoginCode(staffId: string, code: string) {
+  return crypto.createHmac("sha256", SECRET()).update(`${staffId}:${code}`).digest("hex");
 }
 
-export function newLoginToken() {
-  const raw = crypto.randomBytes(32).toString("base64url");
-  return { raw, hash: hashLoginToken(raw) };
+export function newLoginCode(staffId: string) {
+  // randomInt is uniform. Math.random would bias the low digits.
+  const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
+  return { code, hash: hashLoginCode(staffId, code) };
 }
+
+/**
+ * How the code reaches the person. Email today. SMS slots in here once there is
+ * a provider, and WhatsApp behind that, without touching the routes.
+ */
+export type DeliveryChannel = "EMAIL" | "SMS";
 
 const RANK: Record<StaffSession["tier"], number> = {
   ALL_STAFF: 0,
