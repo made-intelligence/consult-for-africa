@@ -142,11 +142,11 @@ export const LYFE_EVENT = {
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Victoria Island",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
   // Moved with the date. Five clear working days before, which is what a
-  // curated 130-person room needs to be chased properly. Confirm it.
+  // curated 70-person room needs to be chased properly. Confirm it.
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Friday, 16 October",
-  /// Curated rather than conference scale. The number is in the brief, so the
-  /// scarcity line on the page is a fact rather than a device.
-  places: 130,
+  /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
+  /// A real number, so the scarcity line on the page is a fact not a device.
+  places: 70,
   footerLine: "MedLYFE introduces Lyfe Plastics and Dermatology.",
 } as const;
 
