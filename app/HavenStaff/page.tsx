@@ -4,6 +4,8 @@ import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/S
 import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
 import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffLeave";
 import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
+import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
+import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -105,6 +107,9 @@ export default async function HavenStaffPage() {
   let entitlement = 20;
   let notes: NoteRow[] = [];
   let myDepartment = "";
+  let thisWeek: ScoreRow[] = [];
+  let lastWeek: ScoreRow[] = [];
+  const period = isoWeek();
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -144,6 +149,13 @@ export default async function HavenStaffPage() {
       orderBy: { createdAt: "desc" },
       take: 25,
     });
+    const scores = await prisma.scoreboardEntry.findMany({
+      where: { clientId: session.clientId, period: { in: [period, previousWeek(period)] } },
+      select: { measure: true, value: true, movedBy: true, period: true },
+    });
+    thisWeek = scores.filter((s) => s.period === period);
+    lastWeek = scores.filter((s) => s.period !== period);
+
     notes = raw.map((n) => ({
       id: n.id,
       body: n.body,
@@ -209,6 +221,19 @@ export default async function HavenStaffPage() {
               lead="The whole team, by department, in your pocket. Tap to call."
             >
               <StaffDirectory people={people} />
+            </Section>
+
+            <Section
+              eyebrow="How we are doing"
+              title="This week"
+              lead="Six things, counted every week. Where a number moved, what moved it is written underneath."
+            >
+              <Scoreboard
+                thisWeek={thisWeek}
+                lastWeek={lastWeek}
+                canEdit={atLeast(session, "SUPERVISOR")}
+                period={period}
+              />
             </Section>
 
             <Section

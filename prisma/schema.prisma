@@ -525,6 +525,7 @@ model Client {
   staff              StaffMember[]
   staffNotes         StaffNote[]
   protocols          Protocol[]
+  scoreboard         ScoreboardEntry[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7607,6 +7608,7 @@ model StaffMember {
   notes          StaffNote[]         @relation("StaffNotes")
   protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
   observations     ProtocolProgress[] @relation("ProtocolObservations")
+  scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -7846,4 +7848,40 @@ model ProtocolProgress {
 
   @@unique([protocolId, staffId])
   @@index([staffId])
+}
+
+/// One measure, one week, one number, and what moved it.
+///
+/// The whole system is meant to produce a measurable improvement every week. It
+/// cannot, until something is counted every week, and today nothing at Haven is.
+/// Six measures entered by hand beats sixty instrumented next quarter.
+///
+/// `movedBy` is the point. A number that changes and nobody can say why teaches
+/// the team that the scoreboard is weather. A number with "we fixed the reorder
+/// point on the fast movers" against it teaches them it is theirs.
+model ScoreboardEntry {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Stable key, e.g. "discharges-before-noon".
+  measure String
+  /// ISO week, e.g. "2026-W41". Weekly is the cadence a team can feel.
+  period  String
+
+  /// Held as text: some measures are counts, some percentages, one is a streak.
+  /// Parsing them into a number would force a shape onto six things that do not
+  /// share one.
+  value   String
+  /// What we did that moved it. Published to the whole team with the number.
+  movedBy String? @db.Text
+
+  enteredById String?
+  enteredBy   StaffMember? @relation("ScoreboardEntries", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, measure, period])
+  @@index([clientId, period])
 }
