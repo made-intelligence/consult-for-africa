@@ -480,9 +480,9 @@ function Panel() {
           {LYFE_EVENT.panelTitle}
         </h2>
         <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-          The evening opens on the range of what is now possible. The panel then stays with the
-          inner, the metabolic and physical ground everything else is built on, and the fireside
-          turns outward to the face and the body. One argument, carried through the evening.
+          {LYFE_EVENT.panelStandfirst} The evening opens on the range of what is now possible,
+          the panel stays with the inner, and the fireside turns outward to the face and the body.
+          One argument, carried through the evening.
         </p>
       </div>
 

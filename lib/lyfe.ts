@@ -134,6 +134,8 @@ export const LYFE_EVENT = {
     "How modern science is changing the way we look, feel, perform and live as we age.",
   tagline: MEDLYFE_TAGLINE,
   panelTitle: "From Within, Outward",
+  panelStandfirst:
+    "What changes in your body, brain and skin after 40, and what you can actually do about it.",
   sessionTitle: "The Art of Looking Like Yourself",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "6:00 PM",
@@ -170,12 +172,12 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "7:05",
     title: "The panel: From Within, Outward",
-    body: "Thirty minutes on the inner. Metabolism, weight, sleep, energy and physical function, and how far they carry the way we age.",
+    body: "Thirty minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, weight, sleep, energy and physical function, and how far they carry the way we age.",
   },
   {
     time: "7:35",
     title: "Fireside: The Art of Looking Like Yourself",
-    body: "An intimate hosted conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
+    body: "Dr Debo Odulana in conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
   },
   {
     time: "8:00",
@@ -225,6 +227,13 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     portrait: null,
   },
   {
+    seat: "In the chair",
+    subject: "Moderating the panel and the questions from the room",
+    name: "Dr Itunu Akinware",
+    title: "Chief Executive, Medbury Healthcare Group",
+    portrait: null,
+  },
+  {
     seat: "The panel, on the inner",
     subject: "Metabolism, weight, body composition, and the questions the room has about the new drugs",
     name: "Dr Timi Adenuga",
@@ -240,31 +249,25 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "What Nigerian women actually buy in wellness, and what ten years of building it has taught her",
+    subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
     portrait: null,
   },
   {
     seat: "The panel, on the inner",
-    subject: "Sleep, movement and physical function. Staying able bodied, not only looking well",
+    subject: "Sleep, energy and physical function. Staying able bodied, not only looking well",
     name: null,
     title: null,
     portrait: null,
   },
   {
     seat: "The featured fireside, on the outward",
-    subject: "Aesthetics, plastic surgery and looking like yourself",
+    subject:
+      "Aesthetics, plastic surgery and looking like yourself. In conversation with Dr Debo Odulana",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
     portrait: "/lyfe/chinwe-portrait.jpg",
-  },
-  {
-    seat: "In the chair",
-    subject: "Moderating the panel and the questions from the room",
-    name: "Dr Debo Odulana",
-    title: "Founding Partner, Consult for Africa",
-    portrait: null,
   },
 ];
 
