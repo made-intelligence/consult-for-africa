@@ -522,6 +522,7 @@ model Client {
   engagements        Engagement[]
   invoices           Invoice[]
   contacts           ClientContact[]
+  staff              StaffMember[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -7561,4 +7562,59 @@ model LyfeEnquiry {
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+/// A member of a CLIENT's own staff, as against a CFA consultant (User) or a
+/// client's commercial contact (ClientContact). Built for the Haven staff app
+/// but deliberately keyed on clientId rather than hardcoded, because every
+/// transformation engagement needs the same thing.
+model StaffMember {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name       String
+  email      String?
+  phone      String?
+  department String
+  position   String
+
+  /// Governs what this person sees. Mirrors the tiers in lib/haven-playbook.ts.
+  /// Deliberately has no tier for an individual's own assessment result: that
+  /// never reaches a shared surface at all, so it is not a permission.
+  tier StaffTier @default(ALL_STAFF)
+
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+
+  loginTokens StaffLoginToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, email])
+  @@index([clientId, isActive])
+}
+
+enum StaffTier {
+  ALL_STAFF
+  SUPERVISOR
+  LEADERSHIP
+}
+
+/// Single-use sign-in link. No passwords: nineteen people on personal email,
+/// mostly on phones mid-shift, and nobody at the hospital to administer resets.
+/// Only the hash is stored, so a leaked table cannot be used to sign in.
+model StaffLoginToken {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([staffId])
+  @@index([expiresAt])
 }

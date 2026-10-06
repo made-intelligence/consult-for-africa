@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { NearMissForm, WhatsBrokenForm } from "@/components/haven/StaffForms";
+import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
 // The temporary staff page for Haven Paediatric Centre, standing in for the
 // staff app until that exists. Unindexed and unlisted: the link is the control,
@@ -79,7 +81,16 @@ const DOCS = [
   },
 ];
 
-export default function HavenStaffPage() {
+// The documents and both forms are open without signing in, deliberately. The
+// forms are anonymous by default and a sign-in wall in front of them would make
+// that untrue in practice, whatever the form said. Signing in adds what is tied
+// to a person or a tier: their area's numbers, the rota, the standards.
+//
+// Submitting while signed in still attaches no identity. The forms post only
+// what the person typed, and the name field stays optional and blank.
+export default async function HavenStaffPage() {
+  const session = await getStaffSession();
+
   return (
     <main style={{ background: "#F8FAFC", minHeight: "100vh", fontFamily: "system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" }}>
       <div style={{ background: DEEP, padding: "52px 20px 56px" }}>
@@ -138,6 +149,39 @@ export default function HavenStaffPage() {
             <WhatsBrokenForm />
           </div>
         </Section>
+
+        {session ? (
+          <Section
+            eyebrow={`Signed in as ${session.name.split(" ")[0]}`}
+            title="Your area"
+            lead={
+              atLeast(session, "SUPERVISOR")
+                ? "Your unit's numbers, your team's outstanding tasks and the rota will appear here as each one is built."
+                : "Your tasks, your standards and the rota will appear here as each one is built."
+            }
+          >
+            <div style={{ ...card, color: MUTED, fontSize: 15, lineHeight: 1.65 }}>
+              Nothing to show yet. The scoreboard and the standards are being built now, and this is
+              where they will land for you.
+            </div>
+          </Section>
+        ) : (
+          <Section
+            eyebrow="For more"
+            title="Sign in"
+            lead="The documents and both forms above work without signing in, and the forms stay anonymous either way. Signing in is for the things tied to you: your tasks, your rota, your area's numbers."
+          >
+            <Link
+              href="/HavenStaff/login"
+              style={{ ...card, display: "block", textDecoration: "none", borderLeft: `4px solid ${TEAL}` }}
+            >
+              <div style={{ color: NAVY, fontSize: 17, fontWeight: 700 }}>Sign in with your email</div>
+              <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.6, margin: "6px 0 0" }}>
+                We send you a link. There is no password to remember.
+              </p>
+            </Link>
+          </Section>
+        )}
 
         <Section
           eyebrow="Coming here"
