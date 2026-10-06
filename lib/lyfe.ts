@@ -138,8 +138,8 @@ export const LYFE_EVENT = {
     "What changes in your body, brain and skin after 40, and what you can actually do about it.",
   sessionTitle: "The Art of Looking Like Yourself",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
-  arrival: "6:00 PM",
-  programme: "6:45 PM",
+  arrival: "5:30 PM",
+  programme: "6:30 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Victoria Island",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
@@ -155,24 +155,24 @@ export const LYFE_EVENT = {
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
-    time: "6:00",
+    time: "5:30",
     title: "Arrival and cocktails",
     body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:45",
+    time: "6:30",
     title: "Welcome and opening film",
-    body: "Dr Itunu Akinware opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
+    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
   },
   {
-    time: "6:50",
+    time: "6:35",
     title: "The range",
     body: "Dr Adedotun Ajelabi on what modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical.",
   },
   {
-    time: "7:05",
+    time: "6:50",
     title: "The panel: From Within, Outward",
-    body: "Thirty minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, weight, sleep, energy and physical function, and how far they carry the way we age.",
+    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight, sleep, energy and physical function, and how far they carry the way we age.",
   },
   {
     time: "7:35",
@@ -257,6 +257,13 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   {
     seat: "The panel, on the inner",
     subject: "Sleep, energy and physical function. Staying able bodied, not only looking well",
+    name: null,
+    title: null,
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    subject: "Hormones and the midlife transition. What changes, what is worth measuring, and what can be done about it",
     name: null,
     title: null,
     portrait: null,
