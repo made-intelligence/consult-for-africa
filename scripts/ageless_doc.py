@@ -231,6 +231,12 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
 
     while i < len(md):
         line = md[i]
+        # A blank line must never be the thing that opens a page. The guard
+        # below fired on trailing whitespace, which left a final page carrying
+        # nothing but the header and the folio.
+        if not line.strip():
+            i += 1
+            continue
         if y < 110:
             y = new_page()
 
