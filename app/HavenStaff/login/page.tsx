@@ -103,8 +103,8 @@ export default function HavenStaffLogin() {
             <form onSubmit={askForCode}>
               <h2 style={{ color: NAVY, fontSize: 21, margin: 0 }}>Sign in</h2>
               <p style={{ color: MUTED, fontSize: 15.5, lineHeight: 1.65, margin: "10px 0 20px" }}>
-                Put in your email address and we will send you a six-digit code. There is no password
-                to remember.
+                Put in your email address and we will send you a six-digit code, by text message if we
+                have your number, otherwise by email. There is no password to remember.
               </p>
               <input
                 type="email"
@@ -125,7 +125,7 @@ export default function HavenStaffLogin() {
               <h2 style={{ color: NAVY, fontSize: 21, margin: 0 }}>Enter your code</h2>
               <p style={{ color: MUTED, fontSize: 15.5, lineHeight: 1.65, margin: "10px 0 20px" }}>
                 If <strong style={{ color: NAVY }}>{email}</strong> is on the staff list, a six-digit
-                code is on its way to it. It lasts thirty minutes.
+                code is on its way to you, by text message or by email. It lasts thirty minutes.
               </p>
               <input
                 required
@@ -156,7 +156,7 @@ export default function HavenStaffLogin() {
                 </button>
               </div>
               <p style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.6, margin: "18px 0 0" }}>
-                Nothing arrived? Check your spam folder, then ask any of us and we will sort it out.
+                Nothing arrived? Check your texts and your spam folder, then ask any of us and we will sort it out.
               </p>
             </form>
           )}

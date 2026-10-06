@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
 import { newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
+import { sendSMS } from "@/lib/cadreHealth/sms";
 
 // Public endpoint. A staff member gives their email and gets a six-digit code.
 //
@@ -17,13 +18,32 @@ const CLIENT_NAME = "Haven Paediatric Centre";
 const bodySchema = z.object({ email: z.string().email().max(200) });
 
 /**
- * Email today. When there is an SMS provider this gains an "SMS" branch and
- * nothing else in the flow changes: the roster already carries mobile numbers
- * for all nineteen, and in Nigeria SMS beats email for staff who check personal
- * mail at home rather than on shift.
+ * SMS first where we hold a mobile, email behind it.
+ *
+ * In Nigeria SMS beats email for this group: most of the nineteen are on
+ * personal addresses they check at home rather than on shift, and we watched a
+ * mail to this hospital arrive late only today. Termii is already wired for
+ * CadreHealth outreach and normalises 080... to 234... itself.
+ *
+ * sendSMS returns false rather than throwing when TERMII_API_KEY is absent, so
+ * with no key this quietly becomes email-only and nobody is stranded. The
+ * person is told the code may arrive either way, because they typed an email
+ * and a text message would otherwise be a surprise.
  */
-async function deliver(channel: DeliveryChannel, to: string, firstName: string, code: string) {
-  if (channel !== "EMAIL") throw new Error(`No provider wired for ${channel}`);
+async function deliver(to: string, phone: string | null, firstName: string, code: string): Promise<DeliveryChannel> {
+  if (phone) {
+    const sent = await sendSMS(
+      phone,
+      `${code} is your code for the Haven staff page. It lasts ${TOKEN_TTL_MINUTES} minutes. Consult for Africa.`,
+      process.env.TERMII_SENDER_ID_CFA
+    );
+    if (sent) return "SMS";
+  }
+  await sendEmail(to, firstName, code);
+  return "EMAIL";
+}
+
+async function sendEmail(to: string, firstName: string, code: string) {
   await sendTransactionalEmail({
     from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
     replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
@@ -66,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     const staff = await prisma.staffMember.findFirst({
       where: { clientId: client.id, email, isActive: true },
-      select: { id: true, name: true },
+      select: { id: true, name: true, phone: true },
     });
     if (!staff) return NextResponse.json({ ok: true });
 
@@ -86,7 +106,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await deliver("EMAIL", email, staff.name.split(" ")[0], code);
+    const via = await deliver(email, staff.phone, staff.name.split(" ")[0], code);
+    console.log(`[haven-staff/login] code issued via ${via}`);
   } catch (err) {
     // Never leak the reason. A failure here must look the same as success, or
     // the error itself becomes the enumeration oracle.
