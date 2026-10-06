@@ -22,7 +22,7 @@ A few things I want to say plainly up front about the job.
 
 Your role exists because I am the bottleneck. Work reaches me, waits for me, and sometimes dies there, and the cost of that is not visible in any report because nobody writes down the proposal that went out nine days late. The point of this office is to make my attention the scarce thing it actually is and to stop it being the thing everything queues behind. You are not here to tidy my diary. You are here to hold the follow-through for a firm that is carrying more engagements than it has people, and to make sure that a promise made in a meeting in Lagos on Tuesday is still being chased in Abuja on Thursday.
 
-Abigail Oladejo reports to you, not to me. She is a fresh graduate with no consulting background, so everything she is given carries a written brief and a written definition of done, and I expect you to hold that standard even when it is faster to explain something verbally. When she is stuck she marks the work blocked, which comes to you rather than to me. If I find myself reviewing her output directly, something has gone wrong in the chain and I will say so.
+Abigail Oladejo reports to you, not to me. She joined us from university, she is quick and she wants to learn, and she has held this office on her own since she started. Everything she is given carries a written brief, a definition of done and an example of one that is already right, and I expect you to hold that standard even when explaining it verbally would be faster. It is what makes the difference between work that lands and work that has to be done twice, and that is a statement about how we brief rather than about her. When she is stuck she marks the work blocked, which comes to you rather than to me. If I find myself reviewing her output directly, something has gone wrong in the chain and I will say so.
 
 You are based in Abuja and that is deliberate rather than convenient. Our registered working base is in Lifecamp, the largest single piece of work starting this month is in Asokoro, the Medbury campus conversion we have been mandated to set up spans Lagos and Abuja, and the institutional conversations that shape this sector happen in Abuja whether we are in the room or not. Part Four of this pack is the longest part for that reason.
 
@@ -151,7 +151,7 @@ These are not suggestions, they are the standard the office is judged on.
 
 A task goes out with a **brief** explaining why it matters and what it feeds into, and a **definition of done** describing what finished looks like in the assignee's words rather than yours. Neither is written verbally and neither is skipped because the task seems obvious.
 
-Anything new to the assignee gets a **worked example** attached the first time. The reason is on the record. The first office inventory count came back in ten minutes against a three hour estimate with nothing actually recorded, because a definition of done had described a thing the person had never seen.
+Anything new to the assignee gets a **worked example** attached the first time. A definition of done describes a finished thing, and if the person has never seen one, you have described something they can only guess at. The example is what turns the standard from a sentence into something they can match.
 
 A **check in date** is set at the moment of assignment and is not renegotiated later, so a five day task gets a day two conversation instead of a day five surprise.
 
@@ -195,7 +195,7 @@ He often knows the person you are writing to, frequently from Cedarcrest, Everca
 
 ### 2.7 The three month mark
 
-At three months the withheld list gets revisited, which in practice means finance write access and some of the admin surfaces. What earns that is not tenure. It is the review backlog staying empty, the chase register being current, and Abigail's work arriving finished because the briefs she is given are good.
+At three months the withheld list gets revisited, which in practice means finance write access and some of the admin surfaces. What earns that is not tenure. It is the review backlog staying empty, the chase register being current, and work coming back finished because the briefs going out are good.
 
 ---
 
@@ -696,7 +696,7 @@ The list below is already on your desk on the platform as seven tasks, dated acr
 
 - [ ] Get the Medbury division and both House of Refuge strands onto the platform as engagements
 - [ ] Reconcile the Aman engagement figure against the signed commercial
-- [ ] Finish the office inventory count properly, with a worked example written for Abigail first
+- [ ] Get the office inventory count onto the register, writing the worked example first so the standard is visible before the work starts
 - [ ] Fill the missing client contacts: Osteon, Havana, and anywhere else a send would fail
 - [ ] Take over the Monday pack as a reviewed product, not a chased one
 - [ ] Hold the first monthly evaluation with Abigail on the 28th, conversation before the form
@@ -711,7 +711,7 @@ Start preparing meeting packs ahead of the meeting rather than minutes afterward
 
 ### Month three
 
-The withheld access list gets revisited. What earns it is an empty review backlog, a current chase register, and Abigail's work arriving finished because what she was given was good.
+The withheld access list gets revisited. What earns it is an empty review backlog, a current chase register, and work coming back finished because what went out was good.
 
 ---
 

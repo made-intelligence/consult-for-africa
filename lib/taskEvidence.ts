@@ -9,15 +9,25 @@ import { prisma } from "@/lib/prisma";
  * zero assets and zero stock items in the database. Nothing in the product said
  * so, and the person reviewing it would have had to go and look.
  *
- * This is not a pass or fail. It is the one fact the reviewer would otherwise
- * have to go and find, put next to the claim.
+ * This is not a pass or fail, and it is not evidence of absence.
+ *
+ * An empty section has at least three explanations and this cannot tell them
+ * apart: there was nothing to record, it was recorded somewhere else, or it has
+ * not been done. The first version of this treated empty as the third, that
+ * conclusion reached an onboarding pack with a colleague's name attached to it,
+ * and she read it. The count is worth showing. The inference is not ours to
+ * draw, and the copy below says so rather than leaving the reviewer to assume.
  */
 export interface TaskEvidence {
-  /** What we counted, in words the reviewer can act on. */
+  /** What we counted, stated as a count and nothing more. */
   summary: string;
-  /** True when the section shows no sign of the work at all. */
+  /** The section has no new rows. Says nothing about whether the work happened. */
   empty: boolean;
 }
+
+/** Appended wherever the count is zero, so absence never reads as a verdict. */
+const CANNOT_TELL =
+  " That may be because there was nothing to record, because it was captured somewhere other than the platform, or because it is still to do. Ask before you conclude.";
 
 export async function evidenceFor(task: {
   linkedEntityType: string | null;
@@ -40,7 +50,7 @@ export async function evidenceFor(task: {
         empty: total === 0,
         summary:
           total === 0
-            ? "Nothing has been added to the asset register or the stock list since this task was given out."
+            ? "Nothing has been added to the asset register or the stock list since this task was given out." + CANNOT_TELL
             : `${assets} asset${assets === 1 ? "" : "s"} and ${stock} stock item${stock === 1 ? "" : "s"} added since this task was given out.`,
       };
     }
@@ -49,7 +59,7 @@ export async function evidenceFor(task: {
       return {
         empty: n === 0,
         summary: n === 0
-          ? "No commitments have been recorded since this task was given out."
+          ? "No commitments have been recorded since this task was given out." + CANNOT_TELL + ""
           : `${n} commitment${n === 1 ? "" : "s"} recorded since this task was given out.`,
       };
     }
@@ -58,7 +68,7 @@ export async function evidenceFor(task: {
       return {
         empty: n === 0,
         summary: n === 0
-          ? "No decisions have been raised since this task was given out."
+          ? "No decisions have been raised since this task was given out." + CANNOT_TELL + ""
           : `${n} decision${n === 1 ? "" : "s"} raised since this task was given out.`,
       };
     }
@@ -74,7 +84,7 @@ export async function evidenceFor(task: {
       return {
         empty: organised + written === 0,
         summary: organised + written === 0
-          ? "No meetings have been scheduled or written up since this task was given out."
+          ? "No meetings have been scheduled or written up since this task was given out." + CANNOT_TELL
           : `${organised} meeting${organised === 1 ? "" : "s"} scheduled and ${written} written up since this task was given out.`,
       };
     }
@@ -84,7 +94,7 @@ export async function evidenceFor(task: {
       return {
         empty: n === 0,
         summary: n === 0
-          ? "No leads have been added since this task was given out."
+          ? "No leads have been added since this task was given out." + CANNOT_TELL + ""
           : `${n} lead${n === 1 ? "" : "s"} added since this task was given out.`,
       };
     }
@@ -93,7 +103,7 @@ export async function evidenceFor(task: {
       return {
         empty: n === 0,
         summary: n === 0
-          ? "No communications have been logged since this task was given out."
+          ? "No communications have been logged since this task was given out." + CANNOT_TELL + ""
           : `${n} communication${n === 1 ? "" : "s"} logged since this task was given out.`,
       };
     }
