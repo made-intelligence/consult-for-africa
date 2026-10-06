@@ -6,6 +6,7 @@ import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffL
 import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
 import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
 import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
+import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -56,14 +57,16 @@ function Section({
   title,
   lead,
   children,
+  id,
 }: {
   eyebrow: string;
   title: string;
   lead?: string;
   children?: React.ReactNode;
+  id?: string;
 }) {
   return (
-    <section style={{ marginTop: 44 }}>
+    <section id={id} style={{ marginTop: 44, scrollMarginTop: 20 }}>
       <Eyebrow>{eyebrow}</Eyebrow>
       <h2 style={{ color: NAVY, fontSize: 25, lineHeight: 1.2, margin: "8px 0 0", letterSpacing: "-0.01em" }}>{title}</h2>
       {lead && (
@@ -76,12 +79,12 @@ function Section({
 
 const DOCS = [
   {
-    href: "/haven-staff-pack.pdf",
+    href: "/api/haven-staff/doc/staff-pack",
     title: "Welcome to Haven, Again",
     blurb: "The onboarding and reorientation pack. Why everybody is starting again at the same time, what we are trying to achieve, and what changes on your shift.",
   },
   {
-    href: "/haven-town-hall.pdf",
+    href: "/api/haven-staff/doc/town-hall",
     title: "The town hall",
     blurb: "The slides from the staff town hall, so you can go back over any of it.",
   },
@@ -110,6 +113,7 @@ export default async function HavenStaffPage() {
   let thisWeek: ScoreRow[] = [];
   let lastWeek: ScoreRow[] = [];
   const period = isoWeek();
+  let waiting: WaitingItem[] = [];
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -129,6 +133,7 @@ export default async function HavenStaffPage() {
       }),
     ]);
     people = dir;
+    waiting = await whatsWaiting(session);
     entitlement = me?.annualLeaveDays ?? 20;
     myDepartment = me?.department ?? "";
 
@@ -215,8 +220,46 @@ export default async function HavenStaffPage() {
       <div style={shell}>
         {session ? (
           <>
+            <section id="today" style={{ marginTop: 40 }}>
+              <Eyebrow>{`Hello ${session.name.split(" ")[0]}`}</Eyebrow>
+              <h2 style={{ color: NAVY, fontSize: 25, lineHeight: 1.2, margin: "8px 0 0", letterSpacing: "-0.01em" }}>
+                {waiting.length === 0 ? "Nothing is waiting on you" : "Waiting on you"}
+              </h2>
+              {waiting.length === 0 ? (
+                <p style={{ color: MUTED, fontSize: 16, lineHeight: 1.65, margin: "10px 0 0" }}>
+                  Everything is up to date. Have a look at the team notes, or tell us what is broken.
+                </p>
+              ) : (
+                <div style={{ marginTop: 20, display: "grid", gap: 10 }}>
+                  {waiting.map((w, i) => (
+                    <a
+                      key={`${w.kind}-${i}`}
+                      href={w.href}
+                      style={{
+                        ...card,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 14,
+                        textDecoration: "none",
+                        padding: 16,
+                        borderLeft: `4px solid ${w.urgency === "NOW" ? "#B0392B" : w.urgency === "TODAY" ? GOLD : TEAL}`,
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ color: NAVY, fontWeight: 650, fontSize: 15.5 }}>{w.title}</div>
+                        {w.detail && (
+                          <div style={{ color: MUTED, fontSize: 13.5, marginTop: 2 }}>{w.detail}</div>
+                        )}
+                      </div>
+                      <span style={{ color: TEAL, fontSize: 20, flexShrink: 0 }} aria-hidden>&rsaquo;</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </section>
+
             <Section
-              eyebrow={`Signed in as ${session.name.split(" ")[0]}`}
+              eyebrow="The team"
               title="Everyone's number"
               lead="The whole team, by department, in your pocket. Tap to call."
             >
@@ -224,6 +267,7 @@ export default async function HavenStaffPage() {
             </Section>
 
             <Section
+              id="numbers"
               eyebrow="How we are doing"
               title="This week"
               lead="Six things, counted every week. Where a number moved, what moved it is written underneath."
@@ -245,6 +289,7 @@ export default async function HavenStaffPage() {
             </Section>
 
             <Section
+              id="leave"
               eyebrow="Your leave"
               title="Time off"
               lead="Ask from here rather than chasing somebody down a corridor. You will see who else in your area is already off before you pick your dates."
@@ -263,6 +308,7 @@ export default async function HavenStaffPage() {
             )}
 
             <Section
+              id="pulse"
               eyebrow="Once a week"
               title="How has your week been?"
               lead="One tap is a complete answer. We publish how many people answered, and what changed because of it."
