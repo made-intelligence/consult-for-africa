@@ -2,7 +2,7 @@
 
 ## AGELESS, Wednesday 21 October 2026
 
-Fifteen days. Capital Club, Victoria Island. Seventy guests.
+Fifteen days. Capital Club, Lagos. Seventy guests.
 
 PREPARED FOR
 Dr Itunu Akinware and Dr Chinwe Kpaduwa

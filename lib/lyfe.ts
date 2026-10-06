@@ -141,7 +141,7 @@ export const LYFE_EVENT = {
   arrival: "5:30 PM",
   programme: "6:30 PM",
   close: "9:30 PM",
-  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Victoria Island",
+  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
   // Moved with the date. Five clear working days before, which is what a
   // curated 70-person room needs to be chased properly. Confirm it.
@@ -256,7 +256,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Hormones and the midlife transition. What changes, what is worth measuring, and what can be done about it",
+    subject: "Menopause and andropause. What changes in the hormonal system on both sides of midlife, what is worth measuring, and what can be done about it",
     name: null,
     title: null,
     portrait: null,

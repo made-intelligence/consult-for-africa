@@ -15,7 +15,7 @@ AS AT
 
 ## The evening
 
-AGELESS is a cocktail evening at the Capital Club, Victoria Island, on Wednesday 21 October. Arrival at half past five, programme from half past six, close at half past nine. Seventy places.
+AGELESS is a cocktail evening at the Capital Club, Lagos, on Wednesday 21 October. Arrival at half past five, programme from half past six, close at half past nine. Seventy places.
 
 Medlyfe hosts. It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology to a Lagos audience already spending on how they look and feel, through a conversation about ageing rather than a pitch for surgery. Her window in the country sets the date. The evening is built to run again, and this edition carries the format, identity, film library and guest list that later editions inherit.
 
@@ -45,14 +45,14 @@ The programme runs two hours and After Hours needs its full hour, since that is 
 | Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
 | Panel | Gbemi Giwa, the African Fat Loss Method. Food and body composition |
 | Panel | Joycee Awosika, the ORÍKÌ Group. Vitality and energy |
-| Panel | One seat open. Hormones and the midlife transition |
+| Panel | One seat open. Menopause and andropause |
 | Fireside | Dr Chinwe Kpaduwa, in conversation with Dr Debo Odulana |
 
 The panel is experiential rather than clinical, delivered by people with the credentials to be believed on it, and every answer should end in something a guest can act on.
 
 ## What is still open
 
-The last seat. It covers hormones and the midlife transition, which is one of the three strands the room most wants and the one nobody else on the stage holds. A shortlist is in hand. Filling it takes the row to four, the right number for forty five minutes.
+The last seat. It covers menopause and andropause, which is one of the three strands the room most wants and the one nobody else on the stage holds. Taking in andropause rather than menopause alone widens it to the men in the room, and the intention is to fill it with a male physician. A shortlist is in hand. Filling it takes the row to four, the right number for forty five minutes.
 
 Three practical things block the invitations: the Capital Club street address, an RSVP name and direct line, and the Medlyfe logo in vector.
 
