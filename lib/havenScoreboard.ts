@@ -86,3 +86,101 @@ export function movement(current: string, previous?: string) {
   if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
   return Number((a - b).toFixed(1));
 }
+
+/**
+ * The operations manager's weekly inputs. Debo's call: everything weekly.
+ *
+ * These never appear on a staff surface. Entries carry visibility LEADERSHIP,
+ * which the capability map grants LEADERSHIP to enter and LEADERSHIP plus BOARD
+ * to view. Staff hear a revenue figure as a conversation about their pay, and
+ * the six measures above are the ones they can actually move.
+ *
+ * Grounded in what the audit could and could not establish, so entering them is
+ * also how the gaps close. Receivables by payer and claims outcomes were the
+ * two critical items never supplied; once they are entered weekly the recovery
+ * plan can finally be sized.
+ */
+export const FINANCIAL_MEASURES: Measure[] = [
+  {
+    key: "revenue-billed",
+    label: "Revenue billed",
+    howToCount: "Everything invoiced this week, self-pay and insured together.",
+    better: "UP",
+  },
+  {
+    key: "cash-collected",
+    label: "Cash collected",
+    howToCount: "What actually reached the account. Billed and collected are different questions.",
+    better: "UP",
+  },
+  {
+    key: "selfpay-share",
+    label: "Self-pay share of revenue",
+    howToCount: "Self-pay as a percentage of the week's billing. The mix is a decision, not a fact.",
+    better: "UP",
+    suffix: "%",
+  },
+  {
+    key: "receivables-outstanding",
+    label: "Receivables outstanding",
+    howToCount: "Total owed across all payers, after the non-payer lines are stripped out.",
+    better: "DOWN",
+  },
+  {
+    key: "claims-submitted",
+    label: "Claims submitted",
+    howToCount: "Count submitted this week. Late submission is a refusal that has nothing to do with the care.",
+    better: "UP",
+  },
+  {
+    key: "claims-rejected",
+    label: "Claims rejected",
+    howToCount: "Count refused this week, with the reason recorded against each one.",
+    better: "DOWN",
+  },
+  {
+    key: "admissions",
+    label: "Admissions",
+    howToCount: "Paediatric and NICU together.",
+    better: "UP",
+  },
+  {
+    key: "nicu-admissions",
+    label: "NICU admissions",
+    howToCount: "Separately, because it is the highest-yield bed in the building and the growth plan rests on it.",
+    better: "UP",
+  },
+  {
+    key: "pharmacy-stock-value",
+    label: "Pharmacy stock value",
+    howToCount: "Cash standing on the shelf. Falls when consignment lands, not before.",
+    better: "DOWN",
+  },
+  {
+    key: "tariff-lines-priced",
+    label: "Tariff lines priced",
+    howToCount: "Out of 2,413. Started at 461.",
+    better: "UP",
+  },
+];
+
+/**
+ * Payroll is the exception and is asked for monthly rather than weekly. A
+ * weekly payroll figure in a hospital that pays on the twenty-fifth is a
+ * quarter of a number, and entering it four times teaches people the scoreboard
+ * tolerates guesses.
+ */
+export const MONTHLY_MEASURES: Measure[] = [
+  {
+    key: "payroll",
+    label: "Payroll",
+    howToCount: "The month's total cost of employment, not the gross salary bill.",
+    better: "DOWN",
+  },
+];
+
+export const ALL_MEASURES = [...MEASURES, ...FINANCIAL_MEASURES, ...MONTHLY_MEASURES];
+export const ALL_MEASURE_BY_KEY = Object.fromEntries(ALL_MEASURES.map((m) => [m.key, m]));
+export const FINANCIAL_KEYS = new Set(
+  [...FINANCIAL_MEASURES, ...MONTHLY_MEASURES].map((m) => m.key)
+);

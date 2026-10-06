@@ -33,7 +33,7 @@ export interface StaffSession {
   sub: string; // StaffMember id
   clientId: string;
   name: string;
-  tier: "ALL_STAFF" | "SUPERVISOR" | "LEADERSHIP";
+  tier: "ALL_STAFF" | "SUPERVISOR" | "LEADERSHIP" | "BOARD";
 }
 
 export function signStaffJWT(payload: StaffSession): string {
@@ -102,17 +102,87 @@ export function newLoginCode(staffId: string) {
  */
 export type DeliveryChannel = "EMAIL" | "SMS";
 
-const RANK: Record<StaffSession["tier"], number> = {
+export type Tier = StaffSession["tier"];
+
+/**
+ * Capabilities, not a ladder.
+ *
+ * BOARD broke the ladder, and that is the point rather than a nuisance. The
+ * founders sit ABOVE leadership on the hospital's numbers, including the
+ * financials, and BELOW everybody on anything about a named person. A board
+ * that can read the ward's own notes, or see which nurse failed which test,
+ * ends both of those things inside a month: the notes go quiet and the test
+ * becomes something to survive rather than something to learn from.
+ *
+ * So the gate is per capability. Anything else forces a choice between showing
+ * the founders too much and showing them too little.
+ */
+export type Capability =
+  | "READ_DIRECTORY"
+  | "READ_NOTES"
+  | "POST_NOTES"
+  | "REQUEST_LEAVE"
+  | "DECIDE_LEAVE"
+  | "VIEW_SCOREBOARD"
+  | "ENTER_SCOREBOARD"
+  | "VIEW_FINANCIALS"
+  | "ENTER_FINANCIALS"
+  | "SCHEDULE_TRAINING"
+  | "VIEW_COMPETENCY_NAMED"
+  | "VIEW_COMPETENCY_AGGREGATE"
+  | "VIEW_NEAR_MISS_DETAIL";
+
+const GRANTS: Record<Capability, Tier[]> = {
+  READ_DIRECTORY: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP", "BOARD"],
+
+  // Not BOARD. This is the ward talking to itself, and an owner reading over
+  // their shoulder is how it stops being used.
+  READ_NOTES: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP"],
+  POST_NOTES: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP"],
+
+  // The founders are not employees of the hospital in this sense.
+  REQUEST_LEAVE: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP"],
+  DECIDE_LEAVE: ["SUPERVISOR", "LEADERSHIP"],
+
+  VIEW_SCOREBOARD: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP", "BOARD"],
+  ENTER_SCOREBOARD: ["SUPERVISOR", "LEADERSHIP"],
+
+  // Financials are the founders' own business and the operations manager's job
+  // to keep current. They are never on a staff surface: staff hear a revenue
+  // figure as a conversation about their pay.
+  VIEW_FINANCIALS: ["LEADERSHIP", "BOARD"],
+  ENTER_FINANCIALS: ["LEADERSHIP"],
+
+  SCHEDULE_TRAINING: ["SUPERVISOR", "LEADERSHIP"],
+
+  // Named competency stops at the people who have to act on it. The board gets
+  // the shape, never the name.
+  VIEW_COMPETENCY_NAMED: ["SUPERVISOR", "LEADERSHIP"],
+  VIEW_COMPETENCY_AGGREGATE: ["LEADERSHIP", "BOARD"],
+
+  // Detail stops at leadership. The board sees that reports are rising, which
+  // is the number that matters to them, and not who filed what.
+  VIEW_NEAR_MISS_DETAIL: ["LEADERSHIP"],
+};
+
+export function can(session: StaffSession | null, capability: Capability) {
+  return !!session && GRANTS[capability].includes(session.tier);
+}
+
+/**
+ * Kept for the handful of call sites that genuinely mean seniority, and
+ * deliberately excludes BOARD so an owner never inherits an operational
+ * permission by accident.
+ */
+const RANK: Record<Tier, number> = {
   ALL_STAFF: 0,
   SUPERVISOR: 1,
   LEADERSHIP: 2,
+  BOARD: -1,
 };
 
-/**
- * Gate on the server with this, never by hiding a rendered component. A page
- * that renders everything and hides some of it client side has already sent it
- * to the browser, and in a hospital of nineteen somebody will look.
- */
-export function atLeast(session: StaffSession | null, tier: StaffSession["tier"]) {
-  return !!session && RANK[session.tier] >= RANK[tier];
+export function atLeast(session: StaffSession | null, tier: Tier) {
+  if (!session) return false;
+  if (session.tier === "BOARD" || tier === "BOARD") return session.tier === tier;
+  return RANK[session.tier] >= RANK[tier];
 }
