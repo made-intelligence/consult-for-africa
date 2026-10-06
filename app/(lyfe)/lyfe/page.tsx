@@ -174,7 +174,7 @@ function Rule({ color = MB.lime, width = 56 }: { color?: string; width?: number 
   return <div className="h-px" style={{ width, background: color, opacity: 0.75 }} />;
 }
 
-function RsvpButton({ children = "Reserve a place" }: { children?: React.ReactNode }) {
+function RsvpButton({ children = "Register your interest" }: { children?: React.ReactNode }) {
   return (
     <a
       href="?go=rsvp#enquire"
@@ -288,7 +288,8 @@ function Hero() {
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
               <RsvpButton />
               <span className="text-[14px]" style={{ color: MB.greenSoft }}>
-                An intimate evening for {LYFE_EVENT.places}. Kindly reply by {LYFE_EVENT.rsvpBy}.
+                An intimate evening for {LYFE_EVENT.places}. Register your interest by{" "}
+                {LYFE_EVENT.rsvpBy} and we will come back to you.
               </span>
             </div>
 
@@ -582,16 +583,17 @@ function Rsvp({
     <Section bg={MB.green} id="enquire">
       <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
-          <Eyebrow>Reserve a place</Eyebrow>
+          <Eyebrow>Register your interest</Eyebrow>
           <h2
             className="mt-5 text-[30px] leading-[1.14] md:text-[42px]"
             style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
           >
-            We would be glad to have you.
+            We would be glad to consider you.
           </h2>
           <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-            A member of the team will call to confirm you personally, and the address follows your
-            reply. Kindly let us know by {LYFE_EVENT.rsvpBy}.
+            The room holds {LYFE_EVENT.places}, which is fewer than the number of people who
+            would like to be in it. Tell us you are interested and we will come back to you either
+            way. An invitation carries a link of your own, and your place is held when you use it.
           </p>
 
           <div className="mt-9">
@@ -618,7 +620,7 @@ function Rsvp({
             </a>{" "}
             or{" "}
             <a
-              href={whatsappLink(`Hello, I would like to RSVP to the evening on ${LYFE_EVENT.date}.`)}
+              href={whatsappLink(`Hello, I would like to register my interest in the evening on ${LYFE_EVENT.date}.`)}
               className="font-semibold underline underline-offset-4"
               style={{ color: MB.limeSoft }}
             >

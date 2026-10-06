@@ -3,6 +3,9 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { LYFE_EVENT } from "@/lib/lyfe";
+import { emailLyfeInvitation } from "@/lib/lyfeEmail";
+import { randomBytes } from "crypto";
 
 /**
  * The coordinator's write endpoint.
@@ -16,7 +19,10 @@ import { handler } from "@/lib/api-handler";
 const ALLOWED_ROLES = ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"];
 
 const schema = z.object({
-  action: z.enum(["LOG_CONTACT", "UPDATE"]),
+  action: z.enum(["LOG_CONTACT", "UPDATE", "SEND_INVITE", "SET_STAGE"]),
+  eventStage: z
+    .enum(["INTERESTED", "INVITED", "CONFIRMED", "DECLINED", "WAITLIST", "ATTENDED", "NO_SHOW"])
+    .optional(),
   status: z
     .enum([
       "NEW",
@@ -58,7 +64,16 @@ export const PATCH = handler(async function PATCH(
 
   const existing = await prisma.lyfeEnquiry.findUnique({
     where: { id },
-    select: { id: true, firstContactedAt: true, coordinatorNotes: true, contactAttempts: true },
+    select: {
+      id: true,
+      firstContactedAt: true,
+      coordinatorNotes: true,
+      contactAttempts: true,
+      fullName: true,
+      email: true,
+      eventStage: true,
+      inviteToken: true,
+    },
   });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -72,6 +87,46 @@ export const PATCH = handler(async function PATCH(
     update.lastContactedAt = now;
     update.contactAttempts = existing.contactAttempts + 1;
     if (!data.status) update.status = "CONTACTED";
+  }
+
+  // Sending the invitation is the only action here that reaches a guest, so it
+  // refuses rather than guesses: a full room is a decision for a person, not
+  // something to be discovered after the email has gone.
+  if (data.action === "SEND_INVITE") {
+    const rows = await prisma.lyfeEnquiry.findMany({
+      where: { eventStage: { in: ["CONFIRMED", "ATTENDED"] } },
+      select: { guestCount: true },
+    });
+    const confirmed = rows.reduce((n, r) => n + 1 + (r.guestCount ?? 0), 0);
+    if (confirmed >= LYFE_EVENT.places && existing.eventStage !== "INVITED") {
+      return NextResponse.json(
+        { error: `The room is full at ${confirmed} of ${LYFE_EVENT.places}. Release a place or use the waiting list.` },
+        { status: 409 },
+      );
+    }
+
+    const token = existing.inviteToken ?? randomBytes(18).toString("base64url");
+    const firstName = existing.fullName.trim().split(/\s+/)[0] ?? existing.fullName;
+    try {
+      await emailLyfeInvitation({
+        to: existing.email,
+        firstName,
+        token,
+        from: session.user.name ?? null,
+      });
+    } catch (err) {
+      console.error("[lyfe-enquiries] invitation failed:", err);
+      return NextResponse.json({ error: "The invitation did not send." }, { status: 502 });
+    }
+    update.inviteToken = token;
+    update.invitedAt = now;
+    update.eventStage = "INVITED";
+  }
+
+  if (data.action === "SET_STAGE" && data.eventStage) {
+    update.eventStage = data.eventStage;
+    if (data.eventStage === "CONFIRMED") update.confirmedAt = now;
+    if (data.eventStage === "DECLINED") update.declinedAt = now;
   }
 
   if (data.status) update.status = data.status;
@@ -97,6 +152,9 @@ export const PATCH = handler(async function PATCH(
     select: {
       id: true,
       status: true,
+      eventStage: true,
+      invitedAt: true,
+      confirmedAt: true,
       firstContactedAt: true,
       lastContactedAt: true,
       contactAttempts: true,

@@ -8,6 +8,7 @@ import {
   FORMAT_LABELS,
   PATHWAY_LABELS,
   SOURCE_LABELS,
+  LYFE_STAGE_LABELS,
   STATUS_LABELS,
   TIMING_LABELS,
   waitingLabel,
@@ -18,7 +19,10 @@ export interface Row {
   fullName: string;
   email: string;
   phone: string;
-  intent: "EVENT_RSVP" | "DISCOVERY_CALL";
+  intent: "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL";
+  /** "Tuesday 13 October, 11:00 WAT", or null for anything that is not a consultation. */
+  slotLabel: string | null;
+  paid: boolean;
   guestCount: number | null;
   isClinician: boolean | null;
   pathway: keyof typeof PATHWAY_LABELS;
@@ -31,6 +35,9 @@ export interface Row {
   source: keyof typeof SOURCE_LABELS;
   sourceDetail: string | null;
   status: keyof typeof STATUS_LABELS;
+  /** Event guests only. Where they stand with the room, not with the call. */
+  eventStage: keyof typeof LYFE_STAGE_LABELS | null;
+  invitedAtLabel: string | null;
   contactAttempts: number;
   waitingMinutes: number;
   createdAtLabel: string;
@@ -40,6 +47,16 @@ export interface Row {
   ownerName: string | null;
   screening: { label: string; value: string }[];
 }
+
+const STAGE_ORDER = [
+  "INTERESTED",
+  "INVITED",
+  "CONFIRMED",
+  "DECLINED",
+  "WAITLIST",
+  "ATTENDED",
+  "NO_SHOW",
+] as const;
 
 const STATUS_ORDER: (keyof typeof STATUS_LABELS)[] = [
   "NEW",
@@ -103,7 +120,11 @@ function EnquiryRow({
   // rather than pending.
   const late = untouched && row.waitingMinutes > 60;
 
-  const send = async (action: "LOG_CONTACT" | "UPDATE") => {
+  const [stage, setStage] = useState<string>(row.eventStage ?? "INTERESTED");
+
+  const send = async (
+    action: "LOG_CONTACT" | "UPDATE" | "SEND_INVITE" | "SET_STAGE",
+  ) => {
     setBusy(true);
     setError(null);
     try {
@@ -113,6 +134,7 @@ function EnquiryRow({
         body: JSON.stringify({
           action,
           status: action === "UPDATE" ? status : undefined,
+          eventStage: action === "SET_STAGE" ? stage : undefined,
           note: note.trim() || null,
           nextAction: nextAction.trim() || null,
           nextActionAt: nextActionAt ? new Date(nextActionAt).toISOString() : null,
@@ -149,7 +171,9 @@ function EnquiryRow({
         <span className="min-w-[180px] flex-1 text-xs text-slate-600">
           {row.intent === "EVENT_RSVP"
             ? `Coming to the evening${row.guestCount ? `, bringing ${row.guestCount}` : ", on their own"}`
-            : PATHWAY_LABELS[row.pathway]}
+            : row.slotLabel
+              ? row.slotLabel
+              : PATHWAY_LABELS[row.pathway]}
         </span>
         <span className="min-w-[120px] text-xs text-slate-500">
           {row.intent === "EVENT_RSVP"
@@ -160,6 +184,18 @@ function EnquiryRow({
               ? TIMING_LABELS[row.timing]
               : ""}
         </span>
+        {row.intent === "CONSULTATION" && (
+          <span
+            className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+            style={
+              row.paid
+                ? { background: "#ECFDF5", color: "#065F46" }
+                : { background: "#FFFBEB", color: "#92400E" }
+            }
+          >
+            {row.paid ? "Paid" : "Unpaid"}
+          </span>
+        )}
         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
           {STATUS_LABELS[row.status]}
         </span>
@@ -208,6 +244,12 @@ function EnquiryRow({
                   <Fact k="Wants" v={row.concerns.map((c) => CONCERN_LABELS[c]).join(", ") || "Not said"} />
                 )}
                 <Fact k="Based" v={BASED_LABELS[row.based]} />
+                {row.intent === "CONSULTATION" && (
+                  <>
+                    <Fact k="Her diary" v={row.slotLabel ?? "No time held"} />
+                    <Fact k="Fee" v={row.paid ? "Paid in full" : "Not paid, so not booked"} />
+                  </>
+                )}
                 {row.intent === "DISCOVERY_CALL" && <Fact k="Consultation" v={FORMAT_LABELS[row.format]} />}
                 <Fact
                   k="Found us"
@@ -283,6 +325,52 @@ function EnquiryRow({
                   />
                 </label>
               </div>
+
+              {row.intent === "EVENT_RSVP" && (
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50/60 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                    The room
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={busy || row.eventStage === "CONFIRMED"}
+                      onClick={() => send("SEND_INVITE")}
+                      className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      {row.eventStage === "INVITED" ? "Send the invitation again" : "Send the invitation"}
+                    </button>
+                    <select
+                      value={stage}
+                      onChange={(e) => setStage(e.target.value)}
+                      className="rounded-lg border border-emerald-300 bg-white p-2 text-xs"
+                    >
+                      {STAGE_ORDER.map((st) => (
+                        <option key={st} value={st}>
+                          {LYFE_STAGE_LABELS[st]}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => send("SET_STAGE")}
+                      className="rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-semibold text-emerald-800 disabled:opacity-50"
+                    >
+                      Set by hand
+                    </button>
+                    {row.invitedAtLabel && (
+                      <span className="text-[11px] text-emerald-800">
+                        Invited {row.invitedAtLabel}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-[11px] leading-snug text-emerald-900/70">
+                    The invitation carries a link of their own. A place is filled when they use it,
+                    not when it is sent.
+                  </p>
+                </div>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button

@@ -35,6 +35,14 @@ enum TaskStatus {
   CANCELLED
 }
 
+/// What happened to a task. Exactly two things can happen to a live one: it
+/// changes state, or it changes hands. RAISED is the row that opens the trail.
+enum TaskEventKind {
+  RAISED
+  STATUS
+  REASSIGNED
+}
+
 /// A commitment is not a task. A task is work we hold; a commitment is a promise
 /// somebody made, and the person who made it is often not ours to assign to.
 enum CommitmentStatus {
@@ -397,10 +405,12 @@ model User {
   sourceApplicationId      String? // TalentApplication ID that created this ACADEMY_LEARNER account
 
   // Delegation task board
-  tasksAssigned         Task[]         @relation("TaskAssignee")
-  tasksRaised           Task[]         @relation("TaskAssigner")
-  taskQuestionsAsked    TaskQuestion[] @relation("TaskQuestionsAsked")
-  taskQuestionsAnswered TaskQuestion[] @relation("TaskQuestionsAnswered")
+  tasksAssigned         Task[]           @relation("TaskAssignee")
+  tasksRaised           Task[]           @relation("TaskAssigner")
+  taskQuestionsAsked    TaskQuestion[]   @relation("TaskQuestionsAsked")
+  taskQuestionsAnswered TaskQuestion[]   @relation("TaskQuestionsAnswered")
+  taskAttachments       TaskAttachment[] @relation("TaskAttachmentUploader")
+  taskEvents            TaskEvent[]      @relation("TaskEventActor")
 
   // Office of the Founding Partner
   commitmentsOwed        Commitment[]      @relation("CommitmentOwner")
@@ -2957,12 +2967,20 @@ model Task {
   recurringTaskId String?
   recurringTask   RecurringTask? @relation(fields: [recurringTaskId], references: [id], onDelete: SetNull)
 
+  /// What the assignee says they are handing over, written at the moment of
+  /// submitting. Sits next to the attachments rather than in a comment thread,
+  /// because the reviewer should not have to read a conversation to find out
+  /// what they are being asked to judge.
+  handoverNote String? @db.Text
+
   submittedAt DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  questions TaskQuestion[]
+  questions   TaskQuestion[]
+  attachments TaskAttachment[]
+  events      TaskEvent[]
 
   @@index([assigneeId, status])
   @@index([assignerId, status])
@@ -2971,6 +2989,69 @@ model Task {
   @@index([parentTaskId])
   @@index([linkedEntityType, linkedEntityId])
   @@index([recurringTaskId])
+}
+
+/// What the assignee is actually handing over.
+///
+/// Submitting used to record a timestamp and nothing else. The reviewer was
+/// asked to sign off work they could not see, so "submitted" came to mean
+/// "trust me" and signing off came to mean "I believe you". The first inventory
+/// count came back in ten minutes against a three hour estimate and there was
+/// nothing on the record to look at.
+model TaskAttachment {
+  id     String @id @default(cuid())
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  /// What it is called in the list: the filename, or what the link points at.
+  label String
+
+  /// Exactly one of these is set. A file the firm holds, or a pointer to where
+  /// the work actually lives, because a shared folder is still an answer.
+  fileKey String?
+  url     String?
+
+  contentType String?
+  sizeBytes   Int?
+
+  uploadedById String
+  uploadedBy   User   @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}
+
+/// One row per move, carrying the one note that move required.
+///
+/// The status columns say where a task is now. They cannot say it was sent back
+/// twice, who cleared the block, or what the reviewer said the first time. A
+/// task that bounced three times and one that landed first time read
+/// identically on the board, which threw away the only thing worth knowing
+/// about how a working relationship is going.
+model TaskEvent {
+  id     String @id @default(cuid())
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  kind TaskEventKind @default(STATUS)
+
+  /// Null where there is no previous state to leave, and on a change of hands.
+  fromStatus TaskStatus?
+  toStatus   TaskStatus?
+
+  /// The note the move required. Blocking says what is in the way, sending back
+  /// says what to change, handing over says what is being handed over,
+  /// cancelling says why, signing off says what was good. One note per move, so
+  /// no column ever has to carry two meanings at once.
+  note String? @db.Text
+
+  actorId String
+  actor   User   @relation("TaskEventActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId, createdAt])
 }
 
 // ─── Office of the Founding Partner ──────────────────────────────────────────
@@ -7422,6 +7503,11 @@ model EstateRateChange {
 /// March campaign lost a hundred and seventy names.
 enum LyfeIntent {
   EVENT_RSVP
+  /// A paid half hour with Dr Kpaduwa, by video, in her Tuesday and Wednesday
+  /// diary. It replaced the free discovery call, which was easy to say yes to
+  /// and just as easy to forget.
+  CONSULTATION
+  /// Retired October 2026. Kept so the rows that used it still read.
   DISCOVERY_CALL
 }
 
@@ -7498,6 +7584,27 @@ enum LyfeSource {
 /// The coordinator's queue, not a marketing funnel. NEW means nobody has
 /// spoken to this person yet, and the dashboard counts how long that has been
 /// true.
+/// Where a guest stands with the room, which is separate from where the
+/// coordinator stands with the conversation. A person can be CONFIRMED for the
+/// evening and still be NEW on LyfeStatus, because nobody has rung them yet.
+enum LyfeEventStage {
+  /// Signified interest through the page. Costs them nothing and promises
+  /// them nothing.
+  INTERESTED
+  /// Chosen, and sent an invitation carrying a confirmation link.
+  INVITED
+  /// Confirmed they are coming. The only stage that fills a place.
+  CONFIRMED
+  /// Said no, or confirmed and then withdrew. Releases the place.
+  DECLINED
+  /// Interested and wanted, but the room was full when we got to them.
+  WAITLIST
+  /// Through the door on the night.
+  ATTENDED
+  /// Confirmed and did not come. Worth knowing before edition two.
+  NO_SHOW
+}
+
 enum LyfeStatus {
   NEW
   CONTACTED
@@ -7545,6 +7652,18 @@ model LyfeEnquiry {
   goal  String? @db.Text
   notes String? @db.Text
 
+  /// The half hour they asked for, as an instant. Consultations only.
+  slotAt DateTime?
+
+  /// Paystack. A consultation is not booked until it is paid for, so the diary
+  /// is held by `paidAt` and nothing else. A unique index on the slot, applied
+  /// only to paid rows, is what actually stops two people buying the same half
+  /// hour; it lives in the migration because Prisma cannot express a partial
+  /// unique index.
+  paymentRef String?   @unique
+  paidAt     DateTime?
+  amountKobo Int?
+
   source       LyfeSource @default(OTHER)
   /// The specific person, post, search term or event behind the source above.
   sourceDetail String?
@@ -7552,6 +7671,16 @@ model LyfeEnquiry {
   utmMedium    String?
   utmCampaign  String?
   sourcePath   String?
+
+  /// The room holds seventy, so interest and attendance are two different
+  /// things. A guest signifies interest through the page, the team chooses who
+  /// is invited, and the invitation carries a link only that person can use to
+  /// confirm. Only CONFIRMED counts against the seventy.
+  eventStage  LyfeEventStage?
+  inviteToken String?         @unique
+  invitedAt   DateTime?
+  confirmedAt DateTime?
+  declinedAt  DateTime?
 
   status           LyfeStatus @default(NEW)
   /// Set the moment somebody actually speaks to them. The gap between
@@ -7577,6 +7706,7 @@ model LyfeEnquiry {
   updatedAt DateTime @updatedAt
 
   @@index([status, createdAt])
+  @@index([eventStage, createdAt])
   @@index([intent, status])
   @@index([pathway, status])
   @@index([email])

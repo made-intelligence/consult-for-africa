@@ -4,10 +4,14 @@ import {
   CONCERN_LABELS,
   FORMAT_LABELS,
   LYFE_BRAND,
+  LYFE_CONSULT,
   LYFE_CONTACT_EMAIL,
   LYFE_EVENT,
   LYFE_EVENT_TAKEAWAY,
+  LYFE_EVENT_THEME,
+  lyfeConfirmUrl,
   LYFE_NAME,
+  LYFE_SURGEON,
   MEDLYFE_BRAND,
   LYFE_PHONE_DISPLAY,
   NICOTINE_LABELS,
@@ -63,7 +67,7 @@ function layout(content: string, preheader: string): string {
 
 type PathwayKey = keyof typeof PATHWAY_LABELS;
 
-type Intent = "EVENT_RSVP" | "DISCOVERY_CALL";
+type Intent = "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL";
 
 export interface LyfeConfirmationInput {
   to: string;
@@ -71,6 +75,18 @@ export interface LyfeConfirmationInput {
   intent: Intent;
   surgical: boolean;
   guestCount: number | null;
+  slotAt?: Date | null;
+}
+
+/** "Tuesday 13 October, 11:00 WAT", from an instant, in Lagos time. */
+export function slotLabel(slotAt: Date): string {
+  const lagos = new Date(slotAt.getTime() + 3600_000);
+  const day = lagos.toLocaleDateString("en-GB", {
+    weekday: "long", day: "numeric", month: "long", timeZone: "UTC",
+  });
+  const hh = String(lagos.getUTCHours()).padStart(2, "0");
+  const mm = String(lagos.getUTCMinutes()).padStart(2, "0");
+  return `${day}, ${hh}:${mm} WAT`;
 }
 
 /**
@@ -85,15 +101,44 @@ export async function emailLyfeConfirmation({
   intent,
   surgical,
   guestCount,
+  slotAt,
 }: LyfeConfirmationInput): Promise<void> {
+  // Asked for, not yet paid for. Saying "booked" here would be a lie that the
+  // person discovers on the Tuesday, so this says exactly what is true: the
+  // time is held while they finish paying, and not a minute longer.
+  if (intent === "CONSULTATION") {
+    const when = slotAt ? slotLabel(slotAt) : "the time you chose";
+    const html = layout(
+      `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+       <p style="margin:0 0 14px;">Thank you. You have asked for half an hour with ${esc(LYFE_SURGEON.name)}, by video, on <strong>${esc(when)}</strong>.</p>
+       <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+         <tr><td style="background:${LYFE_BRAND.greenTint};border-left:3px solid ${LYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.ink};">
+           The time is yours once the ${esc(LYFE_CONSULT.feeDisplay)} is paid. Her diary is ${esc(LYFE_CONSULT.dayNames.toLowerCase())}, ${esc(LYFE_CONSULT.hoursDisplay)}, so there are only ${LYFE_CONSULT.perWeek} of these in a week and we cannot hold one open.
+           <br><br>
+           ${esc(LYFE_CONSULT.redeemable)}
+         </td></tr>
+       </table>
+       <p style="margin:0 0 14px;">If the payment did not go through, reply to this note and we will send you the link again. If you would rather pay by transfer, say so and we will send the account.</p>
+       <p style="margin:0 0 14px;">Before the call, it helps to have thought about one thing: what it is you would like to be different. You do not need photographs and you do not need to have decided anything.</p>
+       <p style="margin:0 0 6px;">With kind regards,</p>
+       <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
+      `Your half hour with ${LYFE_SURGEON.name} on ${when}.`,
+    );
+    await notifyInternal(to, `Your consultation, ${esc(firstName)}`, html);
+    return;
+  }
+
+  // Interest, not a place. Seventy seats and an open form means most of the
+  // people who fill it in cannot be told yes, and the kind thing is to be
+  // straight about that in the first sentence rather than in the third email.
   if (intent === "EVENT_RSVP") {
     const plusOne = guestCount && guestCount > 0
-      ? `<p style="margin:0 0 14px;">We have you down for ${guestCount === 1 ? "one guest" : `${guestCount} guests`} as well. If that changes, reply and tell us.</p>`
+      ? `<p style="margin:0 0 14px;">You have asked to bring ${guestCount === 1 ? "one guest" : `${guestCount} guests`}, and that is noted against your name.</p>`
       : "";
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you. You are on the list for the evening at ${esc(LYFE_EVENT.host)}, with ${esc(LYFE_EVENT.withWhom)}, and we are glad you are coming.</p>
+       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening at ${esc(LYFE_EVENT.host)} with ${esc(LYFE_EVENT.withWhom)}.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -105,15 +150,13 @@ export async function emailLyfeConfirmation({
            ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">A member of the team will call you to confirm personally. The evening opens with an introduction to what Medlyfe has built across wellness and aesthetics, then a conversation about how wellbeing, longevity, confidence and appearance connect, and then Dr Kpaduwa leads a conversation titled &ldquo;${esc(LYFE_EVENT.sessionTitle)}&rdquo;.</p>
-       <p style="margin:0 0 14px;">There will be plenty of time for questions, conversation and cocktails, and the clinical team is in the room throughout if you would like to speak to somebody personally.</p>
-       <p style="margin:0 0 14px;">Every guest goes home with a short printed piece, &ldquo;${esc(LYFE_EVENT_TAKEAWAY)}&rdquo;. It is useful whether or not you ever come to us.</p>
-       <p style="margin:0 0 14px;">If you would rather speak to somebody before the evening, reply to this note and we will arrange a call.</p>
+       <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places}, which is fewer than the number of people who would like to be in it. Invitations go out from this list, and you will hear from us either way. If you are invited, the note will carry a link of your own to confirm your place.</p>
+       <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
        <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
-      `You are on the list for ${LYFE_EVENT.date}.`,
+      `Your interest in ${LYFE_EVENT_THEME} is registered.`,
     );
-    await notifyInternal(to, `You are on the list, ${esc(firstName)}`, html);
+    await notifyInternal(to, `Thank you for your interest, ${esc(firstName)}`, html);
     return;
   }
 
@@ -142,6 +185,7 @@ export async function emailLyfeConfirmation({
 
 export interface LyfeInternalInput {
   to: string | string[];
+  slotAt?: Date | null;
   id: string;
   fullName: string;
   email: string;
@@ -235,9 +279,138 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
 
   await notifyInternal(
     input.to,
-    `${rsvp ? "RSVP: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
+    `${rsvp ? "RSVP: " : input.intent === "CONSULTATION" ? "CONSULTATION: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
     html,
   );
 }
 
 export { LYFE_CONTACT_EMAIL };
+
+
+/**
+ * Sent when Paystack says the money arrived, and only then.
+ *
+ * The earlier note said the time was held while she paid. This is the one that
+ * says it is hers, so it has to carry the three things a person actually needs
+ * on the day: when, how to join, and what to have thought about.
+ */
+export async function emailLyfeConsultationConfirmed({
+  to,
+  firstName,
+  slotAt,
+}: {
+  to: string;
+  firstName: string;
+  slotAt: Date | null;
+}): Promise<void> {
+  const when = slotAt ? slotLabel(slotAt) : null;
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">That is paid and your consultation with ${esc(LYFE_SURGEON.name)} is booked.</p>
+     ${
+       when
+         ? `<table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+         <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:15px;line-height:1.8;color:#FFFFFF;">
+           <strong style="font-size:18px;">${esc(when)}</strong><br>
+           <span style="color:${MEDLYFE_BRAND.limeSoft};">Thirty minutes, by video. We send the link the day before.</span>
+         </td></tr>
+       </table>`
+         : `<p style="margin:0 0 14px;">The half hour you chose had just gone when your payment landed, so a coordinator will call you today to find another time that works. Nothing is lost and nothing more is owed.</p>`
+     }
+     <p style="margin:0 0 14px;">Come with one thing in mind: what you would like to be different. You do not need photographs, you do not need to have decided anything, and you will not be sold to on the call.</p>
+     <p style="margin:0 0 14px;">${esc(LYFE_CONSULT.redeemable)}</p>
+     <p style="margin:0 0 14px;">If you need to move it, reply to this note or call ${esc(LYFE_PHONE_DISPLAY)}. Please give us a day's notice if you can, because the diary is only ${LYFE_CONSULT.perWeek} of these a week.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
+    when ? `Booked: ${when} with ${LYFE_SURGEON.name}.` : "Your consultation is paid for.",
+  );
+  await notifyInternal(to, when ? `Booked, ${esc(firstName)}: ${esc(when)}` : `Your consultation, ${esc(firstName)}`, html);
+}
+
+/**
+ * The invitation. This is the note that offers a place, so it is the only one
+ * that carries a link, and the link is the person. Nothing here says "click to
+ * RSVP" generically, because a forwarded generic link is exactly how a room
+ * built for seventy ends up with ninety people at the door.
+ */
+export async function emailLyfeInvitation({
+  to,
+  firstName,
+  token,
+  from,
+}: {
+  to: string;
+  firstName: string;
+  token: string;
+  from?: string | null;
+}): Promise<void> {
+  const url = lyfeConfirmUrl(token);
+  const signature = from?.trim() || `The team at ${LYFE_NAME}`;
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">We would like you to join us for ${esc(LYFE_EVENT_THEME)}, an evening hosted by ${esc(LYFE_EVENT.host)} with ${esc(LYFE_EVENT.withWhom)}.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <strong style="font-size:18px;">${esc(LYFE_EVENT.proposition)}</strong><br>
+         <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.standfirst)}</span>
+         <br><br>
+         <strong>${esc(LYFE_EVENT.date)}</strong><br>
+         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+         ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
+       </td></tr>
+     </table>
+     <p style="margin:0 0 20px;">This invitation is yours and the link below belongs to it. Please confirm so we know to keep your place, and tell us there if you are bringing anybody.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};">
+         <a href="${url}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Confirm your place</a>
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${url}" style="color:${MEDLYFE_BRAND.green};">${esc(url)}</a></p>
+     <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places}, so if the evening turns out not to suit you, saying so lets us offer the place to somebody else. There is no awkwardness in it.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
+    `An invitation to ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
+  );
+
+  await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
+}
+
+/** Sent the moment somebody confirms, so they have the details in writing. */
+export async function emailLyfeAttendanceConfirmed({
+  to,
+  firstName,
+  guestCount,
+}: {
+  to: string;
+  firstName: string;
+  guestCount: number | null;
+}): Promise<void> {
+  const plusOne = guestCount && guestCount > 0
+    ? `<p style="margin:0 0 14px;">We have you down for ${guestCount === 1 ? "one guest" : `${guestCount} guests`} as well. If that changes, reply and tell us.</p>`
+    : "";
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Your place is held. Thank you, and we look forward to seeing you.</p>
+     ${plusOne}
+     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <strong style="font-size:17px;">${esc(LYFE_EVENT_THEME)}</strong><br>
+         <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.standfirst)}</span>
+         <br><br>
+         <strong>${esc(LYFE_EVENT.date)}</strong><br>
+         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+         ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;">The evening opens with an address on what modern medicine can now do about the way we age, then a panel, then a conversation with ${esc(LYFE_SURGEON.name)} titled &ldquo;${esc(LYFE_EVENT.sessionTitle)}&rdquo;. The clinical team is in the room throughout if you would like to speak to somebody personally.</p>
+     <p style="margin:0 0 14px;">Every guest goes home with a short printed piece, &ldquo;${esc(LYFE_EVENT_TAKEAWAY)}&rdquo;.</p>
+     <p style="margin:0 0 14px;">If your plans change, reply to this note. Releasing a place is genuinely helpful rather than a nuisance.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
+    `Your place at ${LYFE_EVENT_THEME} is held.`,
+  );
+
+  await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
+}

@@ -4,9 +4,11 @@ import { prisma } from "@/lib/prisma";
 import {
   NICOTINE_LABELS,
   WEIGHT_TREND_LABELS,
+  lyfeHeadcount,
   minutesWaiting,
   waitingLabel,
 } from "@/lib/lyfe";
+import { slotLabel } from "@/lib/lyfeEmail";
 import Queue, { type Row } from "./Queue";
 
 export const dynamic = "force-dynamic";
@@ -70,7 +72,9 @@ export default async function LyfeEnquiriesPage() {
   // The evening is its own number, because a room that is half full on the
   // Thursday is a different problem from a diary that is half full.
   const rsvps = entries.filter((e) => e.intent === "EVENT_RSVP");
-  const heads = rsvps.reduce((n, e) => n + 1 + (e.guestCount ?? 0), 0);
+  const count = lyfeHeadcount(rsvps);
+  const interested = rsvps.filter((e) => e.eventStage === "INTERESTED").length;
+  const waitlist = rsvps.filter((e) => e.eventStage === "WAITLIST").length;
   const clinicians = rsvps.filter((e) => e.isClinician).length;
 
   const rows: Row[] = [...entries]
@@ -92,6 +96,8 @@ export default async function LyfeEnquiriesPage() {
       email: e.email,
       phone: e.phone,
       intent: e.intent,
+      slotLabel: e.slotAt ? slotLabel(e.slotAt) : null,
+      paid: !!e.paidAt,
       guestCount: e.guestCount,
       isClinician: e.isClinician,
       pathway: e.pathway,
@@ -104,6 +110,15 @@ export default async function LyfeEnquiriesPage() {
       source: e.source,
       sourceDetail: e.sourceDetail,
       status: e.status,
+      eventStage: e.eventStage,
+      invitedAtLabel: e.invitedAt
+        ? e.invitedAt.toLocaleString("en-GB", {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : null,
       contactAttempts: e.contactAttempts,
       waitingMinutes: minutesWaiting(e.createdAt, e.firstContactedAt),
       createdAtLabel: e.createdAt.toLocaleString("en-GB", {
@@ -174,9 +189,15 @@ export default async function LyfeEnquiriesPage() {
           detail={`${booked} of ${entries.length}. Benchmark 20 to 35`}
         />
         <Stat
-          label="Coming to the evening"
-          value={String(heads)}
-          detail={`${rsvps.length} replies, ${clinicians} clinicians`}
+          label="Places held"
+          value={`${count.confirmed} of ${count.places}`}
+          detail={`${count.invitedAwaiting} invited and silent, ${clinicians} clinicians`}
+          alarm={count.confirmed > count.places}
+        />
+        <Stat
+          label="Interested, not yet invited"
+          value={String(interested)}
+          detail={waitlist ? `${waitlist} on the waiting list` : `${count.remaining} places left`}
         />
       </div>
 

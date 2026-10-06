@@ -7,8 +7,11 @@ import {
   FORMAT_LABELS,
   LYFE_BRAND as C,
   LYFE_CONSENT_TEXT,
+  LYFE_CONSULT,
+  LYFE_CONSULT_SCHEDULE,
   LYFE_DOORS,
   LYFE_EVENT,
+  type ConsultSlot,
   NICOTINE_LABELS,
   PATHWAY_LABELS,
   SOURCE_LABELS,
@@ -21,7 +24,7 @@ import {
 /**
  * Two doors, and the shorter one is on the left.
  *
- * An RSVP is three fields and a plus one, because saying yes to an evening
+ * Registering interest is three fields and a plus one, because saying yes to an evening
  * should cost nothing. The discovery call is stepped: HubSpot's analysis across
  * 40,000+ customers puts peak conversion at three form fields with the sharpest
  * drop at the fourth, and the documented answer for anything longer is a
@@ -33,7 +36,7 @@ import {
  * her weight would be both rude and pointless.
  */
 
-type Intent = "EVENT_RSVP" | "DISCOVERY_CALL";
+type Intent = "EVENT_RSVP" | "CONSULTATION";
 type Pathway = "AESTHETIC" | "SURGICAL" | "UNSURE";
 type Concern = keyof typeof CONCERN_LABELS;
 type Timing = keyof typeof TIMING_LABELS;
@@ -59,12 +62,15 @@ const SOURCE_OPTIONS: Source[] = [
 export default function EnquiryForm({
   utm,
   initialIntent,
+  slots,
 }: {
   utm: { source: string | null; medium: string | null; campaign: string | null };
   initialIntent: Intent | null;
+  slots: ConsultSlot[];
 }) {
   const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
-  const [step, setStep] = useState(initialIntent === "DISCOVERY_CALL" ? 1 : 2);
+  const [step, setStep] = useState(initialIntent === "CONSULTATION" ? 1 : 2);
+  const [slotAt, setSlotAt] = useState<string>("");
   const [pathway, setPathway] = useState<Pathway | "">("");
   const [concerns, setConcerns] = useState<Concern[]>([]);
   const [timing, setTiming] = useState<Timing | "">("");
@@ -99,7 +105,7 @@ export default function EnquiryForm({
   useEffect(() => {
     if (!initialIntent) return;
     setIntent(initialIntent);
-    setStep(initialIntent === "DISCOVERY_CALL" ? 1 : 2);
+    setStep(initialIntent === "CONSULTATION" ? 1 : 2);
   }, [initialIntent]);
 
   const toggleConcern = (c: Concern) =>
@@ -113,6 +119,7 @@ export default function EnquiryForm({
     if (!phone.trim()) return setError("We need a number we can call or message.");
     if (!email.trim()) return setError("Please give us an email as well.");
     if (!rsvp && !timing) return setError("Please tell us roughly when you are thinking about this.");
+    if (!rsvp && !slotAt) return setError("Please choose a time in Dr Kpaduwa's diary.");
     if (!source) return setError("Please tell us how you found us. It genuinely helps.");
     if (!consent) return setError("We need your agreement before we can hold your details.");
 
@@ -126,6 +133,7 @@ export default function EnquiryForm({
           email: email.trim(),
           phone: phone.trim(),
           intent,
+          slotAt: rsvp ? null : slotAt,
           guestCount: rsvp ? guestCount : null,
           isClinician: rsvp ? isClinician : null,
           pathway: rsvp ? "UNSURE" : pathway || "UNSURE",
@@ -151,6 +159,14 @@ export default function EnquiryForm({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
+      // A consultation is not booked until it is paid for, so the browser goes
+      // straight to Paystack rather than showing a success card for something
+      // that has not happened. Staying on this page to say "well done" and then
+      // asking for money is how a checkout loses people.
+      if (data.payUrl) {
+        window.location.href = data.payUrl;
+        return;
+      }
       setDone(intent);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -172,16 +188,16 @@ export default function EnquiryForm({
           </svg>
         </div>
         <h3 className="mt-5 text-xl font-semibold" style={{ color: C.ink }}>
-          {done === "EVENT_RSVP" ? `You are on the list, ${firstName}` : `Thank you, ${firstName}`}
+          {done === "EVENT_RSVP" ? `Thank you, ${firstName}` : `Thank you, ${firstName}`}
         </h3>
         <p className="mt-3 leading-relaxed" style={{ color: C.body }}>
           {done === "EVENT_RSVP"
-            ? `A member of the team will call to confirm you personally before ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
+            ? `Your interest is registered. The room holds ${LYFE_EVENT.places} and invitations go out from this list, so you will hear from us either way before ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
             : "A coordinator will call you shortly. If you would rather not wait for the phone to ring, message us and we will pick it up straight away."}
         </p>
         <a
           href={whatsappLink(
-            `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "RSVP'd to the evening" : "asked for a discovery call"} through your website.`,
+            `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "registered my interest in the evening" : "booked a consultation"} through your website.`,
           )}
           className="mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
           style={{ background: MB.greenDeep, color: "#FFFFFF" }}
@@ -221,15 +237,41 @@ export default function EnquiryForm({
         ) : null}
       </div>
 
-      {/* Discovery call, step one: what it is about */}
+      {/* Consultation, step one: the time, then what it is about */}
       {!rsvp && step === 1 && (
         <>
-          <Head>What are you thinking about?</Head>
+          <Head>Choose your half hour</Head>
           <p className="mt-2.5 text-sm leading-relaxed" style={{ color: C.body }}>
-            Rough is fine. The call exists to work it out.
+            {LYFE_CONSULT_SCHEDULE}. These are the times still open.
           </p>
 
-          <div className="mt-5 grid gap-2.5">
+          {slots.length === 0 ? (
+            <p
+              className="mt-5 rounded-xl px-4 py-4 text-sm leading-relaxed"
+              style={{ background: C.greenTint, color: C.ink }}
+            >
+              Her diary is full for the next three weeks. Message us on WhatsApp and we will
+              tell you the moment the next one opens.
+            </p>
+          ) : (
+            <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+              {slots.slice(0, 8).map((slot) => (
+                <Choice
+                  key={slot.iso}
+                  checked={slotAt === slot.iso}
+                  onSelect={() => setSlotAt(slot.iso)}
+                  label={`${slot.day}, ${slot.time}`}
+                />
+              ))}
+            </div>
+          )}
+
+          <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: C.muted }}>
+            {LYFE_CONSULT.feeDisplay} for {LYFE_CONSULT.minutes} minutes. {LYFE_CONSULT.redeemable}
+          </p>
+
+          <Legend className="mt-7">What are you thinking about?</Legend>
+          <div className="grid gap-2.5">
             {(["AESTHETIC", "SURGICAL", "UNSURE"] as Pathway[]).map((pv) => (
               <Choice key={pv} checked={pathway === pv} onSelect={() => setPathway(pv)} label={PATHWAY_LABELS[pv]} />
             ))}
@@ -252,6 +294,7 @@ export default function EnquiryForm({
           <button
             type="button"
             onClick={() => {
+              if (!slotAt) return setError("Please choose a time in her diary.");
               if (!pathway) return setError("Please choose one, even roughly.");
               if (!timing) return setError("Please tell us roughly when you are thinking about this.");
               setError(null);
@@ -436,7 +479,11 @@ export default function EnquiryForm({
             className="mt-6 w-full rounded-xl py-4 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
             style={{ background: MB.greenDeep, color: "#FFFFFF" }}
           >
-            {submitting ? "Sending..." : rsvp ? "Confirm my place" : "Book my discovery call"}
+            {submitting
+              ? "Sending..."
+              : rsvp
+                ? "Confirm my place"
+                : `Pay ${LYFE_CONSULT.feeDisplay} and book it`}
           </button>
           <p className="mt-3 text-center text-[11px] leading-relaxed" style={{ color: C.muted }}>
             We will never sell or share your details, and you can ask us to delete them at any time.
@@ -448,7 +495,7 @@ export default function EnquiryForm({
               onClick={() => {
                 setError(null);
                 if (rsvp) {
-                  setIntent("DISCOVERY_CALL");
+                  setIntent("CONSULTATION");
                   setStep(1);
                 } else {
                   setIntent("EVENT_RSVP");
@@ -459,7 +506,7 @@ export default function EnquiryForm({
               style={{ color: MB.greenDeep }}
             >
               {rsvp
-                ? "I cannot make the evening. Book me a call instead"
+                ? `I would rather consult Dr Kpaduwa directly, ${LYFE_CONSULT.feeDisplay}`
                 : "Actually, I would like to come to the evening"}
             </button>
           </div>

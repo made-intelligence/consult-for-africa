@@ -209,6 +209,56 @@ export const LYFE_EVENT_PROGRAMME = [
  * Fill a seat by giving it a name, a title and optionally a portrait in
  * /public/lyfe. Anything without a name renders as a placeholder.
  */
+/**
+ * The guest funnel.
+ *
+ * Seventy places and an open form are not compatible, because the form cannot
+ * tell the difference between the person you built the evening for and the
+ * person who saw a link. So interest is open and cheap, the team chooses who
+ * is invited, and the invitation carries a link that only its recipient can
+ * use. A place is filled by a confirmation and by nothing else.
+ */
+export const LYFE_STAGE_LABELS: Record<string, string> = {
+  INTERESTED: "Interested",
+  INVITED: "Invited, awaiting reply",
+  CONFIRMED: "Confirmed",
+  DECLINED: "Declined",
+  WAITLIST: "Waiting list",
+  ATTENDED: "Attended",
+  NO_SHOW: "Did not come",
+};
+
+/** Stages that occupy a place in the room. */
+export const LYFE_STAGES_HOLDING_A_PLACE = ["CONFIRMED", "ATTENDED"] as const;
+
+/**
+ * Heads in the room, counting the guests people bring. An invitation that has
+ * been sent and not answered is deliberately not counted here: holding places
+ * for silence is how a room ends up half empty with a closed list.
+ */
+export function lyfeHeadcount(
+  rows: { eventStage: string | null; guestCount: number | null }[],
+): { confirmed: number; invitedAwaiting: number; places: number; remaining: number } {
+  const heads = (r: { guestCount: number | null }) => 1 + (r.guestCount ?? 0);
+  const confirmed = rows
+    .filter((r) => r.eventStage && (LYFE_STAGES_HOLDING_A_PLACE as readonly string[]).includes(r.eventStage))
+    .reduce((n, r) => n + heads(r), 0);
+  const invitedAwaiting = rows
+    .filter((r) => r.eventStage === "INVITED")
+    .reduce((n, r) => n + heads(r), 0);
+  return {
+    confirmed,
+    invitedAwaiting,
+    places: LYFE_EVENT.places,
+    remaining: Math.max(0, LYFE_EVENT.places - confirmed),
+  };
+}
+
+export function lyfeConfirmUrl(token: string): string {
+  const base = process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com";
+  return `${base.replace(/\/$/, "")}/lyfe/confirm/${token}`;
+}
+
 export interface LyfePanelSeat {
   seat: string;
   subject: string;
@@ -496,8 +546,8 @@ export const LYFE_DOORS = {
     short: "An evening on how you feel and how you look, and why those are the same appointment",
     blurb:
       "An invitation to a conversation rather than a sales floor. A panel, a conversation with Dr Kpaduwa under her own title, the full menu said out loud, and questions from the room. You can book a consultation on the night if you want one, and nobody will mind if you do not.",
-    cta: "RSVP to the evening",
-    note: "By invitation. Numbers are limited and the address goes to confirmed guests.",
+    cta: "Register your interest",
+    note: "By invitation. The room holds seventy, invitations are sent from this list, and the address goes to confirmed guests.",
   },
   CONSULTATION: {
     label: "Consult Dr Kpaduwa",
