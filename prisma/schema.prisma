@@ -7565,9 +7565,18 @@ model LyfeEnquiry {
 }
 
 /// A member of a CLIENT's own staff, as against a CFA consultant (User) or a
-/// client's commercial contact (ClientContact). Built for the Haven staff app
-/// but deliberately keyed on clientId rather than hardcoded, because every
-/// transformation engagement needs the same thing.
+/// client's commercial contact (ClientContact).
+///
+/// TEMPORARY, AND NOT THE CANONICAL STAFF MODEL. The real staff app is being
+/// built by Matthew into the Mezo Suite and HospitlOS, in their own codebases.
+/// This exists only so the nineteen at Haven have somewhere to sign in during
+/// the transformation, and it is expected to be superseded.
+///
+/// So: do not grow it into a product, and do not let a second client's needs
+/// shape it. What has to survive is the DATA, not this surface. Keep anything
+/// collected here exportable, and agree the shape with Matthew before adding
+/// fields, so what the hospital enters lands in HospitlOS rather than being
+/// re-keyed.
 model StaffMember {
   id       String @id @default(cuid())
   clientId String
