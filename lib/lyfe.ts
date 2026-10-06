@@ -115,7 +115,7 @@ export const LYFE_EVENT_THEME = "Ageless";
 /**
  * AGELESS, from the event brief.
  *
- * A recurring MedLYFE platform rather than a one-off launch, so the naming is
+ * A recurring Medlyfe platform rather than a one-off launch, so the naming is
  * layered: AGELESS is the platform, "A New Era of Health, Beauty and
  * Longevity" is the proposition, "From Within, Outward" is the main panel,
  * and "The Art of Looking Like Yourself" is the featured fireside. Keeping
@@ -149,7 +149,7 @@ export const LYFE_EVENT = {
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
   places: 70,
-  footerLine: "MedLYFE introduces Lyfe Plastics and Dermatology.",
+  footerLine: "Medlyfe introduces Lyfe Plastics and Dermatology.",
 } as const;
 
 /** The run of show, with the times from the brief. */
@@ -223,7 +223,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject:
       "The range. What modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical",
     name: "Dr Adedotun Ajelabi",
-    title: "MedLYFE",
+    title: "Clinical Lead, Medlyfe",
     portrait: null,
   },
   {

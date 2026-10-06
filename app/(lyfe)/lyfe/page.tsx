@@ -25,7 +25,7 @@ import StickyRsvp from "./StickyRsvp";
 export const metadata: Metadata = {
   title: "Ageless",
   description:
-    "Ageless: a new era of health, beauty and longevity. An evening at MedLYFE with Dr Chinwe Kpaduwa, MD FACS, on Thursday 15 October 2026, on how modern science is changing the way we look, feel, perform and live as we age.",
+    "Ageless: a new era of health, beauty and longevity. An evening at Medlyfe with Dr Chinwe Kpaduwa, MD FACS, on Thursday 15 October 2026, on how modern science is changing the way we look, feel, perform and live as we age.",
 };
 
 /**
