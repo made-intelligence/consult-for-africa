@@ -20,6 +20,19 @@ export const ADVANCE_LIVE = false;
 export const ADVANCE_RATE = 0.6;
 export const ADVANCE_HOURS = 48;
 
+/**
+ * The funding partner's discount. One time, not monthly, and deducted at
+ * disbursement rather than recovered out of the payor's settlement.
+ *
+ * Carbon buys the vetted claim at a discount and pays within the window. The
+ * hospital pays once, knows the number before it accepts, and owes nothing
+ * further however long the payor then takes. That last part is what makes it
+ * sellable: the hospital is buying certainty, and the risk of a payor going
+ * slow stops being theirs.
+ */
+export const DISCOUNT_LOW = 0.04;
+export const DISCOUNT_HIGH = 0.05;
+
 /** The conversion offer: a free review of a sample of claims. */
 export const SAMPLE_SIZE = 20;
 
@@ -44,7 +57,7 @@ export const OLDEST_UNPAID = [
 ] as const;
 
 export type CheckInput = {
-  /** What the hospital bills health plans, corporates and schemes in a month. */
+  /** What the hospital bills payors, corporates and schemes in a month. */
   monthlyBilled: number;
   /** Average days from submitting a claim to the money arriving. */
   daysToPay: number;
@@ -59,8 +72,18 @@ export type CheckResult = {
   inDispute: number;
   /** Released for good by getting paid 30 days faster. */
   per30Days: number;
-  /** What an early payment against vetted claims could look like. */
+  /**
+   * The gross advance against vetted claims, before the funding partner's
+   * discount. The discount comes off at disbursement, so the hospital
+   * receives less than this and the label has to say so.
+   */
   earlyPayment: number;
+  /** What the discount costs over the expected wait, at both ends of the range. */
+  discountLow: number;
+  discountHigh: number;
+  /** What actually lands, after the discount is deducted at disbursement. */
+  netLow: number;
+  netHigh: number;
 };
 
 /**
@@ -73,11 +96,20 @@ export function check({ monthlyBilled, daysToPay, queriedPct }: CheckInput): Che
   const q = Math.min(100, Math.max(0, queriedPct)) / 100;
   const outstanding = (m * d) / 30;
   const inDispute = outstanding * q;
+  const advance = (outstanding - inDispute) * ADVANCE_RATE;
+  // One time, taken off the disbursement. It does not grow with how long the
+  // payor takes, which is the whole point of it.
+  const discountLow = advance * DISCOUNT_LOW;
+  const discountHigh = advance * DISCOUNT_HIGH;
   return {
     outstanding,
     inDispute,
     per30Days: d > 30 ? m : (m * d) / 30,
-    earlyPayment: (outstanding - inDispute) * ADVANCE_RATE,
+    earlyPayment: advance,
+    discountLow,
+    discountHigh,
+    netLow: Math.max(0, advance - discountHigh),
+    netHigh: Math.max(0, advance - discountLow),
   };
 }
 

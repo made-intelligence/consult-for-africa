@@ -19,7 +19,7 @@ export interface Row {
   fullName: string;
   email: string;
   phone: string;
-  intent: "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL";
+  intent: "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL" | "FACILITY_VISIT";
   /** "Tuesday 13 October, 11:00 WAT", or null for anything that is not a consultation. */
   slotLabel: string | null;
   paid: boolean;

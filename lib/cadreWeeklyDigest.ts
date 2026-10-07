@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { greetingFor } from "@/lib/cadreSalutation";
 import { nextCatalystEvent, type DfcCatalystEvent } from "@/lib/cadreHealth/dfcCatalystEvents";
+
+/** She leaves in November, and the slot removes itself when she does. */
+const LYFE_REFERRALS_CLOSE = new Date("2026-11-03T00:00:00+01:00");
 import { randomBytes } from "crypto";
 import type { CadreDigestAsk } from "@prisma/client";
 
@@ -145,6 +148,8 @@ export interface WeekContext {
   showcase: DigestShowcase | null;
   /** The next DFC Catalyst session, or null when there is none to announce. */
   catalyst: DfcCatalystEvent | null;
+  /** True while Dr Kpaduwa is still in the country and taking referrals. */
+  referralsOpen: boolean;
   /**
    * Emails that have already answered the Medipark survey, so nobody is asked
    * twice. Only the respondents who opted in on Q16 gave us an email, so a
@@ -167,6 +172,7 @@ export interface CadreDigestContent {
   onlyYou: { kind: string; label: string; headline: string; detail: string; ctaLabel: string; href: string; tone: "URGENT" | "NEUTRAL" | "GOOD" };
   ask: { ask: CadreDigestAsk; label: string; headline: string; detail: string; ctaLabel: string; href: string; done: boolean };
   catalyst: { headline: string; detail: string; ctaLabel: string; href: string } | null;
+  referral: { headline: string; detail: string; ctaLabel: string; href: string } | null;
   medipark: { headline: string; detail: string; ctaLabel: string; href: string } | null;
   prize: { won: boolean; headline: string; detail: string; ctaLabel: string; href: string };
   showcase: DigestShowcase | null;
@@ -466,6 +472,7 @@ export async function buildWeekContext(
     mezoReady,
     showcase,
     catalyst: nextCatalystEvent(now),
+    referralsOpen: now.getTime() < LYFE_REFERRALS_CLOSE.getTime(),
     mediparkAnswered,
     awards,
     awardsIssued: awards.size,
@@ -884,6 +891,24 @@ function buildCatalyst(ctx: WeekContext): CadreDigestContent["catalyst"] {
   };
 }
 
+/**
+ * A colleague taking referrals, for as long as that is true.
+ *
+ * It drops itself the day she leaves rather than waiting for somebody to
+ * remember, because a digest that keeps offering a surgeon who has flown home
+ * is worse than one that never mentioned her.
+ */
+function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
+  if (!ctx.referralsOpen) return null;
+  return {
+    headline: "A board certified plastic surgeon in Lagos, taking referrals until early November",
+    detail:
+      "Dr Chinwe Kpaduwa is board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons, both publicly verifiable. Body after childbirth, breast surgery including reduction and reconstruction, facial work, and the keloid and scarring cases that are common here and poorly served. If an operation is not the right answer she says so.",
+    ctaLabel: "Refer someone, or speak to her yourself",
+    href: "https://www.consultforafrica.com/lyfe/consult?src=doctor",
+  };
+}
+
 /** Slot 4. Five a week, earned. Scarcity is the point. */
 function buildPrize(p: DigestRecipient, ctx: WeekContext): CadreDigestContent["prize"] {
   const award = ctx.awards.get(p.id);
@@ -918,6 +943,7 @@ export function buildDigestForProfessional(p: DigestRecipient, ctx: WeekContext)
     onlyYou: buildOnlyYou(p, ctx),
     ask: buildAsk(p, ctx),
     catalyst: buildCatalyst(ctx),
+    referral: buildReferral(ctx),
     medipark: buildMedipark(p, ctx),
     prize: buildPrize(p, ctx),
     showcase: ctx.showcase,
@@ -999,6 +1025,9 @@ export function renderDigestHtml(
     ...(d.catalyst
       ? [block(TONES.CATALYST, "DFC Catalyst Series", d.catalyst.headline, d.catalyst.detail, d.catalyst.ctaLabel, abs(baseUrl, d.catalyst.href))]
       : []),
+    ...(d.referral
+      ? [block(TONES.GOOD, "For your patients", d.referral.headline, d.referral.detail, d.referral.ctaLabel, abs(baseUrl, d.referral.href))]
+      : []),
     block(TONES.PRIZE, d.prize.won ? "Yours this week" : "Five a week", d.prize.headline, d.prize.detail, d.prize.ctaLabel, abs(baseUrl, d.prize.href)),
   ];
 
@@ -1020,6 +1049,7 @@ export function renderDigestHtml(
     `${d.ask.label.toUpperCase()}: ${endSentence(d.ask.headline)} ${d.ask.detail} ${abs(baseUrl, d.ask.href)}`,
     ...(d.medipark ? [`HELP US DESIGN IT: ${d.medipark.headline} ${d.medipark.detail} ${abs(baseUrl, d.medipark.href)}`] : []),
     ...(d.catalyst ? [`DFC CATALYST SERIES: ${d.catalyst.headline}. ${d.catalyst.detail} ${abs(baseUrl, d.catalyst.href)}`] : []),
+    ...(d.referral ? [`FOR YOUR PATIENTS: ${d.referral.headline}. ${d.referral.detail} ${abs(baseUrl, d.referral.href)}`] : []),
     `${d.prize.headline}. ${d.prize.detail} ${abs(baseUrl, d.prize.href)}`,
     ...(d.showcase ? [`${d.showcase.kind === "MEMBER" ? "MEMBER OF THE WEEK" : "SPECIALTY SPOTLIGHT"}: ${d.showcase.headline}. ${d.showcase.detail} ${abs(baseUrl, d.showcase.href)}`] : []),
   ];

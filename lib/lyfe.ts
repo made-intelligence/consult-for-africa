@@ -311,17 +311,17 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    // Her subject is blank on purpose. Her Doctors for Change record carries
-    // no bio, specialty or institution, so writing a line for her would be
-    // inventing one. It fills in the moment she replies.
-    subject: "",
+    // Taken from her own DFC Catalyst billing in this repo, where she spoke in
+    // September. She is the hormones seat the panel was missing.
+    subject:
+      "Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring",
     name: "Dr Folake Kofo-Idowu",
-    title: "Vice President, Doctors for Change",
+    title: "Founder and Medical Director of Nelia. Double board certified physician",
     portrait: null,
   },
   {
     seat: "The panel, on the inner",
-    subject: "Menopause and andropause. What changes in the hormonal system on both sides of midlife, what is worth measuring, and what can be done about it",
+    subject: "Andropause and men's health at midlife. The half of this conversation men never get invited to",
     name: null,
     title: null,
     portrait: null,
@@ -462,12 +462,11 @@ export const LYFE_CONSULT = {
   blurb:
     "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
   /**
-   * Not a deposit. It was written as credited against treatment, which was
-   * wrong, and a false money claim on a live page is worth fixing fast even
-   * though it costs the easiest objection handler on the offer.
+   * Dr Kpaduwa's own wording. Note the narrowing: it goes towards surgery, not
+   * towards any treatment. A non-surgical course does not carry the credit,
+   * and saying "treatment" would quietly promise that it does.
    */
-  feeNote:
-    "A consultation fee for half an hour of her time, not a deposit against treatment.",
+  feeNote: "Put towards the total cost of your surgery if you go ahead.",
   note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
 } as const;
 
@@ -896,7 +895,7 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What does the consultation cost, and is it wasted if I do not proceed?",
-    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. It is a consultation fee rather than a deposit, so it is not credited against treatment. What you are buying is half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
+    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. If you go on to have surgery, it is put towards the total. If you do not, you have bought half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
   },
   {
     q: "Is she really board certified?",
@@ -913,7 +912,7 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
   { stat: "ABPS", line: "Board certified by the American Board of Plastic Surgery" },
   { stat: "FACS", line: "Fellow of the American College of Surgeons" },
   { stat: `${LYFE_CONSULT.perWeek} a week`, line: "Half hours in her diary, and no more than that" },
-  { stat: "Her, not a coordinator", line: "Thirty minutes with the surgeon who would operate" },
+  { stat: "Towards surgery", line: "The fee goes to the total if you go ahead with an operation" },
 ];
 
 /**
@@ -939,6 +938,46 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
     name: "Medbury Healthcare",
     role: "The group",
-    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre and the Medbury and Alameda Specialist Care and Tourism Centre, and is led by its chief executive Dr Itunu Akinware.",
+    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
   },
 ];
+
+/**
+ * The facility tour.
+ *
+ * Dr Kpaduwa goes to the doctors rather than waiting for their patients. A
+ * referral from a colleague is the highest trust route into a surgical
+ * practice and the shortest, because the patient has already decided to trust
+ * the person who suggested it.
+ *
+ * The form is five fields. A consultant filling this in between clinics will
+ * not finish eight.
+ */
+export const LYFE_VISIT = {
+  /** Named in the register doctors already use. A round is a thing they do. */
+  name: "Facility Rounds",
+  areas: ["Lekki Phase 1", "Lekki, elsewhere", "Victoria Island", "Ikoyi", "Somewhere else in Lagos"],
+  roles: [
+    "Medical Director or Owner",
+    "Consultant",
+    "General Practitioner",
+    "Practice or Facility Manager",
+    "Other",
+  ],
+  minutes: 30,
+  /** What she actually does on a visit, so nobody expects a sales call. */
+  whatHappens: [
+    {
+      t: "She comes to you",
+      b: "At your facility, at a time that suits your list. Thirty minutes, or longer if you want to walk her round.",
+    },
+    {
+      t: "A real clinical conversation",
+      b: "What she does, what she will not do, how she assesses, and where the line sits between what you can manage and what needs an operation.",
+    },
+    {
+      t: "A referral route that works both ways",
+      b: "A named contact, a number that is answered, and your patient comes back to you with a letter. If she thinks surgery is wrong for them, you hear that too.",
+    },
+  ],
+} as const;

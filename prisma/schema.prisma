@@ -7522,6 +7522,10 @@ enum LyfeIntent {
   CONSULTATION
   /// Retired October 2026. Kept so the rows that used it still read.
   DISCOVERY_CALL
+  /// A clinician asking Dr Kpaduwa to visit their facility in Lekki or VI.
+  /// Referral building, so it is a different conversation and a different
+  /// queue from a patient enquiry.
+  FACILITY_VISIT
 }
 
 enum LyfePathway {
@@ -7648,6 +7652,11 @@ model LyfeEnquiry {
   /// up from the guests in the room.
   guestCount  Int?
   isClinician Boolean?
+
+  /// Facility visits only. Who they are and where to go.
+  facilityName String?
+  facilityArea String?
+  clinicianRole String?
 
   pathway    LyfePathway   @default(UNSURE)
   concerns   LyfeConcern[]

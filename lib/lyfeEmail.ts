@@ -67,7 +67,7 @@ function layout(content: string, preheader: string): string {
 
 type PathwayKey = keyof typeof PATHWAY_LABELS;
 
-type Intent = "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL";
+type Intent = "EVENT_RSVP" | "CONSULTATION" | "DISCOVERY_CALL" | "FACILITY_VISIT";
 
 export interface LyfeConfirmationInput {
   to: string;
