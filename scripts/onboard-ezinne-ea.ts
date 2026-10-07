@@ -159,7 +159,7 @@ async function main() {
     prisma.user.findUnique({ where: { email: AA_EMAIL }, select: { id: true, name: true } }),
   ]);
   if (!ea) throw new Error(`No account for ${EA_EMAIL}. Run scripts/invite-office-staff.ts first.`);
-  if (ea.role !== "EXECUTIVE_ASSISTANT") throw new Error(`${EA_EMAIL} is ${ea.role}, not EXECUTIVE_ASSISTANT.`);
+  if (ea.role !== "EXECUTIVE_ASSISTANT" && ea.role !== "ADMIN") throw new Error(`${EA_EMAIL} is ${ea.role}, not EXECUTIVE_ASSISTANT or ADMIN.`);
   if (!partner) throw new Error(`No account for ${PARTNER_EMAIL}.`);
   if (!aa) throw new Error(`No account for ${AA_EMAIL}.`);
 
