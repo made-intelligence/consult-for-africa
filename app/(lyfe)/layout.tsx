@@ -39,6 +39,13 @@ export const metadata: Metadata = {
     description:
       "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. A consultation that will tell you when the answer is no.",
   },
+  // The root layout declares icons explicitly, and an explicit declaration
+  // beats the icon file convention in a child segment, which is why the mark
+  // was sitting in the tree doing nothing. Stated here, it wins back.
+  icons: {
+    icon: [{ url: "/lyfe-icon.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/lyfe-icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function LyfeLayout({ children }: { children: React.ReactNode }) {
