@@ -11,38 +11,38 @@ import { ADVANCE_HOURS, ADVANCE_LIVE, ADVANCE_RATE, SAMPLE_SIZE } from "@/lib/cl
 
 export const metadata: Metadata = {
   title: "Claims Recovery for Hospitals | Consult For Africa",
-  description: "We recover unpaid HMO and corporate claims for private hospitals in Nigeria, by settling disputes with the health plans claim by claim.",
+  description: "We recover unpaid HMO and corporate claims for private hospitals in Nigeria, by settling disputes with the payors claim by claim.",
   keywords: ["HMO claims recovery Nigeria", "hospital receivables Nigeria", "unpaid HMO claims", "hospital debt recovery Lagos", "claims reconciliation Nigeria", "invoice discounting hospitals Nigeria"],
   openGraph: {
     title: "Claims Recovery for Hospitals | Consult For Africa",
-    description: "Your hospital has already done the work. We get the health plans to pay for it.",
+    description: "Your hospital has already done the work. We get the payors to pay for it.",
     type: "website",
     images: ["/og-image.jpg"],
   },
 };
 
 const stuck = [
-  { why: "No authorisation code, or one that does not match what was billed", fix: "Retrospective authorisation, agreed with the plan's medical team" },
+  { why: "No authorisation code, or one that does not match what was billed", fix: "Retrospective authorisation, agreed with the payor's medical team" },
   { why: "Billed on the wrong or an old tariff", fix: "Rebilled at the agreed rate, so the claim is paid rather than written off" },
-  { why: "Notes, results or a discharge summary missing", fix: "Records pulled and the claim resubmitted inside the plan's window" },
-  { why: "Submitted late, or never submitted", fix: "Negotiated case by case, with the plan's claims lead" },
+  { why: "Notes, results or a discharge summary missing", fix: "Records pulled and the claim resubmitted inside the payor's window" },
+  { why: "Submitted late, or never submitted", fix: "Negotiated case by case, with the payor's claims lead" },
 ];
 
 const steps = [
-  { n: "01", t: "Vet", d: "Every claim is checked against the plan's tariff, the authorisation record and the paperwork before anyone chases it. Claims that will not pay as they stand are repaired first." },
-  { n: "02", t: "Reconcile", d: "We match what you billed against what each plan says it owes and clear the difference claim by claim, with the people at the plan who decide." },
+  { n: "01", t: "Vet", d: "Every claim is checked against the payor's tariff, the authorisation record and the paperwork before anyone chases it. Claims that will not pay as they stand are repaired first." },
+  { n: "02", t: "Reconcile", d: "We match what you billed against what each payor says it owes and clear the difference claim by claim, with the people at the payor who decide." },
   { n: "03", t: "Recover", d: "We follow up, escalate and settle. You see every claim's status from submission to cash, the same view we work from." },
 ];
 
 const faqs = [
   { q: "Will this damage our relationship with the HMOs?", a: "It should improve it. Most unpaid claims are disputes nobody has had time to settle. We settle them at claims level, with documents, and nobody is threatened." },
-  { q: "Do you need our patients' records?", a: `No. To start we need a list of ${SAMPLE_SIZE} unpaid claims by claim reference, plan, date and amount. Records stay in your system, and when a claim needs a document we ask for that document only.` },
+  { q: "Do you need our patients' records?", a: `No. To start we need a list of ${SAMPLE_SIZE} unpaid claims by claim reference, payor, date and amount. Records stay in your system, and when a claim needs a document we ask for that document only.` },
   { q: "What does it cost?", a: "The first review is free. After that we are paid from what we recover, so there is no fee on money we do not bring in. We agree the terms in writing before we start." },
-  { q: "Which hospitals is this for?", a: "Private hospitals, clinics, diagnostic centres and specialist practices that bill health plans, corporate accounts or a state scheme, in Lagos, Abuja and beyond." },
+  { q: "Which hospitals is this for?", a: "Private hospitals, clinics, diagnostic centres and specialist practices that bill payors, corporate accounts or a state scheme, in Lagos, Abuja and beyond." },
   {
     q: "Can we be paid before the HMO pays?",
     a: ADVANCE_LIVE
-      ? `Yes. Once a claim has passed vetting, ${Math.round(ADVANCE_RATE * 100)}% of its value can be paid to you within ${ADVANCE_HOURS} hours through our funding partner, with the balance when the plan pays.`
+      ? `Yes. Once a claim has passed vetting, our funding partner disburses ${Math.round(ADVANCE_RATE * 100)}% of its value to you within ${ADVANCE_HOURS} hours, less their discount, which is deducted at disbursement so you know the cost before you accept rather than after. The remaining balance reaches you when the payor settles.`
       : "We are setting up early payment against vetted claims for a first group of hospitals. If that interests you, say so in the form and we will tell you when it opens.",
   },
 ];
@@ -64,7 +64,7 @@ export default async function ClaimsRecoveryPage({ searchParams }: { searchParam
           </h1>
           <div className="mt-6 w-12 h-[2px]" style={{ background: "#D4AF37" }} />
           <p className="mt-6 max-w-2xl leading-relaxed" style={{ fontSize: "clamp(1rem,1.5vw,1.15rem)", color: "rgba(255,255,255,0.7)" }}>
-            Your hospital has already done the work. We get the health plans to pay for it.
+            Your hospital has already done the work. We get the payors to pay for it.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <a href="#check" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm" style={{ background: "#D4AF37", color: "#0F2744" }}>

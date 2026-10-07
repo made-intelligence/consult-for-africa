@@ -44,7 +44,7 @@ export const OLDEST_UNPAID = [
 ] as const;
 
 export type CheckInput = {
-  /** What the hospital bills health plans, corporates and schemes in a month. */
+  /** What the hospital bills payors, corporates and schemes in a month. */
   monthlyBilled: number;
   /** Average days from submitting a claim to the money arriving. */
   daysToPay: number;
@@ -59,7 +59,11 @@ export type CheckResult = {
   inDispute: number;
   /** Released for good by getting paid 30 days faster. */
   per30Days: number;
-  /** What an early payment against vetted claims could look like. */
+  /**
+   * The gross advance against vetted claims, before the funding partner's
+   * discount. The discount comes off at disbursement, so the hospital
+   * receives less than this and the label has to say so.
+   */
   earlyPayment: number;
 };
 
