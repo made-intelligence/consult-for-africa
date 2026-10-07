@@ -332,7 +332,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
       "Aesthetics, plastic surgery and looking like yourself. In conversation with Dr Debo Odulana",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
-    portrait: "/lyfe/chinwe-portrait.jpg",
+    portrait: "/lyfe/chinwe-portrait-centred.jpg",
   },
 ];
 
@@ -366,9 +366,12 @@ export const LYFE_EVENT_TAKEAWAY = "A thoughtfully designed Ageless takeaway";
 export const LYFE_SURGEON = {
   name: "Dr Chinwe Kpaduwa, MD FACS",
   shortName: "Dr Chinwe Kpaduwa",
-  portrait: "/lyfe/chinwe-portrait.jpg",
-  portraitWidth: 682,
-  portraitHeight: 1024,
+  // Cropped so she sits in the middle of the frame. The original has her right
+  // of centre; the crop also stops above the KD mark on her scrubs, which would
+  // otherwise be cut in half at the left edge.
+  portrait: "/lyfe/chinwe-portrait-centred.jpg",
+  portraitWidth: 532,
+  portraitHeight: 810,
   // Verified against her own CV and three directories. "Harvard educated,
   // California trained" is her own formulation and is the safe phrasing: she
   // read biochemistry at Harvard, not medicine.

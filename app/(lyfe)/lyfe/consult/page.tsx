@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     siteName: LYFE_NAME,
     locale: "en_NG",
-    images: [{ url: `${SITE}${LYFE_SURGEON.portrait}`, width: 682, height: 1024, alt: LYFE_SURGEON.name }],
+    images: [{ url: `${SITE}${LYFE_SURGEON.portrait}`, width: LYFE_SURGEON.portraitWidth, height: LYFE_SURGEON.portraitHeight, alt: LYFE_SURGEON.name }],
   },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
   robots: { index: true, follow: true },
