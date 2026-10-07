@@ -20,6 +20,7 @@ import {
 } from "@/lib/lyfe";
 import EnquiryForm from "./EnquiryForm";
 import LyfeNav from "./LyfeNav";
+import AboutGroup from "./AboutGroup";
 import StickyRsvp from "./StickyRsvp";
 
 export const metadata: Metadata = {
@@ -94,6 +95,7 @@ export default async function LyfePage({
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
       <ThePractice />
+      <AboutGroup tone="dark" />
       <ConsultCta />
       <Footer />
       <StickyRsvp />

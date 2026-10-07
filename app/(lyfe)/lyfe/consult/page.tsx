@@ -16,13 +16,14 @@ import {
 } from "@/lib/lyfe";
 import EnquiryForm from "../EnquiryForm";
 import LyfeNav from "../LyfeNav";
+import AboutGroup from "../AboutGroup";
 
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
 
 const TITLE = "Consult a board certified plastic surgeon in Lagos";
 const DESCRIPTION =
-  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000, credited in full against your treatment. Eight appointments a week.";
+  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000 for the consultation. Eight appointments a week.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -171,7 +172,7 @@ export default async function ConsultPage({
                 Book for {LYFE_CONSULT.feeDisplay}
               </a>
               <p className="text-[14px] leading-snug" style={{ color: C.muted }}>
-                {LYFE_CONSULT.redeemable}
+                {LYFE_CONSULT.feeNote}
               </p>
             </div>
 
@@ -390,6 +391,8 @@ export default async function ConsultPage({
           </div>
         </div>
       </section>
+
+      <AboutGroup tone="light" />
 
       <footer className="px-6 py-10 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto w-full max-w-5xl">
