@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // The consultation page is listed first because Googlebot resolves the
+        // most specific match: it escapes the brand-wide /lyfe block below
+        // without letting the private event page into the index.
+        allow: ["/lyfe/consult", "/"],
         disallow: [
           "/api/",
           "/studio/",
@@ -36,11 +39,6 @@ export default function robots(): MetadataRoute.Robots {
           // moves to bolarinwaakinola.com, so it must never rank here.
           "/drbola",
         ],
-        // The one exception inside /lyfe. The event page stays out of the
-        // index because it is private and dated, but the consultation page
-        // is chasing commercial search and has to be crawlable. Googlebot
-        // takes the most specific match, so this beats the /lyfe disallow.
-        allow: ["/lyfe/consult"],
       },
     ],
     sitemap: "https://consultforafrica.com/sitemap.xml",
