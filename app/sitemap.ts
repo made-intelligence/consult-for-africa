@@ -18,6 +18,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "/careers/apply", priority: 0.7, changeFrequency: "monthly" as const },
     { url: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
     { url: "/turnaround", priority: 0.8, changeFrequency: "monthly" as const },
+    // The one Lyfe route that is meant to rank. Weekly, because her diary
+    // and therefore the offer's availability changes every week.
+    { url: "/lyfe/consult", priority: 0.9, changeFrequency: "weekly" as const },
     { url: "/insights", priority: 0.7, changeFrequency: "weekly" as const },
     { url: "/agent", priority: 0.6, changeFrequency: "monthly" as const },
     // Service pages

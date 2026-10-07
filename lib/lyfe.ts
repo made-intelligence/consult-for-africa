@@ -776,6 +776,7 @@ export const SOURCE_LABELS = {
   PRESS_OR_PODCAST: "Press, radio or a podcast",
   FLYER_OR_QR: "A flyer or a QR code",
   REACTIVATION: "We contacted them",
+  MEZO: "Mezo",
   OTHER: "Somewhere else",
 } as const;
 
@@ -830,3 +831,64 @@ export function waitingLabel(minutes: number): string {
   if (minutes < 60 * 24) return `${Math.floor(minutes / 60)} hr`;
   return `${Math.floor(minutes / (60 * 24))} days`;
 }
+
+/**
+ * Social proof.
+ *
+ * Left empty rather than guessed at. Putting a handle on a page that turns out
+ * to belong to somebody else is worse than having no handle, and a dead link
+ * under a surgeon's name reads as carelessness to exactly the buyer who is
+ * checking whether she is real. Each entry renders only when it is filled.
+ */
+export const LYFE_SOCIAL: { label: string; handle: string; url: string }[] = [
+  // { label: "Instagram", handle: "@...", url: "https://instagram.com/..." },
+  // { label: "TikTok", handle: "@...", url: "https://tiktok.com/@..." },
+  // { label: "LinkedIn", handle: "Dr Chinwe Kpaduwa", url: "https://..." },
+];
+
+/**
+ * The consultation page.
+ *
+ * Bottom of funnel only. Nobody arriving here is asking what a procedure is;
+ * they are choosing a surgeon and looking for a reason to stop looking. So
+ * every question below is one a Lagos buyer asks last, not first, and the
+ * answers are the ones that lose the sale if they are evasive.
+ */
+export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
+  {
+    q: "Who actually holds the instrument?",
+    a: "Dr Kpaduwa operates. For non-surgical treatment the clinician who treats you is named before you book, is registered, and is trained and signed off by her against a logged competency standard rather than a weekend course. If you want to know who will be in the room, ask, and you will be told a name.",
+  },
+  {
+    q: "Who answers at two in the morning?",
+    a: "You are given a named contact and a number that is answered, not a general clinic line that opens at nine. Aftercare is the part of this that most people never ask about until they need it, and it is the part that decides how the whole thing feels.",
+  },
+  {
+    q: "Will I look obviously done?",
+    a: "Her published position, over two years of writing, is that the point is to look like yourself. If what you are asking for would read as work from across a room, she will say so in the consultation rather than after it.",
+  },
+  {
+    q: "Should I just fly abroad for this?",
+    a: "Plenty of people do, and for some procedures the arithmetic genuinely favours it. What travels badly is the complication. If something needs attention in week three you are either on a plane again or in front of a surgeon who did not do the operation and has no notes. That is the trade, said plainly, and you should weigh it rather than be sold past it.",
+  },
+  {
+    q: "What does the consultation cost, and is it wasted if I do not proceed?",
+    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. ${LYFE_CONSULT.redeemable} If you do not go ahead, you have paid for half an hour of a board certified plastic surgeon's judgement, which is the thing you came for.`,
+  },
+  {
+    q: "Is she really board certified?",
+    a: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Both are verifiable publicly and you are encouraged to check, because in this market the claim is made more often than it is true.",
+  },
+  {
+    q: "Why the hurry?",
+    a: `Her diary here is ${LYFE_CONSULT.hoursDisplay} on ${LYFE_CONSULT.dayNames.toLowerCase()}, which is ${LYFE_CONSULT.perWeek} half hours a week and no more. She is in Nigeria for a limited period. The dates on this page are the real ones.`,
+  },
+];
+
+/** The four things a buyer weighs at the point of choosing. */
+export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
+  { stat: "ABPS", line: "Board certified by the American Board of Plastic Surgery" },
+  { stat: "FACS", line: "Fellow of the American College of Surgeons" },
+  { stat: `${LYFE_CONSULT.perWeek} a week`, line: "Half hours in her diary, and no more than that" },
+  { stat: "Credited", line: "The fee comes off your treatment in full if you go ahead" },
+];

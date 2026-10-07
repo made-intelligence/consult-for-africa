@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // The consultation page is listed first because Googlebot resolves the
+        // most specific match: it escapes the brand-wide /lyfe block below
+        // without letting the private event page into the index.
+        allow: ["/lyfe/consult", "/"],
         disallow: [
           "/api/",
           "/studio/",
