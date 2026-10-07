@@ -938,6 +938,6 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
     name: "Medbury Healthcare",
     role: "The group",
-    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre and the Medbury and Alameda Specialist Care and Tourism Centre, and is led by its chief executive Dr Itunu Akinware.",
+    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
   },
 ];
