@@ -46,6 +46,8 @@ const HEADERS: Record<string, string[]> = {
   contactName: ["contact person", "contact name", "contact"],
   role: ["role", "title", "designation", "position"],
   website: ["website", "web", "url"],
+  /** Free text about earlier contact; becomes one HospitalContactLog entry. */
+  history: ["history", "contact history"],
 };
 
 type Row = Record<keyof typeof HEADERS, string | null>;
@@ -80,31 +82,44 @@ async function main() {
   const source = flag("source") ?? file!.split("/").pop()!;
   const live = Object.entries(PRODUCTS).filter(([, p]) => p.live).map(([k]) => k);
 
-  const stats = { rows: rows.length, hospitalsNew: 0, hospitalsUpdated: 0, contactsNew: 0, withEmail: 0, withPhone: 0, withNeither: 0 };
-  const seen = new Set<string>();
-
+  // One entry per hospital key; later rows for the same hospital add contacts.
+  type Entry = { key: string; r: Row; emails: string[]; phones: string[] };
+  const byKey = new Map<string, Entry>();
   for (const r of rows) {
-    const name = r.name!.replace(/\s+/g, " ");
-    const key = importKey(name, r.lga ?? r.city);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const emails = splitEmails(r.email);
-    const phones = splitPhones(r.phone);
-    if (emails.length) stats.withEmail++;
-    if (phones.length) stats.withPhone++;
-    if (!emails.length && !phones.length) stats.withNeither++;
+    const key = importKey(r.name!.replace(/\s+/g, " "), r.lga ?? r.city);
+    const e = byKey.get(key) ?? { key, r, emails: [], phones: [] };
+    e.emails = [...new Set([...e.emails, ...splitEmails(r.email)])];
+    e.phones = [...new Set([...e.phones, ...splitPhones(r.phone)])];
+    byKey.set(key, e);
+  }
+  const entries = [...byKey.values()];
+  const existing = new Map(
+    (await prisma.hospital.findMany({ where: { importKey: { in: entries.map((e) => e.key) } }, select: { id: true, importKey: true } })).map((h) => [h.importKey!, h.id]),
+  );
+  const fresh = entries.filter((e) => !existing.has(e.key));
+  const stats = {
+    rows: rows.length,
+    hospitals: entries.length,
+    alreadyThere: existing.size,
+    toCreate: fresh.length,
+    withEmail: entries.filter((e) => e.emails.length).length,
+    withPhone: entries.filter((e) => e.phones.length).length,
+    withNeither: entries.filter((e) => !e.emails.length && !e.phones.length).length,
+    contactsCreated: 0,
+    logsCreated: 0,
+  };
+  if (!COMMIT) {
+    console.log("DRY RUN (pass --commit to write)", stats);
+    return;
+  }
 
-    const existing = await prisma.hospital.findUnique({ where: { importKey: key }, select: { id: true } });
-    if (existing) stats.hospitalsUpdated++;
-    else stats.hospitalsNew++;
-    if (!COMMIT) {
-      stats.contactsNew += Math.max(emails.length, phones.length ? 1 : 0);
-      continue;
-    }
-
-    await prisma.$transaction(async (tx) => {
-      const data = {
-        name,
+  // Bulk writes, so a slow or flaky connection is not held open per row.
+  // Every step is idempotent: re-running after a failure picks up where it stopped.
+  const now = new Date();
+  for (let i = 0; i < fresh.length; i += 200) {
+    await prisma.hospital.createMany({
+      data: fresh.slice(i, i + 200).map(({ key, r }) => ({
+        name: r.name!.replace(/\s+/g, " "),
         state: r.state ?? state,
         lga: r.lga,
         city: r.city ?? (r.lga ? state : null),
@@ -112,42 +127,42 @@ async function main() {
         category: r.category,
         website: r.website,
         source,
-        importedAt: new Date(),
-      };
-      const h = existing
-        ? await tx.hospital.update({ where: { id: existing.id }, data: Object.fromEntries(Object.entries(data).filter(([, v]) => v != null)) })
-        : await tx.hospital.create({ data: { ...data, importKey: key } });
-
-      // One contact per email; phones ride on the first. A list with phones and
-      // no email still gets a contact so the call and WhatsApp queue can use it.
-      const contacts = emails.length ? emails.map((e, i) => ({ email: e, phone: i === 0 ? phones[0] ?? null : null })) : phones.length ? [{ email: null, phone: phones[0] }] : [];
-      for (const c of contacts) {
-        const found = await tx.hospitalContact.findFirst({
-          where: { hospitalId: h.id, ...(c.email ? { email: c.email } : { email: null, phone: c.phone }) },
-          select: { id: true },
-        });
-        if (found) continue;
-        await tx.hospitalContact.create({
-          data: { hospitalId: h.id, email: c.email, phone: c.phone, name: r.contactName, role: r.role, isPrimary: true, source },
-        });
-        stats.contactsNew++;
-      }
-      // Extra phones beyond the first go on a phone-only contact so none are lost.
-      for (const p of phones.slice(1)) {
-        const has = await tx.hospitalContact.findFirst({ where: { hospitalId: h.id, phone: p }, select: { id: true } });
-        if (!has) await tx.hospitalContact.create({ data: { hospitalId: h.id, phone: p, source } });
-      }
-      for (const product of live) {
-        await tx.hospitalProductStage.upsert({
-          where: { hospitalId_product: { hospitalId: h.id, product } },
-          create: { hospitalId: h.id, product, stage: "TARGET" },
-          update: {},
-        });
-      }
+        importKey: key,
+        importedAt: now,
+      })),
+      skipDuplicates: true,
     });
   }
+  const ids = new Map(
+    (await prisma.hospital.findMany({ where: { importKey: { in: entries.map((e) => e.key) } }, select: { id: true, importKey: true } })).map((h) => [h.importKey!, h.id]),
+  );
+  const have = await prisma.hospitalContact.findMany({ where: { hospitalId: { in: [...ids.values()] } }, select: { hospitalId: true, email: true, phone: true } });
+  const seen = new Set(have.flatMap((c) => [c.email ? `${c.hospitalId}|e|${c.email}` : "", c.phone ? `${c.hospitalId}|p|${c.phone}` : ""]).filter(Boolean));
 
-  console.log(COMMIT ? "COMMITTED" : "DRY RUN (pass --commit to write)", stats);
+  const contacts: { hospitalId: string; email: string | null; phone: string | null; name: string | null; role: string | null; isPrimary: boolean; source: string }[] = [];
+  for (const e of entries) {
+    const hospitalId = ids.get(e.key)!;
+    const phones = e.phones.filter((p) => !seen.has(`${hospitalId}|p|${p}`));
+    e.emails.forEach((email, i) => {
+      if (seen.has(`${hospitalId}|e|${email}`)) return;
+      contacts.push({ hospitalId, email, phone: i === 0 ? phones.shift() ?? null : null, name: e.r.contactName, role: e.r.role, isPrimary: i === 0, source });
+    });
+    for (const phone of phones) contacts.push({ hospitalId, email: null, phone, name: e.r.contactName, role: e.r.role, isPrimary: !e.emails.length, source });
+  }
+  for (let i = 0; i < contacts.length; i += 500) {
+    stats.contactsCreated += (await prisma.hospitalContact.createMany({ data: contacts.slice(i, i + 500), skipDuplicates: true })).count;
+  }
+
+  for (const product of live) {
+    await prisma.hospitalProductStage.createMany({ data: [...ids.values()].map((hospitalId) => ({ hospitalId, product, stage: "TARGET" })), skipDuplicates: true });
+  }
+
+  // History goes on only once per hospital, so a re-run does not repeat it.
+  const logged = new Set((await prisma.hospitalContactLog.findMany({ where: { hospitalId: { in: [...ids.values()] }, contactedBy: source }, select: { hospitalId: true } })).map((l) => l.hospitalId));
+  const logs = entries.filter((e) => e.r.history && !logged.has(ids.get(e.key)!)).map((e) => ({ hospitalId: ids.get(e.key)!, contactedBy: source, channel: "NOTE", summary: e.r.history!.slice(0, 2000) }));
+  if (logs.length) stats.logsCreated = (await prisma.hospitalContactLog.createMany({ data: logs })).count;
+
+  console.log("COMMITTED", stats);
 }
 
 main()

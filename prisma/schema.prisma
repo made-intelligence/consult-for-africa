@@ -7811,7 +7811,7 @@ model RecoveryPayer {
   id              String   @id @default(cuid())
   name            String   @unique
   type            String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | OTHER
-  /// CFA advises this payer (e.g. Aman). Claims against it are recovered only
+  /// CFA advises this payer. Claims against it are recovered only
   /// with the hospital told in writing, and are never advanced.
   conflict        Boolean  @default(false)
   conflictNote    String?
