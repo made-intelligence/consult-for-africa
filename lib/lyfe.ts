@@ -457,7 +457,7 @@ export const LYFE_CONSULT = {
    * bought is her judgement and nothing else on the page sells that.
    */
   blurb:
-    "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what it would cost, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get.",
+    "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
   /**
    * Not a deposit. It was written as credited against treatment, which was
    * wrong, and a false money claim on a live page is worth fixing fast even
@@ -630,7 +630,7 @@ export const LYFE_OBJECTIONS = [
   {
     worry: "I do not want to look like I have had work done",
     answer:
-      "Neither does Dr Kpaduwa. The whole of her position is that the best result is the one nobody can point at. If what you are asking for would be obvious, she will tell you, and she will tell you before you pay for anything.",
+      "Neither does Dr Kpaduwa. The whole of her position is that the best result is the one nobody can point at. If what you are asking for would be obvious, she will tell you, and she will tell you at the consultation rather than once you are committed.",
   },
   {
     worry: "I do not know who is actually treating me",
@@ -645,7 +645,7 @@ export const LYFE_OBJECTIONS = [
   {
     worry: "I do not know what it costs",
     answer:
-      "Ask us and we will tell you, on the telephone or at the consultation. You get a written quote afterwards and the price does not move without you agreeing to it in writing.",
+      "Ask the team and we will tell you, on the telephone or by message, before or after you see her. Dr Kpaduwa does not discuss fees with patients. You get a written quote and the price does not move without you agreeing to it in writing.",
   },
   {
     worry: "I am not sure I need anything at all",

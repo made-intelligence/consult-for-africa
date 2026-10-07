@@ -209,7 +209,7 @@ function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: bo
           height={LYFE_SURGEON.portraitHeight}
           priority={priority}
           sizes="(max-width: 768px) 72vw, 340px"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
       </div>
     </div>
@@ -504,7 +504,7 @@ function Panel() {
                     width={seat.portraitWidth ?? LYFE_SURGEON.portraitWidth}
                     height={seat.portraitHeight ?? LYFE_SURGEON.portraitHeight}
                     sizes="190px"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
                   />
                 </div>
               </div>

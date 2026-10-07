@@ -266,12 +266,12 @@ export default async function ConsultPage({
               {
                 n: "02",
                 t: "She tells you what is actually involved",
-                b: "What the procedure is, what recovery really looks like in Lagos, what it would cost, and what she would and would not do in your case.",
+                b: "What the procedure is, what recovery really looks like in Lagos, and what she would and would not do in your case. She does not discuss fees on the call; that comes from the team afterwards, in writing.",
               },
               {
                 n: "03",
                 t: "You leave knowing where you stand",
-                b: "Either a plan and what it costs, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the fee has still bought you it.",
+                b: "Either a plan, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the half hour has still bought you it. A written costing follows from the team if you want one.",
               },
             ].map((x) => (
               <div key={x.n}>
