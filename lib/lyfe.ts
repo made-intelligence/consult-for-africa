@@ -897,3 +897,30 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
   { stat: `${LYFE_CONSULT.perWeek} a week`, line: "Half hours in her diary, and no more than that" },
   { stat: "Her, not a coordinator", line: "Thirty minutes with the surgeon who would operate" },
 ];
+
+/**
+ * Who stands behind this.
+ *
+ * A buyer deciding on surgery is deciding who to trust, and a surgeon with no
+ * visible institution behind her is a harder yes than one with a licensed
+ * centre and a group. Every claim below is drawn from Medbury's own documents
+ * or from publicly verifiable credentials. Nothing asserts a site count, a
+ * founding year or a patient number, because none of those is on file here.
+ */
+export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
+  {
+    name: "Lyfe Plastics & Dermatology",
+    role: "The practice",
+    body: "The plastic surgery and dermatology practice led by Dr Chinwe Kpaduwa, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
+  },
+  {
+    name: "Medlyfe",
+    role: "The licensed centre",
+    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, which is the argument the whole evening is built on: how you feel and how you look are one appointment, not two.",
+  },
+  {
+    name: "Medbury Healthcare",
+    role: "The group",
+    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre and the Medbury and Alameda Specialist Care and Tourism Centre, and is led by its chief executive Dr Itunu Akinware.",
+  },
+];

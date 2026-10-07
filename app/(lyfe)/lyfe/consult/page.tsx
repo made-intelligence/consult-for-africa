@@ -16,6 +16,7 @@ import {
 } from "@/lib/lyfe";
 import EnquiryForm from "../EnquiryForm";
 import LyfeNav from "../LyfeNav";
+import AboutGroup from "../AboutGroup";
 
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
@@ -390,6 +391,8 @@ export default async function ConsultPage({
           </div>
         </div>
       </section>
+
+      <AboutGroup tone="light" />
 
       <footer className="px-6 py-10 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto w-full max-w-5xl">
