@@ -501,8 +501,8 @@ function Panel() {
                   <Image
                     src={seat.portrait}
                     alt={seat.name ?? seat.seat}
-                    width={LYFE_SURGEON.portraitWidth}
-                    height={LYFE_SURGEON.portraitHeight}
+                    width={seat.portraitWidth ?? LYFE_SURGEON.portraitWidth}
+                    height={seat.portraitHeight ?? LYFE_SURGEON.portraitHeight}
                     sizes="190px"
                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
                   />

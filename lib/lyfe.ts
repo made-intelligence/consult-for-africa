@@ -265,6 +265,9 @@ export interface LyfePanelSeat {
   name: string | null;
   title: string | null;
   portrait: string | null;
+  /** Intrinsic size, so a seat's photograph is not declared at somebody else's. */
+  portraitWidth?: number;
+  portraitHeight?: number;
 }
 
 export const LYFE_PANEL: LyfePanelSeat[] = [
@@ -295,7 +298,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Eating the food we actually eat and still changing body composition. A decade of it, with the training to match",
     name: "Gbemi Giwa",
     title: "Founder of the African Fat Loss Method. Fitness and nutrition coach",
-    portrait: null,
+    portrait: "/lyfe/gbemi-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",

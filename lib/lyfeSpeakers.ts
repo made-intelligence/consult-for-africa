@@ -62,9 +62,9 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     email: "hello@gbemigiwa.com",
     org: "The African Fat Loss Method",
     slot: "the panel, on food and body composition",
-    need: ["photo"],
+    need: [],
     bio: "Gbemi Giwa is an award winning fitness and nutrition coach with over a decade of experience helping women build strong, lean bodies and sustainable lifestyles without disconnecting from their culture or real life. She is the founder of the African Fat Loss Method, a coaching system that blends structured strength training, culturally relevant nutrition and mindset work. Her audience runs to more than ninety five thousand across Instagram and TikTok, her work has been covered by Women's Health Middle East, Cosmopolitan Middle East, Entrepreneur, The National and Emirates Woman, and she has worked with Nike and Apple.",
-    notes: "Bio received 7 Oct. Photographs are in a Google Drive folder that needs downloading; the Drive connector here is not authorised.",
+    notes: "Bio received 7 Oct. Bio and portrait both on file. Portrait cropped from her own shoot, 7 Oct.",
   },
   {
     name: "Joycee Awosika",
