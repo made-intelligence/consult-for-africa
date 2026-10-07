@@ -9,8 +9,9 @@ vetted claim within 48 hours.
 Carbon is a lender, so the deck carries the things a lender reads: the legal
 route to the cash, the decision rules exactly as the platform applies them,
 the risk controls, market pricing for Carbon's own side, and a pilot with
-stop-loss terms. CFA's own recovery fee and its share of any discount are not
-stated anywhere. No other client engagement is named.
+stop-loss terms. Pricing as Debo set it: Carbon takes a one time discount of
+4% to 5% of the advance and CFA a one time fee of 1.2%, both deducted at
+disbursement. No other client engagement is named.
 
 Every external fact is from docs/claims-recovery/research-how-to-execute.md,
 and vendor-reported figures are labelled as such on the page.
@@ -143,7 +144,7 @@ def cover(c):
         y -= 42
     c.setFont(SERIF_I, 15)
     c.setFillColor(MUTED)
-    for line in wrap(c, "A partnership in which Carbon lends against claims the health plans owe, and we make sure they pay.", SERIF_I, 15, 500):
+    for line in wrap(c, "A partnership in which Carbon lends against claims the payors owe, and we make sure they pay.", SERIF_I, 15, 500):
         y -= 4
         c.drawString(MX, y, line)
         y -= 17
@@ -164,7 +165,7 @@ def cover(c):
 # ------------------------------------------------------------------ 02 ------
 def s_summary(c):
     chrome(c, "The proposal on one page")
-    y = heading(c, "Carbon lends against claims the plans owe. We make sure the plans pay.")
+    y = heading(c, "Carbon lends against claims the payors owe. We make sure the payors pay.")
     tiles = [
         ("60%", "of a verified claim's value paid to the hospital within 48 hours"),
         ("8", "checks every claim passes before any money moves, and a person signs each one"),
@@ -179,18 +180,18 @@ def s_summary(c):
     col = (W - 24) / 2
     kicker_line(c, "What Carbon does", MX, y)
     bullet_block(c, [
-        ("", "Lends to the hospital against its verified claims, through a collection account the plans pay into."),
-        ("", "Sets the credit policy, the facility per hospital and the discount."),
+        ("", "Lends to the hospital against its verified claims, through a collection account the payors pay into."),
+        ("", "Sets the credit policy and the facility per hospital, and takes a one time discount of 4% to 5% of the advance at disbursement."),
         ("", "Receives claim-level performance data, monthly or live."),
     ], MX, y - 20, col, size=11.2, leading=15, gap=8)
     kicker_line(c, "What we do", MX + col + 24, y)
     bullet_block(c, [
         ("", "Find the hospitals, verify every claim and keep the bad ones out of the book."),
-        ("", "Settle disputes with the plans, chase, escalate and collect."),
+        ("", "Settle disputes with the payors, chase, escalate and collect, for a one time fee of 1.2% of the advance, also taken at disbursement."),
         ("", "Never lend, never buy a claim, never guarantee. Factoring needs a licence we do not hold and do not want."),
     ], MX + col + 24, y - 20, col, size=11.2, leading=15, gap=8)
     callout(c, MX, 118, W,
-            "For tomorrow: agree the lending route, the pilot size, how the discount is set and what data Carbon needs to underwrite.",
+            "For tomorrow: agree the route (lend against the claims or buy them), the pilot size, the discount within its range and the data Carbon needs to underwrite.",
             bg=CREAM, spine=GOLD, size=11.5, leading=15)
     c.showPage()
 
@@ -198,8 +199,8 @@ def s_summary(c):
 # ------------------------------------------------------------------ 03 ------
 def s_problem(c):
     chrome(c, "The problem")
-    y = heading(c, "Private hospitals are financing the health plans.")
-    y = para(c, "Most of what a private hospital earns from insured patients is owed by HMOs, with corporate accounts and state schemes behind them. The work is done and the cost is paid this month. The cash arrives months later, if the claim survives the plan's review at all.",
+    y = heading(c, "Private hospitals are financing the payors.")
+    y = para(c, "Most of what a private hospital earns from insured patients is owed by HMOs, with corporate accounts and state schemes behind them. The work is done and the cost is paid this month. The cash arrives months later, if the claim survives the payor's review at all.",
              MX, y - 16, "Helvetica", 12.2, BODY, W - 20, 17.5)
     y -= 18
     gap = 14
@@ -227,12 +228,12 @@ def s_stuck(c):
     y = heading(c, "Most of it is disputed. Very little of it is refused.")
     rows = [
         ["Why the claim is unpaid", "What clears it", "Recoverable"],
-        ["No pre-authorisation code, or the code does not match the service billed", "Retrospective authorisation, agreed with the plan's medical team", "Usually"],
+        ["No pre-authorisation code, or the code does not match the service billed", "Retrospective authorisation, agreed with the payor's medical team", "Usually"],
         ["Billed above the agreed tariff, or on an old tariff", "Rebilled at the agreed rate; the gap is written off, not the claim", "Mostly"],
-        ["Missing documents: notes, results, discharge summary", "Pull the record and resubmit inside the plan's window", "Usually"],
-        ["Submitted late, or never submitted", "Depends on the plan's window and goodwill", "Sometimes"],
-        ["The plan is slow to pay across the board", "Escalation, a payment schedule, then the regulator", "Slowly"],
-        ["The enrollee was not covered, or the plan has failed", "Bill the patient or employer, or write it off", "Rarely"],
+        ["Missing documents: notes, results, discharge summary", "Pull the record and resubmit inside the payor's window", "Usually"],
+        ["Submitted late, or never submitted", "Depends on the payor's window and goodwill", "Sometimes"],
+        ["The payor is slow to pay across the board", "Escalation, a payment schedule, then the regulator", "Slowly"],
+        ["The enrollee was not covered, or the payor has failed", "Bill the patient or employer, or write it off", "Rarely"],
     ]
     y = simple_table(c, rows, MX, y - 20, [330, W - 330 - 110, 110], size=10.8, leading=14, pad=8)
     callout(c, MX, y - 16, W,
@@ -271,11 +272,11 @@ def s_why_now(c):
 def s_service(c):
     chrome(c, "What we do")
     y = heading(c, "Verify, reconcile, recover")
-    y = para(c, "One desk, run by people who have run hospitals and sat across the table from health plans, on a platform we built for the job.",
+    y = para(c, "One desk, run by people who have run hospitals and sat across the table from payors, on a platform we built for the job.",
              MX, y - 12, "Helvetica", 12.2, BODY, W, 17)
     cols = [
-        ("Verify", "Every claim is read against the plan's tariff, the authorisation record, the documents held and its age. The platform drafts the verdict, the likelihood of payment and the exact repairs; a person confirms it. Claims that will not pay are kept out of the funded book and sent to repair."),
-        ("Reconcile", "We match what the hospital billed against what each plan says it owes, then clear the gap claim by claim with the plan's claims team. For each plan the platform ranks the claims by naira recovered per hour of effort and drafts the reconciliation letter and the call script."),
+        ("Verify", "Every claim is read against the payor's tariff, the authorisation record, the documents held and its age. The platform drafts the verdict, the likelihood of payment and the exact repairs; a person confirms it. Claims that will not pay are kept out of the funded book and sent to repair."),
+        ("Reconcile", "We match what the hospital billed against what each payor says it owes, then clear the gap claim by claim with the payor's claims team. For each payor the platform ranks the claims by naira recovered per hour of effort and drafts the reconciliation letter and the call script."),
         ("Recover", "We chase, escalate and settle. Every call is logged and the platform turns the notes into dated promises, disputes and next actions, so a promise made on a Tuesday is chased on the Friday. Payment lands in the account Carbon controls."),
     ]
     gap = 16
@@ -295,13 +296,13 @@ def s_service(c):
 # ------------------------------------------------------------------ 07 ------
 def s_flow(c):
     chrome(c, "How the money moves")
-    y = heading(c, "Sixty per cent within 48 hours, the balance when the plan pays.")
+    y = heading(c, "Sixty per cent within 48 hours, priced once, the balance when the payor pays.")
     steps = [
-        ("1", "Hospital submits", "a batch of claims: references, plan, dates, amounts. No patient names."),
+        ("1", "Hospital submits", "a batch of claims: references, payor, dates, amounts. No patient names."),
         ("2", "We verify", "against tariff, authorisation, documents and age, and a person confirms."),
-        ("3", "Carbon advances", "60% of the verified value to the hospital within 48 hours."),
-        ("4", "We recover", "and the plan pays into the collection account at Carbon."),
-        ("5", "Settlement", "Carbon is repaid with its discount; the hospital receives the balance."),
+        ("3", "Carbon advances", "60% of verified value within 48 hours, less the one time discount and fee."),
+        ("4", "We recover", "and the payor pays into the collection account at Carbon."),
+        ("5", "Settlement", "Carbon takes back its 60%; the balance goes to the hospital."),
     ]
     gap = 12
     bw = (W - 4 * gap) / 5
@@ -324,14 +325,16 @@ def s_flow(c):
     kicker_line(c, "One claim, end to end (illustrative)", MX, y)
     rows = [
         ["", "Naira", "When"],
-        ["Billed to the plan", "1,000,000", "Day 0"],
+        ["Billed to the payor", "1,000,000", "Day 0"],
         ["Verified payable (after tariff correction)", "950,000", "Day 1"],
-        ["Advance to the hospital, 60% of verified", "570,000", "By day 3"],
-        ["Plan pays into the collection account", "950,000", "Day 30 to 90"],
-        ["Carbon: advance returned, plus its discount", "570,000 + discount", "On receipt"],
-        ["Hospital: the balance, less the recovery fee", "the rest", "On receipt"],
+        ["Advance, 60% of verified", "570,000", "By day 3"],
+        ["Less Carbon's one time discount, 4% to 5%", "22,800 to 28,500", "At disbursement"],
+        ["Less CFA's one time fee, 1.2%", "6,840", "At disbursement"],
+        ["Hospital receives now", "534,660 to 540,360", "By day 3"],
+        ["Payor pays into the collection account; Carbon takes back 570,000", "950,000", "Day 30 to 90"],
+        ["Hospital receives the balance", "380,000", "On receipt"],
     ]
-    simple_table(c, rows, MX, y - 12, [W - 300, 160, 140], size=10.2, leading=13, pad=6.5)
+    simple_table(c, rows, MX, y - 12, [W - 300, 160, 140], size=9.8, leading=12, pad=5.2)
     c.showPage()
 
 
@@ -344,11 +347,11 @@ def s_rules(c):
         ["1", "Funding is live with a signed funder, and the hospital's agreement is signed and active", "Hold"],
         ["2", "The claim has been verified, and a person has confirmed the verification", "Hold"],
         ["3", "Verdict is PASS. A claim that needs repair is repaired first; one that will not pay is declined", "Hold or decline"],
-        ["4", "Likelihood the plan pays is at least 75%", "Hold"],
-        ["5", "The payer is eligible, and is not one CFA advises", "Decline"],
+        ["4", "Likelihood the payor pays is at least 75%", "Hold"],
+        ["5", "The payor is eligible, and is not one CFA advises", "Decline"],
         ["6", "Claim age is within the limit (180 days by default, set per hospital)", "Decline"],
         ["7", "The advance keeps the hospital inside its facility limit", "Hold"],
-        ["8", "No single plan above 40% of the hospital's advanced book, once the book is past a quarter of its limit", "Hold"],
+        ["8", "No single payor above 40% of the hospital's advanced book, once the book is past a quarter of its limit", "Hold"],
     ]
     y = simple_table(c, rows, MX, y - 18, [34, W - 34 - 120, 120], size=10.4, leading=13.4, pad=7)
     y -= 16
@@ -384,7 +387,7 @@ def s_verification(c):
          "Expected payable N420,000"),
         ("Appendicectomy", "Billed N600,000   No tariff on file   No authorisation   232 days", "FAIL, 12%", RED,
          ["Never submitted, 232 days after service", "No authorisation for a procedure that normally needs one", "No documents held, cover not confirmed"],
-         ["Establish whether it was an emergency and whether the plan was told", "Check the submission window and tariff in the provider agreement", "Only then decide whether to pursue retrospective authorisation"],
+         ["Establish whether it was an emergency and whether the payor was told", "Check the submission window and tariff in the provider agreement", "Only then decide whether to pursue retrospective authorisation"],
          "Kept out of the funded book"),
     ]
     for i, (title, facts, verdict, vcol, issues, repairs, foot) in enumerate(cards):
@@ -522,7 +525,7 @@ def s_structure(c):
     kx, ky = cx, top - nh
     node(c, kx, ky, nw, nh, "Carbon", "lends to the hospital; holds the collection account; registers at the NCR")
     node(c, hx, hy, nw, nh, "Hospital", "borrower; assigns or charges the funded claims")
-    node(c, px, py, nw, nh, "Health plan", "pays the claim into the collection account")
+    node(c, px, py, nw, nh, "Payor", "pays the claim into the collection account")
     node(c, cx, top - 250, nw, nh, "Consult for Africa", "originates, verifies, services, collects. Never lends.", fill=GOLD, tcol=INK, scol=INK)
     arrow(c, kx + 30, ky, hx + nw - 30, hy + nh, col=NAVY)
     c.setFont("Helvetica", 8.8)
@@ -539,12 +542,12 @@ def s_structure(c):
     yb = hy - 20
     col = (W - 24) / 2
     bullet_block(c, [
-        ("", "Collection account at Carbon with a domiciliation and lien; the plan is told to pay there."),
+        ("", "Collection account at Carbon with a domiciliation and lien; the payor is told to pay there."),
         ("", "Register every funded claim at the National Collateral Registry. Priority goes by time of registration (STMA s.33(3))."),
     ], MX, yb, col, size=10.2, leading=13.4, gap=5)
     bullet_block(c, [
-        ("", "Serve notice of assignment on a plan only on default, slow payment or a set-off risk, so Carbon stays out of the hospital's relationship with the plan."),
-        ("", "Vet for open clawbacks: set-off the plan acquires before notice binds the lender (s.33(1)(b))."),
+        ("", "Serve notice of assignment on a payor only on default, slow payment or a set-off risk, so Carbon stays out of the hospital's relationship with the payor."),
+        ("", "Vet for open clawbacks: set-off the payor acquires before notice binds the lender (s.33(1)(b))."),
     ], MX + col + 24, yb, col, size=10.2, leading=13.4, gap=5)
     source(c, "For Carbon's counsel to confirm: whether Carbon lends against the claims or buys them outright, and the notice and registration mechanics above.", y=44)
     c.showPage()
@@ -556,11 +559,11 @@ def s_roles(c):
     y = heading(c, "The division of labour, line by line")
     rows = [
         ["Carbon", "Consult for Africa", "The hospital"],
-        ["Sets the credit policy and the facility limit for each hospital", "Brings the hospitals, verifies every claim before it is funded", "Assigns or charges the funded claims, and tells the plans where to pay"],
-        ["Advances 60% of verified value within 48 hours", "Reconciles and recovers with the plans", "Provides records, and repairs claims we send back"],
-        ["Holds the collection account the plans pay into", "Reports every claim's status to Carbon and the hospital", "Repays any advance on a claim rejected for a reason it controlled"],
-        ["Prices the discount", "Keeps the claims data clean enough to lend on", "Submits its whole book with each plan, not only its worst claims"],
-        ["Registers at the NCR and holds the security", "Runs the conflicts policy for any payer it advises", "Keeps submitting through the desk, not around it"],
+        ["Sets the credit policy and the facility limit for each hospital", "Brings the hospitals, verifies every claim before it is funded", "Assigns or charges the funded claims, and tells the payors where to pay"],
+        ["Advances 60% of verified value within 48 hours", "Reconciles and recovers with the payors", "Provides records, and repairs claims we send back"],
+        ["Holds the collection account the payors pay into", "Reports every claim's status to Carbon and the hospital", "Repays any advance on a claim rejected for a reason it controlled"],
+        ["Takes its one time discount of 4% to 5% at disbursement", "Takes its one time fee of 1.2% at disbursement, and keeps the claims data clean enough to lend on", "Submits its whole book with each payor, not only its worst claims"],
+        ["Registers at the NCR and holds the security", "Runs the conflicts policy for any payor it advises", "Keeps submitting through the desk, not around it"],
     ]
     simple_table(c, rows, MX, y - 22, [W / 3.0] * 3, size=10.8, leading=14, pad=9)
     c.showPage()
@@ -568,29 +571,29 @@ def s_roles(c):
 
 # ------------------------------------------------------------------ 15 ------
 def s_economics(c):
-    chrome(c, "Carbon's side of the numbers")
-    y = heading(c, "What the market pays for money like this")
+    chrome(c, "The price")
+    y = heading(c, "Priced once, at disbursement, so the payor's speed is Carbon's yield.")
+    gap = 12
+    tw = (W - 2 * gap) / 3
+    stat(c, MX, y - 12, tw, 92, "4% to 5%", "Carbon's discount on the advance, one time, taken at disbursement", vsize=22)
+    stat(c, MX + tw + gap, y - 12, tw, 92, "1.2%", "Consult for Africa's fee on the advance, one time, taken at disbursement", vsize=22)
+    stat(c, MX + 2 * (tw + gap), y - 12, tw, 92, "5.2% to 6.2%", "all in for the hospital, known before it accepts, and nothing more however long the payor takes", vsize=22, spine=TEAL)
+    y -= 126
+    kicker_line(c, "Carbon's annualised return on the one time discount, by days until the payor settles", MX, y)
     rows = [
-        ["Reference point", "Price", "Source"],
-        ["Bank invoice discounting (FirstBank)", "32% a year plus a 1% fee, 60-day tenor", "Published product terms"],
-        ["Nigerian invoice finance, general", "1.5% to 4% a month, plus 0.5% to 2.5% fees", "Market survey, September 2026"],
-        ["US medical receivables factoring", "70% to 90% advanced; 1% to 5% per 30 days", "Industry reports"],
-        ["CBN monetary policy rate", "23%, cut from 26.5% on 22 September 2026", "CBN"],
+        ["Discount", "45 days", "60 days", "90 days", "120 days"],
+        ["4.0%", "32.4%", "24.3%", "16.2%", "12.2%"],
+        ["4.5%", "36.5%", "27.4%", "18.3%", "13.7%"],
+        ["5.0%", "40.6%", "30.4%", "20.3%", "15.2%"],
     ]
-    y = simple_table(c, rows, MX, y - 18, [250, 300, W - 550], size=10.4, leading=13.4, pad=7)
-    y -= 22
-    kicker_line(c, "Illustration: N100m of verified claims, 60% advanced, one 60-day cycle", MX, y)
-    rows2 = [
-        ["Monthly discount Carbon sets", "1.5%", "2.5%", "3.5%"],
-        ["Deployed", "N60.0m", "N60.0m", "N60.0m"],
-        ["Discount income per cycle", "N1.8m", "N3.0m", "N4.2m"],
-        ["Over six cycles a year", "N10.8m", "N18.0m", "N25.2m"],
-    ]
-    cw0 = 260
-    cwi = (W - cw0) / 3
-    y = simple_table(c, rows2, MX, y - 12, [cw0, cwi, cwi, cwi], size=10.6, leading=13.6, pad=7)
-    callout(c, MX, y - 14, W,
-            "The discount is Carbon's to price. Opening at 60% leaves a cushion of 40% of verified value against tariff cuts, late claims and the discount itself, and the rate can rise for a plan once it has paid on time for two or three cycles.",
+    cw0 = 150
+    cwi = (W - cw0) / 4
+    y = simple_table(c, rows, MX, y - 12, [cw0, cwi, cwi, cwi, cwi], size=10.6, leading=13.6, pad=7)
+    c.setFont("Helvetica", 8.6)
+    c.setFillColor(MUTED)
+    c.drawString(MX, y - 13, "For reference: bank invoice discounting (FirstBank) 32% a year plus a 1% fee; the CBN policy rate 23% since 22 September 2026.")
+    callout(c, MX, y - 26, W,
+            "This is why recovery and funding belong in one product. Every week we take off a payor's settlement raises Carbon's return without costing the hospital a naira more, and the payors that pay slowly are exactly the ones the pilot will find and price.",
             bg=CREAM, spine=GOLD, size=10.8, leading=14.5)
     c.showPage()
 
@@ -619,11 +622,11 @@ def s_risks(c):
     y = heading(c, "What could go wrong, and what stops it")
     rows = [
         ["Risk", "What it looks like", "Control"],
-        ["Adverse selection", "Hospitals send their weakest claims for funding", "Whole-book submission per plan to qualify; only verified PASS claims funded"],
+        ["Adverse selection", "Hospitals send their weakest claims for funding", "Whole-book submission per payor to qualify; only verified PASS claims funded"],
         ["Fraud and duplicates", "Padded or invented claims; the same claim funded twice", "Duplicate checks on payer, amount and date; NCR search before funding; hospital warranty with recourse"],
-        ["Payer failure", "A plan stops paying or loses accreditation", "Per-payer limits and the 40% concentration cap; lower or no advance on weak payers"],
-        ["Set-off", "A plan deducts an old overpayment from a funded claim", "Vet for open clawbacks; serve notice as soon as a set-off risk appears"],
-        ["Plan pushback", "A plan slows authorisations for hospitals that use the desk", "Reconciliation first; notices only when needed; the regulator only after the relationship route"],
+        ["Payor failure", "A payor stops paying or loses accreditation", "Per-payor limits and the 40% concentration cap; lower or no advance on weak payors"],
+        ["Set-off", "A payor deducts an old overpayment from a funded claim", "Vet for open clawbacks; serve notice as soon as a set-off risk appears"],
+        ["Payor pushback", "A payor slows authorisations for hospitals that use the desk", "Reconciliation first; notices only when needed; the regulator only after the relationship route"],
         ["Conflict of interest", "We recover from a payer CFA also advises", "Written policy: that payer is never advanced against, and both sides are told in writing"],
         ["Data protection", "Health data leaves the hospital", "No patient names held or processed; claim references only; a data protection impact assessment before the pilot"],
     ]
@@ -643,10 +646,10 @@ def s_pilot(c):
     y -= 122
     rows = [
         ["Measure", "What it tells Carbon"],
-        ["First-pass acceptance", "Share of verified claims the plan pays without query. The quality of our verification"],
+        ["First-pass acceptance", "Share of verified claims the payor pays without query. The quality of our verification"],
         ["Days to cash", "Submission to payment into the collection account. How long Carbon's money is out"],
         ["Recovery rate", "Share of disputed value recovered. The quality of our recovery"],
-        ["Loss rate", "Advances not repaid by the plan or the hospital. The number that sets the price"],
+        ["Loss rate", "Advances not repaid by the payor or the hospital. The number that sets the price"],
     ]
     y = simple_table(c, rows, MX, y - 6, [200, W - 200], size=10.4, leading=13.4, pad=7)
     y -= 16
@@ -659,7 +662,7 @@ def s_pilot(c):
         c.setFillColor(GOLD if i == 3 else NAVY)
         c.drawString(x + 14, y - 20, t)
         para(c, b, x + 14, y - 36, "Helvetica", 9.2, LIGHT if i == 3 else BODY, pw - 24, 12)
-    source(c, "Stop-loss and step-up triggers are agreed before the first advance: the loss rate that ends the pilot, and the payment record that lifts a plan's advance rate.", y=46)
+    source(c, "Stop-loss and step-up triggers are agreed before the first advance: the loss rate that ends the pilot, and the payment record that lifts a payor's advance rate.", y=46)
     c.showPage()
 
 
@@ -669,7 +672,7 @@ def s_next_products(c):
     y = heading(c, "Three lines that follow once the claims history exists")
     cards = [
         ("Surgery finance for patients", "Our doctor network sees patients at the point where surgery is recommended and priced. The money goes straight to the facility, the surgeon confirms the procedure and the price is a fixed package, which is how this kind of lending keeps defaults low. Carbon's interest, and a natural second line."),
-        ("Doctors' pending claims", "Specialists in private practice wait on the same plans as the hospitals do. The same verification and the same advance, sized for an individual practice."),
+        ("Doctors' pending claims", "Specialists in private practice wait on the same payors as the hospitals do. The same verification and the same advance, sized for an individual practice."),
         ("Claims submission, done right first time", "Once a hospital's backlog is cleared, we take over its monthly claims preparation, so fewer claims are queried in the first place and the funded book gets cleaner every month."),
     ]
     gap = 16
@@ -687,7 +690,7 @@ def s_next_products(c):
             yy -= 19
         para(c, b, x + 22, yy - 8, "Helvetica", 10.4, BODY, cw - 40, 14.2)
     callout(c, MX, top - ch - 20, W,
-            "The order matters. Recovery builds a claim-level payment history for every hospital and every plan, and that history is what lets Carbon price each of the next three lines with evidence rather than hope.",
+            "The order matters. Recovery builds a claim-level payment history for every hospital and every payor, and that history is what lets Carbon price each of the next three lines with evidence rather than hope.",
             bg=SURFACE, spine=TEAL, size=11.5, leading=15.5)
     c.showPage()
 
@@ -706,7 +709,7 @@ def s_next(c):
     bullet_block(c, [
         ("The route.", "Carbon lends against the claims, or buys them. Counsel on both sides to confirm."),
         ("The pilot.", "Facility size, the hospitals, and the stop-loss and step-up triggers."),
-        ("The price.", "How Carbon sets the discount, and what moves it."),
+        ("The price.", "4% to 5% to Carbon and 1.2% to us, one time at disbursement. Where in the range, and what moves it."),
         ("The data.", "What Carbon needs to underwrite, in what form, and how often."),
     ], MX, PAGE_H - 178, 540, size=12.3, leading=16.5, gap=12, body_color=LIGHT, tick=GOLD, lead_color=GOLD)
     box(c, MX, 104, 540, 58, D.IND, spine=GOLD)
