@@ -115,7 +115,7 @@ export async function emailLyfeConfirmation({
          <tr><td style="background:${LYFE_BRAND.greenTint};border-left:3px solid ${LYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.ink};">
            The time is yours once the ${esc(LYFE_CONSULT.feeDisplay)} is paid. Her diary is ${esc(LYFE_CONSULT.dayNames.toLowerCase())}, ${esc(LYFE_CONSULT.hoursDisplay)}, so there are only ${LYFE_CONSULT.perWeek} of these in a week and we cannot hold one open.
            <br><br>
-           ${esc(LYFE_CONSULT.redeemable)}
+           ${esc(LYFE_CONSULT.feeNote)}
          </td></tr>
        </table>
        <p style="margin:0 0 14px;">If the payment did not go through, reply to this note and we will send you the link again. If you would rather pay by transfer, say so and we will send the account.</p>
@@ -318,7 +318,7 @@ export async function emailLyfeConsultationConfirmed({
          : `<p style="margin:0 0 14px;">The half hour you chose had just gone when your payment landed, so a coordinator will call you today to find another time that works. Nothing is lost and nothing more is owed.</p>`
      }
      <p style="margin:0 0 14px;">Come with one thing in mind: what you would like to be different. You do not need photographs, you do not need to have decided anything, and you will not be sold to on the call.</p>
-     <p style="margin:0 0 14px;">${esc(LYFE_CONSULT.redeemable)}</p>
+     <p style="margin:0 0 14px;">${esc(LYFE_CONSULT.feeNote)}</p>
      <p style="margin:0 0 14px;">If you need to move it, reply to this note or call ${esc(LYFE_PHONE_DISPLAY)}. Please give us a day's notice if you can, because the diary is only ${LYFE_CONSULT.perWeek} of these a week.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
