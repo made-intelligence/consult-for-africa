@@ -9,7 +9,7 @@ import { LYFE_EVENT_THEME, LYFE_NAME, MEDLYFE_BRAND as MB } from "@/lib/lyfe";
  * and somebody weighing a consultation can see there is an evening. Two items,
  * no dropdowns, nothing else competing with the page's own call to action.
  */
-export default function LyfeNav({ on }: { on: "event" | "consult" }) {
+export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
   const event = on === "event";
   return (
     <nav

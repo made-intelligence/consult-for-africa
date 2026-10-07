@@ -941,3 +941,43 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
     body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
   },
 ];
+
+/**
+ * The facility tour.
+ *
+ * Dr Kpaduwa goes to the doctors rather than waiting for their patients. A
+ * referral from a colleague is the highest trust route into a surgical
+ * practice and the shortest, because the patient has already decided to trust
+ * the person who suggested it.
+ *
+ * The form is five fields. A consultant filling this in between clinics will
+ * not finish eight.
+ */
+export const LYFE_VISIT = {
+  /** Named in the register doctors already use. A round is a thing they do. */
+  name: "Facility Rounds",
+  areas: ["Lekki Phase 1", "Lekki, elsewhere", "Victoria Island", "Ikoyi", "Somewhere else in Lagos"],
+  roles: [
+    "Medical Director or Owner",
+    "Consultant",
+    "General Practitioner",
+    "Practice or Facility Manager",
+    "Other",
+  ],
+  minutes: 30,
+  /** What she actually does on a visit, so nobody expects a sales call. */
+  whatHappens: [
+    {
+      t: "She comes to you",
+      b: "At your facility, at a time that suits your list. Thirty minutes, or longer if you want to walk her round.",
+    },
+    {
+      t: "A real clinical conversation",
+      b: "What she does, what she will not do, how she assesses, and where the line sits between what you can manage and what needs an operation.",
+    },
+    {
+      t: "A referral route that works both ways",
+      b: "A named contact, a number that is answered, and your patient comes back to you with a letter. If she thinks surgery is wrong for them, you hear that too.",
+    },
+  ],
+} as const;
