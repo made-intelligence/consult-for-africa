@@ -311,17 +311,17 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    // Her subject is blank on purpose. Her Doctors for Change record carries
-    // no bio, specialty or institution, so writing a line for her would be
-    // inventing one. It fills in the moment she replies.
-    subject: "",
+    // Taken from her own DFC Catalyst billing in this repo, where she spoke in
+    // September. She is the hormones seat the panel was missing.
+    subject:
+      "Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring",
     name: "Dr Folake Kofo-Idowu",
-    title: "Vice President, Doctors for Change",
+    title: "Founder and Medical Director of Nelia. Double board certified physician",
     portrait: null,
   },
   {
     seat: "The panel, on the inner",
-    subject: "Menopause and andropause. What changes in the hormonal system on both sides of midlife, what is worth measuring, and what can be done about it",
+    subject: "Andropause and men's health at midlife. The half of this conversation men never get invited to",
     name: null,
     title: null,
     portrait: null,

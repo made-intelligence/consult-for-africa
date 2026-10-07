@@ -36,6 +36,18 @@ export const DFC_CATALYST_EVENTS: DfcCatalystEvent[] = [
     venue: "Zoom",
     registerUrl: "https://us06web.zoom.us/meeting/register/Kt7gU0vmRKS8npHFEVDNvQ",
   },
+  {
+    startsAt: new Date("2026-10-24T12:00:00+01:00"),
+    speaker: "Dr Tare Biu",
+    speakerBio:
+      "MRCP FRCPCH FRSM FWACP FMCPAED DCH, Consultant Neurodevelopmental Paediatrician in Bristol, United Kingdom.",
+    topic: "Identifying and managing children with ADHD",
+    when: "Saturday 24 October 2026, 12:00 PM WAT",
+    venue: "Zoom",
+    // The flyer says the link follows. Replace this the moment it exists,
+    // because an invitation that cannot be acted on is worse than none.
+    registerUrl: DFC_SITE_URL,
+  },
 ];
 
 /**
