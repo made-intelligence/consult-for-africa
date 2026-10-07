@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import {
   LYFE_BRAND as C,
@@ -8,7 +7,6 @@ import {
   LYFE_CONSULT_FAQ,
   LYFE_CONSULT_PROOF,
   LYFE_CONSULT_SCHEDULE,
-  LYFE_EVENT,
   LYFE_NAME,
   LYFE_PHONE_DISPLAY,
   LYFE_SOCIAL,
@@ -243,6 +241,88 @@ export default async function ConsultPage({
         </dl>
       </section>
 
+      {/* ── what the half hour actually is ───────────────────────────── */}
+      <section className="px-6 py-16 md:px-10 md:py-20">
+        <div className="mx-auto w-full max-w-5xl">
+          <h2
+            className="text-[28px] leading-tight md:text-[38px]"
+            style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.02em" }}
+          >
+            What happens in the thirty minutes.
+          </h2>
+          <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-3">
+            {[
+              {
+                n: "01",
+                t: "You talk first",
+                b: "What you have been thinking about, how long for, and what you would want to be different. You do not need photographs, the right words, or a decision.",
+              },
+              {
+                n: "02",
+                t: "She tells you what is actually involved",
+                b: "What the procedure is, what recovery really looks like in Lagos, what it would cost, and what she would and would not do in your case.",
+              },
+              {
+                n: "03",
+                t: "You leave knowing where you stand",
+                b: "Either a plan and what it costs, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the fee has still bought you it.",
+              },
+            ].map((x) => (
+              <div key={x.n}>
+                <p
+                  className="text-[13px] font-semibold"
+                  style={{ color: C.bronze, letterSpacing: "0.1em" }}
+                >
+                  {x.n}
+                </p>
+                <h3 className="mt-3 text-[17.5px] font-semibold" style={{ color: C.ink }}>
+                  {x.t}
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed" style={{ color: C.body }}>
+                  {x.b}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 grid gap-8 border-t pt-10 md:grid-cols-2" style={{ borderColor: C.line }}>
+            <div>
+              <h3 className="text-[16px] font-semibold" style={{ color: C.ink }}>
+                Book this if
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {[
+                  "You are seriously considering a procedure and want a straight answer before you commit",
+                  "You have been quoted elsewhere and want a second, qualified opinion",
+                  "You are weighing travelling abroad against being treated here",
+                  "You have had surgery before and are living with the result",
+                ].map((i) => (
+                  <li key={i} className="text-[14.5px] leading-relaxed" style={{ color: C.body }}>
+                    {i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-[16px] font-semibold" style={{ color: C.ink }}>
+                Do not book this if
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {[
+                  "You are looking for a price list. Ask us on WhatsApp and we will send what we can",
+                  "You want reassurance rather than an assessment. She will give you the second",
+                  "You need urgent medical attention. Go to a hospital, not a video call",
+                ].map((i) => (
+                  <li key={i} className="text-[14.5px] leading-relaxed" style={{ color: C.muted }}>
+                    {i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── the booking ───────────────────────────────────────────────── */}
       <section id="book" className="px-6 py-16 md:px-10 md:py-24" style={{ background: C.groundWarm }}>
         <div className="mx-auto w-full max-w-5xl">
@@ -303,26 +383,6 @@ export default async function ConsultPage({
               Or message us on WhatsApp
             </a>
           </div>
-        </div>
-      </section>
-
-      {/* ── the evening ───────────────────────────────────────────────── */}
-      <section style={{ background: C.greenTint }} className="px-6 py-14 md:px-10">
-        <div className="mx-auto w-full max-w-3xl">
-          <p
-            className="text-[10.5px] font-semibold uppercase"
-            style={{ color: C.green, letterSpacing: "0.18em" }}
-          >
-            Also on
-          </p>
-          <p className="mt-4 text-[17px] leading-relaxed" style={{ color: C.inkSoft }}>
-            {LYFE_SURGEON.shortName} appears at {LYFE_EVENT.theme}, an evening hosted by{" "}
-            {LYFE_EVENT.host} on {LYFE_EVENT.date} at {LYFE_EVENT.venueName}.{" "}
-            <Link href="/lyfe" className="font-semibold underline underline-offset-4" style={{ color: C.green }}>
-              Register your interest in the evening
-            </Link>
-            . A place there is not a consultation, and a consultation does not need the evening.
-          </p>
         </div>
       </section>
 

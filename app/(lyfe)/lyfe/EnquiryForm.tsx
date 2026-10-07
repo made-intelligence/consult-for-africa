@@ -63,10 +63,17 @@ export default function EnquiryForm({
   utm,
   initialIntent,
   slots,
+  lock = false,
 }: {
   utm: { source: string | null; medium: string | null; campaign: string | null };
   initialIntent: Intent | null;
   slots: ConsultSlot[];
+  /**
+   * One page, one job. The event landing and the consultation landing are
+   * separate pages now, so the form on each is not allowed to turn into the
+   * other one. Two calls to action on a page halve both of them.
+   */
+  lock?: boolean;
 }) {
   const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
   const [step, setStep] = useState(initialIntent === "CONSULTATION" ? 1 : 2);
@@ -489,27 +496,29 @@ export default function EnquiryForm({
             We will never sell or share your details, and you can ask us to delete them at any time.
           </p>
 
-          <div className="mt-6 border-t pt-5 text-center" style={{ borderColor: C.line }}>
-            <button
-              type="button"
-              onClick={() => {
-                setError(null);
-                if (rsvp) {
-                  setIntent("CONSULTATION");
-                  setStep(1);
-                } else {
-                  setIntent("EVENT_RSVP");
-                  setStep(2);
-                }
-              }}
-              className="text-[13px] font-semibold underline underline-offset-4"
-              style={{ color: MB.greenDeep }}
-            >
-              {rsvp
-                ? `I would rather consult Dr Kpaduwa directly, ${LYFE_CONSULT.feeDisplay}`
-                : "Actually, I would like to come to the evening"}
-            </button>
-          </div>
+          {!lock && (
+            <div className="mt-6 border-t pt-5 text-center" style={{ borderColor: C.line }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  if (rsvp) {
+                    setIntent("CONSULTATION");
+                    setStep(1);
+                  } else {
+                    setIntent("EVENT_RSVP");
+                    setStep(2);
+                  }
+                }}
+                className="text-[13px] font-semibold underline underline-offset-4"
+                style={{ color: MB.greenDeep }}
+              >
+                {rsvp
+                  ? `I would rather consult Dr Kpaduwa directly, ${LYFE_CONSULT.feeDisplay}`
+                  : "Actually, I would like to come to the evening"}
+              </button>
+            </div>
+          )}
         </>
       )}
     </form>
