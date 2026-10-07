@@ -55,6 +55,14 @@ async function main() {
   const send = args.includes("--send");
   const limit = Number(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? 0);
 
+  const ev0 = nextCatalystEvent();
+  if (send && ev0 && ev0.registerUrl === "https://www.dfcare.org") {
+    console.error("The Catalyst session has no Zoom link yet, only the site.");
+    console.error("Refusing to send: an invitation nobody can act on is worse than none.");
+    console.error("Put the real registerUrl in lib/cadreHealth/dfcCatalystEvents.ts first.");
+    process.exit(1);
+  }
+
   if (send && !process.env.ZEPTOMAIL_API_KEY) {
     console.error("No ZEPTOMAIL_API_KEY. Refusing: the fallback is Zoho and bulk must not go that way.");
     process.exit(1);
@@ -66,12 +74,18 @@ async function main() {
       .filter((e): e is string => !!e),
   );
 
+  // Converted only. These are the people who answered an email once and then
+  // went and claimed a profile, so they are the only ones on this list who
+  // have shown they want to hear from us. The other eight thousand have been
+  // written to and said nothing, and a cold blast to them buys bounces and
+  // complaints rather than referrals.
   const all = await prisma.cadreProfessional.findMany({
+    where: { outreachRecord: { profileClaimedAt: { not: null } } },
     select: { id: true, email: true, firstName: true, lastName: true },
   });
   const targets = all.filter((p) => p.email && !suppressed.has(p.email.toLowerCase()));
 
-  console.log(`${all.length} on the list, ${suppressed.size} suppressed, ${targets.length} mailable.`);
+  console.log(`${all.length} converted, ${suppressed.size} suppressed overall, ${targets.length} mailable.`);
   const batch = limit > 0 ? targets.slice(0, limit) : targets;
   console.log(`${send ? "SENDING" : "DRY RUN"} to ${batch.length}.\n`);
 
