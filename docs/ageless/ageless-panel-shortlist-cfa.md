@@ -47,14 +47,20 @@ Working shortlist. Nobody has been approached.
 
 ---
 
-## Seat three: performance and physical function
+## Seat three: performance, nutrition and physical function
 
 | Name | Who they are | Why | Flag |
 | --- | --- | --- | --- |
 | **Ngozi Ojora** | Founder, Elite Figures, Ikoyi. Four time NCAA All American. NASM certified and a MedFit Menopause Health and Fitness Specialist. Has spoken to NLNG executives on the Lagos Business School programme | The audience match of the whole list. Perimenopause, bone health and strength, which is the seat that makes the evening actionable on Monday morning | Clean. Certificates not clinical degrees, so bill her as a coach |
-| **Dr Olusola Oguntolu** | Clinic lead, Sleep Inc, Ikoyi. American Board certified in internal medicine, pulmonary, critical care and sleep medicine | The only properly board certified sleep physician found in Lagos | Unverified whether he is resident here or practising in the US |
-| **Boroji Osindero** | Founder and CEO, Wellpath Physiotherapy, Victoria Island, Ikoyi and Lekki, since 2007. Birmingham trained. Opened Lagos's first inpatient rehab facility | Physical function and recovery, and she gives good copy | Unverified. Newest source found is 2020, so confirm she is still CEO |
-| **Abasianie Udo-Umo** | Registered Dietitian, trading as The Lagos Dietitian. The most public credentialled dietitian found | Can talk about jollof and insulin in the same sentence, which matters in this room | Verify her Dietitians Association registration before billing her as registered |
+| **Gbemi Giwa** | Fitness and nutrition coach. Founder of the African Fat Loss Method. Roughly eighty two thousand on Instagram, over a hundred thousand across platforms | The best cultural fit on the list for the weight question, because she answers the one this room actually has: how to eat Nigerian food and still change body composition | Check the register. Her programmes are sold on lose three to ten kilos and keep your curves without giving up jollof, which is diet industry language sitting next to consultant physicians. No supplements, which is the less damaging version. Certifying body not named anywhere public, and she now works between Lagos and London, so confirm she is here |
+| **Dr Olusesan Awe** | Founder and CEO, Physio-Fit Physiotherapy Hospital, Lagos | The better structural answer for a man in this seat. A clinical movement professional rather than a trainer, covering joints, mobility and staying able bodied at sixty five, which is the longevity question this audience actually asks and which nobody else on the panel covers | Not vetted in depth. Confirm the post and that he presents well |
+| **Foluso Ogunwale** | Founder and CEO, i-Fitness. Built West Africa's largest gym chain from a three bedroom flat on Admiralty Way to more than twenty four branches. Seven years at Skye Bank before that | The cleanest well known man in Nigerian fitness. He speaks to the national picture, what Nigerians actually do, what they pay for and why they stop, and on a panel of physicians he reads as industry rather than influencer | Clean. A business operator, not a trainer or a scientist. Low social profile, which here is a feature |
+
+**Alternates for this seat.** Dr Olusola Oguntolu of Sleep Inc, Ikoyi, the only board certified sleep physician found in Lagos, if sleep earns a seat of its own and he is in the country. Boroji Osindero, founder of Wellpath Physiotherapy, if a woman physiotherapist is preferred to Dr Awe. Abasianie Udo-Umo, The Lagos Dietitian, if the nutrition seat should go to a registered dietitian rather than a coach.
+
+**On the question of a prominent fitness man.** Every well known Nigerian man in fitness is a personality first. We could not find a single publicly visible Nigerian male strength and conditioning professional holding a formal credential. So the choice is between a personality with a real business behind him and changing the shape of the seat, which is why Dr Awe is above Mr Ogunwale.
+
+Two names that will come up, and should not. **Maje Ayida** of Eden Lifestyle is professionally the obvious answer, with a corporate wellness arm and a real industry position. He is also Toke Makinwa's former husband, the marriage was dissolved in 2017 on proven adultery after a very public scandal, and he was still giving interviews about it in 2025. Seventy affluent Lagos women between thirty five and sixty five is the single audience most likely to know that story in detail, and she is already on our do not approach list for separate reasons. **Kemen** has the largest following of any Nigerian trainer at around two hundred and sixty thousand and runs two Lagos gyms, but he was disqualified from Big Brother Naija in 2017 for touching a sleeping female housemate and publicly apologised to women across Africa for it. Neither belongs on a stage with a female plastic surgeon in front of this room.
 
 ---
 
@@ -94,6 +100,20 @@ A different skill from chairing a panel. This one has to get her talking about w
 | **Funmi Iyanda** | CEO, Oya Media. Host of Public Eye. Created New Dawn. Aspen and Tutu fellow. 46k, verified | Depth. The most skilled long form interviewer Nigeria has produced. Pick her if you want the evening quoted for a year | She interrogates rather than hosts, and she is London based now. Accept that she may ask a hard question on camera |
 | **Kate Henshaw** | Actress, author and advocate. Medical science graduate. The most sustained public voice in Nigeria on menopause and ageing, through Without Pause. 3.2m, verified | The only name whose public subject is literally ageing in a woman's body, and she is inside the room's age band | Check her Efamol relationship does not collide with anything MedLYFE sells |
 | **Zainab Balogun-Nwachukwu** | Actress, host and executive producer, ZABA Productions. Former host of The Voice Nigeria. Endometriosis advocate. 354k, verified | Polished, genuinely in women's health, and a face the luxury end of Lagos associates with taste | Could not verify her broadcast platform is currently in production |
+
+---
+
+## Added at your request, with what we found
+
+**Joycee Awosika**, founder and chief executive of the ORÍKÌ Group. Note the spelling. She runs a wellness business of real scale: ten years old, somewhere between thirteen and fifteen spas plus six hair restoration centres across several African countries, with her own manufacturing in Nigeria, a training institute and an app. Roughly thirty three thousand on Instagram, and genuine international standing through the World Economic Forum and the Presidential Precinct.
+
+She is a strong name and we would want her in the room. We would not put her on this panel, for two reasons.
+
+The first is register. She is an energy economist by training, with a career at Constellation Energy, DFID and the Ministry of Power before ORÍKÌ. She has no health credential, and on a stage with three consultant physicians and a board certified plastic surgeon she would be the only person with no clinical training. Her public themes are natural ingredients, building an African wellness industry, vocational training and entrepreneurial structure. We found nothing from her on hormones, metabolic health, menopause or the biology of ageing.
+
+The second is commercial. ORÍKÌ is a spa chain and a skincare line in Lagos. That is directly adjacent to a longevity and aesthetics centre, and she would be selling a category the host also sells.
+
+**Our suggestion.** Invite her as a guest, and ask her to co-host or convene rather than to sit on the panel. A wellness industry founder of her standing bringing her own list is worth more to this evening than a fifth chair, and it avoids both problems at once.
 
 ---
 

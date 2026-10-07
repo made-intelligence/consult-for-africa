@@ -5,11 +5,14 @@ import { handler } from "@/lib/api-handler";
 import { isRateLimited } from "@/lib/rate-limit";
 import {
   LYFE_CONSENT_TEXT,
+  LYFE_CONSULT,
   LYFE_CONTACT_EMAIL,
   clientIpFrom,
   hashIp,
+  isConsultSlot,
   normalisePhone,
 } from "@/lib/lyfe";
+import { startConsultPayment } from "@/lib/lyfePayment";
 import { emailLyfeConfirmation, emailLyfeInternal } from "@/lib/lyfeEmail";
 
 /**
@@ -25,7 +28,9 @@ const schema = z.object({
   fullName: z.string().trim().min(2, "Please give your name").max(120),
   email: z.string().trim().toLowerCase().email("That email does not look right").max(200),
   phone: z.string().trim().min(7, "We need a number we can call").max(40),
-  intent: z.enum(["EVENT_RSVP", "DISCOVERY_CALL"]),
+  intent: z.enum(["EVENT_RSVP", "CONSULTATION", "DISCOVERY_CALL"]),
+  /** The half hour they picked, as an ISO instant. Consultations only. */
+  slotAt: z.string().trim().max(40).optional().nullable(),
   guestCount: z.number().int().min(0).max(4).optional().nullable(),
   isClinician: z.boolean().optional().nullable(),
   pathway: z.enum(["AESTHETIC", "SURGICAL", "UNSURE"]),
@@ -140,8 +145,38 @@ export const POST = handler(async function POST(req: NextRequest) {
   }
 
   const rsvp = data.intent === "EVENT_RSVP";
+  const consultation = data.intent === "CONSULTATION";
   const surgical = !rsvp && data.pathway === "SURGICAL";
   const phone = normalisePhone(data.phone);
+
+  // A consultation is a half hour of a surgeon's week, so the slot is checked
+  // against the diary rather than trusted from the browser, and checked again
+  // for being sold before the person is sent to pay. The authority on whether
+  // it is really sold is the unique index, which runs at the moment the money
+  // lands; this is the courteous version of the same answer.
+  let slotAt: Date | null = null;
+  if (consultation) {
+    if (!data.slotAt || !isConsultSlot(data.slotAt)) {
+      return NextResponse.json(
+        { error: "Please choose one of the times in Dr Kpaduwa's diary." },
+        { status: 400 },
+      );
+    }
+    slotAt = new Date(data.slotAt);
+    if (slotAt.getTime() < Date.now()) {
+      return NextResponse.json({ error: "That time has passed. Please pick another." }, { status: 400 });
+    }
+    const gone = await prisma.lyfeEnquiry.findFirst({
+      where: { slotAt, paidAt: { not: null } },
+      select: { id: true },
+    });
+    if (gone) {
+      return NextResponse.json(
+        { error: "Somebody took that half hour while you were filling this in. Please pick another." },
+        { status: 409 },
+      );
+    }
+  }
 
   const entry = await prisma.lyfeEnquiry.create({
     data: {
@@ -149,6 +184,8 @@ export const POST = handler(async function POST(req: NextRequest) {
       email: data.email,
       phone,
       intent: data.intent,
+      // Interest, not a place. The team decides who is invited from here.
+      eventStage: rsvp ? "INTERESTED" : null,
       guestCount: rsvp ? (data.guestCount ?? 0) : null,
       isClinician: rsvp ? (data.isClinician ?? null) : null,
       pathway: rsvp ? "UNSURE" : data.pathway,
@@ -166,6 +203,8 @@ export const POST = handler(async function POST(req: NextRequest) {
       priorSurgery: surgical ? (data.priorSurgery ?? null) : null,
       goal: data.goal || null,
       notes: data.notes || null,
+      slotAt,
+      amountKobo: consultation ? LYFE_CONSULT.fee * 100 : null,
       source: data.source,
       sourceDetail: data.sourceDetail || null,
       utmSource: data.utmSource || null,
@@ -180,6 +219,25 @@ export const POST = handler(async function POST(req: NextRequest) {
 
   const firstName = entry.fullName.trim().split(/\s+/)[0] ?? entry.fullName;
 
+  // Send them to Paystack before anything else happens on this request. They
+  // are sitting on a spinner waiting for the redirect, and an email provider
+  // having a slow morning must not be what stands between a booking and the
+  // money.
+  let payUrl: string | null = null;
+  if (consultation) {
+    payUrl = await startConsultPayment({
+      enquiryId: entry.id,
+      email: entry.email,
+      name: entry.fullName,
+      slotAt: slotAt!,
+    });
+    if (!payUrl) {
+      // The row is saved and the coordinator is told, so this is recoverable by
+      // a telephone call rather than a lost enquiry.
+      console.error(`[lyfe/enquiry] could not start payment for ${entry.id}`);
+    }
+  }
+
   try {
     await emailLyfeConfirmation({
       to: entry.email,
@@ -187,6 +245,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       intent: entry.intent,
       surgical,
       guestCount: entry.guestCount,
+      slotAt: entry.slotAt,
     });
   } catch (err) {
     console.error("[lyfe/enquiry] confirmation email failed:", err);
@@ -200,6 +259,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       email: entry.email,
       phone: entry.phone,
       intent: entry.intent,
+      slotAt: entry.slotAt,
       guestCount: entry.guestCount,
       isClinician: entry.isClinician,
       pathway: entry.pathway,
@@ -223,5 +283,5 @@ export const POST = handler(async function POST(req: NextRequest) {
     console.error("[lyfe/enquiry] coordinator notification failed:", err);
   }
 
-  return NextResponse.json({ ok: true, intent: entry.intent });
+  return NextResponse.json({ ok: true, intent: entry.intent, payUrl, id: entry.id });
 });

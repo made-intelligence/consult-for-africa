@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCadreEmployerContext, canWrite } from "@/lib/cadreEmployerAuth";
 import { handler } from "@/lib/api-handler";
-import { sendCadreEmail } from "@/lib/cadreEmail";
-import { greetingFor } from "@/lib/cadreSalutation";
+import { createContactRequest } from "@/lib/cadreHealth/contactRequest";
 
 /**
  * Asking a professional whether a hospital may approach them.
@@ -13,10 +12,10 @@ import { greetingFor } from "@/lib/cadreSalutation";
  * an employer never receives an email address or a phone number from search.
  * They raise one of these instead, the professional answers, and the answer is
  * recorded either way so nobody is asked twice by the same hospital.
+ *
+ * The guards and the wording live in lib/cadreHealth/contactRequest.ts, shared
+ * with the admin route CFA uses to approach on a client's behalf.
  */
-
-/** How long a professional has to answer before the request lapses. */
-const EXPIRY_DAYS = 30;
 
 export const POST = handler(async function POST(req: NextRequest) {
   const ctx = await getCadreEmployerContext();
@@ -30,140 +29,32 @@ export const POST = handler(async function POST(req: NextRequest) {
     );
   }
 
-  // Verification is the point at which we are willing to put a hospital's name
-  // in front of a doctor. Until then they can search, not reach.
-  if (!ctx.org.isVerified) {
-    return NextResponse.json(
-      {
-        error:
-          "Your organisation needs to be verified before you can approach professionals.",
-        code: "NOT_VERIFIED",
-      },
-      { status: 403 },
-    );
-  }
-
   const body = await req.json().catch(() => ({}));
-  const professionalId = typeof body.professionalId === "string" ? body.professionalId : "";
-  const mandateId = typeof body.mandateId === "string" && body.mandateId ? body.mandateId : null;
-  const message = typeof body.message === "string" ? body.message.trim().slice(0, 1000) : "";
 
-  if (!professionalId) {
-    return NextResponse.json({ error: "professionalId is required" }, { status: 400 });
-  }
-  if (message.length < 20) {
-    return NextResponse.json(
-      { error: "Say something about the role. A bare request is rarely answered." },
-      { status: 400 },
-    );
-  }
-
-  const professional = await prisma.cadreProfessional.findUnique({
-    where: { id: professionalId },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      cadre: true,
-      email: true,
-      availability: true,
-      accountStatus: true,
-    },
+  const result = await createContactRequest({
+    orgId: ctx.org.id,
+    professionalId: typeof body.professionalId === "string" ? body.professionalId : "",
+    mandateId: typeof body.mandateId === "string" && body.mandateId ? body.mandateId : null,
+    message: typeof body.message === "string" ? body.message : "",
+    requestedById: ctx.accountId,
   });
-  if (!professional) {
-    return NextResponse.json({ error: "Professional not found" }, { status: 404 });
-  }
-  // Someone who has said they do not want to be approached is not shown in
-  // search, and is not reachable by guessing an id either.
-  if (professional.availability === "NOT_LOOKING" || professional.accountStatus === "SUSPENDED") {
-    return NextResponse.json(
-      { error: "This professional is not open to approaches." },
-      { status: 403 },
-    );
-  }
 
-  // If the role is named, it has to be one of ours.
-  if (mandateId) {
-    const owned = await prisma.cadreMandate.findFirst({
-      where: { id: mandateId, employerOrgId: ctx.org.id },
-      select: { id: true },
-    });
-    if (!owned) {
-      return NextResponse.json({ error: "Role not found" }, { status: 404 });
-    }
-  }
-
-  // A previous no stands. Asking again through a new request would turn a
-  // consent gate into a nuisance.
-  const declined = await prisma.cadreContactRequest.findFirst({
-    where: { orgId: ctx.org.id, professionalId, status: "DECLINED" },
-    select: { id: true },
-  });
-  if (declined) {
-    return NextResponse.json(
-      { error: "This professional has already declined an approach from you.", code: "DECLINED" },
-      { status: 409 },
-    );
-  }
-
-  const existing = await prisma.cadreContactRequest.findUnique({
-    where: {
-      orgId_professionalId_mandateId: { orgId: ctx.org.id, professionalId, mandateId },
-    },
-    select: { id: true, status: true },
-  });
-  if (existing) {
+  if (!result.ok) {
     return NextResponse.json(
       {
+        // An employer asking on their own behalf should read it as "your
+        // organisation", not as a third-person description of themselves.
         error:
-          existing.status === "ACCEPTED"
-            ? "They have already agreed. Their details are on their profile."
-            : "You have already asked. We will tell you when they answer.",
-        code: existing.status,
+          result.code === "NOT_VERIFIED"
+            ? "Your organisation needs to be verified before you can approach professionals."
+            : result.error,
+        ...(result.code ? { code: result.code } : {}),
       },
-      { status: 409 },
+      { status: result.status },
     );
   }
 
-  const request = await prisma.cadreContactRequest.create({
-    data: {
-      orgId: ctx.org.id,
-      professionalId,
-      mandateId,
-      message,
-      requestedById: ctx.accountId,
-      expiresAt: new Date(Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  await prisma.cadreNotification.create({
-    data: {
-      professionalId,
-      type: "CONTACT_REQUEST",
-      title: `${ctx.org.name} would like to contact you`,
-      message:
-        message.length > 140 ? `${message.slice(0, 140)}...` : message,
-      link: "/oncadre/approaches",
-    },
-  });
-
-  // Best effort. The notification in the portal is the record; the email is the
-  // nudge, and a bounced address should not fail the request.
-  try {
-    await sendCadreEmail({
-      to: professional.email,
-      subject: `${ctx.org.name} would like to contact you`,
-      heading: "A hospital has asked to reach you",
-      body: `${greetingFor(professional)}, ${ctx.org.name} found you on CadreHealth and would like to get in touch. They wrote:\n\n"${message}"\n\nWe have not given them your phone number or email. You decide whether they get it, and you can say no without giving a reason.`,
-      ctaText: "See the request",
-      ctaHref: `${process.env.NEXTAUTH_URL ?? "https://oncadre.com"}/oncadre/approaches`,
-      footer: "If you would rather not hear from employers at all, you can turn approaches off in your profile.",
-    });
-  } catch (err) {
-    console.error("[contact request] email send failed:", err);
-  }
-
-  return NextResponse.json({ ok: true, id: request.id, status: request.status });
+  return NextResponse.json({ ok: true, id: result.id, status: "PENDING" });
 });
 
 /** The org's own requests, for the Candidates area to show what is outstanding. */

@@ -23,16 +23,32 @@ from osteon_doc import build_doc  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "office"
 
-FOOTER = "Consult for Africa internal  /  Office of the Founding Partner  /  Not for circulation outside the firm"
+def footer(function: str) -> str:
+    """The footer names the function the pack belongs to, not the office that
+    happens to build it, because a page torn out of a growth pack should not
+    read as though it came from the Founding Partner's own file."""
+    return f"Consult for Africa internal  /  {function}  /  Not for circulation outside the firm"
+
 
 DOCS_TO_BUILD = [
-    ("ezinne", "ezinne-onboarding-pack-cfa", "Onboarding Pack  /  Executive Assistant to the Founding Partner"),
+    (
+        "ezinne",
+        "ezinne-onboarding-pack-cfa",
+        "Onboarding Pack  /  Executive Assistant to the Founding Partner",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "dorathy",
+        "dorathy-growth-pack-cfa",
+        "Growth Pack  /  Director of Business Development and Growth",
+        footer("Business Development and Growth"),
+    ),
 ]
 
 
 if __name__ == "__main__":
     wanted = set(sys.argv[1:])
-    for key, stem, header in DOCS_TO_BUILD:
+    for key, stem, header, foot in DOCS_TO_BUILD:
         if wanted and key not in wanted:
             continue
-        build_doc(OUT / f"{stem}.md", OUT / f"{stem}.pdf", header, FOOTER)
+        build_doc(OUT / f"{stem}.md", OUT / f"{stem}.pdf", header, foot)

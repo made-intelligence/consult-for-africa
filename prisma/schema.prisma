@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -33,6 +34,14 @@ enum TaskStatus {
   CHANGES_REQUESTED
   DONE
   CANCELLED
+}
+
+/// What happened to a task. Exactly two things can happen to a live one: it
+/// changes state, or it changes hands. RAISED is the row that opens the trail.
+enum TaskEventKind {
+  RAISED
+  STATUS
+  REASSIGNED
 }
 
 /// A commitment is not a task. A task is work we hold; a commitment is a promise
@@ -397,10 +406,12 @@ model User {
   sourceApplicationId      String? // TalentApplication ID that created this ACADEMY_LEARNER account
 
   // Delegation task board
-  tasksAssigned         Task[]         @relation("TaskAssignee")
-  tasksRaised           Task[]         @relation("TaskAssigner")
-  taskQuestionsAsked    TaskQuestion[] @relation("TaskQuestionsAsked")
-  taskQuestionsAnswered TaskQuestion[] @relation("TaskQuestionsAnswered")
+  tasksAssigned         Task[]           @relation("TaskAssignee")
+  tasksRaised           Task[]           @relation("TaskAssigner")
+  taskQuestionsAsked    TaskQuestion[]   @relation("TaskQuestionsAsked")
+  taskQuestionsAnswered TaskQuestion[]   @relation("TaskQuestionsAnswered")
+  taskAttachments       TaskAttachment[] @relation("TaskAttachmentUploader")
+  taskEvents            TaskEvent[]      @relation("TaskEventActor")
 
   // Office of the Founding Partner
   commitmentsOwed        Commitment[]      @relation("CommitmentOwner")
@@ -1981,6 +1992,10 @@ enum AuditAction {
   DOWNLOAD
   LOGIN
   AI_GENERATE
+  /// A project record has fallen behind the work and its manager was chased.
+  FRESHNESS_NUDGE
+  /// The chase went unanswered long enough to reach the partner.
+  FRESHNESS_ESCALATION
 }
 
 // ─── Maarova Assessment Platform ──────────────────────────────────────────────
@@ -2959,12 +2974,20 @@ model Task {
   recurringTaskId String?
   recurringTask   RecurringTask? @relation(fields: [recurringTaskId], references: [id], onDelete: SetNull)
 
+  /// What the assignee says they are handing over, written at the moment of
+  /// submitting. Sits next to the attachments rather than in a comment thread,
+  /// because the reviewer should not have to read a conversation to find out
+  /// what they are being asked to judge.
+  handoverNote String? @db.Text
+
   submittedAt DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  questions TaskQuestion[]
+  questions   TaskQuestion[]
+  attachments TaskAttachment[]
+  events      TaskEvent[]
 
   @@index([assigneeId, status])
   @@index([assignerId, status])
@@ -2973,6 +2996,69 @@ model Task {
   @@index([parentTaskId])
   @@index([linkedEntityType, linkedEntityId])
   @@index([recurringTaskId])
+}
+
+/// What the assignee is actually handing over.
+///
+/// Submitting used to record a timestamp and nothing else. The reviewer was
+/// asked to sign off work they could not see, so "submitted" came to mean
+/// "trust me" and signing off came to mean "I believe you". The first inventory
+/// count came back in ten minutes against a three hour estimate and there was
+/// nothing on the record to look at.
+model TaskAttachment {
+  id     String @id @default(cuid())
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  /// What it is called in the list: the filename, or what the link points at.
+  label String
+
+  /// Exactly one of these is set. A file the firm holds, or a pointer to where
+  /// the work actually lives, because a shared folder is still an answer.
+  fileKey String?
+  url     String?
+
+  contentType String?
+  sizeBytes   Int?
+
+  uploadedById String
+  uploadedBy   User   @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}
+
+/// One row per move, carrying the one note that move required.
+///
+/// The status columns say where a task is now. They cannot say it was sent back
+/// twice, who cleared the block, or what the reviewer said the first time. A
+/// task that bounced three times and one that landed first time read
+/// identically on the board, which threw away the only thing worth knowing
+/// about how a working relationship is going.
+model TaskEvent {
+  id     String @id @default(cuid())
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  kind TaskEventKind @default(STATUS)
+
+  /// Null where there is no previous state to leave, and on a change of hands.
+  fromStatus TaskStatus?
+  toStatus   TaskStatus?
+
+  /// The note the move required. Blocking says what is in the way, sending back
+  /// says what to change, handing over says what is being handed over,
+  /// cancelling says why, signing off says what was good. One note per move, so
+  /// no column ever has to carry two meanings at once.
+  note String? @db.Text
+
+  actorId String
+  actor   User   @relation("TaskEventActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId, createdAt])
 }
 
 // ─── Office of the Founding Partner ──────────────────────────────────────────
@@ -3520,6 +3606,15 @@ model Hospital {
   nhiaAccredited     Boolean @default(false)
   registrationNumber String?
 
+  // Sales directory. The same hospital is a prospect for every product in the
+  // suite, so contacts and per-product stages hang off this one record.
+  city       String?
+  category   String? // Hospital / clinic | Dental | Eye / optical | Diagnostic / lab | ...
+  website    String?
+  /// Normalised name + LGA, so a re-import updates rather than duplicates.
+  importKey  String?   @unique
+  importedAt DateTime?
+
   // Distress scoring (0-100, computed)
   distressScore       Decimal? @db.Decimal(5, 2)
   distressTier        String? // A | B | C | D
@@ -3546,11 +3641,15 @@ model Hospital {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  diagnostics  Diagnostic[]
-  kpiSnapshots TransformKPISnapshot[]
-  dealRecords  DealRecord[]
-  exitDossier  ExitDossier?
-  contactLog   HospitalContactLog[]
+  diagnostics     Diagnostic[]
+  kpiSnapshots    TransformKPISnapshot[]
+  dealRecords     DealRecord[]
+  exitDossier     ExitDossier?
+  contactLog      HospitalContactLog[]
+  contacts        HospitalContact[]
+  productStages   HospitalProductStage[]
+  campaignSends   SalesCampaignSend[]
+  recoveryAccount RecoveryAccount?
 
   @@index([pipelineStage])
   @@index([distressTier])
@@ -4712,6 +4811,15 @@ model CadreEmployerOrg {
   verifiedById String?
   verifiedBy   User?     @relation("CadreEmployerVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
   verifiedNote String?   @db.Text
+
+  /// What a professional is told, when the client is not to be named.
+  ///
+  /// A confidential search is only confidential if it is confidential
+  /// everywhere. The job board already carried an anonymous label, but an
+  /// approach said "<real client name> would like to contact you" and handed
+  /// the name straight to the doctor, which threw the whole thing away on the
+  /// first message. Null means the client is named openly.
+  publicName String?
 
   members         CadreEmployerAccount[]
   mandates        CadreMandate[]
@@ -7408,6 +7516,11 @@ model EstateRateChange {
 /// March campaign lost a hundred and seventy names.
 enum LyfeIntent {
   EVENT_RSVP
+  /// A paid half hour with Dr Kpaduwa, by video, in her Tuesday and Wednesday
+  /// diary. It replaced the free discovery call, which was easy to say yes to
+  /// and just as easy to forget.
+  CONSULTATION
+  /// Retired October 2026. Kept so the rows that used it still read.
   DISCOVERY_CALL
 }
 
@@ -7484,6 +7597,30 @@ enum LyfeSource {
 /// The coordinator's queue, not a marketing funnel. NEW means nobody has
 /// spoken to this person yet, and the dashboard counts how long that has been
 /// true.
+/// Where a guest stands with the room, which is separate from where the
+/// coordinator stands with the conversation. A person can be CONFIRMED for the
+/// evening and still be NEW on LyfeStatus, because nobody has rung them yet.
+enum LyfeEventStage {
+  /// Signified interest through the page. Costs them nothing and promises
+  /// them nothing.
+  INTERESTED
+  /// Chosen, and sent an invitation carrying a confirmation link.
+  INVITED
+  /// Confirmed they are coming. The only stage that fills a place.
+  CONFIRMED
+  /// Said no, or confirmed and then withdrew. Releases the place.
+  DECLINED
+  /// Interested and wanted, but the room was full when we got to them.
+  WAITLIST
+  /// Through the door on the night.
+  ATTENDED
+  /// Confirmed and did not come. Worth knowing before edition two.
+  NO_SHOW
+}
+
+/// The coordinator's queue, not a marketing funnel. NEW means nobody has
+/// spoken to this person yet, and the dashboard counts how long that has been
+/// true.
 enum LyfeStatus {
   NEW
   CONTACTED
@@ -7531,6 +7668,18 @@ model LyfeEnquiry {
   goal  String? @db.Text
   notes String? @db.Text
 
+  /// The half hour they asked for, as an instant. Consultations only.
+  slotAt DateTime?
+
+  /// Paystack. A consultation is not booked until it is paid for, so the diary
+  /// is held by `paidAt` and nothing else. A unique index on the slot, applied
+  /// only to paid rows, is what actually stops two people buying the same half
+  /// hour; it lives in the migration because Prisma cannot express a partial
+  /// unique index.
+  paymentRef String?   @unique
+  paidAt     DateTime?
+  amountKobo Int?
+
   source       LyfeSource @default(OTHER)
   /// The specific person, post, search term or event behind the source above.
   sourceDetail String?
@@ -7538,6 +7687,16 @@ model LyfeEnquiry {
   utmMedium    String?
   utmCampaign  String?
   sourcePath   String?
+
+  /// The room holds seventy, so interest and attendance are two different
+  /// things. A guest signifies interest through the page, the team chooses who
+  /// is invited, and the invitation carries a link only that person can use to
+  /// confirm. Only CONFIRMED counts against the seventy.
+  eventStage  LyfeEventStage?
+  inviteToken String?         @unique
+  invitedAt   DateTime?
+  confirmedAt DateTime?
+  declinedAt  DateTime?
 
   status           LyfeStatus @default(NEW)
   /// Set the moment somebody actually speaks to them. The gap between
@@ -7563,10 +7722,266 @@ model LyfeEnquiry {
   updatedAt DateTime @updatedAt
 
   @@index([status, createdAt])
+  @@index([eventStage, createdAt])
   @@index([intent, status])
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+// ─── Hospital sales: one directory, every product ───────────────────────────
+// Claims recovery is the first product sold through this. Each product gets a
+// stage per hospital, and every outbound email is a SalesCampaignSend so the
+// funnel can be read from sent to signed.
+
+model HospitalContact {
+  id         String   @id @default(cuid())
+  hospitalId String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  name       String?
+  role       String?
+  email      String?
+  phone      String?
+  isPrimary  Boolean  @default(false)
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sends SalesCampaignSend[]
+
+  @@unique([hospitalId, email])
+  @@index([email])
+}
+
+/// Where a hospital stands for one product.
+/// TARGET | CONTACTED | ENGAGED | ENQUIRED | SAMPLE | PROPOSAL | WON | LOST | NOT_FIT
+model HospitalProductStage {
+  id         String   @id @default(cuid())
+  hospitalId String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  product    String // key from lib/hospital-sales.ts PRODUCTS
+  stage      String   @default("TARGET")
+  leadId     String?
+  note       String?  @db.Text
+  stageAt    DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([hospitalId, product])
+  @@index([product, stage])
+}
+
+model SalesCampaign {
+  id          String   @id @default(cuid())
+  product     String
+  name        String
+  subject     String
+  /// Plain text with {{hospital}} and {{name}} placeholders. Rendered into the
+  /// house layout with a tracked link and an unsubscribe line.
+  body        String   @db.Text
+  ctaText     String
+  status      String   @default("DRAFT") // DRAFT | SENDING | PAUSED | DONE
+  dailyCap    Int      @default(100)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sends SalesCampaignSend[]
+
+  @@index([product, status])
+}
+
+model SalesCampaignSend {
+  id             String          @id @default(cuid())
+  campaignId     String
+  campaign       SalesCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  hospitalId     String
+  hospital       Hospital        @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  contactId      String
+  contact        HospitalContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  email          String
+  /// Public token for the tracked link and the unsubscribe link.
+  token          String          @unique
+  status         String          @default("QUEUED") // QUEUED | SENT | FAILED | SUPPRESSED
+  sentAt         DateTime?
+  messageId      String?
+  error          String?         @db.Text
+  clickedAt      DateTime?
+  enquiredAt     DateTime?
+  unsubscribedAt DateTime?
+  createdAt      DateTime        @default(now())
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId, status])
+  @@index([hospitalId])
+}
+
+// ─── Claims recovery desk ────────────────────────────────────────────────────
+// What happens after a hospital signs. Claims carry references, payer, dates
+// and amounts, never patient names: enrolleeRef is the plan's member number
+// and serviceSummary is a clinical description with no identifiers.
+// RecoveryActivity and RecoveryPayment are append-only, so every naira and
+// every promise a payer made can be traced.
+
+model RecoveryPayer {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  type            String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | OTHER
+  /// CFA advises this payer. Claims against it are recovered only
+  /// with the hospital told in writing, and are never advanced.
+  conflict        Boolean  @default(false)
+  conflictNote    String?
+  advanceEligible Boolean  @default(true)
+  claimsContact   String?
+  claimsEmail     String?
+  claimsPhone     String?
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  claims     RecoveryClaim[]
+  activities RecoveryActivity[]
+}
+
+model RecoveryAccount {
+  id                String    @id @default(cuid())
+  hospitalId        String    @unique
+  hospital          Hospital  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  status            String    @default("SAMPLE") // SAMPLE | ONBOARDING | ACTIVE | PAUSED | EXITED
+  advanceRate       Decimal   @default(0.6) @db.Decimal(5, 4)
+  recoveryFeeRate   Decimal?  @db.Decimal(5, 4)
+  facilityLimit     Decimal?  @db.Decimal(14, 2)
+  maxClaimAgeDays   Int       @default(180)
+  /// No payer above this share of the hospital's advanced book.
+  payerCap          Decimal   @default(0.4) @db.Decimal(5, 4)
+  /// Token for the hospital's private claim upload link.
+  intakeToken       String    @unique
+  agreementSignedAt DateTime?
+  notes             String?   @db.Text
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  batches    RecoveryBatch[]
+  claims     RecoveryClaim[]
+  activities RecoveryActivity[]
+}
+
+model RecoveryBatch {
+  id         String          @id @default(cuid())
+  accountId  String
+  account    RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  reference  String
+  kind       String          @default("LIVE") // SAMPLE | LIVE
+  status     String          @default("RECEIVED") // RECEIVED | VETTING | VETTED | FUNDING | CLOSED
+  receivedAt DateTime        @default(now())
+  vettedAt   DateTime?
+  funder     String?
+  notes      String?         @db.Text
+  createdAt  DateTime        @default(now())
+
+  claims RecoveryClaim[]
+
+  @@index([accountId, status])
+}
+
+model RecoveryClaim {
+  id             String          @id @default(cuid())
+  batchId        String
+  batch          RecoveryBatch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  accountId      String
+  account        RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId        String
+  payer          RecoveryPayer   @relation(fields: [payerId], references: [id])
+  claimRef       String
+  enrolleeRef    String?
+  serviceDate    DateTime?
+  submittedAt    DateTime?
+  serviceSummary String?
+  authCode       String?
+  documentsHeld  String[]
+  billedAmount   Decimal         @db.Decimal(14, 2)
+  tariffAmount   Decimal?        @db.Decimal(14, 2)
+  payerResponse  String? // what the payer has said: queried, cut, rejected, silent
+
+  /// RECEIVED | VETTED | ADVANCED | IN_RECOVERY | PART_PAID | PAID | WRITTEN_OFF
+  status String @default("RECEIVED")
+
+  // Verification (AI first pass, a person confirms)
+  vetVerdict       String? // PASS | REPAIR | FAIL
+  vetLikelihood    Int? // 0-100 chance the payer pays as it stands or after repair
+  vetPayable       Decimal?  @db.Decimal(14, 2)
+  vetIssues        Json?
+  vetRepairs       Json?
+  vetRationale     String?   @db.Text
+  vetModel         String?
+  vettedAt         DateTime?
+  vetConfirmedById String?
+  vetConfirmedAt   DateTime?
+
+  // Decision (rules decide, a person approves)
+  decision        String? // ADVANCE | HOLD | DECLINE
+  decisionAmount  Decimal?  @db.Decimal(14, 2)
+  decisionReasons Json?
+  decidedAt       DateTime?
+  approvedById    String?
+  approvedAt      DateTime?
+
+  // Money
+  advanceAmount   Decimal?  @db.Decimal(14, 2)
+  advancedAt      DateTime?
+  recoveredAmount Decimal   @default(0) @db.Decimal(14, 2)
+  closedAt        DateTime?
+
+  // Recovery queue
+  priority     Int?
+  nextAction   String?
+  nextActionAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities RecoveryActivity[]
+  payments   RecoveryPayment[]
+
+  @@unique([accountId, payerId, claimRef])
+  @@index([accountId, status])
+  @@index([payerId, status])
+  @@index([nextActionAt])
+}
+
+model RecoveryActivity {
+  id          String          @id @default(cuid())
+  accountId   String
+  account     RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  claimId     String?
+  claim       RecoveryClaim?  @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  payerId     String?
+  payer       RecoveryPayer?  @relation(fields: [payerId], references: [id])
+  /// NOTE | CALL | EMAIL | LETTER | PROMISE | ESCALATION | PAYMENT | STATUS | AI_VET | AI_DRAFT | DECISION
+  kind        String
+  summary     String          @db.Text
+  detail      Json?
+  amount      Decimal?        @db.Decimal(14, 2)
+  promisedFor DateTime?
+  createdById String?
+  createdAt   DateTime        @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([claimId])
+  @@index([payerId, kind])
+}
+
+model RecoveryPayment {
+  id           String        @id @default(cuid())
+  claimId      String
+  claim        RecoveryClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  amount       Decimal       @db.Decimal(14, 2)
+  receivedAt   DateTime
+  reference    String?
+  recordedById String?
+  createdAt    DateTime      @default(now())
+
+  @@index([claimId])
 }
 
 /// A member of a CLIENT's own staff, as against a CFA consultant (User) or a

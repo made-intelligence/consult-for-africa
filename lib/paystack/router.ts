@@ -26,6 +26,7 @@ import {
   handleInvoicePayment,
   handleCadreSubscription,
   handleCoachingSession,
+  handleLyfeConsultation,
   type PaystackEvent,
 } from "@/lib/paystack/handlers";
 
@@ -54,6 +55,7 @@ function hasInternalMarker(event: PaystackEvent): boolean {
   const m = event.data?.metadata;
   if (m?.invoiceId || m?.trackPurchaseId) return true;
   if (m?.type === "cadre_subscription" || m?.type === "cadre_coaching_session") return true;
+  if (m?.type === "lyfe_consultation") return true;
   return false;
 }
 
@@ -112,6 +114,10 @@ async function runInternal(event: PaystackEvent): Promise<void> {
     }
     if (event.data?.metadata?.type === "cadre_coaching_session") {
       await handleCoachingSession(event);
+      return;
+    }
+    if (event.data?.metadata?.type === "lyfe_consultation") {
+      await handleLyfeConsultation(event);
       return;
     }
     if (event.data?.metadata?.invoiceId) {

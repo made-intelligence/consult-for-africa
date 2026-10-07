@@ -123,9 +123,12 @@ export default async function DashboardPage() {
 
   // ─── Alerts ───────────────────────────────────────────────────────────────
   const now = new Date();
+  // A closed project owes nobody a milestone. Counting them put four dead
+  // milestones from a completed and a cancelled engagement into the portfolio
+  // alert, which is how a real number starts getting ignored.
   const overdueMilestones = await prisma.milestone.count({
     where: {
-      engagement: projectWhere,
+      engagement: { ...projectWhere, status: { notIn: ["COMPLETED", "CANCELLED"] } },
       dueDate: { lt: now },
       status: { notIn: ["COMPLETED", "SKIPPED"] },
     },
