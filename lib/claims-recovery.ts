@@ -21,22 +21,17 @@ export const ADVANCE_RATE = 0.6;
 export const ADVANCE_HOURS = 48;
 
 /**
- * The funding partner's discount, charged monthly and deducted at
+ * The funding partner's discount. One time, not monthly, and deducted at
  * disbursement rather than recovered out of the payor's settlement.
  *
- * This is the number a hospital's accountant will go at first, and it should
- * be: four to five per cent a month is fifty to eighty per cent annualised.
- * On a receivable that takes ninety days to settle it is twelve to fifteen
- * per cent of the advance, so the sum only works where the alternative is
- * waiting, not where the alternative is a bank.
- *
- * It also means speed is worth money twice. Every month taken off the
- * settlement is a month of discount the hospital does not pay, which is the
- * strongest argument for buying the recovery work and the advance together
- * rather than the advance alone.
+ * Carbon buys the vetted claim at a discount and pays within the window. The
+ * hospital pays once, knows the number before it accepts, and owes nothing
+ * further however long the payor then takes. That last part is what makes it
+ * sellable: the hospital is buying certainty, and the risk of a payor going
+ * slow stops being theirs.
  */
-export const DISCOUNT_MONTHLY_LOW = 0.04;
-export const DISCOUNT_MONTHLY_HIGH = 0.05;
+export const DISCOUNT_LOW = 0.04;
+export const DISCOUNT_HIGH = 0.05;
 
 /** The conversion offer: a free review of a sample of claims. */
 export const SAMPLE_SIZE = 20;
@@ -102,11 +97,10 @@ export function check({ monthlyBilled, daysToPay, queriedPct }: CheckInput): Che
   const outstanding = (m * d) / 30;
   const inDispute = outstanding * q;
   const advance = (outstanding - inDispute) * ADVANCE_RATE;
-  // Charged for as long as the money is out, which is however long the payor
-  // takes. A minimum of one month, because nobody discounts for nothing.
-  const months = Math.max(1, d / 30);
-  const discountLow = advance * DISCOUNT_MONTHLY_LOW * months;
-  const discountHigh = advance * DISCOUNT_MONTHLY_HIGH * months;
+  // One time, taken off the disbursement. It does not grow with how long the
+  // payor takes, which is the whole point of it.
+  const discountLow = advance * DISCOUNT_LOW;
+  const discountHigh = advance * DISCOUNT_HIGH;
   return {
     outstanding,
     inDispute,

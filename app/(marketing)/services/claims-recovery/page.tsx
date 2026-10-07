@@ -42,7 +42,7 @@ const faqs = [
   {
     q: "Can we be paid before the HMO pays?",
     a: ADVANCE_LIVE
-      ? `Yes. Once a claim has passed vetting, our funding partner disburses ${Math.round(ADVANCE_RATE * 100)}% of its value to you within ${ADVANCE_HOURS} hours, less their discount, which is deducted at disbursement so you know the cost before you accept rather than after. The remaining balance reaches you when the payor settles.`
+      ? `Yes. Once a claim has passed vetting, our funding partner disburses ${Math.round(ADVANCE_RATE * 100)}% of its value to you within ${ADVANCE_HOURS} hours, less a one time discount taken at disbursement. You know the number before you accept, you pay it once, and you owe nothing further however long the payor then takes. The remaining balance reaches you when the payor settles.`
       : "We are setting up early payment against vetted claims for a first group of hospitals. If that interests you, say so in the form and we will tell you when it opens.",
   },
 ];
