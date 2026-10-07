@@ -98,7 +98,7 @@ EVENT_THEME = "Feel Good, Look Good, Live Better."
 EVENT_DATE = "Wednesday 21 October"
 EVENT_TIME = "Cocktails 6.30pm"
 EVENT_DRESS = "RSVP by 16 October"
-EVENT_VENUE = "Capital Club, Victoria Island"
+EVENT_VENUE = "Capital Club, Lagos"
 RSVP_MESSAGE = "Hello, I would like to RSVP to the evening."
 CALL_MESSAGE = "Hello, I would like to book a discovery call."
 

@@ -55,7 +55,7 @@ export default function StickyRsvp() {
           className="shrink-0 rounded-lg px-5 py-3 text-[13px] font-semibold transition hover:opacity-90"
           style={{ background: MB.lime, color: MB.greenDeep }}
         >
-          RSVP
+          Register interest
         </a>
       </div>
     </div>

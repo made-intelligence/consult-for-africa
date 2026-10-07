@@ -375,7 +375,11 @@ export async function buildWeekContext(
       select: { cadre: true, state: true, totalMonthlyTakeHome: true, baseSalary: true },
     }),
     prisma.cadreMandate.findMany({
-      where: { status: "OPEN" },
+      // isPublished, not just status. The digest names the role and the facility
+      // to thousands of doctors, so it must respect the same gate as the public
+      // job board. Status alone meant any mandate created in admin, including a
+      // search not yet agreed with the client, went out on the next send.
+      where: { status: "OPEN", isPublished: true },
       select: { id: true, title: true, cadre: true, facilityName: true, locationCity: true },
       orderBy: { createdAt: "desc" },
     }),

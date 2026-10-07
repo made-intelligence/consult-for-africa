@@ -125,6 +125,20 @@ const services = [
     tag: "Marketing Agency",
     href: "/services/healthcare-marketing",
   },
+  {
+    num: "10",
+    title: "Claims Recovery",
+    summary:
+      "Most of what health plans owe a private hospital is disputed, not refused. We check each unpaid claim, fix what can be fixed, and settle it with the plan's claims team, so money already earned reaches the hospital.",
+    points: [
+      "Claim by claim verification against tariff, authorisation and records",
+      "Reconciliation with HMOs, corporates and state schemes",
+      "A live view of every claim from submission to cash",
+      "Paid from what we recover",
+    ],
+    tag: "Revenue",
+    href: "/services/claims-recovery",
+  },
 ];
 
 export default function CoreTransformation() {

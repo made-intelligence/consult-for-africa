@@ -3,6 +3,7 @@ import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import ApproachResponse from "./ApproachResponse";
+import { publicNameFor } from "@/lib/cadreHealth/contactRequest";
 
 /**
  * Hospitals that have asked to contact this member.
@@ -26,7 +27,11 @@ export default async function ApproachesPage() {
       message: true,
       createdAt: true,
       expiresAt: true,
-      org: { select: { name: true, isVerified: true } },
+      // publicName is what the member is shown when the client is running a
+      // confidential search. Rendering `name` here handed the client's identity
+      // to the doctor on the first message, after the job board had been
+      // careful not to name them.
+      org: { select: { name: true, publicName: true, isVerified: true } },
       mandate: {
         select: { id: true, title: true, locationState: true, locationCity: true },
       },
@@ -81,7 +86,7 @@ export default async function ApproachesPage() {
                   }}
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">{r.org.name}</h3>
+                    <h3 className="font-semibold text-gray-900">{publicNameFor(r.org)}</h3>
                     {r.org.isVerified && (
                       <span
                         className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
@@ -126,7 +131,7 @@ export default async function ApproachesPage() {
                       })}`}
                   </p>
 
-                  <ApproachResponse requestId={r.id} orgName={r.org.name} />
+                  <ApproachResponse requestId={r.id} orgName={publicNameFor(r.org)} />
                 </article>
               ))}
             </section>
@@ -144,7 +149,7 @@ export default async function ApproachesPage() {
                   style={{ border: "1px solid #E8EBF0" }}
                 >
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900">{r.org.name}</h3>
+                    <h3 className="font-semibold text-gray-900">{publicNameFor(r.org)}</h3>
                     <p className="mt-0.5 text-xs text-gray-400">
                       {r.mandate ? `${r.mandate.title} · ` : ""}
                       {r.createdAt.toLocaleDateString("en-NG", {

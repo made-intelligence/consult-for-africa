@@ -2,7 +2,7 @@
 
 ## AGELESS, Wednesday 21 October 2026
 
-Fifteen days. Capital Club, Victoria Island. Seventy guests.
+Fifteen days. Capital Club, Lagos. Seventy guests.
 
 PREPARED FOR
 Dr Itunu Akinware and Dr Chinwe Kpaduwa
@@ -27,7 +27,7 @@ Cutting from 130 to 70 helps more than it costs. Seventy is a room where people 
 
 ## What the evening has to do
 
-AGELESS is the platform and it is built to recur. The proposition is a new era of health, beauty and longevity. The panel is *From Within, Outward*. The fireside is *The Art of Looking Like Yourself*, with Dr Chinwe Kpaduwa. Keeping those four names apart is what lets edition two reuse everything but the panel.
+AGELESS is the platform and it is built to recur. The proposition is a new era of health, beauty and longevity. The panel is *The New Science of Ageing Well*. The fireside is *The Art of Looking Like Yourself*, with Dr Chinwe Kpaduwa. Keeping those four names apart is what lets edition two reuse everything but the panel.
 
 MedLYFE hosts and Lyfe Plastics and Dermatology is introduced, in the footer. That is a regulatory position rather than a courtesy: MedLYFE is the licensed, bookable entity, and Dr Kpaduwa sets the clinical standard and is introduced. Every piece of copy already survives that distinction and it should hold on the night.
 

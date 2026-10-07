@@ -115,9 +115,9 @@ export const LYFE_EVENT_THEME = "Ageless";
 /**
  * AGELESS, from the event brief.
  *
- * A recurring MedLYFE platform rather than a one-off launch, so the naming is
+ * A recurring Medlyfe platform rather than a one-off launch, so the naming is
  * layered: AGELESS is the platform, "A New Era of Health, Beauty and
- * Longevity" is the proposition, "From Within, Outward" is the main panel,
+ * Longevity" is the proposition, "The New Science of Ageing Well" is the panel,
  * and "The Art of Looking Like Yourself" is the featured fireside. Keeping
  * those four apart is what lets edition two reuse everything but the panel.
  *
@@ -133,13 +133,15 @@ export const LYFE_EVENT = {
   standfirst:
     "How modern science is changing the way we look, feel, perform and live as we age.",
   tagline: MEDLYFE_TAGLINE,
-  panelTitle: "From Within, Outward",
+  panelTitle: "The New Science of Ageing Well",
+  panelStandfirst:
+    "What changes in your body, brain and skin after 40, and what you can actually do about it.",
   sessionTitle: "The Art of Looking Like Yourself",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
-  arrival: "6:00 PM",
-  programme: "6:45 PM",
+  arrival: "5:30 PM",
+  programme: "6:30 PM",
   close: "9:30 PM",
-  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Victoria Island",
+  venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
   // Moved with the date. Five clear working days before, which is what a
   // curated 70-person room needs to be chased properly. Confirm it.
@@ -147,35 +149,35 @@ export const LYFE_EVENT = {
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
   places: 70,
-  footerLine: "MedLYFE introduces Lyfe Plastics and Dermatology.",
+  footerLine: "Medlyfe introduces Lyfe Plastics and Dermatology.",
 } as const;
 
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
-    time: "6:00",
+    time: "5:30",
     title: "Arrival and cocktails",
     body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:45",
+    time: "6:30",
     title: "Welcome and opening film",
-    body: "A short film asking how modern science is changing the way we look, feel, perform and live as we age.",
+    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
+  },
+  {
+    time: "6:35",
+    title: "The range",
+    body: "Dr Adedotun Ajelabi on what modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical.",
   },
   {
     time: "6:50",
-    title: "The MedLYFE perspective",
-    body: "The philosophy and the approach to longevity and health optimisation, connecting health and vitality with beauty and aesthetics.",
-  },
-  {
-    time: "7:05",
-    title: "The panel: From Within, Outward",
-    body: "Thirty minutes on how metabolic health, hormones, energy, skin and aesthetics come together in the way we age.",
+    title: "The panel: The New Science of Ageing Well",
+    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
   },
   {
     time: "7:35",
     title: "Fireside: The Art of Looking Like Yourself",
-    body: "An intimate hosted conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
+    body: "Dr Debo Odulana in conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
   },
   {
     time: "8:00",
@@ -195,18 +197,68 @@ export const LYFE_EVENT_PROGRAMME = [
 ] as const;
 
 /**
- * The panel, From Within, Outward.
+ * The panel, The New Science of Ageing Well.
  *
- * The brief asks for experts representing both longevity and health
- * optimisation and skin and aesthetics, so the seats are defined by what each
- * one has to cover rather than by who is in them. Unfilled seats show as
- * placeholders with the subject named, which is honest and also quietly
- * useful: a guest reading "hormones and metabolic health, to be announced"
- * knows the subject is covered.
+ * This is the running order, not a cast list, and the page renders it in
+ * sequence: the opening address on the range, four seats on the inner, the
+ * fireside on the outward, then the chair. Unfilled seats show as placeholders
+ * with the subject named, which is honest and also quietly useful: a guest
+ * reading "sleep, movement and physical function, to be announced" knows the
+ * subject is covered.
  *
  * Fill a seat by giving it a name, a title and optionally a portrait in
  * /public/lyfe. Anything without a name renders as a placeholder.
  */
+/**
+ * The guest funnel.
+ *
+ * Seventy places and an open form are not compatible, because the form cannot
+ * tell the difference between the person you built the evening for and the
+ * person who saw a link. So interest is open and cheap, the team chooses who
+ * is invited, and the invitation carries a link that only its recipient can
+ * use. A place is filled by a confirmation and by nothing else.
+ */
+export const LYFE_STAGE_LABELS: Record<string, string> = {
+  INTERESTED: "Interested",
+  INVITED: "Invited, awaiting reply",
+  CONFIRMED: "Confirmed",
+  DECLINED: "Declined",
+  WAITLIST: "Waiting list",
+  ATTENDED: "Attended",
+  NO_SHOW: "Did not come",
+};
+
+/** Stages that occupy a place in the room. */
+export const LYFE_STAGES_HOLDING_A_PLACE = ["CONFIRMED", "ATTENDED"] as const;
+
+/**
+ * Heads in the room, counting the guests people bring. An invitation that has
+ * been sent and not answered is deliberately not counted here: holding places
+ * for silence is how a room ends up half empty with a closed list.
+ */
+export function lyfeHeadcount(
+  rows: { eventStage: string | null; guestCount: number | null }[],
+): { confirmed: number; invitedAwaiting: number; places: number; remaining: number } {
+  const heads = (r: { guestCount: number | null }) => 1 + (r.guestCount ?? 0);
+  const confirmed = rows
+    .filter((r) => r.eventStage && (LYFE_STAGES_HOLDING_A_PLACE as readonly string[]).includes(r.eventStage))
+    .reduce((n, r) => n + heads(r), 0);
+  const invitedAwaiting = rows
+    .filter((r) => r.eventStage === "INVITED")
+    .reduce((n, r) => n + heads(r), 0);
+  return {
+    confirmed,
+    invitedAwaiting,
+    places: LYFE_EVENT.places,
+    remaining: Math.max(0, LYFE_EVENT.places - confirmed),
+  };
+}
+
+export function lyfeConfirmUrl(token: string): string {
+  const base = process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com";
+  return `${base.replace(/\/$/, "")}/lyfe/confirm/${token}`;
+}
+
 export interface LyfePanelSeat {
   seat: string;
   subject: string;
@@ -217,39 +269,55 @@ export interface LyfePanelSeat {
 
 export const LYFE_PANEL: LyfePanelSeat[] = [
   {
-    seat: "The featured fireside",
-    subject: "Aesthetics, plastic surgery and looking like yourself",
-    name: "Dr Chinwe Kpaduwa, MD FACS",
-    title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
-    portrait: "/lyfe/chinwe-portrait.jpg",
-  },
-  {
-    seat: "Longevity and health optimisation",
-    subject: "What actually changes in the body as we age, and what can be acted on early",
-    name: null,
-    title: null,
-    portrait: null,
-  },
-  {
-    seat: "Metabolic health and hormones",
-    subject: "Metabolism, weight, body composition, hormonal change, sleep and energy",
-    name: null,
-    title: null,
-    portrait: null,
-  },
-  {
-    seat: "Skin and regenerative medicine",
-    subject: "Skin ageing and regeneration, and where aesthetic medicine helps",
-    name: null,
-    title: null,
+    seat: "The opening address",
+    subject:
+      "The range. What modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical",
+    name: "Dr Adedotun Ajelabi",
+    title: "Clinical Lead, Medlyfe",
     portrait: null,
   },
   {
     seat: "In the chair",
     subject: "Moderating the panel and the questions from the room",
+    name: "Dr Itunu Akinware",
+    title: "Chief Executive, Medbury Healthcare Group",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    subject: "Metabolism, weight, body composition, and the questions the room has about the new drugs",
+    name: "Dr Timi Adenuga",
+    title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    subject: "Eating the food we actually eat and still changing body composition",
+    name: "Gbemi Giwa",
+    title: "Fitness and nutrition coach. Founder of the African Fat Loss Method",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
+    name: "Joycee Awosika",
+    title: "Founder and Chief Executive, the ORÍKÌ Group",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    subject: "Menopause and andropause. What changes in the hormonal system on both sides of midlife, what is worth measuring, and what can be done about it",
     name: null,
     title: null,
     portrait: null,
+  },
+  {
+    seat: "The featured fireside, on the outward",
+    subject:
+      "Aesthetics, plastic surgery and looking like yourself. In conversation with Dr Debo Odulana",
+    name: "Dr Chinwe Kpaduwa, MD FACS",
+    title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
+    portrait: "/lyfe/chinwe-portrait.jpg",
   },
 ];
 
@@ -334,22 +402,159 @@ export const LYFE_PATHWAY_COPY = {
  * saying yes to a surgeon costs something. The discovery call is the one that
  * actually fills a diary, so it is the one that survives after the tenth.
  */
+/**
+ * THE CONSULTATION WITH DR KPADUWA.
+ *
+ * The page used to end at a free fifteen minute discovery call. A free call is
+ * the easiest thing on a page to say yes to and the easiest to forget, and it
+ * put a coordinator between the person and the only thing they actually wanted,
+ * which was to talk to the surgeon. It also meant that a page carrying her name
+ * sold nothing.
+ *
+ * This is the paid step in its place: her own clinic, her own diary, booked and
+ * paid for in one sitting. It is a teleconsultation, which is what makes it
+ * deliverable while she is abroad and what makes the two hours on a Tuesday
+ * real rather than aspirational.
+ *
+ * It sits ABOVE the clinic's own aesthetic consultation on purpose. The
+ * clinic's is NGN 100,000 with a registered clinician; this is the surgeon who
+ * wrote the protocols. A practice whose founder costs the same as everybody
+ * else is telling the room what it thinks she is worth.
+ */
+export const LYFE_CONSULT = {
+  /** Naira. One number, read by the page, the form, the invoice and Paystack. */
+  fee: 150_000,
+  feeDisplay: "₦150,000",
+  minutes: 30,
+  /** 2 (Tuesday) and 3 (Wednesday), matching JavaScript's getDay. */
+  days: [2, 3] as const,
+  dayNames: "Tuesdays and Wednesdays",
+  startHour: 11,
+  endHour: 13,
+  hoursDisplay: "11am to 1pm",
+  timezone: "WAT",
+  /** Four half hours across the two hours, so eight in a working week. */
+  perDay: 4,
+  perWeek: 8,
+  label: "A consultation with Dr Kpaduwa",
+  /**
+   * Said in her own words rather than the clinic's, because the thing being
+   * bought is her judgement and nothing else on the page sells that.
+   */
+  blurb:
+    "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what it would cost, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get.",
+  redeemable:
+    "Credited in full against your treatment or your surgical planning review if you go ahead.",
+  note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
+} as const;
+
+/** The days spelled out, for copy that needs them inline. */
+export const LYFE_CONSULT_SCHEDULE = `${LYFE_CONSULT.dayNames}, ${LYFE_CONSULT.hoursDisplay} ${LYFE_CONSULT.timezone}`;
+
+export interface ConsultSlot {
+  /** ISO instant the consultation starts. */
+  iso: string;
+  /** "Tuesday 14 October" */
+  day: string;
+  /** "11:00" */
+  time: string;
+  /** "Tuesday 14 October, 11:00 WAT" */
+  full: string;
+}
+
+/**
+ * The next bookable half hours in her diary.
+ *
+ * Real dates, not "Tuesdays and Wednesdays". A named date is a thing a person
+ * can picture themselves at and a thing they can see running out; a recurring
+ * rule is an abstraction they put off. The list is generated rather than typed
+ * so it cannot go stale, and `taken` removes what is already sold rather than
+ * decorating the page with scarcity that is not real.
+ *
+ * Lagos keeps a fixed +01:00 offset with no daylight saving, so the slot can be
+ * built as an instant directly without a timezone library.
+ */
+export function consultSlots({
+  from = new Date(),
+  weeks = 3,
+  taken = [],
+  leadHours = 24,
+}: {
+  from?: Date;
+  weeks?: number;
+  taken?: string[];
+  leadHours?: number;
+} = {}): ConsultSlot[] {
+  const out: ConsultSlot[] = [];
+  const sold = new Set(taken);
+  // Nobody should be able to book a slot that starts in ninety minutes.
+  const earliest = new Date(from.getTime() + leadHours * 3600_000);
+
+  for (let d = 0; d < weeks * 7 + 1; d++) {
+    const day = new Date(from.getTime() + d * 86400_000);
+    // Lagos is +01:00 all year, so the Lagos calendar day is the UTC day
+    // shifted by an hour.
+    const lagos = new Date(day.getTime() + 3600_000);
+    const weekday = lagos.getUTCDay();
+    if (!(LYFE_CONSULT.days as readonly number[]).includes(weekday)) continue;
+
+    for (let i = 0; i < LYFE_CONSULT.perDay; i++) {
+      const minutes = LYFE_CONSULT.startHour * 60 + i * LYFE_CONSULT.minutes;
+      if (minutes >= LYFE_CONSULT.endHour * 60) break;
+      const start = new Date(
+        Date.UTC(
+          lagos.getUTCFullYear(),
+          lagos.getUTCMonth(),
+          lagos.getUTCDate(),
+          Math.floor(minutes / 60) - 1, // back to UTC from WAT
+          minutes % 60,
+        ),
+      );
+      if (start < earliest) continue;
+      const iso = start.toISOString();
+      if (sold.has(iso)) continue;
+
+      const label = new Date(start.getTime() + 3600_000);
+      const dayLabel = label.toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        timeZone: "UTC",
+      });
+      const time = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+      out.push({ iso, day: dayLabel, time, full: `${dayLabel}, ${time} ${LYFE_CONSULT.timezone}` });
+    }
+  }
+  return out;
+}
+
+/** True if this instant is a real slot in her diary, so the API can trust it. */
+export function isConsultSlot(iso: string): boolean {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  const lagos = new Date(d.getTime() + 3600_000);
+  if (!(LYFE_CONSULT.days as readonly number[]).includes(lagos.getUTCDay())) return false;
+  const minutes = lagos.getUTCHours() * 60 + lagos.getUTCMinutes();
+  if (minutes < LYFE_CONSULT.startHour * 60) return false;
+  if (minutes >= LYFE_CONSULT.endHour * 60) return false;
+  return minutes % LYFE_CONSULT.minutes === 0 && lagos.getUTCSeconds() === 0;
+}
+
 export const LYFE_DOORS = {
   EVENT_RSVP: {
     label: "Come to the evening",
     short: "An evening on how you feel and how you look, and why those are the same appointment",
     blurb:
       "An invitation to a conversation rather than a sales floor. A panel, a conversation with Dr Kpaduwa under her own title, the full menu said out loud, and questions from the room. You can book a consultation on the night if you want one, and nobody will mind if you do not.",
-    cta: "RSVP to the evening",
-    note: "By invitation. Numbers are limited and the address goes to confirmed guests.",
+    cta: "Register your interest",
+    note: "By invitation. The room holds seventy, invitations are sent from this list, and the address goes to confirmed guests.",
   },
-  DISCOVERY_CALL: {
-    label: "Book a discovery call",
-    short: "Fifteen minutes on the telephone, with no obligation and no charge",
-    blurb:
-      "Not a consultation and not a sales call. A coordinator listens to what you are thinking about, tells you honestly whether we are the right place for it, explains what a consultation would involve and what it would cost, and answers the practical questions. If a clinician needs to answer something, we route it and come back to you.",
-    cta: "Book a discovery call",
-    note: "Free. Usually the same day, and you choose the time.",
+  CONSULTATION: {
+    label: "Consult Dr Kpaduwa",
+    short: `Half an hour with the surgeon herself, by video, ${LYFE_CONSULT.feeDisplay}`,
+    blurb: LYFE_CONSULT.blurb,
+    cta: `Book a consultation, ${LYFE_CONSULT.feeDisplay}`,
+    note: `${LYFE_CONSULT_SCHEDULE}. ${LYFE_CONSULT.redeemable}`,
   },
 } as const;
 
