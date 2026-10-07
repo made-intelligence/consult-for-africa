@@ -240,21 +240,27 @@ SCHEDULE = [
     ["08:45", "Tom Ogboi", "Makeup by Dr Kpaduwa's own artist, to her direction. Look one"],
     ["09:45", "Tom Ogboi", "Mic, prompter check, walk the lines"],
     ["10:00", "Tom Ogboi, warm interior", "<b>Roll. Story 1, Aftercare (long).</b> Shot first so it is safe if the day slips"],
-    ["11:00", "Tom Ogboi, warm interior", "Story 3, Two in the morning (short)"],
-    ["11:20", "Tom Ogboi, entrance in shade", "Story 2, Why not fly (short). Arrival b-roll"],
+    ["10:55", "Tom Ogboi", "<i>Break, 10 minutes. Water, touch-up</i>"],
+    ["11:05", "Tom Ogboi, warm interior", "Story 3, Two in the morning (short)"],
+    ["11:25", "Tom Ogboi, entrance in shade", "Story 2, Why not fly (short). Arrival b-roll"],
     ["11:45", "Tom Ogboi", "Stills: 5 environmental portraits"],
-    ["12:00", "On the road", "Wrap location one. Change to look two. Lunch on the move"],
-    ["12:45", "Kakulus Studio, Treasure Gardens Estate, Freedom Way, Lekki", "Crew in, light the dark portrait set to the reference look"],
+    ["12:00", "Tom Ogboi", "Wrap and load out"],
+    ["12:15", "Travel", "<i>To Treasure Gardens Estate, Freedom Way. 30 minutes allowed</i>"],
+    ["12:45", "Kakulus Studio, Treasure Gardens Estate, Freedom Way, Lekki", "<i>Lunch, 30 minutes, seated, for everyone.</i> Change to look two in the second half while the director and camera light the portrait set"],
     ["13:15", "Studio", "<b>Stories 4, 5 and 6 (shorts),</b> back to back, one setup"],
-    ["14:15", "Studio", "Stills: 7 portraits, colour and black and white"],
-    ["14:30", "On the road", "Wrap studio. Change to look three. Travel to the clinic"],
-    ["15:00", "MedLYFE, 25 Admiralty Way, Lekki Phase 1", "Crew in, light the consultation room. Physician arrives for briefing; her artist checks his shine"],
+    ["14:10", "Studio", "Stills: 7 portraits, colour and black and white"],
+    ["14:25", "Studio", "Wrap. Change to look three"],
+    ["14:35", "Travel", "<i>To MedLYFE, 25 Admiralty Way. 25 minutes allowed</i>"],
+    ["15:00", "MedLYFE, inside i-Fitness, 25 Admiralty Way, Lekki Phase 1", "Arrive. Crew lights the consultation room. <i>Dr Kpaduwa rests for 20 minutes, then a touch-up</i>"],
+    ["15:15", "Clinic", "Physician arrives for briefing; her artist checks his shine"],
     ["15:30", "Clinic, consultation room", "<b>Story 7, Your consultation (long).</b> Dr Kpaduwa alone"],
-    ["16:15", "Clinic, consultation room", "<b>Story 8, Who looks after you (long),</b> with MedLYFE's physician"],
-    ["17:00", "Clinic, consultation room", "Physician released. Story 9, The questions I ask (short)"],
-    ["17:20", "Clinic, treatment room", "Relight. Story 10 if confirmed, hands and equipment only"],
-    ["17:50", "Clinic", "Stills: 8 images, consultation room, two-shot, detail"],
-    ["18:15", "Clinic", "Wrap. Rushes checked and backed up before the crew leaves"],
+    ["16:15", "Clinic", "<i>Break, 10 minutes.</i> Change to look four"],
+    ["16:25", "Clinic, consultation room", "<b>Story 8, Who looks after you (long),</b> with MedLYFE's physician"],
+    ["17:05", "Clinic, consultation room", "Physician released. Story 9, The questions I ask (short)"],
+    ["17:20", "Clinic", "<i>Relight the treatment room. Comfort break, 15 minutes</i>"],
+    ["17:35", "Clinic, treatment room", "Story 10 if confirmed, hands and equipment only"],
+    ["17:55", "Clinic", "Stills: 8 images, consultation room, two-shot, detail"],
+    ["18:10", "Clinic", "Wrap. Rushes checked and backed up before the crew leaves. Clear by 18:30"],
 ]
 
 
@@ -274,7 +280,7 @@ def build():
     s += [meta, Spacer(1, 8)]
 
     s.append(P("The day in one paragraph", "h1"))
-    s.append(P("Six hours on camera across three locations, in this order: Tom Ogboi Avenue from ten, our studio at Treasure Gardens Estate on Freedom Way after lunch, and the MedLYFE clinic from three o'clock. "
+    s.append(P("A ten o'clock first roll and a six o'clock wrap, across three locations in this order: Tom Ogboi Avenue in the morning, our studio at Treasure Gardens Estate on Freedom Way over lunch, and the MedLYFE clinic from three o'clock. Travel, lunch and breaks are set in the schedule rather than squeezed between takes. "
                "The quote covers three long films of three to five minutes, six short films of forty five seconds and twenty retouched stills. "
                "We have written ten storyboards so there is a choice to make rather than a list to film: pick three long and six short, "
                "and the tenth can be added on the day as an extra short at N14,000 plus VAT. Everything here is built to be sent one to one, "
@@ -292,7 +298,7 @@ def build():
     s.append(table([
         ["", "Who", "When"],
         ["Principal", "Dr Chinwe Kpaduwa, MD FACS", "The full day. One look per setting, from the options below"],
-        ["Second contributor", "MedLYFE's physician (Dr Adedotun Ajelabi, Clinical Lead, to be confirmed by Dr Akinware)", "15:00 to 17:00 at the clinic, for Story 8"],
+        ["Second contributor", "MedLYFE's physician (Dr Adedotun Ajelabi, Clinical Lead, to be confirmed by Dr Akinware)", "15:15 to 17:05 at the clinic, for Story 8"],
         ["Hands", "A MedLYFE colleague, gloved", "Story 10 only. Hands and equipment, no face"],
         ["Nobody else", "No patients, no models, no extras", ""],
     ], [W * 0.2, W * 0.45, None]))
