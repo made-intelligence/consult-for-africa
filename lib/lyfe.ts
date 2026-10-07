@@ -462,12 +462,11 @@ export const LYFE_CONSULT = {
   blurb:
     "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
   /**
-   * Not a deposit. It was written as credited against treatment, which was
-   * wrong, and a false money claim on a live page is worth fixing fast even
-   * though it costs the easiest objection handler on the offer.
+   * Dr Kpaduwa's own wording. Note the narrowing: it goes towards surgery, not
+   * towards any treatment. A non-surgical course does not carry the credit,
+   * and saying "treatment" would quietly promise that it does.
    */
-  feeNote:
-    "A consultation fee for half an hour of her time, not a deposit against treatment.",
+  feeNote: "Put towards the total cost of your surgery if you go ahead.",
   note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
 } as const;
 
@@ -896,7 +895,7 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What does the consultation cost, and is it wasted if I do not proceed?",
-    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. It is a consultation fee rather than a deposit, so it is not credited against treatment. What you are buying is half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
+    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. If you go on to have surgery, it is put towards the total. If you do not, you have bought half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
   },
   {
     q: "Is she really board certified?",
@@ -913,7 +912,7 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
   { stat: "ABPS", line: "Board certified by the American Board of Plastic Surgery" },
   { stat: "FACS", line: "Fellow of the American College of Surgeons" },
   { stat: `${LYFE_CONSULT.perWeek} a week`, line: "Half hours in her diary, and no more than that" },
-  { stat: "Her, not a coordinator", line: "Thirty minutes with the surgeon who would operate" },
+  { stat: "Towards surgery", line: "The fee goes to the total if you go ahead with an operation" },
 ];
 
 /**

@@ -23,7 +23,7 @@ const URL = `${SITE}/lyfe/consult`;
 
 const TITLE = "Consult a board certified plastic surgeon in Lagos";
 const DESCRIPTION =
-  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000 for the consultation. Eight appointments a week.";
+  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000, put towards the total if you go on to have surgery. Eight appointments a week.";
 
 export const metadata: Metadata = {
   title: TITLE,
