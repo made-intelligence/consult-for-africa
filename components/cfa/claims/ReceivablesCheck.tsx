@@ -75,7 +75,12 @@ export default function ReceivablesCheck({ refToken }: { refToken: string | null
             { v: naira(r.outstanding), l: "owed to you at any one time" },
             { v: naira(r.inDispute), l: "of that, held up in queries and disputes" },
             { v: naira(r.per30Days), l: "released for good if you are paid 30 days sooner" },
-            ...(ADVANCE_LIVE ? [{ v: naira(r.earlyPayment), l: "advanced early against vetted claims, before the funder's discount" }] : []),
+            ...(ADVANCE_LIVE
+              ? [
+                  { v: naira(r.earlyPayment), l: "advanced against vetted claims, before the funder's discount" },
+                  { v: `${naira(r.netLow)} to ${naira(r.netHigh)}`, l: "what lands, after the discount is deducted at disbursement" },
+                ]
+              : []),
           ].map((x) => (
             <div key={x.l} className="rounded-xl p-4" style={{ background: "#F8FAFC" }}>
               <p className="text-xl font-semibold" style={{ color: NAVY }}>{x.v}</p>

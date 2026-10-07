@@ -20,6 +20,24 @@ export const ADVANCE_LIVE = false;
 export const ADVANCE_RATE = 0.6;
 export const ADVANCE_HOURS = 48;
 
+/**
+ * The funding partner's discount, charged monthly and deducted at
+ * disbursement rather than recovered out of the payor's settlement.
+ *
+ * This is the number a hospital's accountant will go at first, and it should
+ * be: four to five per cent a month is fifty to eighty per cent annualised.
+ * On a receivable that takes ninety days to settle it is twelve to fifteen
+ * per cent of the advance, so the sum only works where the alternative is
+ * waiting, not where the alternative is a bank.
+ *
+ * It also means speed is worth money twice. Every month taken off the
+ * settlement is a month of discount the hospital does not pay, which is the
+ * strongest argument for buying the recovery work and the advance together
+ * rather than the advance alone.
+ */
+export const DISCOUNT_MONTHLY_LOW = 0.04;
+export const DISCOUNT_MONTHLY_HIGH = 0.05;
+
 /** The conversion offer: a free review of a sample of claims. */
 export const SAMPLE_SIZE = 20;
 
@@ -65,6 +83,12 @@ export type CheckResult = {
    * receives less than this and the label has to say so.
    */
   earlyPayment: number;
+  /** What the discount costs over the expected wait, at both ends of the range. */
+  discountLow: number;
+  discountHigh: number;
+  /** What actually lands, after the discount is deducted at disbursement. */
+  netLow: number;
+  netHigh: number;
 };
 
 /**
@@ -77,11 +101,21 @@ export function check({ monthlyBilled, daysToPay, queriedPct }: CheckInput): Che
   const q = Math.min(100, Math.max(0, queriedPct)) / 100;
   const outstanding = (m * d) / 30;
   const inDispute = outstanding * q;
+  const advance = (outstanding - inDispute) * ADVANCE_RATE;
+  // Charged for as long as the money is out, which is however long the payor
+  // takes. A minimum of one month, because nobody discounts for nothing.
+  const months = Math.max(1, d / 30);
+  const discountLow = advance * DISCOUNT_MONTHLY_LOW * months;
+  const discountHigh = advance * DISCOUNT_MONTHLY_HIGH * months;
   return {
     outstanding,
     inDispute,
     per30Days: d > 30 ? m : (m * d) / 30,
-    earlyPayment: (outstanding - inDispute) * ADVANCE_RATE,
+    earlyPayment: advance,
+    discountLow,
+    discountHigh,
+    netLow: Math.max(0, advance - discountHigh),
+    netHigh: Math.max(0, advance - discountLow),
   };
 }
 
