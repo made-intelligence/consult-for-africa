@@ -244,7 +244,7 @@ SCHEDULE = [
     ["11:20", "Tom Ogboi, entrance in shade", "Story 2, Why not fly (short). Arrival b-roll"],
     ["11:45", "Tom Ogboi", "Stills: 5 environmental portraits"],
     ["12:00", "On the road", "Wrap location one. Change to look two. Lunch on the move"],
-    ["12:45", "Kakulus Studio, Treasure Gardens", "Crew in, light the dark portrait set to the reference look"],
+    ["12:45", "Kakulus Studio, Treasure Gardens Estate, Freedom Way, Lekki", "Crew in, light the dark portrait set to the reference look"],
     ["13:15", "Studio", "<b>Stories 4, 5 and 6 (shorts),</b> back to back, one setup"],
     ["14:15", "Studio", "Stills: 7 portraits, colour and black and white"],
     ["14:30", "On the road", "Wrap studio. Change to look three. Travel to the clinic"],
@@ -274,7 +274,7 @@ def build():
     s += [meta, Spacer(1, 8)]
 
     s.append(P("The day in one paragraph", "h1"))
-    s.append(P("Six hours on camera across three locations, in this order: Tom Ogboi Avenue from ten, our studio at Treasure Gardens after lunch, and the MedLYFE clinic from three o'clock. "
+    s.append(P("Six hours on camera across three locations, in this order: Tom Ogboi Avenue from ten, our studio at Treasure Gardens Estate on Freedom Way after lunch, and the MedLYFE clinic from three o'clock. "
                "The quote covers three long films of three to five minutes, six short films of forty five seconds and twenty retouched stills. "
                "We have written ten storyboards so there is a choice to make rather than a list to film: pick three long and six short, "
                "and the tenth can be added on the day as an extra short at N14,000 plus VAT. Everything here is built to be sent one to one, "
@@ -284,7 +284,7 @@ def build():
     s.append(table([
         ["", "Address", "Setups", "Stories"],
         ["1", "2-4 Tom Ogboi Avenue, Lekki Phase 1", "Warm interior, seated low. Entrance or terrace in shade", "1, 2, 3"],
-        ["2", "Kakulus Studio, Treasure Gardens", "Dark portrait set: near black, single source, matched to Dr Kpaduwa's existing portrait", "4, 5, 6"],
+        ["2", "Kakulus Studio, Treasure Gardens Estate, Freedom Way, Lekki", "Dark portrait set: near black, single source, matched to Dr Kpaduwa's existing portrait", "4, 5, 6"],
         ["3", "MedLYFE clinic, inside i-Fitness, 25 Admiralty Way, Lekki Phase 1", "Consultation room in daylight. Treatment room, equipment visible", "7, 8, 9, 10"],
     ], [10 * mm, W * 0.33, W * 0.42, None]))
 
