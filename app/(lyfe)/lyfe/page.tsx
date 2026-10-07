@@ -20,6 +20,7 @@ import {
 } from "@/lib/lyfe";
 import EnquiryForm from "./EnquiryForm";
 import LyfeNav from "./LyfeNav";
+import AboutGroup from "./AboutGroup";
 import StickyRsvp from "./StickyRsvp";
 
 export const metadata: Metadata = {
@@ -94,6 +95,7 @@ export default async function LyfePage({
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
       <ThePractice />
+      <AboutGroup tone="dark" />
       <ConsultCta />
       <Footer />
       <StickyRsvp />
@@ -207,7 +209,7 @@ function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: bo
           height={LYFE_SURGEON.portraitHeight}
           priority={priority}
           sizes="(max-width: 768px) 72vw, 340px"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
       </div>
     </div>
@@ -499,10 +501,10 @@ function Panel() {
                   <Image
                     src={seat.portrait}
                     alt={seat.name ?? seat.seat}
-                    width={LYFE_SURGEON.portraitWidth}
-                    height={LYFE_SURGEON.portraitHeight}
+                    width={seat.portraitWidth ?? LYFE_SURGEON.portraitWidth}
+                    height={seat.portraitHeight ?? LYFE_SURGEON.portraitHeight}
                     sizes="190px"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 16%" }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
                   />
                 </div>
               </div>
@@ -524,9 +526,11 @@ function Panel() {
                 {seat.title}
               </p>
             )}
-            <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: "#AFC2B4" }}>
-              {seat.subject}
-            </p>
+            {seat.subject && (
+              <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: "#AFC2B4" }}>
+                {seat.subject}
+              </p>
+            )}
           </div>
         ))}
       </div>

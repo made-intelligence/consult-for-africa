@@ -100,7 +100,7 @@ export default async function BookedPage({
 
           {confirmed && (
             <p className="mt-4 text-[14px] leading-relaxed" style={{ color: MB.greenSoft }}>
-              {LYFE_CONSULT.redeemable}
+              {LYFE_CONSULT.feeNote}
             </p>
           )}
 

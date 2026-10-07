@@ -115,7 +115,7 @@ export async function emailLyfeConfirmation({
          <tr><td style="background:${LYFE_BRAND.greenTint};border-left:3px solid ${LYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.ink};">
            The time is yours once the ${esc(LYFE_CONSULT.feeDisplay)} is paid. Her diary is ${esc(LYFE_CONSULT.dayNames.toLowerCase())}, ${esc(LYFE_CONSULT.hoursDisplay)}, so there are only ${LYFE_CONSULT.perWeek} of these in a week and we cannot hold one open.
            <br><br>
-           ${esc(LYFE_CONSULT.redeemable)}
+           ${esc(LYFE_CONSULT.feeNote)}
          </td></tr>
        </table>
        <p style="margin:0 0 14px;">If the payment did not go through, reply to this note and we will send you the link again. If you would rather pay by transfer, say so and we will send the account.</p>
@@ -318,7 +318,7 @@ export async function emailLyfeConsultationConfirmed({
          : `<p style="margin:0 0 14px;">The half hour you chose had just gone when your payment landed, so a coordinator will call you today to find another time that works. Nothing is lost and nothing more is owed.</p>`
      }
      <p style="margin:0 0 14px;">Come with one thing in mind: what you would like to be different. You do not need photographs, you do not need to have decided anything, and you will not be sold to on the call.</p>
-     <p style="margin:0 0 14px;">${esc(LYFE_CONSULT.redeemable)}</p>
+     <p style="margin:0 0 14px;">${esc(LYFE_CONSULT.feeNote)}</p>
      <p style="margin:0 0 14px;">If you need to move it, reply to this note or call ${esc(LYFE_PHONE_DISPLAY)}. Please give us a day's notice if you can, because the diary is only ${LYFE_CONSULT.perWeek} of these a week.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
@@ -413,4 +413,55 @@ export async function emailLyfeAttendanceConfirmed({
   );
 
   await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
+}
+
+/**
+ * The ask to a confirmed speaker for their bio and a photograph.
+ *
+ * Short on purpose. These are busy people doing us a favour, and the commonest
+ * reason this request goes unanswered is that it arrives as a form with eight
+ * fields. Two things, a deadline, and a reply-all address.
+ */
+export async function emailLyfeSpeakerAsk({
+  to,
+  firstName,
+  slot,
+  needSubject,
+  deadline,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  slot: string;
+  needSubject: boolean;
+  deadline: string;
+  fromName: string;
+}): Promise<void> {
+  const subjectAsk = needSubject
+    ? `<li style="margin:0 0 10px;"><strong>A line on what you would like to speak to.</strong> One sentence is plenty. It goes under your name in the programme and tells the chair where to come to you.</li>`
+    : "";
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for joining us for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong> at ${esc(LYFE_EVENT.venueName)}. Arrival is ${esc(LYFE_EVENT.arrival)} and we are done by ${esc(LYFE_EVENT.close)}.</p>
+     <p style="margin:0 0 14px;">You are down for <strong>${esc(slot)}</strong>.</p>
+     <p style="margin:0 0 10px;">Two things from you, and a third if it is easy:</p>
+     <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+       <li style="margin:0 0 10px;"><strong>A short bio.</strong> Eighty to a hundred words, written the way you would want to be introduced from a stage rather than the way a conference programme would do it.</li>
+       <li style="margin:0 0 10px;"><strong>A photograph.</strong> Any good headshot you already have. It does not need to be new and it does not need to be formal, it only needs to be high resolution.</li>
+       ${subjectAsk}
+     </ul>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 20px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:#FFFFFF;">
+         We are printing and briefing the press from <strong>${esc(deadline)}</strong>, so anything that reaches us by then makes the programme. Simply reply to this note with both attached.
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;">If anything about the slot or the timing does not work, say so now rather than later and we will move it. The running order is still ours to change.</p>
+     <p style="margin:0 0 6px;">With thanks,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
+    `Your bio and a photograph for ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
+  );
+
+  await notifyInternal(to, `${LYFE_EVENT_THEME}: your bio and a photograph`, html);
 }

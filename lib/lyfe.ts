@@ -265,6 +265,9 @@ export interface LyfePanelSeat {
   name: string | null;
   title: string | null;
   portrait: string | null;
+  /** Intrinsic size, so a seat's photograph is not declared at somebody else's. */
+  portraitWidth?: number;
+  portraitHeight?: number;
 }
 
 export const LYFE_PANEL: LyfePanelSeat[] = [
@@ -292,16 +295,28 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Eating the food we actually eat and still changing body composition",
+    subject: "Eating the food we actually eat and still changing body composition. A decade of it, with the training to match",
     name: "Gbemi Giwa",
-    title: "Fitness and nutrition coach. Founder of the African Fat Loss Method",
-    portrait: null,
+    title: "Founder of the African Fat Loss Method. Fitness and nutrition coach",
+    portrait: "/lyfe/gbemi-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
     subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
+    // Her subject is blank on purpose. Her Doctors for Change record carries
+    // no bio, specialty or institution, so writing a line for her would be
+    // inventing one. It fills in the moment she replies.
+    subject: "",
+    name: "Dr Folake Kofo-Idowu",
+    title: "Vice President, Doctors for Change",
     portrait: null,
   },
   {
@@ -442,9 +457,14 @@ export const LYFE_CONSULT = {
    * bought is her judgement and nothing else on the page sells that.
    */
   blurb:
-    "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what it would cost, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get.",
-  redeemable:
-    "Credited in full against your treatment or your surgical planning review if you go ahead.",
+    "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
+  /**
+   * Not a deposit. It was written as credited against treatment, which was
+   * wrong, and a false money claim on a live page is worth fixing fast even
+   * though it costs the easiest objection handler on the offer.
+   */
+  feeNote:
+    "A consultation fee for half an hour of her time, not a deposit against treatment.",
   note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
 } as const;
 
@@ -554,7 +574,7 @@ export const LYFE_DOORS = {
     short: `Half an hour with the surgeon herself, by video, ${LYFE_CONSULT.feeDisplay}`,
     blurb: LYFE_CONSULT.blurb,
     cta: `Book a consultation, ${LYFE_CONSULT.feeDisplay}`,
-    note: `${LYFE_CONSULT_SCHEDULE}. ${LYFE_CONSULT.redeemable}`,
+    note: `${LYFE_CONSULT_SCHEDULE}. ${LYFE_CONSULT.feeNote}`,
   },
 } as const;
 
@@ -610,7 +630,7 @@ export const LYFE_OBJECTIONS = [
   {
     worry: "I do not want to look like I have had work done",
     answer:
-      "Neither does Dr Kpaduwa. The whole of her position is that the best result is the one nobody can point at. If what you are asking for would be obvious, she will tell you, and she will tell you before you pay for anything.",
+      "Neither does Dr Kpaduwa. The whole of her position is that the best result is the one nobody can point at. If what you are asking for would be obvious, she will tell you, and she will tell you at the consultation rather than once you are committed.",
   },
   {
     worry: "I do not know who is actually treating me",
@@ -625,7 +645,7 @@ export const LYFE_OBJECTIONS = [
   {
     worry: "I do not know what it costs",
     answer:
-      "Ask us and we will tell you, on the telephone or at the consultation. You get a written quote afterwards and the price does not move without you agreeing to it in writing.",
+      "Ask the team and we will tell you, on the telephone or by message, before or after you see her. Dr Kpaduwa does not discuss fees with patients. You get a written quote and the price does not move without you agreeing to it in writing.",
   },
   {
     worry: "I am not sure I need anything at all",
@@ -873,7 +893,7 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What does the consultation cost, and is it wasted if I do not proceed?",
-    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. ${LYFE_CONSULT.redeemable} If you do not go ahead, you have paid for half an hour of a board certified plastic surgeon's judgement, which is the thing you came for.`,
+    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. It is a consultation fee rather than a deposit, so it is not credited against treatment. What you are buying is half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
   },
   {
     q: "Is she really board certified?",
@@ -890,5 +910,32 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
   { stat: "ABPS", line: "Board certified by the American Board of Plastic Surgery" },
   { stat: "FACS", line: "Fellow of the American College of Surgeons" },
   { stat: `${LYFE_CONSULT.perWeek} a week`, line: "Half hours in her diary, and no more than that" },
-  { stat: "Credited", line: "The fee comes off your treatment in full if you go ahead" },
+  { stat: "Her, not a coordinator", line: "Thirty minutes with the surgeon who would operate" },
+];
+
+/**
+ * Who stands behind this.
+ *
+ * A buyer deciding on surgery is deciding who to trust, and a surgeon with no
+ * visible institution behind her is a harder yes than one with a licensed
+ * centre and a group. Every claim below is drawn from Medbury's own documents
+ * or from publicly verifiable credentials. Nothing asserts a site count, a
+ * founding year or a patient number, because none of those is on file here.
+ */
+export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
+  {
+    name: "Lyfe Plastics & Dermatology",
+    role: "The practice",
+    body: "The plastic surgery and dermatology practice led by Dr Chinwe Kpaduwa, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
+  },
+  {
+    name: "Medlyfe",
+    role: "The licensed centre",
+    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, which is the argument the whole evening is built on: how you feel and how you look are one appointment, not two.",
+  },
+  {
+    name: "Medbury Healthcare",
+    role: "The group",
+    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre and the Medbury and Alameda Specialist Care and Tourism Centre, and is led by its chief executive Dr Itunu Akinware.",
+  },
 ];

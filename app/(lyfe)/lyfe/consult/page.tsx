@@ -16,13 +16,14 @@ import {
 } from "@/lib/lyfe";
 import EnquiryForm from "../EnquiryForm";
 import LyfeNav from "../LyfeNav";
+import AboutGroup from "../AboutGroup";
 
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
 
 const TITLE = "Consult a board certified plastic surgeon in Lagos";
 const DESCRIPTION =
-  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000, credited in full against your treatment. Eight appointments a week.";
+  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000 for the consultation. Eight appointments a week.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -171,7 +172,7 @@ export default async function ConsultPage({
                 Book for {LYFE_CONSULT.feeDisplay}
               </a>
               <p className="text-[14px] leading-snug" style={{ color: C.muted }}>
-                {LYFE_CONSULT.redeemable}
+                {LYFE_CONSULT.feeNote}
               </p>
             </div>
 
@@ -265,12 +266,12 @@ export default async function ConsultPage({
               {
                 n: "02",
                 t: "She tells you what is actually involved",
-                b: "What the procedure is, what recovery really looks like in Lagos, what it would cost, and what she would and would not do in your case.",
+                b: "What the procedure is, what recovery really looks like in Lagos, and what she would and would not do in your case. She does not discuss fees on the call; that comes from the team afterwards, in writing.",
               },
               {
                 n: "03",
                 t: "You leave knowing where you stand",
-                b: "Either a plan and what it costs, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the fee has still bought you it.",
+                b: "Either a plan, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the half hour has still bought you it. A written costing follows from the team if you want one.",
               },
             ].map((x) => (
               <div key={x.n}>
@@ -390,6 +391,8 @@ export default async function ConsultPage({
           </div>
         </div>
       </section>
+
+      <AboutGroup tone="light" />
 
       <footer className="px-6 py-10 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto w-full max-w-5xl">
