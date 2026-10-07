@@ -292,9 +292,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Eating the food we actually eat and still changing body composition",
+    subject: "Eating the food we actually eat and still changing body composition. A decade of it, with the training to match",
     name: "Gbemi Giwa",
-    title: "Fitness and nutrition coach. Founder of the African Fat Loss Method",
+    title: "Founder of the African Fat Loss Method. Fitness and nutrition coach",
     portrait: null,
   },
   {
