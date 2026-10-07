@@ -7578,6 +7578,7 @@ enum LyfeSource {
   PRESS_OR_PODCAST
   FLYER_OR_QR
   REACTIVATION /// Carried over from the March 2026 list.
+  MEZO /// Came through Mezo, which is where the organic dermatology demand is.
   OTHER
 }
 

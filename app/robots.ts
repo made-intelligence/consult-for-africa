@@ -32,7 +32,15 @@ export default function robots(): MetadataRoute.Robots {
           // WhatsApp traffic reach it perfectly well without being indexed.
           // Remove this the day the domain is pointed.
           "/lyfe",
+          // Dr Bola Akinola's rebuilt site, in preview for him to test. It
+          // moves to bolarinwaakinola.com, so it must never rank here.
+          "/drbola",
         ],
+        // The one exception inside /lyfe. The event page stays out of the
+        // index because it is private and dated, but the consultation page
+        // is chasing commercial search and has to be crawlable. Googlebot
+        // takes the most specific match, so this beats the /lyfe disallow.
+        allow: ["/lyfe/consult"],
       },
     ],
     sitemap: "https://consultforafrica.com/sitemap.xml",

@@ -86,6 +86,7 @@ const schema = z.object({
     "PRESS_OR_PODCAST",
     "FLYER_OR_QR",
     "REACTIVATION",
+      "MEZO",
     "OTHER",
   ]),
   sourceDetail: z.string().trim().max(200).optional().nullable(),
