@@ -73,7 +73,10 @@ export default async function ConsultPage({
 }) {
   const sp = await searchParams;
   const utm = {
-    source: sp.utm_source?.slice(0, 100) ?? (sp.src === "mezo" ? "mezo" : null),
+    // Any ?src= tag lands in utmSource, so a flyer, a WhatsApp group, a salon
+    // and a referring doctor are all separable afterwards. A channel you
+    // cannot count is a channel you cannot argue for next time.
+    source: sp.utm_source?.slice(0, 100) ?? sp.src?.slice(0, 40) ?? null,
     medium: sp.utm_medium?.slice(0, 100) ?? null,
     campaign: sp.utm_campaign?.slice(0, 100) ?? null,
   };
