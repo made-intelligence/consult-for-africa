@@ -2,6 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -74,6 +75,24 @@ export async function generateDownloadUrl(
     Key: key,
   });
   return getSignedUrl(r2Client, command, { expiresIn });
+}
+
+/**
+ * Whether the object is actually there.
+ *
+ * A presigned URL is issued before the upload happens, so holding a key proves
+ * nothing about whether anything was stored under it. An upload that fails
+ * halfway leaves a record pointing at an object that does not exist, and the
+ * person who clicks it a week later finds out rather than the person who
+ * uploaded it.
+ */
+export async function objectExists(key: string): Promise<boolean> {
+  try {
+    await r2Client.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**

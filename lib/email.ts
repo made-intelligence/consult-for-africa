@@ -2302,23 +2302,67 @@ export async function emailTaskSubmitted({
   assignerName,
   assigneeName,
   title,
+  handoverNote,
+  attachments = [],
   taskId,
 }: {
   assignerEmail: string;
   assignerName: string;
   assigneeName: string;
   title: string;
+  handoverNote?: string | null;
+  attachments?: string[];
   taskId: string;
 }) {
+  const handedOver = attachments.length
+    ? attachments.map((a) => `&bull; ${a}`).join("<br>")
+    : "Nothing attached. What was done is described in the note.";
   await send(
     assignerEmail,
     `Ready for review: ${title}`,
     layout(`
       ${h1("A task is ready for your review")}
       ${p(`Hi ${assignerName}, ${assigneeName} has submitted this task.`)}
-      ${infoTable([["Task", title], ["Submitted by", assigneeName]])}
+      ${infoTable([
+        ["Task", title],
+        ["Submitted by", assigneeName],
+        ["Handed over", handedOver],
+      ])}
+      ${handoverNote ? p(`"${handoverNote}"`) : ""}
       ${p("If it needs more work, send it back with a written note rather than redoing it yourself. The note is what makes the correction reusable.")}
       ${btn("Review it", `${BASE_URL}/tasks/${taskId}`)}
+    `)
+  );
+}
+
+/**
+ * Cancelling is the one move that takes work away from somebody. Doing it
+ * silently is how a person learns that what they were carrying did not matter.
+ */
+export async function emailTaskCancelled({
+  assigneeEmail,
+  assigneeName,
+  assignerName,
+  title,
+  reason,
+  taskId,
+}: {
+  assigneeEmail: string;
+  assigneeName: string;
+  assignerName: string;
+  title: string;
+  reason: string;
+  taskId: string;
+}) {
+  await send(
+    assigneeEmail,
+    `No longer needed: ${title}`,
+    layout(`
+      ${h1("This one is no longer needed")}
+      ${p(`Hi ${assigneeName}, ${assignerName} has stood this task down. It is nothing to do with how it was going.`)}
+      ${infoTable([["Task", title], ["Why", reason]])}
+      ${p("If you had already started, record the time you spent on it so the estimate is not the only thing on the record.")}
+      ${btn("Open it", `${BASE_URL}/tasks/${taskId}`)}
     `)
   );
 }

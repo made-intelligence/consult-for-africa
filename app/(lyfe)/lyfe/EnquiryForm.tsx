@@ -274,7 +274,7 @@ export default function EnquiryForm({
           )}
 
           <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: C.muted }}>
-            {LYFE_CONSULT.feeDisplay} for {LYFE_CONSULT.minutes} minutes. {LYFE_CONSULT.redeemable}
+            {LYFE_CONSULT.feeDisplay} for {LYFE_CONSULT.minutes} minutes. {LYFE_CONSULT.feeNote}
           </p>
 
           <Legend className="mt-7">What are you thinking about?</Legend>
