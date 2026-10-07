@@ -414,3 +414,54 @@ export async function emailLyfeAttendanceConfirmed({
 
   await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
 }
+
+/**
+ * The ask to a confirmed speaker for their bio and a photograph.
+ *
+ * Short on purpose. These are busy people doing us a favour, and the commonest
+ * reason this request goes unanswered is that it arrives as a form with eight
+ * fields. Two things, a deadline, and a reply-all address.
+ */
+export async function emailLyfeSpeakerAsk({
+  to,
+  firstName,
+  slot,
+  needSubject,
+  deadline,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  slot: string;
+  needSubject: boolean;
+  deadline: string;
+  fromName: string;
+}): Promise<void> {
+  const subjectAsk = needSubject
+    ? `<li style="margin:0 0 10px;"><strong>A line on what you would like to speak to.</strong> One sentence is plenty. It goes under your name in the programme and tells the chair where to come to you.</li>`
+    : "";
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for joining us for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong> at ${esc(LYFE_EVENT.venueName)}. Arrival is ${esc(LYFE_EVENT.arrival)} and we are done by ${esc(LYFE_EVENT.close)}.</p>
+     <p style="margin:0 0 14px;">You are down for <strong>${esc(slot)}</strong>.</p>
+     <p style="margin:0 0 10px;">Two things from you, and a third if it is easy:</p>
+     <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+       <li style="margin:0 0 10px;"><strong>A short bio.</strong> Eighty to a hundred words, written the way you would want to be introduced from a stage rather than the way a conference programme would do it.</li>
+       <li style="margin:0 0 10px;"><strong>A photograph.</strong> Any good headshot you already have. It does not need to be new and it does not need to be formal, it only needs to be high resolution.</li>
+       ${subjectAsk}
+     </ul>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 20px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:#FFFFFF;">
+         We are printing and briefing the press from <strong>${esc(deadline)}</strong>, so anything that reaches us by then makes the programme. Simply reply to this note with both attached.
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;">If anything about the slot or the timing does not work, say so now rather than later and we will move it. The running order is still ours to change.</p>
+     <p style="margin:0 0 6px;">With thanks,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
+    `Your bio and a photograph for ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
+  );
+
+  await notifyInternal(to, `${LYFE_EVENT_THEME}: your bio and a photograph`, html);
+}

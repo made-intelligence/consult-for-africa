@@ -526,9 +526,11 @@ function Panel() {
                 {seat.title}
               </p>
             )}
-            <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: "#AFC2B4" }}>
-              {seat.subject}
-            </p>
+            {seat.subject && (
+              <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: "#AFC2B4" }}>
+                {seat.subject}
+              </p>
+            )}
           </div>
         ))}
       </div>

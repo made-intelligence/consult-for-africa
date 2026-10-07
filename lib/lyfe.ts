@@ -306,6 +306,16 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
+    // Her subject is blank on purpose. Her Doctors for Change record carries
+    // no bio, specialty or institution, so writing a line for her would be
+    // inventing one. It fills in the moment she replies.
+    subject: "",
+    name: "Dr Folake Kofo-Idowu",
+    title: "Vice President, Doctors for Change",
+    portrait: null,
+  },
+  {
+    seat: "The panel, on the inner",
     subject: "Menopause and andropause. What changes in the hormonal system on both sides of midlife, what is worth measuring, and what can be done about it",
     name: null,
     title: null,
