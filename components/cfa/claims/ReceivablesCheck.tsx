@@ -16,7 +16,7 @@ const NAVY = "#0B3C5D";
 const GOLD = "#D4AF37";
 const LINE = "#e5eaf0";
 
-const input = "w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1";
+const input = "w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]";
 
 function Slider({ label, value, set, min, max, step, show }: { label: string; value: number; set: (n: number) => void; min: number; max: number; step: number; show: string }) {
   return (
