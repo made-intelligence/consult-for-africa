@@ -15,6 +15,7 @@ import {
   whatsappLink,
 } from "@/lib/lyfe";
 import EnquiryForm from "../EnquiryForm";
+import LyfeNav from "../LyfeNav";
 
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
@@ -136,6 +137,7 @@ export default async function ConsultPage({
 
   return (
     <div style={{ background: C.ground, color: C.body, fontFamily: sans }}>
+      <LyfeNav on="consult" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* ── the offer ─────────────────────────────────────────────────── */}

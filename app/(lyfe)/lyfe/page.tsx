@@ -5,8 +5,6 @@ import { prisma } from "@/lib/prisma";
 import {
   LYFE_AFTERCARE,
   LYFE_BRAND as C,
-  LYFE_CONSULT,
-  LYFE_CONSULT_SCHEDULE,
   LYFE_DOORS,
   consultSlots,
   LYFE_EVENT,
@@ -21,6 +19,7 @@ import {
   whatsappLink,
 } from "@/lib/lyfe";
 import EnquiryForm from "./EnquiryForm";
+import LyfeNav from "./LyfeNav";
 import StickyRsvp from "./StickyRsvp";
 
 export const metadata: Metadata = {
@@ -86,13 +85,16 @@ export default async function LyfePage({
   // out loud is one the database can stand behind.
   return (
     <div style={{ background: MB.green, color: C.body, fontFamily: sans }}>
+      <LyfeNav on="event" />
       <Hero />
       <Evening />
       <Surgeon />
+      <ConsultCta />
       <Panel />
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
       <ThePractice />
+      <ConsultCta />
       <Footer />
       <StickyRsvp />
     </div>
@@ -287,15 +289,13 @@ function Hero() {
             </div>
 
             <p className="mt-6 text-[13.5px] leading-relaxed" style={{ color: MB.greenSoft }}>
-              Not able to come? {LYFE_SURGEON.shortName} sees people privately,{" "}
-              {LYFE_CONSULT.minutes} minutes by video for {LYFE_CONSULT.feeDisplay}, credited in
-              full against your treatment.{" "}
+              Cannot make it?{" "}
               <Link
                 href="/lyfe/consult"
                 className="font-semibold underline underline-offset-4"
                 style={{ color: MB.limeSoft }}
               >
-                Book a consultation
+                Book a consultation with {LYFE_SURGEON.shortName}
               </Link>
               .
             </p>
@@ -630,6 +630,44 @@ function Rsvp({
 }
 
 /* ─── the secondary path ───────────────────────────────────────────────────── */
+
+/**
+ * The one thing the evening is allowed to sell.
+ *
+ * No fee here. The invitation's job is the room, and a price on it turns a
+ * guest into a prospect before they have agreed to be one. The number lives
+ * on the page that is actually asking for the money.
+ */
+function ConsultCta() {
+  return (
+    <section
+      className="px-6 py-12 md:px-10"
+      style={{ background: MB.greenDark, borderTop: `1px solid rgba(196,215,166,0.14)` }}
+    >
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-6">
+        <div className="max-w-xl">
+          <p
+            className="text-[10.5px] font-semibold uppercase"
+            style={{ color: MB.lime, letterSpacing: "0.18em" }}
+          >
+            Cannot make the evening?
+          </p>
+          <p className="mt-3 text-[17px] leading-relaxed" style={{ color: MB.white }}>
+            {LYFE_SURGEON.shortName} sees a small number of people privately before she travels,
+            by video, from wherever you are.
+          </p>
+        </div>
+        <Link
+          href="/lyfe/consult"
+          className="px-7 py-3.5 text-[15px] font-semibold"
+          style={{ background: MB.lime, color: MB.greenDeep }}
+        >
+          Book a consultation
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 function ThePractice() {
   return (
