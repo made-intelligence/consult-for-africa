@@ -75,8 +75,17 @@ Ninety minutes of programme. Arrival and After Hours are long on purpose, becaus
 - We choose who is invited from that list.
 - The invitation carries a link belonging to that person.
 - A place is held when they use the link, and at no other point.
-- Seventy places, of which fifteen are held for Medbury corporates.
-- The fifty four open places need an invited list of about 110.
+- Seventy places, allocated as follows.
+
+| Who | Places |
+| --- | --- |
+| Capital Club members | 20 |
+| Medbury corporates | 15 |
+| Dr Akinware's guests | 10 |
+| Doctors | 10 |
+| Open, from the register interest list | 15 |
+
+- Invite about twice each allocation. People say yes and do not come.
 
 Never tell anyone their place is confirmed before they have used their link.
 
