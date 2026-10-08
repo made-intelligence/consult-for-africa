@@ -233,9 +233,11 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     key: "pbn",
     name: "PBN",
     credit: null,
-    bucket: "PBN",
+    // Her returned allocation has no PBN row, so the ten sit inside general
+    // rather than inventing a fifth bucket she did not write.
+    bucket: "General invitations: micro-influencers and curated picks",
     places: 10,
-    note: "Ten places given to PBN to fill.",
+    note: "Ten places given to PBN to fill, taken from general.",
   },
   {
     key: "sally",
