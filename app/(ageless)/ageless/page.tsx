@@ -666,12 +666,12 @@ function Rsvp({
             className="mt-5 text-[30px] leading-[1.14] md:text-[42px]"
             style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
           >
-            We would be glad to consider you.
+            We would like you there.
           </h2>
           <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-            The room holds {LYFE_EVENT.places}, which is fewer than the number of people who
-            would like to be in it. Tell us you are interested and we will come back to you either
-            way. An invitation carries a link of your own, and your place is held when you use it.
+            It is a small room, {LYFE_EVENT.places} places, so names are confirmed in advance
+            rather than taken at the door. Tell us you would like to come and we will write
+            back with a link of your own. Your place is held the moment you use it.
           </p>
 
           <div className="mt-9">
