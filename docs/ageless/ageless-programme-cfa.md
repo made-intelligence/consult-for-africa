@@ -1,6 +1,6 @@
 # AGELESS
 
-## What the evening is
+## Medlyfe's evening
 
 FOR
 Medlyfe and the team
@@ -15,25 +15,27 @@ AS AT
 
 ## In short
 
-- A cocktail evening hosted by Medlyfe at the Capital Club, Lagos.
-- Wednesday 21 October 2026. Arrival 5:30pm, programme 6:30pm, close 9:30pm.
-- Seventy guests. Lagos women and men over forty.
-- It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology.
+- **This is Medlyfe's evening.** It establishes Medlyfe as the place in Lagos for health, beauty and longevity.
+- Cocktail evening at the Capital Club, Lagos, Wednesday 21 October 2026.
+- Arrival 5:30pm, programme 6:30pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
+- The evening shows Medlyfe's range: longevity, metabolic health, hormones, skin and aesthetics.
+- Dr Chinwe Kpaduwa's fireside is one segment of it, not the headline.
 - Built to recur. This is edition one.
 
 ## The argument
 
-- How you feel and how you look are one appointment, not two.
-- The panel takes the inside of the body.
-- The fireside turns outward to the face and the body.
+- How you feel and how you look are one appointment, not two. That is what Medlyfe is built on.
+- Medlyfe already does the inside: longevity, infusion, metabolic health, preventive care.
+- The panel is that argument made in public, by people with the credentials to be believed.
+- The fireside turns outward to the face and the body, which is the other half of the same centre.
 - Nobody in this room has had the whole subject explained by people who actually know.
 
 ## Four names, four jobs
 
 | Name | What it is |
 | --- | --- |
-| AGELESS | The platform, built to recur |
-| A New Era of Health, Beauty and Longevity | This edition's proposition |
+| AGELESS | Medlyfe's platform, built to recur |
+| A New Era of Health, Beauty and Longevity | Medlyfe's proposition |
 | The New Science of Ageing Well | The panel |
 | The Art of Looking Like Yourself | Dr Kpaduwa's fireside |
 
@@ -71,7 +73,9 @@ Why 6:30 and not later:
 | Panel | One seat open. Andropause and men's health |
 | Fireside | Dr Chinwe Kpaduwa, MD FACS, with Dr Debo Odulana |
 
-The panel is experiential, delivered by people with the credentials to be believed. Every answer ends in something a guest can do that week.
+- The panel is experiential, delivered by people with the credentials to be believed.
+- Every answer ends in something a guest can do that week.
+- Medlyfe opens the evening and chairs the panel. Both of the most authoritative positions on the stage are Medlyfe's.
 
 ## How guests get in
 
