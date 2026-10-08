@@ -41,7 +41,8 @@ Everything else is ours.
 | Invitation copy, personalised per guest | CFA | Done |
 | Print invitations | Opeoluwa | 13 Oct |
 | Deliver and send invitations | Opeoluwa | 14 Oct |
-| Printed programme | Opeoluwa | 15 Oct |
+| Printed programme, content and sign off | Medlyfe with CFA | 14 Oct |
+| Printed programme, design and print | Opeoluwa | 15 Oct |
 | Name badges and place cards | Opeoluwa | 15 Oct |
 | Backdrop, step and repeat, signage | Opeoluwa | 14 Oct |
 | Print signage and backdrop | Opeoluwa | 17 Oct |
