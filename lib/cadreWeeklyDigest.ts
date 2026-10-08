@@ -902,7 +902,10 @@ function buildCatalyst(ctx: WeekContext): CadreDigestContent["catalyst"] {
  * an advertisement, and it says so.
  */
 function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
-  if (!ctx.referralsOpen) return null;
+  // Off, 8 October 2026. Debo: a thousand clinicians cannot be invited to ten
+  // seats. This slot waits for the Medlyfe clinician network to replace it.
+  const OFF = true;
+  if (OFF || !ctx.referralsOpen) return null;
   return {
     label: "An evening on ageing well",
     headline: "AGELESS, Wednesday 21 October, Capital Club Lagos",
