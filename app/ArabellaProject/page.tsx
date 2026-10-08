@@ -25,25 +25,25 @@ const card = {
   padding: 20,
 } as const;
 
-const FORTNIGHT: { when: string; what: string }[] = [
+const STAGES: { when: string; what: string }[] = [
   {
-    when: "Friday 2 October",
-    what: "We arrive. We walk the whole building with you, then again with the front desk, theatre, the ward, the laboratory, the pharmacy and the fertility unit. The technology and records review opens the same day.",
+    when: "Records",
+    what: "Records and systems reviewed. Revenue rebuilt from the ledger and traced to the bank, and the baseline agreed with you.",
   },
   {
-    when: "Week one",
-    what: "Records and systems reviewed. Revenue rebuilt from the ledger and traced to the bank. The baseline agreed with you. The payer file assembled and the introduction letter drafted for your signature.",
+    when: "Conversations",
+    what: "Short conversations with staff, individually and confidentially, with the four surveys running alongside. Nothing anybody says is reported back with a name attached.",
   },
   {
-    when: "Week one",
-    what: "Short conversations with staff, individually and confidentially. Nothing anybody says is reported back with a name attached.",
+    when: "On site",
+    what: "The patient journey traced end to end on live cases. Pharmacy and stock counted. The patient database reviewed with you, on your own machine.",
   },
   {
-    when: "Week two",
-    what: "The patient journey traced end to end on live cases. Pharmacy and stock counted. Findings tested with you before anything is written down.",
+    when: "Findings",
+    what: "Findings tested with you before anything is written down.",
   },
   {
-    when: "End of week two",
+    when: "By end November",
     what: "The written diagnostic: what Arabella earns, where it leaks, what the operation can carry, and what to fix in what order. Plus the technology and records report with a prioritised roadmap.",
   },
 ];
@@ -103,7 +103,7 @@ export default function ArabellaProjectPage() {
             have asked for, and answer whichever survey applies to you.
           </p>
           <p style={{ color: "#8FA8BC", fontSize: 13.5, margin: "16px 0 0" }}>
-            On site from Friday 2 October 2026. Written diagnostic at the end of week two.
+            Audit under way. Written diagnostic by the end of November 2026.
           </p>
         </div>
       </header>
@@ -112,7 +112,7 @@ export default function ArabellaProjectPage() {
         {/* A word from Debo, so the page has a person behind it */}
         <section style={{ ...card, background: "#FBF6E6", borderLeft: `4px solid ${GOLD}`, marginTop: 22 }}>
           <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.7 }}>
-            We are not coming to write a view of the Abuja women&rsquo;s health market. We are coming
+            We are not here to write a view of the Abuja women&rsquo;s health market. We want
             to establish what Arabella actually earns today, where the patients and the money leak
             out between the first enquiry and the bank account, and whether the operation can carry
             the premium promise the brand is about to make. Nothing on this page is a test. Where a
@@ -129,7 +129,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Start here"
             title="The request"
-            lead="Everything we have asked for, why each part matters, and what the first fortnight looks like from your side."
+            lead="Everything we have asked for, why each part matters, and how the audit runs from here."
           />
           <div style={{ display: "grid", gap: 10 }}>
             {DOCUMENTS.map((d) => (
@@ -141,9 +141,9 @@ export default function ArabellaProjectPage() {
         {/* 2. The eight */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
-            eyebrow="Before Friday"
+            eyebrow="Start with these"
             title="The eight that matter most"
-            lead="These eight unlock everything else. If the week runs away, send these and let the rest follow over the fortnight after."
+            lead="These eight unlock everything else. If time is short, send these first and let the rest follow."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {PRIORITY_EIGHT.map((p, i) => (
@@ -173,7 +173,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Send it to us"
             title="Upload what you have"
-            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it."
+            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it. Please do not upload anything that names a patient, including the patient database: we will look at that with you on site."
           />
           <DocumentUploader />
         </section>
@@ -243,15 +243,15 @@ export default function ArabellaProjectPage() {
           </div>
         </section>
 
-        {/* 6. The fortnight */}
+        {/* 6. How it runs */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
             eyebrow="What happens when"
-            title="The first fortnight from your side"
+            title="How the audit runs from here"
             lead="So that the team knows what is coming and nobody is surprised by a request."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-            {FORTNIGHT.map((f, i) => (
+            {STAGES.map((f, i) => (
               <div
                 key={i}
                 style={{
