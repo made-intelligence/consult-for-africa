@@ -19,7 +19,8 @@ AS AT
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
-- Sally supports on Capital Club engagement. Opeoluwa handles press and media.
+- Sally supports on Capital Club engagement.
+- Opeoluwa handles graphics, print, invitations, press and media.
 
 ## What we need from Medlyfe
 
@@ -32,20 +33,20 @@ AS AT
 
 Everything else is ours.
 
-## Graphics and print
+## Graphics, print and invitations, with Opeoluwa
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Invitation design, digital and A5 print | CFA | 10 Oct |
+| Invitation design, digital and A5 print | Opeoluwa | 10 Oct |
 | Invitation copy, personalised per guest | CFA | Done |
-| Print invitations | CFA | 13 Oct |
-| Deliver and send invitations | CFA | 14 Oct |
-| Printed programme | CFA | 15 Oct |
-| Name badges and place cards | CFA | 15 Oct |
-| Backdrop, step and repeat, signage | CFA | 14 Oct |
-| Print signage and backdrop | CFA | 17 Oct |
-| Takeaway piece for every guest | CFA | 15 Oct |
-| Social countdown set, 8 posts | CFA, with Opeoluwa | 10 Oct |
+| Print invitations | Opeoluwa | 13 Oct |
+| Deliver and send invitations | Opeoluwa | 14 Oct |
+| Printed programme | Opeoluwa | 15 Oct |
+| Name badges and place cards | Opeoluwa | 15 Oct |
+| Backdrop, step and repeat, signage | Opeoluwa | 14 Oct |
+| Print signage and backdrop | Opeoluwa | 17 Oct |
+| Takeaway piece for every guest | Opeoluwa, copy from CFA | 15 Oct |
+| Social countdown set, 8 posts | Opeoluwa | 10 Oct |
 
 ## Guest list and invitations
 
@@ -55,7 +56,7 @@ Everything else is ours.
 | Invite and confirm flow, one link per guest | CFA | Done |
 | Build the invited list to about 140 | CFA | 10 Oct |
 | Capital Club engagement: members list and a mention to members | CFA, supported by Sally | 10 Oct |
-| Send invitations | CFA | 14 Oct |
+| Send invitations | Opeoluwa | 14 Oct |
 | Chase unanswered invitations by phone | CFA | 17 Oct |
 | Close register interest | CFA | 16 Oct |
 | Final headcount to venue | CFA | 19 Oct |
