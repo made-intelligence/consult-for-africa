@@ -61,14 +61,14 @@ Dr Timi Adenuga|public/lyfe/adenuga-portrait.jpg
 Gbemi Giwa|public/lyfe/gbemi-portrait.jpg
 Joycee Awosika|public/lyfe/joycee-portrait.jpg
 Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
-Dr Itunu Akinware|
+Dr Itunu Akinware|public/lyfe/itunu-portrait.jpg
 ::
 
-Download at consultforafrica.com/lyfe/ plus the file name: adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg, joycee-portrait.jpg, chinwe-portrait.jpg.
+Download at consultforafrica.com/lyfe/ plus the file name: adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg, joycee-portrait.jpg, itunu-portrait.jpg, chinwe-portrait.jpg.
 
 Use only these. Do not take pictures from Instagram for printed or paid work. We do not hold the licence.
 
-Dr Akinware still to send hers.
+All seven on file.
 
 ## Four lines that sell it
 

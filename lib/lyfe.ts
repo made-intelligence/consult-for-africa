@@ -295,7 +295,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     name: "Dr Itunu Akinware",
     title: "Chief Executive, Medbury Healthcare Group",
 
-    portrait: null,
+    portrait: "/lyfe/itunu-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
