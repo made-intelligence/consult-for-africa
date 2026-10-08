@@ -16,7 +16,7 @@ AS AT
 ## In short
 
 - Thirteen days to the evening.
-- Seventy places. **Fifteen are held for Medbury corporates**, so fifty five are ours to fill.
+- Seventy places. **Fifteen are held for Medbury corporates** and Yomi attends, so fifty four are ours to fill.
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
@@ -32,7 +32,7 @@ AS AT
 | Capital Club street address | 9 Oct | Invitations cannot print or send |
 | RSVP contact name and direct line | 9 Oct | Invitations and the website |
 | Medlyfe logo, vector or high resolution | 9 Oct | Every printed piece |
-| Names for the invited list | 10 Oct | Fifty five open places needs about 110 invited |
+| Names for the invited list | 10 Oct | Fifty four open places needs about 110 invited |
 | The guest takeaway, decided and produced | 20 Oct | Every guest leaves with it |
 | The 15 Medbury corporate names | 13 Oct | They hold 15 of the 70 and are not invited from our list |
 
@@ -62,6 +62,7 @@ Everything else is ours.
 | Register interest page live | CFA | Done |
 | Invite and confirm flow, one link per guest | CFA | Done |
 | Build the invited list to about 110 | CFA | 10 Oct |
+| Hold a place for Yomi | CFA | Done |
 | Hold 15 places for Medbury corporates | CFA | Done |
 | Medbury corporate names and invitations | Medlyfe with CFA | 13 Oct |
 | Capital Club engagement: members list and a mention to members | CFA, supported by Sally | 10 Oct |
@@ -108,8 +109,8 @@ Everything else is ours.
 
 | Task | Owner |
 | --- | --- |
-| Guest check-in against the confirmed list | CFA, with Yomi |
-| Speaker holding room and timings | CFA, with Yomi |
+| Guest check-in against the confirmed list | CFA |
+| Speaker holding room and timings | CFA |
 | Stage manage, keep to the running order | CFA |
 | Photography direction | Opeoluwa |
 | Clinicians available through After Hours | CFA with Medlyfe |

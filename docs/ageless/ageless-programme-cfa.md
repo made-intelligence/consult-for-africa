@@ -84,7 +84,7 @@ Why 6:30 and not later:
 - The invitation carries a link belonging to that person.
 - A place is held when they use the link, and at no other point.
 - Seventy places, of which fifteen are held for Medbury corporates.
-- The fifty five open places need an invited list of about 110.
+- The fifty four open places need an invited list of about 110.
 
 Never tell anyone their place is confirmed before they have used their link.
 
