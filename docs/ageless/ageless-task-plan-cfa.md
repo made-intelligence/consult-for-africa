@@ -21,7 +21,8 @@ AS AT
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
 - Sally supports on Capital Club engagement, and owns Joycee Awosika with Dr Akinware.
-- CFA designs the programme, badges, backdrop and takeaway. Opeoluwa prints them.
+- CFA designs the programme, badges and backdrop. Opeoluwa prints them.
+- Medlyfe handles the takeaway, end to end.
 - Opeoluwa handles invitations, social, press and media.
 
 ## What we need from Medlyfe
@@ -32,6 +33,7 @@ AS AT
 | RSVP contact name and direct line | 9 Oct | Invitations and the website |
 | Medlyfe logo, vector or high resolution | 9 Oct | Every printed piece |
 | Names for the invited list | 10 Oct | Fifty five open places needs about 110 invited |
+| The guest takeaway, decided and produced | 20 Oct | Every guest leaves with it |
 | The 15 Medbury corporate names | 13 Oct | They hold 15 of the 70 and are not invited from our list |
 
 Everything else is ours.
@@ -50,8 +52,8 @@ Everything else is ours.
 | Print badges and place cards | Opeoluwa | 17 Oct |
 | Backdrop, step and repeat, signage, design | CFA | 14 Oct |
 | Print signage and backdrop | Opeoluwa | 17 Oct |
-| Takeaway piece for every guest, written and designed | CFA | 15 Oct |
-| Print the takeaway | Opeoluwa | 17 Oct |
+| Takeaway for every guest, decide what it is | Medlyfe | 13 Oct |
+| Takeaway produced and in the room | Medlyfe | 20 Oct |
 | Social countdown set, 8 posts | Opeoluwa | 10 Oct |
 
 ## Guest list and invitations
