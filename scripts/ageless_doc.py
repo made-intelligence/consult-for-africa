@@ -180,6 +180,54 @@ def _page_furniture(c, header, footer, page):
     c.drawRightString(PW - M, 22, str(page))
 
 
+
+def _portraits(c, entries, x, y, width, per_row=4):
+    """
+    A row of arch portraits with names under them.
+
+    Missing pictures draw as an empty arch rather than being skipped, so the
+    gap is visible to whoever has to chase it instead of quietly absent.
+    """
+    pal = _pal()
+    gap = 12
+    cw = (width - gap * (per_row - 1)) / per_row
+    ch = cw * 1.25
+    for i, (name, path) in enumerate(entries):
+        row, col = divmod(i, per_row)
+        cx = x + col * (cw + gap)
+        cy = y - row * (ch + 40)
+        top = cy - ch
+        c.saveState()
+        pth = c.beginPath()
+        r = cw / 2
+        pth.moveTo(cx, top)
+        pth.lineTo(cx, top + ch - r)
+        pth.arcTo(cx, top + ch - 2 * r, cx + cw, top + ch, 180, -180)
+        pth.lineTo(cx + cw, top)
+        pth.close()
+        c.clipPath(pth, stroke=0, fill=0)
+        if path and Path(path).exists():
+            img = ImageReader(path)
+            iw, ih = img.getSize()
+            scale = max(cw / iw, ch / ih)
+            dw, dh = iw * scale, ih * scale
+            c.drawImage(img, cx - (dw - cw) / 2, top - (dh - ch) / 2,
+                        width=dw, height=dh, mask="auto")
+        else:
+            c.setFillColor(HexColor(pal["tbl_alt"] if DARK else "#ECEFE7"))
+            c.rect(cx, top, cw, ch, fill=1, stroke=0)
+            c.setFillColor(HexColor(pal["muted"]))
+            c.setFont(SANS, 7)
+            c.drawCentredString(cx + cw / 2, top + ch / 2, "no picture")
+        c.restoreState()
+        c.setFillColor(HexColor(pal["ink"]))
+        c.setFont(SANS_B, 7.6)
+        for k, ln in enumerate(_wrap(c, name, SANS_B, 7.6, cw)[:2]):
+            c.drawString(cx, top - 11 - k * 9, ln)
+    rows = (len(entries) + per_row - 1) // per_row
+    return y - rows * (ch + 40) + 10
+
+
 def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
     """Header row in forest, body banded on paper, chartreuse keyline under the head."""
     n = len(widths)
@@ -321,6 +369,23 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential", dark:
             for ln in _wrap(c, txt, SANS, 9.6, W - 14):
                 c.drawString(M + 14, y, ln); y -= 12.4
             y -= 3
+        elif line.strip() == "::portraits":
+            entries = []
+            i += 1
+            while i < len(md) and md[i].strip() != "::":
+                raw = md[i].strip()
+                if raw:
+                    nm, _, pth = raw.partition("|")
+                    entries.append((nm.strip(), pth.strip()))
+                i += 1
+            if entries:
+                per_row = 4
+                cw = (W - 12 * (per_row - 1)) / per_row
+                rows = (len(entries) + per_row - 1) // per_row
+                need = rows * (cw * 1.25 + 40)
+                if y - need < 90:
+                    y = new_page()
+                y = _portraits(c, entries, M, y, W, per_row) - 6
         elif line.strip() == "---":
             pass
         elif line.strip():

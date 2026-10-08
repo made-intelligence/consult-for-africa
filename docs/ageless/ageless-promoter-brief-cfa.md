@@ -55,19 +55,19 @@ Not a seminar crowd. They are coming for an evening out that happens to be usefu
 
 **Joycee Awosika.** Founder and Chief Executive of the ORÍKÌ Group, a wellness business of ten years standing with spas and hair restoration centres across several African countries, its own manufacturing in Nigeria, a training institute and an app. Note the spelling: Joycee, with two e's.
 
-## Pictures
+## The faces
 
-| Speaker | Download |
-| --- | --- |
-| Dr Chinwe Kpaduwa | consultforafrica.com/lyfe/chinwe-portrait.jpg |
-| Gbemi Giwa | consultforafrica.com/lyfe/gbemi-portrait.jpg |
-| Dr Folake Kofo-Idowu | Not yet supplied |
-| Dr Timi Adenuga | Not yet supplied |
-| Dr Itunu Akinware | Not yet supplied |
-| Dr Adedotun Ajelabi | Not yet supplied |
-| Joycee Awosika | Not yet supplied |
+::portraits
+Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
+Gbemi Giwa|public/lyfe/gbemi-portrait.jpg
+Dr Folake Kofo-Idowu|
+Dr Timi Adenuga|
+Dr Itunu Akinware|
+Dr Adedotun Ajelabi|
+Joycee Awosika|
+::
 
-Use only these. Do not pull a picture off anybody's Instagram for a printed or paid piece, because we do not hold the licence and the photographer does.
+The two we hold are at consultforafrica.com/lyfe/chinwe-portrait.jpg and consultforafrica.com/lyfe/gbemi-portrait.jpg. Use only those. Do not lift a picture off anybody's Instagram for a printed or paid piece, because we do not hold the licence and the photographer does. The five blanks are being chased.
 
 ## The four lines that sell it
 
