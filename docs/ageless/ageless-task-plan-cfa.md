@@ -87,7 +87,6 @@ Everything else is ours.
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Correct the media plan date. It says 10 October | CFA, Marketing | 9 Oct |
 | Press pack: bios, photographs, release | CFA | 13 Oct |
 | Confirm BellaNaija, Guardian, BusinessDay placements | CFA, Marketing | 13 Oct |
 | Social countdown live | CFA, Marketing | 14 Oct |
@@ -112,7 +111,3 @@ Everything else is ours.
 | Photographs and recap film out | CFA, Marketing | 24 Oct |
 | Press recap placed | CFA, Marketing | 27 Oct |
 | What worked, for edition two | CFA | 31 Oct |
-
-## One correction needed
-
-The Medlyfe media plan in circulation is written against **Saturday 10 October**. The evening is **Wednesday 21 October**. Media is being bought against the wrong date.
