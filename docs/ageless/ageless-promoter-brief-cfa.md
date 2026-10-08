@@ -76,7 +76,7 @@ Dr Akinware and Ms Awosika still to send theirs.
 
 **The panel.** What changes in your body, brain and skin after 40, and what you can do about it.
 
-**The surgeon.** Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Both checkable. In Nigeria for a limited period.
+**The surgeon.** Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Both checkable.
 
 **The room.** Seventy places. Invitations go out from the register list.
 

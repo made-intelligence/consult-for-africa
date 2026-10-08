@@ -918,8 +918,8 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
     a: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Both are verifiable publicly and you are encouraged to check, because in this market the claim is made more often than it is true.",
   },
   {
-    q: "Why the hurry?",
-    a: `Her diary here is ${LYFE_CONSULT.hoursDisplay} on ${LYFE_CONSULT.dayNames.toLowerCase()}, which is ${LYFE_CONSULT.perWeek} half hours a week and no more. She is in Nigeria for a limited period. The dates on this page are the real ones.`,
+    q: "Why so few appointments?",
+    a: `Her diary is ${LYFE_CONSULT.hoursDisplay} on ${LYFE_CONSULT.dayNames.toLowerCase()}, which is ${LYFE_CONSULT.perWeek} half hours a week and no more. The dates on this page are the real ones.`,
   },
 ];
 
