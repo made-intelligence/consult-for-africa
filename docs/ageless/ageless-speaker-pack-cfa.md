@@ -35,14 +35,14 @@ The argument running through the night is that how you feel and how you look are
 
 **The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can actually do about it.
 
-Four seats, forty five minutes, which is about nine minutes of speaking each once the chair has done her job. It is experiential rather than clinical: the room wants to know what to do on Monday morning, not what the literature says. Deliver that with the authority of someone who actually knows, which is why you are on the stage and a wellness influencer is not.
+Four seats, forty five minutes, which is about nine minutes of speaking each once the chair has done her job. A fifth may join on andropause and men's health. It is experiential rather than clinical: the room wants to know what to do on Monday morning, not what the literature says. Deliver that with the authority of someone who actually knows, which is why you are on the stage and a wellness influencer is not.
 
 | On the panel | |
 | --- | --- |
 | Dr Timi Adenuga | Metabolism, weight, body composition, and the questions the room has about the new drugs |
 | Gbemi Giwa | Eating the food we actually eat and still changing body composition |
 | Joycee Awosika | Vitality and energy, and what ten years of building a wellness business says about what works |
-| Dr Folake Kofo-Idowu | To be set with her |
+| Dr Folake Kofo-Idowu | Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring |
 
 **One rule for the panel, and it is the only one that matters.** Every answer ends in something a guest can act on. Not a principle, not a caution, something they could begin this week. The chair will come back to anyone who finishes on a generality.
 
