@@ -300,8 +300,10 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     seat: "The panel, on the inner",
     subject: "Metabolism, weight, body composition, and the questions the room has about the new drugs",
     name: "Dr Timi Adenuga",
-    title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim",
-    portrait: null,
+    title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim. ChM (Edinburgh), FWACS, MRCSEd",
+    portrait: "/lyfe/adenuga-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",

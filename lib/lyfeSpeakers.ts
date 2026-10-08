@@ -54,9 +54,9 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     email: "timiadenuga@getslim.ng",
     org: "GetSlim",
     slot: "the panel, on metabolism, weight and the questions about the new drugs",
-    need: ["photo"],
+    need: [],
     bio: "Dr Timi Adenuga, MBBS, ChM, FWACS, FMCS, MRCSEd, is the Lead Bariatric and Laparoscopic Surgeon at GetSlim Nigeria, and one of a small group of surgeons in the region with extensive international training in bariatric and metabolic surgery. He has performed more than 1,000 bariatric procedures and supported more than 5,000 patients to sustained, clinically meaningful weight loss. He specialises in minimally invasive bariatric surgery, including gastric sleeve, gastric bypass and gastric balloon, treating obesity and the conditions that come with it, among them diabetes, hypertension and sleep apnoea. He holds a Master's in General Surgery (ChM) from the University of Edinburgh and a Diploma in Clinical Research from the Harvard T.H. Chan School of Public Health, and trained in the United Kingdom, France, Rwanda and Egypt. He is Secretary of the Bariatric and Metabolic Surgeons Society of Nigeria and a member of the International Federation for the Surgery of Obesity and Metabolic Disorders and the Royal College of Surgeons of Edinburgh. He consults at GetSlim clinics in Lagos and Abuja.",
-    notes: "Bio and email received 8 Oct. Portrait sent on WhatsApp but not yet saved to disk.",
+    notes: "Bio, email and portrait received 8 Oct.",
   },
   {
     name: "Gbemi Giwa",
