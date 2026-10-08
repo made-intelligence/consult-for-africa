@@ -111,7 +111,8 @@ export const MEDLYFE_BRAND = {
   mist: "#D8E3D6",
 } as const;
 
-export const MEDLYFE_NAME = "Medlyfe Wellness and Longevity Centre";
+/// Her own spelling, from the review Dr Akinware returned on 8 October 2026.
+export const MEDLYFE_NAME = "MedLYFE Wellness and Longevity Centre";
 export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
 
 /**
@@ -119,7 +120,7 @@ export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
  * entity that exists and the one the aesthetics pilot runs under.
  */
 export const LYFE_NAME = MEDLYFE_NAME;
-export const LYFE_SHORT = "Medlyfe";
+export const LYFE_SHORT = "MedLYFE";
 
 /** The platform. One word, set large, and the whole of the idea. */
 export const LYFE_EVENT_THEME = "Ageless";
@@ -146,11 +147,12 @@ export const LYFE_EVENT = {
   theme: LYFE_EVENT_THEME,
   proposition: "A New Era of Health, Beauty and Longevity",
   standfirst:
-    "How modern science is changing the way we look, feel, perform and live as we age.",
+    "A practical evening on how to look good, feel well and live well as you age.",
   tagline: MEDLYFE_TAGLINE,
-  panelTitle: "The New Science of Ageing Well",
+  panelTitle:
+    "The Ageless Blueprint: Practical Steps to Look Good, Feel Well and Live Well as You Age",
   panelStandfirst:
-    "What changes in your body, brain and skin after 40, and what you can actually do about it.",
+    "How to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "5:30 PM",
   programme: "6:45 PM",
@@ -171,11 +173,10 @@ export const LYFE_EVENT = {
  * invited against rather than a count the page enforces.
  */
 export const LYFE_EVENT_ALLOCATION = [
-  { bucket: "Medbury corporate network", places: 30 },
+  { bucket: "Medbury corporate network", places: 15 },
   { bucket: "Dr Itunu Akinware's guests", places: 10 },
   { bucket: "Physicians who might refer", places: 10 },
-  { bucket: "PBN", places: 10 },
-  { bucket: "General invitations: micro-influencers and curated picks", places: 10 },
+  { bucket: "General invitations: micro-influencers and curated picks", places: 40 },
 ] as const;
 
 /**
@@ -232,9 +233,11 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     key: "pbn",
     name: "PBN",
     credit: null,
-    bucket: "PBN",
+    // Her returned allocation has no PBN row, so the ten sit inside general
+    // rather than inventing a fifth bucket she did not write.
+    bucket: "General invitations: micro-influencers and curated picks",
     places: 10,
-    note: "Ten places given to PBN to fill.",
+    note: "Ten places given to PBN to fill, taken from general.",
   },
   {
     key: "sally",
@@ -314,6 +317,17 @@ export function lyfeInviteLink(key: string): string {
   return `${base}/ageless?i=${encodeURIComponent(key)}`;
 }
 
+/**
+ * Who the evening is for, in her words. Note the shift on her review: the
+ * room is men and women, not women with one seat kept for a man.
+ */
+export const LYFE_EVENT_ROOM =
+  "The room is for women and men who care about prevention, performance, metabolic health, body composition, self-care, skin health, aesthetics and ageing with more energy and confidence.";
+
+/** How the evening should feel, from the same review. */
+export const LYFE_EVENT_TONE =
+  "The evening should feel practical, current and mixed. The opening address sets the science, and the panel turns it into what guests can do in ordinary life, from diagnostics and body composition to stress, movement, skin health and responsible aesthetic choices.";
+
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
@@ -324,25 +338,20 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "6:45",
     title: "Welcome and opening film",
-    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
+    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
   },
   {
     time: "6:50",
-    title: "The range",
-    body: "Dr Adedotun Ajelabi on what modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical.",
+    title: "Can We Live to 100 and Still Live Well?",
+    body: "Dr Adedotun Ajelabi introduces longevity medicine, the difference between lifespan and healthspan, and how advanced diagnostics, AI and preventive care can help people understand and optimise their bodies before disease takes hold.",
   },
   {
     time: "7:00",
-    title: "The panel: The New Science of Ageing Well",
-    body: "Forty five minutes chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, food and training, beauty and stress, and what ageing does to Black skin.",
+    title: "The panel: The Ageless Blueprint",
+    body: "Forty five minutes chaired by Dr Debo Odulana. Practical steps to look good, feel well and live well as you age, covering longevity medicine, weight and metabolism, nutrition, fitness, behaviour change, stress and self-care, skin health, aesthetics, hair loss and responsible procedure choices for men and women.",
   },
   {
     time: "7:45",
-    title: "What can you actually do?",
-    body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
-  },
-  {
-    time: "8:00",
     title: "Questions from the room",
     body: "A moderated conversation with the clinicians and speakers.",
   },
@@ -430,28 +439,27 @@ export interface LyfePanelSeat {
 export const LYFE_PANEL: LyfePanelSeat[] = [
   {
     seat: "The opening address",
-    subject:
-      "The range. What modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical",
+    subject: "Can We Live to 100 and Still Live Well?",
     name: "Dr Adedotun Ajelabi",
     title:
-      "Head of Medicals, Medlyfe Wellness and Longevity Centre. Consultant Family Physician and Longevity Medicine Physician, FWACP",
+      "Head of Medicals, MedLYFE Wellness and Longevity Centre. Consultant Family Physician and Longevity Medicine Physician, FWACP",
     portrait: "/lyfe/adedotun-portrait.jpg",
     portraitWidth: 800,
     portraitHeight: 1000,
   },
   {
     seat: "In the chair",
-    subject: "Moderating the panel and the questions from the room",
-    name: "Dr Itunu Akinware",
-    title: "Chief Executive, Medbury Healthcare Group",
-
-    portrait: "/lyfe/itunu-portrait.jpg",
+    subject: "Panel chair and practical takeaways",
+    name: "Dr Debo Odulana",
+    title:
+      "Founding Partner, Consult for Africa. Physician and healthcare operator, MBBS, MSc",
+    portrait: "/lyfe/debo-portrait.jpg",
     portraitWidth: 800,
     portraitHeight: 1000,
   },
   {
-    seat: "The panel, on the inner",
-    subject: "Metabolism, weight and body composition. Hormones and the body as we age, and the questions the room has about the new drugs",
+    seat: "The panel",
+    subject: "Weight, Metabolism and Longevity",
     name: "Dr Timi Adenuga",
     title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim. ChM (Edinburgh), FWACS, MRCSEd",
     portrait: "/lyfe/adenuga-portrait.jpg",
@@ -459,8 +467,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     portraitHeight: 1000,
   },
   {
-    seat: "The panel, on the inner",
-    subject: "Eating the food we actually eat and still changing body composition. A decade of it, with the training to match",
+    seat: "The panel",
+    subject: "Lifestyle and Behaviour Change for Longevity",
     name: "Gbemi Giwa",
     title: "Founder of the African Fat Loss Method. Fitness and nutrition coach",
     portrait: "/lyfe/gbemi-portrait.jpg",
@@ -468,8 +476,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     portraitHeight: 1000,
   },
   {
-    seat: "The panel, on the inner",
-    subject: "Maintaining beauty, and managing stress. What ten years of building a wellness business says about what works and what only sells",
+    seat: "The panel",
+    subject: "Stress Management, Self Care and Longevity",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
 
@@ -478,9 +486,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     portraitHeight: 1000,
   },
   {
-    seat: "The panel, on the inner",
-    subject:
-      "Ageing as a Black woman. Skin and aesthetic medicine, what the anti-ageing market is actually worth in a Black population, and where surgery does and does not belong",
+    seat: "The panel",
+    subject: "Aesthetics and Skin Ageing for Men and Women",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
     portrait: "/lyfe/chinwe-portrait-centred-800.jpg",
@@ -663,7 +670,7 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
   {
     key: "METABOLIC",
     name: "Metabolism, weight and hormones",
-    who: "Medlyfe, with referral where surgery is the question",
+    who: "MedLYFE, with referral where surgery is the question",
     body: "Why the same diet stopped working, what the newer drugs do and do not do, and what happens when somebody stops. Including when the honest answer is that you do not need them.",
     fee: null,
     meta: "Bring your numbers if you have them. If you do not, we will measure.",
@@ -941,14 +948,14 @@ export const LYFE_AFTERCARE = [
 ] as const;
 
 export const LYFE_CONSENT_TEXT =
-  "I agree that Medlyfe Wellness and Longevity Centre and the clinicians delivering " +
+  "I agree that MedLYFE Wellness and Longevity Centre and the clinicians delivering " +
   "my care may hold the details I have given and contact me by phone, WhatsApp or " +
   "email about my enquiry. I understand I can ask for my details to be deleted at " +
   "any time.";
 
 /** The evening's version, since it is purely Medlyfe's from 8 October 2026. */
 export const MEDLYFE_EVENT_CONSENT_TEXT =
-  "I agree that Medlyfe Wellness and Longevity Centre may hold the details I have " +
+  "I agree that MedLYFE Wellness and Longevity Centre may hold the details I have " +
   "given and contact me by phone, WhatsApp or email about the evening. I understand " +
   "I can ask for my details to be deleted at any time.";
 
@@ -1153,14 +1160,14 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
     body: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
   },
   {
-    name: "Medlyfe",
+    name: "MedLYFE",
     role: "The licensed centre",
-    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that takes the bookings and where the consultation happens. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
+    body: "MedLYFE Wellness and Longevity Centre is the licensed, trading entity that takes the bookings and where the consultation happens. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
   },
   {
     name: "Medbury Healthcare",
     role: "The group",
-    body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
+    body: "MedLYFE is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
   },
 ];
 
@@ -1170,9 +1177,9 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
  */
 export const MEDLYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
-    name: "Medlyfe",
+    name: "MedLYFE",
     role: "The host",
-    body: "Medlyfe Wellness and Longevity Centre is a licensed centre in Lagos for longevity, preventive health, infusion and health optimisation. Its clinical work is led by Dr Adedotun Ajelabi, a Consultant Family Physician with training in longevity and regenerative medicine. The argument of the evening is the centre's own: how you feel, how you function and how you look are one conversation, not three.",
+    body: "MedLYFE Wellness and Longevity Centre is a licensed centre in Lagos for longevity, preventive health, infusion and health optimisation. Its clinical work is led by Dr Adedotun Ajelabi, a Consultant Family Physician with training in longevity and regenerative medicine. The argument of the evening is the centre's own: how you feel, how you function and how you look are one conversation, not three.",
   },
   LYFE_ABOUT[2],
 ];

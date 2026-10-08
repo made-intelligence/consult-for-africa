@@ -180,7 +180,7 @@ export default async function LyfeEnquiriesPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10">
       <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-700">
-        Medlyfe Wellness and Longevity Centre
+        MedLYFE Wellness and Longevity Centre
       </p>
       <h1 className="mt-2 text-3xl font-bold text-slate-900">The enquiry queue</h1>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">

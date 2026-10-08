@@ -92,7 +92,9 @@ def build(data: dict, out: Path) -> None:
     h = doc.add_paragraph(style="Heading 1")
     h.add_run(f"{ev['theme'].upper()}: {ev['proposition']}")
     _note(doc, f"{ev['date']}  ·  {ev['venueName']}  ·  {ev['places']} places")
-    doc.add_paragraph(ev["standfirst"])
+    doc.add_paragraph(f"{ev['proposition']}. {ev['standfirst']}")
+    if data.get("tone"):
+        doc.add_paragraph(data["tone"])
 
     doc.add_paragraph(style="Heading 2").add_run("How to use this")
     for line in [
@@ -118,6 +120,8 @@ def build(data: dict, out: Path) -> None:
     ])
 
     doc.add_paragraph(style="Heading 2").add_run("Who the room is")
+    if data.get("room"):
+        doc.add_paragraph(data["room"])
     t = doc.add_table(rows=1, cols=2)
     t.style = "Table Grid"
     for i, label in enumerate(("Group", "Places")):
@@ -147,9 +151,10 @@ def build(data: dict, out: Path) -> None:
     _note(
         doc,
         "Each person has been sent their own section only. The bio is printed "
-        "as it reads here. The questions are a brief for the chair, not a "
-        "script, and each speaker has been told they can ask to be asked "
-        "something else.",
+        "as it reads here. The speaker focus explains what they should prepare "
+        "to open with in two to three minutes. The questions are a brief for "
+        "the chair, not a script, and each speaker has been told they can ask "
+        "to be asked something else.",
     )
 
     for s in data["speakers"]:
@@ -159,15 +164,18 @@ def build(data: dict, out: Path) -> None:
         doc.add_paragraph(style="Heading 3").add_run("Subject, as printed")
         doc.add_paragraph(s["subject"] or "[not set]")
 
+        if s.get("focus") and "chair" not in s["slot"]:
+            doc.add_paragraph(style="Heading 3").add_run("Speaker focus")
+            doc.add_paragraph(s["focus"])
+
         doc.add_paragraph(style="Heading 3").add_run("Bio, as printed")
         doc.add_paragraph(s["bio"] or "[no bio on file]")
 
         if "chair" in s["slot"]:
-            doc.add_paragraph(style="Heading 3").add_run("Questions you will put")
+            doc.add_paragraph(style="Heading 3").add_run("Chairing direction")
             doc.add_paragraph(
-                "Each panellist's set is in their own section below. Cut in when "
-                "an answer finishes on a generality, and make sure every answer "
-                "ends in something a guest can do this week."
+                s.get("focus")
+                or "Each panellist's set is in their own section below."
             )
         elif s["questions"]:
             doc.add_paragraph(style="Heading 3").add_run("Questions they will be asked")

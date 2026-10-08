@@ -24,19 +24,19 @@ const sans = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Medlyfe presents Ageless",
-    template: "%s | Medlyfe Wellness and Longevity Centre",
+    default: "MedLYFE presents Ageless",
+    template: "%s | MedLYFE Wellness and Longevity Centre",
   },
   openGraph: {
     type: "website",
     locale: "en_NG",
-    siteName: "Medlyfe Wellness and Longevity Centre",
+    siteName: "MedLYFE Wellness and Longevity Centre",
     images: [
       {
         url: "/medlyfe-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Medlyfe presents Ageless",
+        alt: "MedLYFE presents Ageless",
       },
     ],
   },

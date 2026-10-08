@@ -26,21 +26,21 @@ const sans = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Medlyfe Wellness and Longevity Centre",
-    template: "%s | Medlyfe",
+    default: "MedLYFE Wellness and Longevity Centre",
+    template: "%s | MedLYFE",
   },
   description:
     "Aesthetic care in Lagos for the woman who wants to look rested, not rearranged. Registered clinicians, and a consultation that will tell you when the answer is no.",
   openGraph: {
     type: "website",
     locale: "en_NG",
-    siteName: "Medlyfe Wellness and Longevity Centre",
+    siteName: "MedLYFE Wellness and Longevity Centre",
     images: [
       {
         url: "/medlyfe-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Medlyfe presents Ageless",
+        alt: "MedLYFE presents Ageless",
       },
     ],
     title: "The Art of Looking Like Yourself",
