@@ -85,7 +85,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     firstName: "Dr Adenuga",
     email: "timiadenuga@getslim.ng",
     org: "GetSlim",
-    slot: "the panel, on metabolism, weight and the questions about the new drugs",
+    slot: "the panel, on metabolism, weight, hormones and the questions about the new drugs",
     subject: "Metabolism, weight, hormones and the body, and the new drugs",
     questions: [
       "Why does the same diet stop working at 45?",

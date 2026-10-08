@@ -121,8 +121,9 @@ export const LYFE_EVENT_THEME = "Ageless";
  * panel. Keeping those apart is what lets edition two reuse everything but the
  * panel.
  *
- * Purely Medlyfe's evening from 8 October 2026. Dr Kpaduwa is no longer part
- * of it, so there is no featured fireside and no practice being introduced.
+ * Purely Medlyfe's evening from 8 October 2026: no featured fireside and no
+ * practice being introduced. Dr Kpaduwa sits on the panel as one voice of
+ * four, not as the subject of the evening.
  *
  * Venue address and the RSVP contact are still blank in the brief, so both
  * are environment variables and the page degrades honestly rather than
@@ -184,7 +185,7 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "7:00",
     title: "The panel: The New Science of Ageing Well",
-    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
+    body: "Forty five minutes chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, food and training, beauty and stress, and what ageing does to Black skin.",
   },
   {
     time: "7:45",

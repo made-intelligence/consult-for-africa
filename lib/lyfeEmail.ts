@@ -46,6 +46,12 @@ function esc(str: string): string {
  */
 type Letterhead = "lyfe" | "medlyfe";
 
+/** Why an Ageless mail arrived. The clinic default is wrong for both. */
+const INVITED_FOOTER =
+  "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+const SPEAKER_FOOTER =
+  "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
+
 function masthead(brand: Letterhead): string {
   if (brand === "medlyfe") {
     return `<tr><td style="background:${MEDLYFE_BRAND.green};padding:26px 32px;">
@@ -61,7 +67,18 @@ function masthead(brand: Letterhead): string {
         <tr><td style="height:3px;background:${LYFE_BRAND.bronze};"></td></tr>`;
 }
 
-function layout(content: string, preheader: string, brand: Letterhead = "lyfe"): string {
+/**
+ * AGELESS is Medlyfe's evening, so everything about it goes out on Medlyfe's
+ * letterhead. The default here is the clinic, because most of what this file
+ * sends is clinic correspondence, and an event mail that forgets to say
+ * otherwise reaches a panellist branded as a plastic surgery practice.
+ */
+function layout(
+  content: string,
+  preheader: string,
+  brand: Letterhead = "lyfe",
+  footerNote = "You are receiving this because you made an enquiry. Reply at any time and we will remove your details.",
+): string {
   const name = brand === "medlyfe" ? MEDLYFE_NAME : LYFE_NAME;
   return `<!DOCTYPE html>
 <html lang="en">
@@ -75,7 +92,7 @@ function layout(content: string, preheader: string, brand: Letterhead = "lyfe"):
         <tr><td style="padding:32px;color:${LYFE_BRAND.ink};font-size:15px;line-height:1.65;">${content}</td></tr>
         <tr><td style="padding:18px 32px;background:${LYFE_BRAND.ground};border-top:1px solid ${LYFE_BRAND.line};color:${LYFE_BRAND.muted};font-size:11px;line-height:1.6;">
           ${esc(name)} &middot; Lagos, Nigeria &middot; ${esc(LYFE_PHONE_DISPLAY)}<br>
-          You are receiving this because you made an enquiry. Reply at any time and we will remove your details.
+          ${esc(footerNote)}
         </td></tr>
       </table>
     </td></tr>
@@ -175,6 +192,7 @@ export async function emailLyfeConfirmation({
        <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
       `Your interest in ${LYFE_EVENT_THEME} is registered.`,
       "medlyfe",
+      INVITED_FOOTER,
     );
     await notifyInternal(to, `Thank you for your interest, ${esc(firstName)}`, html);
     return;
@@ -392,6 +410,7 @@ export async function emailLyfeInvitation({
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An invitation to ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
     "medlyfe",
+    INVITED_FOOTER,
   );
 
   await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
@@ -432,6 +451,7 @@ export async function emailLyfeAttendanceConfirmed({
      <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
     `Your place at ${LYFE_EVENT_THEME} is held.`,
     "medlyfe",
+    INVITED_FOOTER,
   );
 
   await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
@@ -484,6 +504,7 @@ export async function emailLyfeSpeakerAsk({
      <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
     `Your bio and a photograph for ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
     "medlyfe",
+    SPEAKER_FOOTER,
   );
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: your bio and a photograph`, html);
@@ -568,6 +589,8 @@ export async function emailLyfeSpeakerConfirm({
      <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
      <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
     `Your part in ${LYFE_EVENT_THEME}. Please confirm by ${deadline}.`,
+    "medlyfe",
+    SPEAKER_FOOTER,
   );
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: please confirm your details`, html);
