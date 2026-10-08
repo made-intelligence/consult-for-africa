@@ -59,15 +59,15 @@ Not a seminar crowd. They are coming for an evening out that happens to be usefu
 
 ::portraits
 Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
+Dr Adedotun Ajelabi|public/lyfe/adedotun-portrait.jpg
+Dr Timi Adenuga|public/lyfe/adenuga-portrait.jpg
+Dr Folake Kofo-Idowu|public/lyfe/folake-portrait.jpg
 Gbemi Giwa|public/lyfe/gbemi-portrait.jpg
-Dr Folake Kofo-Idowu|
-Dr Timi Adenuga|
 Dr Itunu Akinware|
-Dr Adedotun Ajelabi|
 Joycee Awosika|
 ::
 
-The two we hold are at consultforafrica.com/lyfe/chinwe-portrait.jpg and consultforafrica.com/lyfe/gbemi-portrait.jpg. Use only those. Do not lift a picture off anybody's Instagram for a printed or paid piece, because we do not hold the licence and the photographer does. The five blanks are being chased.
+All five are at consultforafrica.com/lyfe/ followed by the file name: chinwe-portrait.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, folake-portrait.jpg and gbemi-portrait.jpg. Use only those. Do not lift a picture off anybody's Instagram for a printed or paid piece, because we do not hold the licence and the photographer does. Dr Akinware and Ms Awosika are still being chased.
 
 ## The four lines that sell it
 

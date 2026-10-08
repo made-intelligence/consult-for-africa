@@ -294,7 +294,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Moderating the panel and the questions from the room",
     name: "Dr Itunu Akinware",
     title: "Chief Executive, Medbury Healthcare Group",
-    portrait: null,
+    portrait: "/lyfe/adedotun-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
@@ -319,7 +321,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
-    portrait: null,
+    portrait: "/lyfe/adenuga-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
@@ -329,7 +333,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
       "Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring",
     name: "Dr Folake Kofo-Idowu",
     title: "Founder and Medical Director of Nelia. Double board certified physician",
-    portrait: null,
+    portrait: "/lyfe/folake-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
