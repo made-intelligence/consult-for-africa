@@ -170,9 +170,12 @@ export async function emailLyfeConfirmation({
     return;
   }
 
-  // Interest, not a place. Seventy seats and an open form means most of the
-  // people who fill it in cannot be told yes, and the kind thing is to be
-  // straight about that in the first sentence rather than in the third email.
+  // Interest, not a place. The constraint is real and has to be said, but it
+  // is a fact about the room, not a judgement about the reader. An earlier
+  // version told senior people they would be "considered" and that they would
+  // hear "either way", which reads as a selection panel writing to a
+  // candidate. Say the room is small and that we will come back; do not
+  // advertise how many others want in.
   if (intent === "EVENT_RSVP") {
     const plusOne = guestCount && guestCount > 0
       ? `<p style="margin:0 0 14px;">You have asked to bring ${guestCount === 1 ? "one guest" : `${guestCount} guests`}, and that is noted against your name.</p>`
@@ -192,7 +195,7 @@ export async function emailLyfeConfirmation({
            ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places}, which is fewer than the number of people who would like to be in it. Invitations go out from this list, and you will hear from us either way. If you are invited, the note will carry a link of your own to confirm your place.</p>
+       <p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
        <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
