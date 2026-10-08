@@ -294,9 +294,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Moderating the panel and the questions from the room",
     name: "Dr Itunu Akinware",
     title: "Chief Executive, Medbury Healthcare Group",
-    portrait: "/lyfe/adedotun-portrait.jpg",
-    portraitWidth: 800,
-    portraitHeight: 1000,
+
+    portrait: null,
   },
   {
     seat: "The panel, on the inner",
@@ -321,7 +320,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject: "Maintaining beauty, and managing stress. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
-    portrait: "/lyfe/adenuga-portrait.jpg",
+
+    portrait: "/lyfe/joycee-portrait.jpg",
     portraitWidth: 800,
     portraitHeight: 1000,
   },

@@ -56,19 +56,19 @@ A few places are kept for clinicians.
 ## The faces
 
 ::portraits
-Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
 Dr Adedotun Ajelabi|public/lyfe/adedotun-portrait.jpg
 Dr Timi Adenuga|public/lyfe/adenuga-portrait.jpg
 Gbemi Giwa|public/lyfe/gbemi-portrait.jpg
+Joycee Awosika|public/lyfe/joycee-portrait.jpg
+Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
 Dr Itunu Akinware|
-Joycee Awosika|
 ::
 
-Download at consultforafrica.com/lyfe/ plus the file name: chinwe-portrait.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg.
+Download at consultforafrica.com/lyfe/ plus the file name: adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg, joycee-portrait.jpg, chinwe-portrait.jpg.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg.
 
 Use only these. Do not take pictures from Instagram for printed or paid work. We do not hold the licence.
 
-Dr Akinware and Ms Awosika still to send theirs.
+Dr Akinware still to send hers.
 
 ## Four lines that sell it
 
