@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LYFE_EVENT_THEME, LYFE_NAME, MEDLYFE_BRAND as MB } from "@/lib/lyfe";
+import { LYFE_EVENT_THEME, LYFE_SHORT, MEDLYFE_BRAND as MB } from "@/lib/lyfe";
 
 /**
  * The only navigation either landing gets.
@@ -31,7 +31,7 @@ export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
             letterSpacing: "0.16em",
           }}
         >
-          {event ? LYFE_EVENT_THEME : LYFE_NAME}
+          {event ? LYFE_EVENT_THEME : LYFE_SHORT}
         </Link>
 
         {event ? (

@@ -1,8 +1,15 @@
 import { createHash } from "crypto";
 
 /**
- * Lyfe Plastics and Dermatology: shared constants for the public page, the
+ * The Medlyfe aesthetics funnel: shared constants for the public pages, the
  * enquiry API and the coordinator's queue.
+ *
+ * "Lyfe Plastics and Dermatology" was a working name and no such practice
+ * exists, so nothing public carries it. The clinic of record is Medlyfe, the
+ * surgeon is named, and the aesthetics entity will get its own name when the
+ * licence question is settled. Advertising a practice name that is not
+ * registered is the ARCON and MDCN exposure we have been careful about
+ * everywhere else, so it is not worth doing for a wordmark.
  *
  * The March 2026 campaign put 170 names into a spreadsheet and converted none
  * of them. The diagnosis was never reach. It was that nobody was told what
@@ -14,9 +21,9 @@ import { createHash } from "crypto";
  */
 
 /**
- * Not the Consult for Africa navy and gold, and not ilé's green. Lyfe is a
- * consumer brand in a category where the client is deciding whether to trust
- * someone with her face, so the palette is quiet: warm paper, near black, one
+ * The consumer palette for the aesthetics pages. Not the Consult for Africa
+ * navy and gold, and not ilé's green: the client here is deciding whether to
+ * trust someone with her face, so it is quiet. Warm paper, near black, one
  * bronze for action, and a deep green reserved for the places where the page
  * talks about safety.
  */
@@ -36,8 +43,6 @@ export const LYFE_BRAND = {
   greenTint: "#E7EDEA",
 } as const;
 
-export const LYFE_NAME = "Lyfe Plastics and Dermatology";
-export const LYFE_SHORT = "Lyfe";
 export const LYFE_THEME = "The Art of Looking Like Yourself";
 export const LYFE_PROMISE =
   "Aesthetic care for the woman who wants to look rested, not rearranged.";
@@ -87,10 +92,10 @@ export function whatsappLink(message: string): string {
 /**
  * Medlyfe's own brand, sampled from their poster rather than guessed at.
  *
- * The evening is Medlyfe's, not Lyfe Plastics'. Medlyfe is the trading,
- * licensed, bookable entity and it hosts; Lyfe Plastics is introduced on the
- * night. So anything to do with the evening wears Medlyfe livery, and the two
- * palettes are deliberately kept apart.
+ * Medlyfe is the trading, licensed, bookable entity, and the evening is its
+ * own. The second palette below is the consumer livery for the aesthetics
+ * pages; the two are kept apart because one sells an evening and the other
+ * sells a consultation.
  */
 export const MEDLYFE_BRAND = {
   // Deep forest ground with the chartreuse accent from Medlyfe's own poster.
@@ -108,6 +113,13 @@ export const MEDLYFE_BRAND = {
 
 export const MEDLYFE_NAME = "Medlyfe Wellness and Longevity Centre";
 export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
+
+/**
+ * The clinic of record on the aesthetics pages. Medlyfe, because it is the
+ * entity that exists and the one the aesthetics pilot runs under.
+ */
+export const LYFE_NAME = MEDLYFE_NAME;
+export const LYFE_SHORT = "Medlyfe";
 
 /** The platform. One word, set large, and the whole of the idea. */
 export const LYFE_EVENT_THEME = "Ageless";
@@ -730,9 +742,10 @@ export const LYFE_AFTERCARE = [
 ] as const;
 
 export const LYFE_CONSENT_TEXT =
-  "I agree that Lyfe Plastics and Dermatology and the clinic delivering my care may " +
-  "hold the details I have given and contact me by phone, WhatsApp or email about my " +
-  "enquiry. I understand I can ask for my details to be deleted at any time.";
+  "I agree that Medlyfe Wellness and Longevity Centre and the clinicians delivering " +
+  "my care may hold the details I have given and contact me by phone, WhatsApp or " +
+  "email about my enquiry. I understand I can ask for my details to be deleted at " +
+  "any time.";
 
 /** The evening's version, since it is purely Medlyfe's from 8 October 2026. */
 export const MEDLYFE_EVENT_CONSENT_TEXT =
@@ -936,14 +949,14 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
  */
 export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
-    name: "Lyfe Plastics & Dermatology",
-    role: "The practice",
-    body: "The plastic surgery and dermatology practice led by Dr Chinwe Kpaduwa, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
+    name: "Dr Chinwe Kpaduwa, MD FACS",
+    role: "The surgeon",
+    body: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
   },
   {
     name: "Medlyfe",
     role: "The licensed centre",
-    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
+    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that takes the bookings and where the consultation happens. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
   },
   {
     name: "Medbury Healthcare",
@@ -953,9 +966,8 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
 ];
 
 /**
- * The same, for the AGELESS page now that the evening is purely Medlyfe's.
- * No practice is introduced on the night, so the first card is the centre
- * itself rather than Lyfe Plastics.
+ * The same, for the AGELESS page. No practice is introduced on the night, so
+ * the first card is the centre itself.
  */
 export const MEDLYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {

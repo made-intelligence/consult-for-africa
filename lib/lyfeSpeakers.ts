@@ -138,7 +138,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     name: "Dr Chinwe Kpaduwa, MD FACS",
     firstName: "Dr Kpaduwa",
     email: null,
-    org: "Lyfe Plastics & Dermatology",
+    org: "Medlyfe Wellness and Longevity Centre",
     slot: "the panel, on ageing in Black skin, aesthetics and plastic surgery",
     subject:
       "Ageing as a Black woman. Skin, aesthetics, and what anti-ageing marketing is worth in a Black population",

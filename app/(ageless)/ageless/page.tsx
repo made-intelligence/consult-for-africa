@@ -20,7 +20,7 @@ import StickyRsvp from "@/app/(lyfe)/lyfe/StickyRsvp";
 const DESCRIPTION = `Medlyfe presents Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}, on how modern science is changing the way we look, feel, perform and live as we age.`;
 
 // Absolute, so the tab and the link preview say Medlyfe rather than inheriting
-// the Lyfe Plastics template from the layout.
+// the aesthetics template from the layout.
 export const metadata: Metadata = {
   title: { absolute: "Medlyfe presents Ageless" },
   description: DESCRIPTION,
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
  *
  * Purely Medlyfe's evening from 8 October 2026, in Medlyfe's livery
  * throughout. Dr Kpaduwa is no longer part of it, so the fireside, the
- * consultation offers and the Lyfe Plastics section have gone, and the face of
+ * consultation offers and the practice section have gone, and the face of
  * the page is Medlyfe's own Head of Medicals, who opens the evening.
  *
  * Still no hero video and nothing heavier than it needs to be: 86 per cent of

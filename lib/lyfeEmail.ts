@@ -60,9 +60,12 @@ function masthead(brand: Letterhead): string {
         </td></tr>
         <tr><td style="height:3px;background:${MEDLYFE_BRAND.lime};"></td></tr>`;
   }
+  // Clinic correspondence. Same name as the evening, because there is only one
+  // entity, carrying the bronze rule so it matches the consultation page a
+  // reader has just come from.
   return `<tr><td style="background:${LYFE_BRAND.ink};padding:26px 32px;">
-          <div style="color:#ffffff;font-weight:600;font-size:23px;line-height:1.1;letter-spacing:-0.01em;">Lyfe</div>
-          <div style="color:${LYFE_BRAND.bronze};font-weight:700;font-size:9px;letter-spacing:0.16em;margin-top:8px;">PLASTICS AND DERMATOLOGY</div>
+          <div style="color:#ffffff;font-size:23px;line-height:1.1;"><span style="font-family:Georgia,serif;">med</span><span style="font-weight:800;letter-spacing:-0.02em;">LYFE</span></div>
+          <div style="color:${LYFE_BRAND.bronze};font-weight:700;font-size:9px;letter-spacing:0.16em;margin-top:8px;">WELLNESS AND LONGEVITY CENTRE</div>
         </td></tr>
         <tr><td style="height:3px;background:${LYFE_BRAND.bronze};"></td></tr>`;
 }

@@ -5,7 +5,7 @@ import { Fraunces, Inter } from "next/font/google";
  * Medlyfe presents AGELESS.
  *
  * The evening has its own address from 8 October 2026, when it became purely
- * Medlyfe's. It used to live at /lyfe under the Lyfe Plastics layout, which
+ * Medlyfe's. It used to live at /lyfe under the aesthetics layout, which
  * put a plastic surgery practice's name in every tab and link preview. Same
  * type pairing as Lyfe so the page itself is unchanged; only the name moves.
  */
