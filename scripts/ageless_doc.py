@@ -326,6 +326,19 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential", dark:
         if y < 110:
             y = new_page()
 
+        if line.startswith("### "):
+            # A named speaker inside a section. Smaller than a section head and
+            # in the accent, so a panellist can find their own name by scanning.
+            if y < 140:
+                y = new_page()
+            y -= 6
+            c.setFillColor(HexColor(LIME if DARK else GREEN))
+            c.setFont(SANS_B, 10.4)
+            for ln in _wrap(c, _clean(line[4:]), SANS_B, 10.4, W):
+                c.drawString(M, y, ln); y -= 14
+            y -= 4
+            i += 1
+            continue
         if line.startswith("## "):
             # A heading stranded at the foot of a page with its section on the
             # next one is the commonest way a short document looks careless.
