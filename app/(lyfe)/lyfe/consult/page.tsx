@@ -181,7 +181,7 @@ export default async function ConsultPage({
                 className="text-[15px] font-semibold underline underline-offset-4"
                 style={{ color: C.bronzeDeep }}
               >
-                Book Dr Kpaduwa, {LYFE_CONSULT.feeDisplay}
+                Request a consultation
               </a>
             </div>
 
@@ -274,33 +274,20 @@ export default async function ConsultPage({
                     {o.body}
                   </p>
                   <div className="mt-6">
-                    {bookable ? (
-                      <>
-                        <a
-                          href="#book"
-                          className="inline-block px-6 py-3 text-[14.5px] font-semibold"
-                          style={{ background: C.ink, color: C.ground }}
-                        >
-                          Book for {o.fee}
-                        </a>
-                        <p className="mt-3 text-[13.5px] leading-snug" style={{ color: C.muted }}>
-                          {o.meta}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <a
-                          href="#book"
-                          className="inline-block px-6 py-3 text-[14.5px] font-semibold"
-                          style={{ background: "transparent", color: C.ink, border: `1px solid ${C.ink}` }}
-                        >
-                          Ask about this
-                        </a>
-                        <p className="mt-3 text-[13.5px] leading-snug" style={{ color: C.muted }}>
-                          {o.meta}
-                        </p>
-                      </>
-                    )}
+                    <a
+                      href="#book"
+                      className="inline-block px-6 py-3 text-[14.5px] font-semibold"
+                      style={
+                        bookable
+                          ? { background: C.ink, color: C.ground }
+                          : { background: "transparent", color: C.ink, border: `1px solid ${C.ink}` }
+                      }
+                    >
+                      Request a consultation
+                    </a>
+                    <p className="mt-3 text-[13.5px] leading-snug" style={{ color: C.muted }}>
+                      {o.fee ? `${o.fee}. ${o.meta}` : o.meta}
+                    </p>
                   </div>
                 </div>
               );
@@ -417,12 +404,12 @@ export default async function ConsultPage({
             className="text-[28px] leading-tight md:text-[38px]"
             style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.02em" }}
           >
-            Choose your half hour.
+            Request a consultation.
           </h2>
           <p className="mt-4 max-w-2xl text-[16px] leading-relaxed" style={{ color: C.body }}>
-            {LYFE_CONSULT.note} The time is held once the fee is paid and not before, because there
-            are only {LYFE_CONSULT.perWeek} of these in a week and holding one open costs somebody
-            else theirs.
+            Tell us which of the four and what you are thinking about. A
+            coordinator calls you, arranges the time and tells you what it
+            costs before anything is booked. Nothing is taken here.
           </p>
           <div className="mt-10">
             <EnquiryForm utm={utm} initialIntent="CONSULTATION" slots={slots} />

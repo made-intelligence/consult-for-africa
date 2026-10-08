@@ -25,6 +25,14 @@ import { emailLyfeConfirmation, emailLyfeInternal } from "@/lib/lyfeEmail";
  * after the write is allowed to fail the request.
  */
 
+/** For the coordinator's note. The page's own labels are longer than useful here. */
+const SERVICE_LABEL = {
+  LONGEVITY: "Longevity and preventive health",
+  METABOLIC: "Metabolism, weight and hormones",
+  SKIN: "Skin and aesthetic medicine",
+  SURGERY: "Plastic surgery, with Dr Kpaduwa",
+} as const;
+
 const schema = z.object({
   fullName: z.string().trim().min(2, "Please give your name").max(120),
   email: z.string().trim().toLowerCase().email("That email does not look right").max(200),
@@ -32,6 +40,14 @@ const schema = z.object({
   intent: z.enum(["EVENT_RSVP", "CONSULTATION", "DISCOVERY_CALL"]),
   /** The half hour they picked, as an ISO instant. Consultations only. */
   slotAt: z.string().trim().max(40).optional().nullable(),
+  /// Which of the four they asked for. Kept on the row as the first line of
+  /// notes rather than its own column, because adding one would mean a
+  /// migration run by hand on a shared database for a field the coordinator
+  /// reads and nothing queries.
+  requestedService: z
+    .enum(["LONGEVITY", "METABOLIC", "SKIN", "SURGERY"])
+    .optional()
+    .nullable(),
   guestCount: z.number().int().min(0).max(4).optional().nullable(),
   isClinician: z.boolean().optional().nullable(),
   pathway: z.enum(["AESTHETIC", "SURGICAL", "UNSURE"]),
@@ -156,9 +172,15 @@ export const POST = handler(async function POST(req: NextRequest) {
   // for being sold before the person is sent to pay. The authority on whether
   // it is really sold is the unique index, which runs at the moment the money
   // lands; this is the courteous version of the same answer.
+  // The page takes a request, not a booking. It used to make a visitor pick a
+  // half hour and pay before anybody had spoken to her, which only ever
+  // worked for the one consultation that had a published fee and a diary, and
+  // Medlyfe has four. The coordinator sets the time and, where there is a
+  // fee, takes it on the call. A slot sent anyway is still honoured, so the
+  // payment path stays usable for a link the coordinator sends.
   let slotAt: Date | null = null;
-  if (consultation) {
-    if (!data.slotAt || !isConsultSlot(data.slotAt)) {
+  if (consultation && data.slotAt) {
+    if (!isConsultSlot(data.slotAt)) {
       return NextResponse.json(
         { error: "Please choose one of the times in Dr Kpaduwa's diary." },
         { status: 400 },
@@ -204,7 +226,14 @@ export const POST = handler(async function POST(req: NextRequest) {
       weightTrend: surgical ? data.weightTrend || null : null,
       priorSurgery: surgical ? (data.priorSurgery ?? null) : null,
       goal: data.goal || null,
-      notes: data.notes || null,
+      notes: [
+        data.requestedService
+          ? `Asked about: ${SERVICE_LABEL[data.requestedService]}`
+          : null,
+        data.notes || null,
+      ]
+        .filter(Boolean)
+        .join("\n") || null,
       slotAt,
       amountKobo: consultation ? LYFE_CONSULT.fee * 100 : null,
       source: data.source,
@@ -226,7 +255,7 @@ export const POST = handler(async function POST(req: NextRequest) {
   // having a slow morning must not be what stands between a booking and the
   // money.
   let payUrl: string | null = null;
-  if (consultation) {
+  if (consultation && slotAt) {
     payUrl = await startConsultPayment({
       enquiryId: entry.id,
       email: entry.email,

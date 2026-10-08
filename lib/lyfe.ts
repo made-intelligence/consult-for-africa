@@ -638,8 +638,10 @@ export const LYFE_CONSULT = {
  * service is the same error as inventing a practice name. Add prices here as
  * Medlyfe confirms them.
  */
+export type LyfeConsultOptionKey = "LONGEVITY" | "METABOLIC" | "SKIN" | "SURGERY";
+
 export interface LyfeConsultOption {
-  key: "LONGEVITY" | "METABOLIC" | "SKIN" | "SURGERY";
+  key: LyfeConsultOptionKey;
   name: string;
   who: string;
   body: string;
@@ -656,7 +658,7 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
     who: "The Medlyfe clinical team, led by Dr Adedotun Ajelabi",
     body: "Where you actually are, measured rather than guessed. Diagnostics, risk, and a plan for the next year. The starting point if you do not yet know what you are treating.",
     fee: null,
-    meta: "Tell us what you are thinking about and a coordinator will call you.",
+    meta: "Usually the right place to start if you have never had any of it measured.",
   },
   {
     key: "METABOLIC",
@@ -664,7 +666,7 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
     who: "Medlyfe, with referral where surgery is the question",
     body: "Why the same diet stopped working, what the newer drugs do and do not do, and what happens when somebody stops. Including when the honest answer is that you do not need them.",
     fee: null,
-    meta: "Tell us what you are thinking about and a coordinator will call you.",
+    meta: "Bring your numbers if you have them. If you do not, we will measure.",
   },
   {
     key: "SKIN",
@@ -672,7 +674,7 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
     who: "Registered clinicians, to protocols Dr Kpaduwa wrote and signs off",
     body: "Skin, injectables and regenerative treatment. Most of what changes how you look sits here rather than in an operating theatre, and most people should start here.",
     fee: null,
-    meta: "Tell us what you are thinking about and a coordinator will call you.",
+    meta: "No referral needed, and no obligation to go on to anything.",
   },
   {
     key: "SURGERY",
