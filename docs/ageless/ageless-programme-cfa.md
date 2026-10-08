@@ -1,6 +1,6 @@
-# The AGELESS programme
+# AGELESS
 
-## What we are doing and why
+## What the evening is
 
 FOR
 Medlyfe and the team
@@ -15,107 +15,104 @@ AS AT
 
 ## In short
 
-**Target: twenty paid consultations with Dr Chinwe Kpaduwa before 3 November.**
+- A cocktail evening hosted by Medlyfe at the Capital Club, Lagos.
+- Wednesday 21 October 2026. Arrival 5:30pm, programme 6:30pm, close 9:30pm.
+- Seventy guests. Lagos women and men over forty.
+- It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology.
+- Built to recur. This is edition one.
 
-She leaves in November. Twenty consultations is ten to twelve operations at published conversion rates.
+## The argument
 
-Five routes feed it. One evening, one booking page, a tour of clinics, a content library, and paid social.
+- How you feel and how you look are one appointment, not two.
+- The panel takes the inside of the body.
+- The fireside turns outward to the face and the body.
+- Nobody in this room has had the whole subject explained by people who actually know.
 
-The constraint is her diary, not demand. Eight half hours a week, about 31 slots left. Only twelve fall after the event on 21 October, so the fortnight before it decides whether the number happens.
-
-## Why this exists
-
-A digital campaign in March produced 170 leads. Eleven went warm. None booked.
-
-The failure was speed and persistence, not interest. Calling at five minutes rather than thirty multiplies qualification by 21. Half of all leads are never called twice. Ninety three per cent of leads that convert are reached inside six attempts.
-
-So the programme is built around one queue, sorted by how long somebody has waited.
-
-## The five routes
-
-| Route | What it is | Expected |
-| --- | --- | --- |
-| AGELESS, 21 October | Cocktail evening, 70 guests, Capital Club | 10 to 17 |
-| Consultation page | Paid booking page, indexed for search | 2 to 4 |
-| Facility Rounds | She visits clinics in Lekki and VI to meet referring doctors | 3 to 6 |
-| Content library | Fifty short films answering the questions that stall a booking | 2 to 4 |
-| Reactivation and paid | The 170 March leads, plus retargeting | 4 to 6 |
-
-Total 21 to 37 against 31 slots. The number is reachable. It fails if the pre-event fortnight goes quiet.
-
-## AGELESS
-
-A recurring platform, not a one-off launch. Edition one carries the format, identity, film library and guest list that later editions inherit.
-
-Four names, four jobs:
+## Four names, four jobs
 
 | Name | What it is |
 | --- | --- |
-| AGELESS | The platform |
+| AGELESS | The platform, built to recur |
 | A New Era of Health, Beauty and Longevity | This edition's proposition |
 | The New Science of Ageing Well | The panel |
 | The Art of Looking Like Yourself | Dr Kpaduwa's fireside |
 
-Guests register interest. We invite from that list. A place is held only when the invitee uses the personal link in their invitation.
+Keeping them apart is what lets edition two reuse everything except the panel.
 
-## The three pages
+## The running order
 
-| Page | Job | Indexed |
-| --- | --- | --- |
-| consultforafrica.com/lyfe | Fill the room | No |
-| consultforafrica.com/lyfe/consult | Fill her diary | Yes |
-| consultforafrica.com/lyfe/visit | Facility Rounds, for clinicians | No |
-
-One job each. The event page carries no booking form and no fee.
-
-Mezo carries a fourth surface. ClearSkin is now ClearSkin by Lyfe Plastics and Dermatology, and there is a practice page at mezohealth.com/practices/lyfe-plastics. Mezo already produces organic dermatology demand, which is the cheapest new channel available.
-
-## The consultation
-
-₦150,000 for thirty minutes with Dr Kpaduwa by video. Put towards the total if the patient goes on to have surgery.
-
-Paid consultations convert to procedure at roughly 90 per cent against 40 per cent for free ones. The fee is a filter, not a barrier. Do not discount it.
-
-She does not discuss fees with patients. Costings come from the team afterwards, in writing.
-
-## Facility Rounds
-
-She visits clinics and hospitals in Lekki and Victoria Island, thirty minutes each, at the doctor's facility.
-
-Doctor referral is the highest trust route into a surgical practice. The patient arrives having already decided to trust whoever suggested it.
-
-No fee is paid for a referral in either direction.
-
-## Rules that bind everything
-
-| Regulator | What it means for us |
+| Time | What |
 | --- | --- |
-| ARCON | Advertising approved before exposure. Fines from ₦500,000. Liability on the advertiser, not the speaker |
-| MDCN | A doctor may not advertise herself. The clinic advertises, the surgeon educates |
-| NAFDAC | Toxins and fillers are prescription only. No brand names in public |
-| HEFAMAA | Scope of practice is live in Lagos now. Do not debate who may inject |
+| 5:30 | Arrival and cocktails |
+| 6:30 | Welcome and opening film |
+| 6:35 | The range. Dr Ajelabi, 15 minutes |
+| 6:50 | The panel, 45 minutes |
+| 7:35 | The fireside, 25 minutes |
+| 8:00 | What you can actually do |
+| 8:15 | Questions from the room |
+| 8:30 | After Hours. Close 9:30 |
 
-No before and after imagery. No outcome claims. The compliant version is also the higher trust version for this buyer.
+Why 6:30 and not later:
+
+- The programme runs two hours.
+- After Hours needs its full hour. That is where guests talk to the clinicians.
+- An hour of arrival before it is the allowance for Victoria Island on a weekday.
+
+## The stage
+
+| Role | Who |
+| --- | --- |
+| Opening address | Dr Adedotun Ajelabi, Clinical Lead, Medlyfe |
+| In the chair | Dr Itunu Akinware, Chief Executive, Medbury Healthcare Group |
+| Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
+| Panel | Gbemi Giwa, African Fat Loss Method. Food and body composition |
+| Panel | Joycee Awosika, ORÍKÌ Group. Vitality and energy |
+| Panel | Dr Folake Kofo-Idowu, Nelia. Menopause and hormones |
+| Panel | One seat open. Andropause and men's health |
+| Fireside | Dr Chinwe Kpaduwa, MD FACS, with Dr Debo Odulana |
+
+The panel is experiential, delivered by people with the credentials to be believed. Every answer ends in something a guest can do that week.
+
+## How guests get in
+
+- They register interest at consultforafrica.com/lyfe.
+- We choose who is invited from that list.
+- The invitation carries a link belonging to that person.
+- A place is held when they use the link, and at no other point.
+- Seventy places needs an invited list of about 140.
+
+Never tell anyone their place is confirmed before they have used their link.
+
+## Rules for the stage
+
+| Regulator | What it means |
+| --- | --- |
+| ARCON | No named prescription products. Fines from ₦500,000, liability on Medlyfe not the speaker |
+| MDCN | A doctor may not advertise herself. No pitching your own practice from the stage |
+| NAFDAC | Toxins and fillers are prescription only. No brand names in public |
+| HEFAMAA | Scope of practice is live in Lagos. Do not debate who may inject |
+
+Also:
+
+- No before and after imagery.
+- No outcome promises.
 
 ## Timeline
 
 | When | What |
 | --- | --- |
-| This week | Doctors, salons and the club. Free, warm, fills pre-event slots |
-| 8 October | Content shoot with Dr Kpaduwa |
-| By 10 October | Speaker bios and photographs in, or they miss the programme |
-| Around 15 October | Content library live, paid campaign starts |
+| By 10 October | Speaker bios and photographs, or they miss the printed programme |
+| By 10 October | Capital Club street address and RSVP contact, or invitations cannot print |
+| Week of 13 October | Invitations out. Guest list worked by phone |
+| 16 October | Register interest closes |
 | 21 October | AGELESS |
-| 22 October to 3 November | Twelve remaining slots, worked by phone, six attempts each |
 
 ## Still open
 
 | What | Who |
 | --- | --- |
-| The 170 March leads are not in any CFA system. Get the list | Medlyfe or the agency |
 | Fifth panel seat, on andropause and men's health | Debo |
 | Photographs for Dr Akinware and Ms Awosika | Themselves |
-| Zoom link for the DFC Catalyst session on 24 October | DFC |
-| Whether Dr Kpaduwa will sit more than eight half hours a week | Dr Kpaduwa |
-
-That last one matters most. Sixteen half hours a week takes capacity to about 60 and makes twenty a floor rather than a stretch.
+| Capital Club street address | Venue |
+| RSVP contact name and direct line | Medlyfe |
+| The invited list, about 140 names | Sally and the team |
