@@ -24,7 +24,7 @@ AS AT
 
 ## The argument
 
-- How you feel and how you look are one appointment, not two. That is what Medlyfe is built on.
+- Medlyfe treats longevity, metabolic health, hormones, skin and aesthetics in one place.
 - Medlyfe already does the inside: longevity, infusion, metabolic health, preventive care.
 - The panel is that argument made in public, by people with the credentials to be believed.
 - Nobody in this room has had the whole subject explained by people who actually know.

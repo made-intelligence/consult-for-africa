@@ -940,7 +940,7 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
     name: "Medlyfe",
     role: "The licensed centre",
-    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, which is the argument the whole evening is built on: how you feel and how you look are one appointment, not two.",
+    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
   },
   {
     name: "Medbury Healthcare",
