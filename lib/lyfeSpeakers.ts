@@ -152,7 +152,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     ],
     need: [],
     bio: "Dr Chinwe Kpaduwa is a plastic surgeon, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained, with a craniofacial fellowship at Nationwide Children's Hospital.",
-    notes: "Reached directly by Debo. Bio and portrait on file. Her ground is ageing in Black skin, aesthetic medicine and plastic surgery, and what the anti-ageing market is actually worth to a Black population. Hormones and metabolism belong to Dr Adenuga; she takes hormones no further than what they do to skin.",
+    notes: "Reached directly by Debo. Bio and portrait on file. Her ground is ageing in Black skin, aesthetic medicine and plastic surgery, and what the anti-ageing market is actually worth to a Black population. Metabolism and hormones sit with Dr Adenuga.",
   },
 ];
 

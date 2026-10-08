@@ -19,7 +19,7 @@ Wednesday 21 October 2026
 - **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
 - Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
-- **Dr Adenuga holds hormones and metabolism.** Dr Kpaduwa holds ageing in Black skin, aesthetics and surgery, and goes no further on hormones than what they do to skin.
+- **Each of you has your own ground.** Dr Adenuga on metabolism, weight and hormones. Dr Kpaduwa on ageing in Black skin, aesthetics and surgery. Gbemi Giwa on food and training. Joycee Awosika on beauty and stress.
 - No slides, no lectern. Cocktail dress.
 
 ## What we need from you
