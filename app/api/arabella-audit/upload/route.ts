@@ -35,7 +35,12 @@ import { z } from "zod";
 
 const ENGAGEMENT = "arabella";
 const FOLDER = "documents";
-const MAX_FILE_SIZE_MB = 25;
+// A scanned bank statement or a stack of register photographs runs well past
+// 25MB, and the file never touches the app, so the ceiling is R2's patience
+// on a slow line rather than ours.
+const MAX_FILE_SIZE_MB = 100;
+// Long enough for 100MB on a poor Abuja uplink.
+const PRESIGN_SECONDS = 3600;
 
 // Wider than the generic public uploader, because an audit arrives as
 // spreadsheet exports and photographs of paper registers, not just PDFs.
@@ -54,7 +59,26 @@ const ALLOWED: Record<string, true> = {
   "image/png": true,
   "image/webp": true,
   "image/heic": true,
+  "image/heif": true,
+  "image/tiff": true,
+  "image/gif": true,
   "application/zip": true,
+  "application/x-zip-compressed": true,
+  "application/vnd.rar": true,
+  "application/x-rar-compressed": true,
+  "application/x-7z-compressed": true,
+  "application/rtf": true,
+  "text/rtf": true,
+  "application/vnd.oasis.opendocument.text": true,
+  "application/vnd.oasis.opendocument.spreadsheet": true,
+  "application/vnd.apple.numbers": true,
+  "application/vnd.apple.pages": true,
+  "application/vnd.apple.keynote": true,
+  "video/mp4": true,
+  "video/quicktime": true,
+  "audio/mpeg": true,
+  "audio/mp4": true,
+  "audio/ogg": true,
 };
 
 const EXT_TO_MIME: Record<string, string> = {
@@ -72,7 +96,25 @@ const EXT_TO_MIME: Record<string, string> = {
   png: "image/png",
   webp: "image/webp",
   heic: "image/heic",
+  heif: "image/heif",
+  tif: "image/tiff",
+  tiff: "image/tiff",
+  gif: "image/gif",
   zip: "application/zip",
+  rar: "application/vnd.rar",
+  "7z": "application/x-7z-compressed",
+  rtf: "application/rtf",
+  odt: "application/vnd.oasis.opendocument.text",
+  ods: "application/vnd.oasis.opendocument.spreadsheet",
+  numbers: "application/vnd.apple.numbers",
+  pages: "application/vnd.apple.pages",
+  key: "application/vnd.apple.keynote",
+  mp4: "video/mp4",
+  mov: "video/quicktime",
+  mp3: "audio/mpeg",
+  m4a: "audio/mp4",
+  ogg: "audio/ogg",
+  opus: "audio/ogg",
 };
 
 /** Letters of the information request, plus a catch-all. */
@@ -81,7 +123,9 @@ const SECTIONS = /^([A-M]|priority|other)$/;
 // Per-IP limiter, same shape as the generic public uploader.
 const hits = new Map<string, { n: number; resetAt: number }>();
 const WINDOW_MS = 60_000;
-const MAX_PER_WINDOW = 30;
+// Each file is two requests and a front office uploads from one shared IP, so
+// 30 stopped a folder of photographs at the fifteenth.
+const MAX_PER_WINDOW = 200;
 
 function rateLimited(ip: string): boolean {
   const now = Date.now();
@@ -162,14 +206,14 @@ export async function POST(req: NextRequest) {
   }
   if (!resolved) {
     return Response.json(
-      { error: "That file type is not accepted. PDF, Word, Excel, CSV, images and zip are." },
+      { error: "That file type is not accepted. Documents, spreadsheets, photographs, voice notes, video and zip are. Try saving it as a PDF." },
       { status: 415 }
     );
   }
 
   const storageKey = auditKey(section, filename);
   try {
-    const uploadUrl = await generateUploadUrl(storageKey, resolved, 900, fileSize);
+    const uploadUrl = await generateUploadUrl(storageKey, resolved, PRESIGN_SECONDS, fileSize);
     // Deliberately no readable URL in this response.
     return Response.json({ uploadUrl, storageKey, contentType: resolved });
   } catch (err) {
