@@ -19,7 +19,7 @@ AS AT
 - Cocktail evening at the Capital Club, Lagos, Wednesday 21 October 2026.
 - Arrival 5:30pm, programme 6:45pm to 8:15pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
 - The evening shows Medlyfe's range: longevity, metabolic health, hormones, skin and aesthetics.
-- Dr Chinwe Kpaduwa sits on the panel. One voice of six, not the headline.
+- Dr Chinwe Kpaduwa sits on the panel.
 - Built to recur. This is edition one.
 
 ## The argument
