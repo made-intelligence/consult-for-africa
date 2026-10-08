@@ -47,7 +47,7 @@ Cover:
 
 **The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can do about it.
 
-50 minutes. Four seats, about twelve minutes each. Chaired by Dr Itunu Akinware.
+45 minutes. Four seats, about eleven minutes each. Chaired by Dr Itunu Akinware.
 
 **Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
 
@@ -96,8 +96,8 @@ She moves the conversation on if it reaches who may perform what. That is a live
 | 5:30 | Arrival and cocktails. Speakers in the room by 6:15 | Everyone |
 | 6:45 | Welcome and opening film | Dr Ajelabi |
 | 6:50 | The range. 10 minutes | Dr Ajelabi |
-| 7:00 | The panel. 50 minutes | Chaired by Dr Akinware |
-| 7:50 | What you can actually do. 10 minutes | Medlyfe |
+| 7:00 | The panel. 45 minutes | Chaired by Dr Akinware |
+| 7:45 | What you can actually do. 15 minutes | Medlyfe |
 | 8:00 | Questions from the room. 15 minutes | All speakers |
 | 8:15 | After Hours. Close 9:30 | Everyone |
 

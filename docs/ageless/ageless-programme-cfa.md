@@ -46,10 +46,11 @@ Three names, three jobs. Keeping them apart is what lets edition two reuse every
 | 5:30 | Arrival and cocktails |
 | 6:45 | Welcome and opening film |
 | 6:50 | The range. Dr Ajelabi, 10 minutes |
-| 7:00 | The panel, 50 minutes |
-| 7:50 | What you can actually do |
+| 7:00 | The panel, 45 minutes |
+| 7:45 | What you can actually do |
 | 8:00 | Questions from the room |
 | 8:15 | After Hours. Close 9:30 |
+
 
 Ninety minutes of programme. Arrival and After Hours are long on purpose, because that is where guests talk to the clinicians.
 

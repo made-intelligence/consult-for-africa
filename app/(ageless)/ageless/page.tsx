@@ -188,31 +188,62 @@ const HOST = LYFE_PANEL[0];
  * a portrait that belongs in the page; a rectangle reads as a photograph
  * dropped on top of one.
  */
-function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: boolean }) {
-  if (!HOST.portrait) return null;
+/**
+ * The speakers, in the hero.
+ *
+ * One portrait made the evening look like one person's. A montage of
+ * everybody we have a picture of says what the evening actually is, and the
+ * arches match the shape used in the panel below.
+ *
+ * Staggered on purpose: a flat grid of headshots reads as a conference, and
+ * the drop on alternate columns is what stops it.
+ */
+function SpeakerMontage({ priority = false }: { priority?: boolean }) {
+  const faces = LYFE_PANEL.filter((s) => s.portrait && s.name).slice(0, 6);
+  if (!faces.length) return null;
+
   return (
-    <div className="relative" style={{ width: w, maxWidth: "100%" }}>
-      <div
-        className="overflow-hidden"
-        style={{
-          borderTopLeftRadius: 9999,
-          borderTopRightRadius: 9999,
-          background: MB.greenDeep,
-          WebkitMaskImage: "linear-gradient(to bottom, #000 70%, transparent 99%)",
-          maskImage: "linear-gradient(to bottom, #000 70%, transparent 99%)",
-          aspectRatio: "0.8",
-        }}
-      >
-        <Image
-          src={HOST.portrait}
-          alt={HOST.name ?? MEDLYFE_NAME}
-          width={HOST.portraitWidth ?? 800}
-          height={HOST.portraitHeight ?? 1000}
-          priority={priority}
-          sizes="(max-width: 768px) 72vw, 340px"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
-        />
-      </div>
+    <div className="grid w-full max-w-[400px] grid-cols-3 gap-x-3 gap-y-4">
+      {faces.map((f, i) => (
+        <figure
+          key={f.name}
+          className="m-0"
+          // Middle column sits low, the outer two high, which gives the block
+          // a rhythm without anything looking misaligned.
+          style={{ marginTop: i % 3 === 1 ? 26 : 0 }}
+        >
+          <div
+            className="overflow-hidden"
+            style={{
+              borderTopLeftRadius: 9999,
+              borderTopRightRadius: 9999,
+              background: MB.greenDark,
+              aspectRatio: "0.78",
+            }}
+          >
+            <Image
+              src={f.portrait!}
+              alt={f.name!}
+              width={f.portraitWidth ?? 800}
+              height={f.portraitHeight ?? 1000}
+              priority={priority && i < 3}
+              sizes="(max-width: 768px) 30vw, 130px"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center 22%",
+              }}
+            />
+          </div>
+          <figcaption
+            className="mt-2 text-[10px] leading-tight"
+            style={{ color: MB.greenSoft }}
+          >
+            {f.name!.replace(/, MD FACS$/, "")}
+          </figcaption>
+        </figure>
+      ))}
     </div>
   );
 }
@@ -294,7 +325,7 @@ function Hero() {
           </div>
 
           <div className="flex justify-center md:justify-end">
-            <ArchPortrait w={330} priority />
+            <SpeakerMontage priority />
           </div>
         </div>
       </div>

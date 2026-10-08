@@ -184,10 +184,10 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "7:00",
     title: "The panel: The New Science of Ageing Well",
-    body: "Fifty minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
+    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
   },
   {
-    time: "7:50",
+    time: "7:45",
     title: "What can you actually do?",
     body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
   },
