@@ -142,28 +142,31 @@ export async function emailLyfeConfirmation({
   guestCount,
   slotAt,
 }: LyfeConfirmationInput): Promise<void> {
-  // Asked for, not yet paid for. Saying "booked" here would be a lie that the
-  // person discovers on the Tuesday, so this says exactly what is true: the
-  // time is held while they finish paying, and not a minute longer.
+  // A request, not a booking. The page stopped taking money at the door, so
+  // saying "booked" or "paid" here would both be wrong. What is true is that
+  // somebody will ring, and the one number that killed the March campaign was
+  // how long that took, so this commits to a day and the queue has to keep it.
   if (intent === "CONSULTATION") {
-    const when = slotAt ? slotLabel(slotAt) : "the time you chose";
+    const when = slotAt ? slotLabel(slotAt) : null;
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you. You have asked for half an hour with ${esc(LYFE_SURGEON.name)}, by video, on <strong>${esc(when)}</strong>.</p>
+       <p style="margin:0 0 14px;">Thank you. We have your request for a consultation at ${esc(MEDLYFE_NAME)}${when ? `, for <strong>${esc(when)}</strong>` : ""}.</p>
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${LYFE_BRAND.greenTint};border-left:3px solid ${LYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.ink};">
-           The time is yours once the ${esc(LYFE_CONSULT.feeDisplay)} is paid. Her diary is ${esc(LYFE_CONSULT.dayNames.toLowerCase())}, ${esc(LYFE_CONSULT.hoursDisplay)}, so there are only ${LYFE_CONSULT.perWeek} of these in a week and we cannot hold one open.
+           <strong>A coordinator will call you within one working day.</strong>
+           They will confirm which consultation is the right one, arrange the
+           time, and tell you what it costs before anything is booked.
            <br><br>
-           ${esc(LYFE_CONSULT.feeNote)}
+           Nothing has been charged.
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">If the payment did not go through, reply to this note and we will send you the link again. If you would rather pay by transfer, say so and we will send the account.</p>
+       <p style="margin:0 0 14px;">If you asked for half an hour with ${esc(LYFE_SURGEON.name)}, that one is ${esc(LYFE_CONSULT.feeDisplay)} and her diary is ${esc(LYFE_CONSULT.dayNames.toLowerCase())}, ${esc(LYFE_CONSULT.hoursDisplay)}, so there are only ${LYFE_CONSULT.perWeek} of them in a week. ${esc(LYFE_CONSULT.feeNote)}</p>
        <p style="margin:0 0 14px;">Before the call, it helps to have thought about one thing: what it is you would like to be different. You do not need photographs and you do not need to have decided anything.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
        <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
-      `Your half hour with ${LYFE_SURGEON.name} on ${when}.`,
+      `We have your request. A coordinator will call you within one working day.`,
     );
-    await notifyInternal(to, `Your consultation, ${esc(firstName)}`, html);
+    await notifyInternal(to, `We have your request, ${esc(firstName)}`, html);
     return;
   }
 
