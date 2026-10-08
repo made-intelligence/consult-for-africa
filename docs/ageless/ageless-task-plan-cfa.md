@@ -16,36 +16,35 @@ AS AT
 ## In short
 
 - Thirteen days to the evening.
-- Five things block everything else. They are in the next table and all five sit with Medlyfe.
-- Owners below are proposed. Correct them and we work to the corrected version.
-- Anything marked **Done** needs nothing from anyone.
+- **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
+- Medlyfe supplies four things only. They are in the next table and nothing can start without them.
+- Owners inside CFA are named so Itunu knows who to call.
 
-## Blocking now
+## What we need from Medlyfe
 
-| What | Owner | Needed by | Why it blocks |
-| --- | --- | --- | --- |
-| Capital Club street address | Medlyfe | 9 Oct | Invitations cannot print or send without it |
-| RSVP contact name and direct line | Medlyfe | 9 Oct | Same |
-| Medlyfe logo, vector or high resolution | Medlyfe | 9 Oct | Every printed piece and the website mark |
-| Invited list, about 140 names | Sally with Medlyfe | 10 Oct | Seventy places needs twice that invited |
-| Speaker bios and photographs | Each speaker, chased by CFA | 10 Oct | Programme, press pack and website |
+| What | Needed by | What it unblocks |
+| --- | --- | --- |
+| Capital Club street address | 9 Oct | Invitations cannot print or send |
+| RSVP contact name and direct line | 9 Oct | Invitations and the website |
+| Medlyfe logo, vector or high resolution | 9 Oct | Every printed piece |
+| Names for the invited list | 10 Oct | Seventy places needs about 140 invited |
+
+Everything else is ours.
 
 ## Graphics and print
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Invitation design, digital and A5 print | Graphics | 10 Oct |
+| Invitation design, digital and A5 print | CFA | 10 Oct |
 | Invitation copy, personalised per guest | CFA | Done |
-| Print invitations | Print supplier | 13 Oct |
-| Hand deliver or send invitations | Medlyfe | 14 Oct |
-| Printed programme for the night | Graphics | 15 Oct |
-| Print programme | Print supplier | 17 Oct |
-| Name badges and place cards | Graphics | 15 Oct |
-| Backdrop, step and repeat, signage | Graphics | 14 Oct |
-| Print signage and backdrop | Print supplier | 17 Oct |
-| Takeaway piece for every guest | Graphics with CFA | 15 Oct |
-| Print takeaway | Print supplier | 17 Oct |
-| Social countdown set, 8 posts | Marketing | 10 Oct |
+| Print invitations | CFA | 13 Oct |
+| Deliver and send invitations | CFA | 14 Oct |
+| Printed programme | CFA | 15 Oct |
+| Name badges and place cards | CFA | 15 Oct |
+| Backdrop, step and repeat, signage | CFA | 14 Oct |
+| Print signage and backdrop | CFA | 17 Oct |
+| Takeaway piece for every guest | CFA | 15 Oct |
+| Social countdown set, 8 posts | CFA, Marketing | 10 Oct |
 
 ## Guest list and invitations
 
@@ -53,65 +52,65 @@ AS AT
 | --- | --- | --- |
 | Register interest page live | CFA | Done |
 | Invite and confirm flow, one link per guest | CFA | Done |
-| Build the invited list to about 140 | Sally with Medlyfe | 10 Oct |
-| Ask Capital Club to mention it to members | Sally | 10 Oct |
-| Send invitations from the queue | Medlyfe | 14 Oct |
-| Chase unanswered invitations by phone | Medlyfe | 17 Oct |
+| Build the invited list to about 140 | CFA, Sally | 10 Oct |
+| Ask Capital Club to mention it to members | CFA, Sally | 10 Oct |
+| Send invitations | CFA | 14 Oct |
+| Chase unanswered invitations by phone | CFA | 17 Oct |
 | Close register interest | CFA | 16 Oct |
-| Final headcount to venue | Medlyfe | 19 Oct |
+| Final headcount to venue | CFA | 19 Oct |
 
 ## Speakers
 
 | Task | Owner | Due |
 | --- | --- | --- |
 | Speaker pack to all seven | CFA | 9 Oct |
-| Collect bios and photographs | CFA chasing, speakers supplying | 10 Oct |
-| Fill the fifth seat, andropause and men's health | Debo | 13 Oct |
-| Confirm Joycee Awosika and Dr Adenuga | Medlyfe | 10 Oct |
-| Brief the chair separately | CFA with Dr Akinware | 17 Oct |
+| Collect bios and photographs | CFA | 10 Oct |
+| Fill the fifth seat, andropause and men's health | CFA, Debo | 13 Oct |
+| Confirm Joycee Awosika and Dr Adenuga | CFA | 10 Oct |
+| Brief the chair | CFA, Debo | 17 Oct |
 | Run of show to all speakers | CFA | 19 Oct |
 
 ## Venue and production
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Capital Club walkthrough | Medlyfe with CFA | 13 Oct |
-| Stage and seating layout | Medlyfe | 14 Oct |
-| AV: handheld and lapel mics, screen, playback | Venue or supplier | 15 Oct |
-| Opening film, 60 to 90 seconds | Marketing with Kalkulus | 17 Oct |
-| Photographer and videographer booked | Marketing | 13 Oct |
-| Catering and cocktails confirmed | Medlyfe with venue | 15 Oct |
-| Music | Medlyfe | 17 Oct |
-| Technical rehearsal | Medlyfe with venue | 20 Oct |
+| Capital Club walkthrough | CFA | 13 Oct |
+| Stage and seating layout | CFA | 14 Oct |
+| AV: handheld and lapel mics, screen, playback | CFA | 15 Oct |
+| Opening film, 60 to 90 seconds | CFA, Kalkulus | 17 Oct |
+| Photographer and videographer booked | CFA | 13 Oct |
+| Catering and cocktails confirmed | CFA with venue | 15 Oct |
+| Music | CFA | 17 Oct |
+| Technical rehearsal | CFA | 20 Oct |
 
 ## Press and social
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Correct the media plan date. It says 10 October | Marketing | 9 Oct |
-| Press pack: bios, photographs, release | CFA with Marketing | 13 Oct |
-| Confirm BellaNaija, Guardian, BusinessDay placements | Marketing | 13 Oct |
-| Social countdown live | Marketing | 14 Oct |
-| Press list and accreditation for the night | Marketing | 17 Oct |
+| Correct the media plan date. It says 10 October | CFA, Marketing | 9 Oct |
+| Press pack: bios, photographs, release | CFA | 13 Oct |
+| Confirm BellaNaija, Guardian, BusinessDay placements | CFA, Marketing | 13 Oct |
+| Social countdown live | CFA, Marketing | 14 Oct |
+| Press list and accreditation | CFA | 17 Oct |
 
 ## On the night
 
 | Task | Owner |
 | --- | --- |
-| Guest check-in against the confirmed list | Medlyfe |
+| Guest check-in against the confirmed list | CFA |
 | Speaker holding room and timings | CFA |
 | Stage manage, keep to the running order | CFA |
-| Photography direction | Marketing |
-| Clinicians available through After Hours | Medlyfe |
+| Photography direction | CFA, Marketing |
+| Clinicians available through After Hours | CFA with Medlyfe |
 
 ## After
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Every lead from the night into the queue | Medlyfe | 22 Oct |
-| First contact with every attendee | Medlyfe | 23 Oct |
-| Photographs and recap film out | Marketing | 24 Oct |
-| Press recap placed | Marketing | 27 Oct |
+| Every lead from the night into the queue | CFA | 22 Oct |
+| First contact with every attendee | CFA | 23 Oct |
+| Photographs and recap film out | CFA, Marketing | 24 Oct |
+| Press recap placed | CFA, Marketing | 27 Oct |
 | What worked, for edition two | CFA | 31 Oct |
 
 ## One correction needed
