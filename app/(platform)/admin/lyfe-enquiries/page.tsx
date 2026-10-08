@@ -5,6 +5,7 @@ import {
   NICOTINE_LABELS,
   WEIGHT_TREND_LABELS,
   lyfeHeadcount,
+  LYFE_EVENT_ALLOCATION,
   minutesWaiting,
   waitingLabel,
 } from "@/lib/lyfe";
@@ -200,6 +201,11 @@ export default async function LyfeEnquiriesPage() {
           detail={waitlist ? `${waitlist} on the waiting list` : `${count.remaining} places left`}
         />
       </div>
+
+      <p className="mt-6 text-[13px] leading-relaxed text-gray-500">
+        Places by source:{" "}
+        {LYFE_EVENT_ALLOCATION.map((a) => `${a.bucket} ${a.places}`).join(" · ")}
+      </p>
 
       <div className="mt-10">
         <Queue rows={rows} />

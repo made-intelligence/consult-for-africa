@@ -7,6 +7,7 @@ import {
   FORMAT_LABELS,
   LYFE_BRAND as C,
   LYFE_CONSENT_TEXT,
+  MEDLYFE_EVENT_CONSENT_TEXT,
   LYFE_CONSULT,
   LYFE_CONSULT_SCHEDULE,
   LYFE_DOORS,
@@ -474,7 +475,7 @@ export default function EnquiryForm({
               style={{ accentColor: MB.greenDeep }}
             />
             <span className="text-sm leading-relaxed" style={{ color: C.body }}>
-              {LYFE_CONSENT_TEXT}
+              {rsvp ? MEDLYFE_EVENT_CONSENT_TEXT : LYFE_CONSENT_TEXT}
             </span>
           </label>
 

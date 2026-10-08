@@ -35,8 +35,9 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     email: null,
     org: "Medlyfe",
     slot: "the welcome, and the opening address on the range",
-    need: ["bio", "photo"],
-    notes: "Clinical Lead, Medlyfe. Confirmed by Debo.",
+    need: [],
+    bio: "Dr Adedotun Ajelabi is a Consultant Family Physician and Fellow of the West African College of Physicians, with more than ten years of clinical experience across private and public healthcare. She is Head of Medicals at the Medlyfe Wellness and Longevity Centre, where she leads clinical delivery of precision health, functional medicine, longevity, preventive health and wellness programmes. She has specialised training in longevity medicine through the American Board of Longevity Medicine and in regenerative medicine through the American Board of Regenerative Medicine. Her work is about moving healthcare from treating disease towards proactive, personalised and preventive medicine, using evidence-informed approaches to extend healthspan, reduce disease risk and support healthy ageing. She received the WONCA Atai Omoruto Scholarship in 2025 for her commitment to primary and family healthcare. She is a member of the Society of Family Physicians of Nigeria, the Society of Lifestyle Medicine of Nigeria, the Society of Occupational and Environmental Health Physicians and the Nigerian Society of Travel Medicine.",
+    notes: "Head of Medicals, Medlyfe (was listed as Clinical Lead). Bio and portrait received 8 Oct; portrait cropped from her studio shoot.",
   },
   {
     name: "Dr Itunu Akinware",
@@ -50,11 +51,12 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
   {
     name: "Dr Timi Adenuga",
     firstName: "Dr Adenuga",
-    email: null,
+    email: "timiadenuga@getslim.ng",
     org: "GetSlim",
     slot: "the panel, on metabolism, weight and the questions about the new drugs",
-    need: ["confirmation", "bio", "photo"],
-    notes: "Debo is getting the contact.",
+    need: [],
+    bio: "Dr Timi Adenuga, MBBS, ChM, FWACS, FMCS, MRCSEd, is the Lead Bariatric and Laparoscopic Surgeon at GetSlim Nigeria, and one of a small group of surgeons in the region with extensive international training in bariatric and metabolic surgery. He has performed more than 1,000 bariatric procedures and supported more than 5,000 patients to sustained, clinically meaningful weight loss. He specialises in minimally invasive bariatric surgery, including gastric sleeve, gastric bypass and gastric balloon, treating obesity and the conditions that come with it, among them diabetes, hypertension and sleep apnoea. He holds a Master's in General Surgery (ChM) from the University of Edinburgh and a Diploma in Clinical Research from the Harvard T.H. Chan School of Public Health, and trained in the United Kingdom, France, Rwanda and Egypt. He is Secretary of the Bariatric and Metabolic Surgeons Society of Nigeria and a member of the International Federation for the Surgery of Obesity and Metabolic Disorders and the Royal College of Surgeons of Edinburgh. He consults at GetSlim clinics in Lagos and Abuja.",
+    notes: "Bio, email and portrait received 8 Oct.",
   },
   {
     name: "Gbemi Giwa",
@@ -71,9 +73,9 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     firstName: "Joycee",
     email: null,
     org: "The ORÍKÌ Group",
-    slot: "the panel, on vitality and energy",
+    slot: "the panel, on maintaining beauty and managing stress",
     need: ["confirmation", "bio", "photo"],
-    notes: "Spelling is Joycee with two e's on her own properties.",
+    notes: "Spelling is Joycee with two e's on her own properties. Sally and Dr Akinware own confirming her and getting the bio and photograph.",
   },
   {
     name: "Dr Folake Kofo-Idowu",
@@ -85,15 +87,6 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     bio: "Dr Folake Kofo-Idowu is a double board certified physician, founder and Medical Director of Nelia and its women's health service line Nelia Oasi. She practises across internal medicine, metabolic health and infectious diseases, and her work is in evidence-based menopause care, hormone optimisation and preventative women's medicine.",
     notes:
       "Bio taken from her own DFC Catalyst billing in this repo, where she spoke in September. Vice President of Doctors for Change. She is the hormones seat the panel was missing, so the ask to her is now only for a photograph.",
-  },
-  {
-    name: "Dr Chinwe Kpaduwa, MD FACS",
-    firstName: "Dr Kpaduwa",
-    email: null,
-    org: "Lyfe Plastics & Dermatology",
-    slot: "the fireside, in conversation with Dr Debo Odulana",
-    need: [],
-    notes: "Bio and portrait already on file.",
   },
 ];
 

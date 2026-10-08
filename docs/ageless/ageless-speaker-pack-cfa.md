@@ -1,6 +1,6 @@
 # AGELESS
 
-## The speaker pack
+## Speaker pack
 
 FOR
 Speakers and panellists
@@ -13,72 +13,128 @@ Wednesday 21 October 2026
 
 ---
 
-## The evening, in one paragraph
+## In short
 
-AGELESS is a cocktail evening at the Capital Club, Lagos, for seventy guests. Mostly Lagos women and men over forty who already spend on how they look and feel, and who have never had the whole subject put in front of them by people who actually know. It is hosted by Medlyfe and it introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology. It is a conversation, not a sales floor, and the room will be able to tell the difference inside five minutes.
-
-The argument running through the night is that how you feel and how you look are one appointment and not two. The panel takes the inner. The fireside turns outward.
-
-## Where you come in
-
-| | |
-| --- | --- |
-| 5:30 | Guests arrive. Cocktails. **Speakers please be in the room by 6:00** |
-| 6:30 | Welcome from Dr Adedotun Ajelabi, and the opening film |
-| 6:35 | The range. Dr Ajelabi on what modern medicine can now do about how we age |
-| 6:50 | **The panel, 45 minutes.** Chaired by Dr Itunu Akinware |
-| 7:35 | The fireside with Dr Chinwe Kpaduwa, in conversation with Dr Debo Odulana |
-| 8:00 | What you can actually do |
-| 8:15 | Questions from the room |
-| 8:30 | Ageless After Hours. Close at 9:30 |
-
-## The panel
-
-**The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can actually do about it.
-
-Four seats, forty five minutes, which is about nine minutes of speaking each once the chair has done her job. It is experiential rather than clinical: the room wants to know what to do on Monday morning, not what the literature says. Deliver that with the authority of someone who actually knows, which is why you are on the stage and a wellness influencer is not.
-
-| On the panel | |
-| --- | --- |
-| Dr Timi Adenuga | Metabolism, weight, body composition, and the questions the room has about the new drugs |
-| Gbemi Giwa | Eating the food we actually eat and still changing body composition |
-| Joycee Awosika | Vitality and energy, and what ten years of building a wellness business says about what works |
-| Dr Folake Kofo-Idowu | To be set with her |
-
-**One rule for the panel, and it is the only one that matters.** Every answer ends in something a guest can act on. Not a principle, not a caution, something they could begin this week. The chair will come back to anyone who finishes on a generality.
-
-## What nobody on this stage may say
-
-This matters more than it sounds, and it is why the briefing exists. Five regulators have an interest in an evening like this and one of them has real teeth.
-
-**ARCON** requires advertising to be approved before it is seen, carries a minimum fine of five hundred thousand naira, and places the liability on the advertiser rather than the speaker. Anything said from this stage that reads as an advertisement lands on Medlyfe. So: **no named prescription products.** Not toxins, not fillers, not weight loss drugs by brand. Describe what a class of treatment does if you must, and let people ask privately afterwards.
-
-**MDCN** treats self advertisement by a doctor as a disciplinary matter. The clinicians on this panel are here to educate, and the clinic is the thing that advertises. In practice that means do not pitch your own practice from the stage. You will be introduced properly and the room will find you at the bar.
-
-**No before and after claims, and no outcome promises.** Not yours, not anyone's. "Most people see" is a claim. "In my experience, some people find" is an observation. The difference is the whole of it.
-
-**Scope of practice is live in Lagos right now.** HEFAMAA is actively looking at who may do what. A panel that drifts into who should be allowed to inject becomes a regulatory moment rather than a lively one. The chair has been asked to move the conversation on if it goes there.
-
-None of this makes for a duller evening. The most trusted thing you can do in front of a Lagos audience that has heard every claim already is to be the person who will not make one.
+- **Wednesday 21 October. Capital Club, Lagos. Be in the room by 6:15pm.**
+- **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
+- Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
+- Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
+- No slides, no lectern. Cocktail dress.
 
 ## What we need from you
 
-**A short bio**, eighty to a hundred words, written the way you would want to be introduced from a stage rather than the way a conference programme would do it.
+| What | Detail |
+| --- | --- |
+| Bio | 80 to 100 words, written as you want to be introduced |
+| Photograph | Any good headshot, high resolution |
+| Corrections | Questions you would rather not be asked, or would rather be asked |
 
-**A photograph.** Any good headshot you already have. It does not need to be new or formal, only high resolution.
+By **Friday 10 October**, or it misses the printed programme and the press pack.
 
-**A line on what you want to speak to**, if your subject above is not yet set.
+## The opening address
 
-These go into the printed programme and to the press, so anything reaching us after **Friday 10 October** will miss the print.
+**Dr Adedotun Ajelabi. 10 minutes.** You set the frame. The room should leave understanding that medicine now has a range of answers to ageing, from everyday to surgical.
+
+Cover:
+
+- What medicine can do now that it could not ten years ago.
+- Where the everyday ends and the medical begins.
+- What is established, and what is oversold.
+- What Medlyfe does with that range in practice.
+
+## The panel
+
+**The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can do about it.
+
+35 minutes. About seven minutes each. Chaired by Dr Itunu Akinware.
+
+**Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
+
+### Dr Timi Adenuga, on metabolism, weight and the new drugs
+
+- Why does the same diet stop working at 45?
+- The weight loss drugs. Who are they for, who should not take them, what is the honest result?
+- What happens when someone stops?
+- Is surgery ever the right first answer?
+- First thing to do tomorrow?
+
+### Gbemi Giwa, on food and body composition
+
+- Can you eat Nigerian food and change your body? What does that look like on a real plate?
+- What do people get wrong in the first month?
+- A woman of 45 who has never lifted. Where does she start?
+- What does a realistic twelve weeks look like?
+- What works and costs nothing?
+
+### Joycee Awosika, on maintaining beauty and managing stress
+
+- What does maintaining beauty actually take, week to week, for a working woman in Lagos?
+- Ten years in this market. What do Nigerian women buy, and what do they say they want?
+- What is sold in Lagos that does not work?
+- Stress. What does it do to how people look, and what do you see in your clients?
+- What is the cheapest thing that works, that nobody will sell them?
+
+### Dr Folake Kofo-Idowu, on menopause and hormones
+
+- What changes, and when does it start? Most of the room thinks fifty.
+- What should a woman of 40 be measuring, and how often?
+- Hormone therapy. What is the evidence, and why is it hard to get here?
+- What do Nigerian doctors get wrong about perimenopause?
+- She recognises herself tonight. What does she do tomorrow?
+
+### Fifth seat
+
+Open, on andropause and men's health. Same terms if filled.
+
+## The fireside
+
+**Dr Chinwe Kpaduwa with Dr Debo Odulana. 20 minutes.** About judgement, not procedures.
+
+- What does "look like yourself" mean in practice, and what does it rule out?
+- What do you refuse to do?
+- Travelling abroad for surgery. What goes wrong, and when?
+- What do you wish people asked before surgery?
+- What has changed in your field in five years?
+
+## The chair
+
+Dr Akinware keeps one argument moving across four people. She cuts in on generalities and makes sure each panellist is asked something only they can answer.
+
+She moves the conversation on if it reaches who may perform what. That is a live regulatory question, not entertainment.
+
+## Running order
+
+| Time | What | Who |
+| --- | --- | --- |
+| 5:30 | Arrival and cocktails. Speakers in the room by 6:15 | Everyone |
+| 6:45 | Welcome and opening film | Dr Ajelabi |
+| 6:50 | The range. 10 minutes | Dr Ajelabi |
+| 7:00 | The panel. 35 minutes | Chaired by Dr Akinware |
+| 7:35 | The fireside. 20 minutes | Dr Kpaduwa with Dr Odulana |
+| 7:55 | What you can actually do. 10 minutes | Medlyfe |
+| 8:05 | Questions from the room. 10 minutes | All speakers |
+| 8:15 | After Hours. Close 9:30 | Everyone |
+
+## Rules for the stage
+
+**No named prescription products.** No toxins, fillers or weight loss drugs by brand. ARCON requires approval before exposure, fines from ₦500,000, and the liability sits on Medlyfe rather than the speaker.
+
+**Do not pitch your own practice.** MDCN treats self-advertisement by a doctor as a disciplinary matter. You will be introduced properly.
+
+**No before and after claims. No outcome promises.** "Most people see" is a claim. "In my experience, some people find" is not.
+
+**Do not debate scope of practice.** HEFAMAA has it live in Lagos now.
 
 ## Practicalities
 
-Capital Club, Lagos. Please be in the room by six, which gives half an hour before the programme to meet the others and see the stage. There is a holding room if you want it.
+| | |
+| --- | --- |
+| Venue | Capital Club, Lagos |
+| Arrive | In the room by 6:00pm |
+| Dress | Cocktail |
+| Audio | Handheld on the panel, lapel for the address and fireside |
+| Slides | None. No lectern. One image behind you if it earns its place |
+| After Hours | Please stay. The useful conversations happen after 8:30 |
 
-Dress is cocktail. The room will be dressed.
+Reply to this note with anything.
 
-Microphones are handheld on the panel and lapel for the address and the fireside. There are no slides and no lectern. If you want a single image behind you, send it with your bio and we will see whether it earns its place.
-
-You are welcome for the whole evening and we would rather you stayed for After Hours than left at half past eight. The conversations that matter to everyone in this room, including you, happen with a drink in hand after the programme ends.
-
-Anything at all, reply to this note.
