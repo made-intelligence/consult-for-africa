@@ -48,6 +48,26 @@ BODY = "#44504A"
 MUTED = "#7C877F"
 RULE = "#DDE3D8"
 
+# Set by build(dark=True). Module level because the drawing helpers are small
+# functions that already read these names, and threading a theme object
+# through all of them would be a larger change than the result is worth.
+DARK = False
+
+
+def _pal():
+    """Ground, body, headings, rules and table fills for the current mode."""
+    if DARK:
+        return {
+            "ground": GREEN_DEEP, "ink": "#FFFFFF", "body": "#C9D6CB",
+            "muted": "#8DA093", "head": LIME, "rule": "#2C4537",
+            "band": GREEN_DARK, "tbl_head": GREEN, "tbl_alt": "#1A3227",
+        }
+    return {
+        "ground": PAPER, "ink": INK, "body": BODY,
+        "muted": MUTED, "head": GREEN, "rule": RULE,
+        "band": GREEN_DEEP, "tbl_head": GREEN_DEEP, "tbl_alt": "#F3F6F0",
+    }
+
 try:
     pdfmetrics.registerFont(TTFont("Didot", "/System/Library/Fonts/Supplemental/Didot.ttc"))
     DISPLAY = "Didot"
@@ -60,22 +80,31 @@ M = 52
 
 
 def _monogram(w: int, h: int, alpha: int = 5) -> ImageReader:
-    """The MedLYFE mark tiled on a half drop, at a whisper, over paper."""
+    """
+    The MedLYFE mark tiled on a half drop, at a whisper.
+
+    The field is opaque and carries the page's ground with it, which is why it
+    has to know about dark mode: painted over a dark rect it was turning the
+    whole page back to paper, and the light text then disappeared into it.
+    """
     TMP.mkdir(parents=True, exist_ok=True)
-    out = TMP / f"mono-{w}x{h}-{alpha}.png"
+    mode = "dark" if DARK else "light"
+    out = TMP / f"mono-{mode}-{w}x{h}-{alpha}.png"
     if not out.exists():
         tile = 150
         t = Image.new("RGBA", (tile, tile), (0, 0, 0, 0))
         d = ImageDraw.Draw(t)
         s = (tile * 0.42) / 73.0
         ox, oy = (tile - 59 * s) / 2, (tile - 73 * s) / 2
-        col = tuple(int(GREEN[i:i + 2], 16) for i in (1, 3, 5)) + (alpha,)
+        mark_hex = LIME if DARK else GREEN
+        col = tuple(int(mark_hex[i:i + 2], 16) for i in (1, 3, 5)) + (alpha + (3 if DARK else 0),)
         for px, py, pw, ph in [(0, 12, 15, 48), (22, 27, 15, 46), (44, 12, 15, 47)]:
             d.rounded_rectangle([ox + px * s, oy + py * s, ox + (px + pw) * s, oy + (py + ph) * s],
                                 radius=(pw * s) / 2, fill=col)
         r = 10.5 * s
         d.ellipse([ox + 29.5 * s - r, oy + 10 * s - r, ox + 29.5 * s + r, oy + 10 * s + r], fill=col)
-        field = Image.new("RGB", (w, h), tuple(int(PAPER[i:i + 2], 16) for i in (1, 3, 5)))
+        ground_hex = GREEN_DEEP if DARK else PAPER
+        field = Image.new("RGB", (w, h), tuple(int(ground_hex[i:i + 2], 16) for i in (1, 3, 5)))
         for row in range(h // tile + 2):
             off = (tile // 2) if row % 2 else 0
             for cjj in range(w // tile + 2):
@@ -125,8 +154,12 @@ def _clean(s: str) -> str:
 
 
 def _page_furniture(c, header, footer, page):
+    p = _pal()
+    if DARK:
+        c.setFillColor(HexColor(p["ground"]))
+        c.rect(0, 0, PW, PH, fill=1, stroke=0)
     c.drawImage(_monogram(int(PW), int(PH)), 0, 0, width=PW, height=PH)
-    c.setFillColor(HexColor(GREEN_DEEP))
+    c.setFillColor(HexColor(p["band"]))
     c.rect(0, PH - 58, PW, 58, fill=1, stroke=0)
     c.setFillColor(HexColor(LIME))
     c.rect(0, PH - 61, PW, 3, fill=1, stroke=0)
@@ -141,10 +174,58 @@ def _page_furniture(c, header, footer, page):
     c.drawRightString(PW - M, PH - 36, header)
     c.setFillColor(HexColor(LIME_DEEP))
     c.rect(M, 34, 18, 2, fill=1, stroke=0)
-    c.setFillColor(HexColor(MUTED))
+    c.setFillColor(HexColor(_pal()["muted"]))
     c.setFont(SANS, 7.4)
     c.drawString(M, 22, footer)
     c.drawRightString(PW - M, 22, str(page))
+
+
+
+def _portraits(c, entries, x, y, width, per_row=4):
+    """
+    A row of arch portraits with names under them.
+
+    Missing pictures draw as an empty arch rather than being skipped, so the
+    gap is visible to whoever has to chase it instead of quietly absent.
+    """
+    pal = _pal()
+    gap = 12
+    cw = (width - gap * (per_row - 1)) / per_row
+    ch = cw * 1.25
+    for i, (name, path) in enumerate(entries):
+        row, col = divmod(i, per_row)
+        cx = x + col * (cw + gap)
+        cy = y - row * (ch + 40)
+        top = cy - ch
+        c.saveState()
+        pth = c.beginPath()
+        r = cw / 2
+        pth.moveTo(cx, top)
+        pth.lineTo(cx, top + ch - r)
+        pth.arcTo(cx, top + ch - 2 * r, cx + cw, top + ch, 180, -180)
+        pth.lineTo(cx + cw, top)
+        pth.close()
+        c.clipPath(pth, stroke=0, fill=0)
+        if path and Path(path).exists():
+            img = ImageReader(path)
+            iw, ih = img.getSize()
+            scale = max(cw / iw, ch / ih)
+            dw, dh = iw * scale, ih * scale
+            c.drawImage(img, cx - (dw - cw) / 2, top - (dh - ch) / 2,
+                        width=dw, height=dh, mask="auto")
+        else:
+            c.setFillColor(HexColor(pal["tbl_alt"] if DARK else "#ECEFE7"))
+            c.rect(cx, top, cw, ch, fill=1, stroke=0)
+            c.setFillColor(HexColor(pal["muted"]))
+            c.setFont(SANS, 7)
+            c.drawCentredString(cx + cw / 2, top + ch / 2, "no picture")
+        c.restoreState()
+        c.setFillColor(HexColor(pal["ink"]))
+        c.setFont(SANS_B, 7.6)
+        for k, ln in enumerate(_wrap(c, name, SANS_B, 7.6, cw)[:2]):
+            c.drawString(cx, top - 11 - k * 9, ln)
+    rows = (len(entries) + per_row - 1) // per_row
+    return y - rows * (ch + 40) + 10
 
 
 def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
@@ -158,12 +239,12 @@ def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
             cells.append(_wrap(c, _clean(str(row[j])), f, size, widths[j] - 2 * pad))
         h = max(len(cl) for cl in cells) * lead + pad * 1.7
         if head:
-            c.setFillColor(HexColor(GREEN))
+            c.setFillColor(HexColor(_pal()["tbl_head"]))
             c.rect(x, cy - h, sum(widths), h, fill=1, stroke=0)
             c.setFillColor(HexColor(LIME))
             c.rect(x, cy - h - 2, sum(widths), 2, fill=1, stroke=0)
         elif i % 2 == 0:
-            c.setFillColor(HexColor("#F2F4EE"))
+            c.setFillColor(HexColor(_pal()["tbl_alt"]))
             c.rect(x, cy - h, sum(widths), h, fill=1, stroke=0)
         cx = x
         for j in range(n):
@@ -173,7 +254,10 @@ def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
                     c.setFont(SANS_B, size); c.setFillColor(white)
                 else:
                     c.setFont(SANS_B if j == 0 else SANS, size)
-                    c.setFillColor(HexColor(INK if j == 0 else BODY))
+                    if DARK:
+                        c.setFillColor(white if j == 0 else HexColor("#C9D6CB"))
+                    else:
+                        c.setFillColor(HexColor(INK if j == 0 else BODY))
                 c.drawString(cx + pad, ty, ln)
                 ty -= lead
             cx += widths[j]
@@ -181,7 +265,9 @@ def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
     return cy
 
 
-def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
+def build(src: Path, out: Path, header: str, footer: str = "Confidential", dark: bool = False):
+    global DARK
+    DARK = dark
     md = src.read_text().split("\n")
     c = canvaslib.Canvas(str(out), pagesize=A4)
     c.setTitle(src.stem)
@@ -202,7 +288,7 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
     while i < len(md) and not md[i].startswith("# "):
         i += 1
     if i < len(md):
-        c.setFillColor(HexColor(INK))
+        c.setFillColor(HexColor(LIME if DARK else _pal()["ink"]))
         c.setFont(DISPLAY, 34)
         for ln in _wrap(c, _clean(md[i][2:]), DISPLAY, 34, W):
             c.drawString(M, y, ln); y -= 38
@@ -225,7 +311,7 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
         i += 1
     for k in range(0, len(meta) - 1, 2):
         _tracked(c, meta[k].upper(), M, y, SANS_B, 6.8, HexColor(LIME_DEEP), 1.1)
-        c.setFillColor(HexColor(BODY)); c.setFont(SANS, 9)
+        c.setFillColor(HexColor(_pal()["body"])); c.setFont(SANS, 9)
         c.drawString(M + 108, y, _clean(meta[k + 1])); y -= 13
     y -= 14
 
@@ -240,13 +326,26 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
         if y < 110:
             y = new_page()
 
+        if line.startswith("### "):
+            # A named speaker inside a section. Smaller than a section head and
+            # in the accent, so a panellist can find their own name by scanning.
+            if y < 140:
+                y = new_page()
+            y -= 6
+            c.setFillColor(HexColor(LIME if DARK else GREEN))
+            c.setFont(SANS_B, 10.4)
+            for ln in _wrap(c, _clean(line[4:]), SANS_B, 10.4, W):
+                c.drawString(M, y, ln); y -= 14
+            y -= 4
+            i += 1
+            continue
         if line.startswith("## "):
             # A heading stranded at the foot of a page with its section on the
             # next one is the commonest way a short document looks careless.
             if y < 165:
                 y = new_page()
             y -= 10
-            c.setFillColor(HexColor(GREEN)); c.setFont(DISPLAY, 17)
+            c.setFillColor(HexColor(_pal()["head"])); c.setFont(DISPLAY, 17)
             for ln in _wrap(c, _clean(line[3:]), DISPLAY, 17, W):
                 c.drawString(M, y, ln); y -= 20
             c.setFillColor(HexColor(LIME)); c.rect(M, y + 6, 26, 1.6, fill=1, stroke=0)
@@ -279,15 +378,32 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential"):
         elif line.startswith("- "):
             txt = _clean(line[2:])
             c.setFillColor(HexColor(LIME_DEEP)); c.circle(M + 3, y + 3, 1.9, fill=1, stroke=0)
-            c.setFillColor(HexColor(BODY)); c.setFont(SANS, 9.6)
+            c.setFillColor(HexColor(_pal()["body"])); c.setFont(SANS, 9.6)
             for ln in _wrap(c, txt, SANS, 9.6, W - 14):
                 c.drawString(M + 14, y, ln); y -= 12.4
             y -= 3
+        elif line.strip() == "::portraits":
+            entries = []
+            i += 1
+            while i < len(md) and md[i].strip() != "::":
+                raw = md[i].strip()
+                if raw:
+                    nm, _, pth = raw.partition("|")
+                    entries.append((nm.strip(), pth.strip()))
+                i += 1
+            if entries:
+                per_row = 4
+                cw = (W - 12 * (per_row - 1)) / per_row
+                rows = (len(entries) + per_row - 1) // per_row
+                need = rows * (cw * 1.25 + 40)
+                if y - need < 90:
+                    y = new_page()
+                y = _portraits(c, entries, M, y, W, per_row) - 6
         elif line.strip() == "---":
             pass
         elif line.strip():
             bold = line.strip().startswith("**")
-            c.setFillColor(HexColor(INK if bold else BODY))
+            c.setFillColor(HexColor(_pal()["ink"] if bold else _pal()["body"]))
             f = SANS_B if bold else SANS
             for ln in _wrap(c, _clean(line), f, 9.8, W):
                 c.setFont(f, 9.8); c.drawString(M, y, ln); y -= 13

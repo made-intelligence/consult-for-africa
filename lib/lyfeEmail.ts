@@ -13,6 +13,7 @@ import {
   LYFE_NAME,
   LYFE_SURGEON,
   MEDLYFE_BRAND,
+  MEDLYFE_NAME,
   LYFE_PHONE_DISPLAY,
   NICOTINE_LABELS,
   PATHWAY_LABELS,
@@ -39,24 +40,62 @@ function esc(str: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function layout(content: string, preheader: string): string {
+/**
+ * The evening is purely Medlyfe's from 8 October 2026, so everything about it
+ * goes out on Medlyfe's letterhead. Consultation mail stays on Lyfe's.
+ */
+type Letterhead = "lyfe" | "medlyfe";
+
+/** Why an Ageless mail arrived. The clinic default is wrong for both. */
+const INVITED_FOOTER =
+  "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+const SPEAKER_FOOTER =
+  "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
+
+function masthead(brand: Letterhead): string {
+  if (brand === "medlyfe") {
+    return `<tr><td style="background:${MEDLYFE_BRAND.green};padding:26px 32px;">
+          <div style="color:#ffffff;font-size:23px;line-height:1.1;"><span style="font-family:Georgia,serif;">med</span><span style="font-weight:800;letter-spacing:-0.02em;">LYFE</span></div>
+          <div style="color:${MEDLYFE_BRAND.lime};font-weight:700;font-size:9px;letter-spacing:0.16em;margin-top:8px;">WELLNESS AND LONGEVITY CENTRE</div>
+        </td></tr>
+        <tr><td style="height:3px;background:${MEDLYFE_BRAND.lime};"></td></tr>`;
+  }
+  // Clinic correspondence. Same name as the evening, because there is only one
+  // entity, carrying the bronze rule so it matches the consultation page a
+  // reader has just come from.
+  return `<tr><td style="background:${LYFE_BRAND.ink};padding:26px 32px;">
+          <div style="color:#ffffff;font-size:23px;line-height:1.1;"><span style="font-family:Georgia,serif;">med</span><span style="font-weight:800;letter-spacing:-0.02em;">LYFE</span></div>
+          <div style="color:${LYFE_BRAND.bronze};font-weight:700;font-size:9px;letter-spacing:0.16em;margin-top:8px;">WELLNESS AND LONGEVITY CENTRE</div>
+        </td></tr>
+        <tr><td style="height:3px;background:${LYFE_BRAND.bronze};"></td></tr>`;
+}
+
+/**
+ * AGELESS is Medlyfe's evening, so everything about it goes out on Medlyfe's
+ * letterhead. The default here is the clinic, because most of what this file
+ * sends is clinic correspondence, and an event mail that forgets to say
+ * otherwise reaches a panellist branded as a plastic surgery practice.
+ */
+function layout(
+  content: string,
+  preheader: string,
+  brand: Letterhead = "lyfe",
+  footerNote = "You are receiving this because you made an enquiry. Reply at any time and we will remove your details.",
+): string {
+  const name = brand === "medlyfe" ? MEDLYFE_NAME : LYFE_NAME;
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(LYFE_NAME)}</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(name)}</title></head>
 <body style="margin:0;padding:0;background:${LYFE_BRAND.groundWarm};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;border:1px solid ${LYFE_BRAND.line};overflow:hidden;">
-        <tr><td style="background:${LYFE_BRAND.ink};padding:26px 32px;">
-          <div style="color:#ffffff;font-weight:600;font-size:23px;line-height:1.1;letter-spacing:-0.01em;">Lyfe</div>
-          <div style="color:${LYFE_BRAND.bronze};font-weight:700;font-size:9px;letter-spacing:0.16em;margin-top:8px;">PLASTICS AND DERMATOLOGY</div>
-        </td></tr>
-        <tr><td style="height:3px;background:${LYFE_BRAND.bronze};"></td></tr>
+        ${masthead(brand)}
         <tr><td style="padding:32px;color:${LYFE_BRAND.ink};font-size:15px;line-height:1.65;">${content}</td></tr>
         <tr><td style="padding:18px 32px;background:${LYFE_BRAND.ground};border-top:1px solid ${LYFE_BRAND.line};color:${LYFE_BRAND.muted};font-size:11px;line-height:1.6;">
-          ${esc(LYFE_NAME)} &middot; Lagos, Nigeria &middot; ${esc(LYFE_PHONE_DISPLAY)}<br>
-          You are receiving this because you made an enquiry. Reply at any time and we will remove your details.
+          ${esc(name)} &middot; Lagos, Nigeria &middot; ${esc(LYFE_PHONE_DISPLAY)}<br>
+          ${esc(footerNote)}
         </td></tr>
       </table>
     </td></tr>
@@ -138,7 +177,7 @@ export async function emailLyfeConfirmation({
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening at ${esc(LYFE_EVENT.host)} with ${esc(LYFE_EVENT.withWhom)}.</p>
+       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by ${esc(LYFE_EVENT.host)}.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -153,8 +192,10 @@ export async function emailLyfeConfirmation({
        <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places}, which is fewer than the number of people who would like to be in it. Invitations go out from this list, and you will hear from us either way. If you are invited, the note will carry a link of your own to confirm your place.</p>
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
-       <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
+       <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
       `Your interest in ${LYFE_EVENT_THEME} is registered.`,
+      "medlyfe",
+      INVITED_FOOTER,
     );
     await notifyInternal(to, `Thank you for your interest, ${esc(firstName)}`, html);
     return;
@@ -221,7 +262,7 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
   const rsvp = input.intent === "EVENT_RSVP";
   const urgent = !rsvp && input.timing === "AS_SOON_AS_POSSIBLE";
   const firstName = input.fullName.trim().split(/\s+/)[0] ?? input.fullName;
-  const waMessage = `Hello ${firstName}, this is the team at ${LYFE_NAME}. Thank you for your enquiry. Is now a good time for a short call?`;
+  const waMessage = `Hello ${firstName}, this is the team at ${rsvp ? MEDLYFE_NAME : LYFE_NAME}. Thank you for your enquiry. Is now a good time for a short call?`;
   const waLink = `https://wa.me/${input.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waMessage)}`;
 
   const row = (k: string, v: string | null | undefined) =>
@@ -345,11 +386,11 @@ export async function emailLyfeInvitation({
   from?: string | null;
 }): Promise<void> {
   const url = lyfeConfirmUrl(token);
-  const signature = from?.trim() || `The team at ${LYFE_NAME}`;
+  const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
 
   const html = layout(
     `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-     <p style="margin:0 0 14px;">We would like you to join us for ${esc(LYFE_EVENT_THEME)}, an evening hosted by ${esc(LYFE_EVENT.host)} with ${esc(LYFE_EVENT.withWhom)}.</p>
+     <p style="margin:0 0 14px;">We would like you to join us for ${esc(LYFE_EVENT_THEME)}, an evening hosted by ${esc(LYFE_EVENT.host)}.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
          <strong style="font-size:18px;">${esc(LYFE_EVENT.proposition)}</strong><br>
@@ -371,6 +412,8 @@ export async function emailLyfeInvitation({
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An invitation to ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
+    "medlyfe",
+    INVITED_FOOTER,
   );
 
   await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
@@ -404,12 +447,14 @@ export async function emailLyfeAttendanceConfirmed({
          ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
        </td></tr>
      </table>
-     <p style="margin:0 0 14px;">The evening opens with an address on what modern medicine can now do about the way we age, then a panel, then a conversation with ${esc(LYFE_SURGEON.name)} titled &ldquo;${esc(LYFE_EVENT.sessionTitle)}&rdquo;. The clinical team is in the room throughout if you would like to speak to somebody personally.</p>
+     <p style="margin:0 0 14px;">The evening opens with an address on what modern medicine can now do about the way we age, then a panel on the new science of ageing well, then the practical part: what you can actually do about it, and where to start. The clinical team is in the room throughout if you would like to speak to somebody personally.</p>
      <p style="margin:0 0 14px;">Every guest goes home with a short printed piece, &ldquo;${esc(LYFE_EVENT_TAKEAWAY)}&rdquo;.</p>
      <p style="margin:0 0 14px;">If your plans change, reply to this note. Releasing a place is genuinely helpful rather than a nuisance.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
-     <p style="margin:0;font-weight:600;">The team at ${esc(LYFE_NAME)}</p>`,
+     <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
     `Your place at ${LYFE_EVENT_THEME} is held.`,
+    "medlyfe",
+    INVITED_FOOTER,
   );
 
   await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
@@ -461,7 +506,95 @@ export async function emailLyfeSpeakerAsk({
      <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
      <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
     `Your bio and a photograph for ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
+    "medlyfe",
+    SPEAKER_FOOTER,
   );
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: your bio and a photograph`, html);
+}
+
+/**
+ * Everything one speaker needs, and one thing to do.
+ *
+ * Sent per person so nobody sees anyone else's address, and carrying only
+ * their own slot, bio and questions. A seven person pack asks a busy
+ * clinician to find themselves in it; this does the finding for them.
+ */
+export async function emailLyfeSpeakerConfirm({
+  to,
+  firstName,
+  slot,
+  subject,
+  bio,
+  questions,
+  chairSet,
+  deadline,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  slot: string;
+  subject?: string;
+  bio?: string;
+  questions?: string[];
+  /** The chair is asking, not answering, so she gets the whole set by seat. */
+  chairSet?: { name: string; subject?: string; questions?: string[] }[];
+  deadline: string;
+  fromName: string;
+}): Promise<void> {
+  const bioBlock = bio
+    ? `<p style="margin:0 0 6px;font-weight:700;">Your bio, as we will print it</p>
+       <table cellpadding="0" cellspacing="0" style="margin:0 0 18px;width:100%;">
+         <tr><td style="background:${LYFE_BRAND.groundWarm};border-left:3px solid ${LYFE_BRAND.bronze};padding:14px 16px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.body};">${esc(bio)}</td></tr>
+       </table>`
+    : `<p style="margin:0 0 18px;"><strong>We do not have a bio for you.</strong> Eighty to a hundred words, written the way you would want to be introduced from a stage.</p>`;
+
+  const chairBlock = chairSet?.length
+    ? `<p style="margin:0 0 6px;font-weight:700;">The questions you will put</p>
+       <p style="margin:0 0 14px;font-size:13.5px;color:${LYFE_BRAND.muted};">A brief, not a script. Cut in when an answer finishes on a generality, and make sure every answer ends in something a guest can do this week.</p>
+       ${chairSet
+         .map(
+           (p) => `<p style="margin:0 0 4px;font-weight:600;font-size:14px;color:${LYFE_BRAND.ink};">${esc(p.name)}${p.subject ? `, on ${esc(p.subject.toLowerCase())}` : ""}</p>
+             <ul style="margin:0 0 14px;padding-left:20px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.body};">
+               ${(p.questions ?? []).map((q) => `<li style="margin:0 0 4px;">${esc(q)}</li>`).join("")}
+             </ul>`,
+         )
+         .join("")}`
+    : "";
+
+  const qBlock = questions?.length
+    ? `<p style="margin:0 0 6px;font-weight:700;">What you will be asked</p>
+       <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+         ${questions.map((q) => `<li style="margin:0 0 6px;">${esc(q)}</li>`).join("")}
+       </ul>
+       <p style="margin:0 0 18px;font-size:13.5px;color:${LYFE_BRAND.muted};">A brief, not a script. Tell us what you would rather be asked.</p>`
+    : "";
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Everything for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong>, ${esc(LYFE_EVENT.venueName)}. Please be in the room by 6:15pm. The programme runs ${esc(LYFE_EVENT.programme)} to 8:15pm, then drinks until ${esc(LYFE_EVENT.close)}.</p>
+
+     <p style="margin:0 0 6px;font-weight:700;">Your part</p>
+     <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Itunu Akinware, four seats, about eleven minutes each.</p>
+
+     ${bioBlock}
+     ${chairBlock}
+     ${qBlock}
+
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 20px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:#FFFFFF;">
+         <strong>One thing to do.</strong> Reply by <strong>${esc(deadline)}</strong> confirming the bio and your subject are right, or send the corrections. After that it goes live on the site, into the printed programme and to the press.
+       </td></tr>
+     </table>
+
+     <p style="margin:0 0 14px;">No slides and no lectern. Dress is cocktail. Please stay for the hour after the programme, which is when guests actually talk to you.</p>
+     <p style="margin:0 0 6px;">With thanks,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
+    `Your part in ${LYFE_EVENT_THEME}. Please confirm by ${deadline}.`,
+    "medlyfe",
+    SPEAKER_FOOTER,
+  );
+
+  await notifyInternal(to, `${LYFE_EVENT_THEME}: please confirm your details`, html);
 }

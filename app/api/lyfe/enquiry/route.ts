@@ -5,6 +5,7 @@ import { handler } from "@/lib/api-handler";
 import { isRateLimited } from "@/lib/rate-limit";
 import {
   LYFE_CONSENT_TEXT,
+  MEDLYFE_EVENT_CONSENT_TEXT,
   LYFE_CONSULT,
   LYFE_CONTACT_EMAIL,
   clientIpFrom,
@@ -213,7 +214,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       utmCampaign: data.utmCampaign || null,
       sourcePath: req.headers.get("referer") ?? null,
       consentedAt: new Date(),
-      consentText: LYFE_CONSENT_TEXT,
+      consentText: rsvp ? MEDLYFE_EVENT_CONSENT_TEXT : LYFE_CONSENT_TEXT,
       ipHash: hashIp(ip),
     },
   });

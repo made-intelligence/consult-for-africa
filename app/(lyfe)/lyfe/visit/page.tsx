@@ -46,9 +46,9 @@ export default function VisitPage() {
               She is doing rounds.
             </h1>
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
-              {LYFE_SURGEON.name} is visiting practices across Lekki and Victoria Island before she
-              travels, to meet the doctors who would refer to her and to say in person what she
-              does, what she will not do, and where the line sits.
+              {LYFE_SURGEON.name} is visiting practices across Lekki and Victoria Island to meet
+              the doctors who would refer to her, and to say in person what she does, what she will
+              not do, and where the line sits.
             </p>
             <p className="mt-4 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
               {LYFE_VISIT.minutes} minutes at your facility, at a time that suits your list. No
