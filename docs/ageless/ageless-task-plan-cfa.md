@@ -114,7 +114,7 @@ Everything else is ours.
 | Guest check-in against the confirmed list | CFA |
 | Speaker holding room and timings | CFA |
 | Stage manage, keep to the running order | CFA |
-| Photography direction | Opeoluwa |
+| Photography direction | CFA |
 | Clinicians available through After Hours | CFA with Medlyfe |
 
 ## After
