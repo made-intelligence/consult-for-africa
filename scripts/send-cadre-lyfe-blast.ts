@@ -55,6 +55,14 @@ async function main() {
   const send = args.includes("--send");
   const limit = Number(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? 0);
 
+  // Stopped 8 October 2026 at Debo's instruction. Dr Kpaduwa is off the
+  // AGELESS stage and this email introduces her as taking referrals. Do not
+  // remove this without his say-so.
+  if (send) {
+    console.error("Stopped by Debo on 8 Oct 2026: this blast introduces Dr Kpaduwa. Refusing to send.");
+    process.exit(1);
+  }
+
   const ev0 = nextCatalystEvent();
   if (send && ev0 && ev0.registerUrl === "https://www.dfcare.org") {
     console.error("The Catalyst session has no Zoom link yet, only the site.");

@@ -1,8 +1,15 @@
 import { createHash } from "crypto";
 
 /**
- * Lyfe Plastics and Dermatology: shared constants for the public page, the
+ * The Medlyfe aesthetics funnel: shared constants for the public pages, the
  * enquiry API and the coordinator's queue.
+ *
+ * "Lyfe Plastics and Dermatology" was a working name and no such practice
+ * exists, so nothing public carries it. The clinic of record is Medlyfe, the
+ * surgeon is named, and the aesthetics entity will get its own name when the
+ * licence question is settled. Advertising a practice name that is not
+ * registered is the ARCON and MDCN exposure we have been careful about
+ * everywhere else, so it is not worth doing for a wordmark.
  *
  * The March 2026 campaign put 170 names into a spreadsheet and converted none
  * of them. The diagnosis was never reach. It was that nobody was told what
@@ -14,9 +21,9 @@ import { createHash } from "crypto";
  */
 
 /**
- * Not the Consult for Africa navy and gold, and not ilé's green. Lyfe is a
- * consumer brand in a category where the client is deciding whether to trust
- * someone with her face, so the palette is quiet: warm paper, near black, one
+ * The consumer palette for the aesthetics pages. Not the Consult for Africa
+ * navy and gold, and not ilé's green: the client here is deciding whether to
+ * trust someone with her face, so it is quiet. Warm paper, near black, one
  * bronze for action, and a deep green reserved for the places where the page
  * talks about safety.
  */
@@ -36,8 +43,6 @@ export const LYFE_BRAND = {
   greenTint: "#E7EDEA",
 } as const;
 
-export const LYFE_NAME = "Lyfe Plastics and Dermatology";
-export const LYFE_SHORT = "Lyfe";
 export const LYFE_THEME = "The Art of Looking Like Yourself";
 export const LYFE_PROMISE =
   "Aesthetic care for the woman who wants to look rested, not rearranged.";
@@ -87,10 +92,10 @@ export function whatsappLink(message: string): string {
 /**
  * Medlyfe's own brand, sampled from their poster rather than guessed at.
  *
- * The evening is Medlyfe's, not Lyfe Plastics'. Medlyfe is the trading,
- * licensed, bookable entity and it hosts; Lyfe Plastics is introduced on the
- * night. So anything to do with the evening wears Medlyfe livery, and the two
- * palettes are deliberately kept apart.
+ * Medlyfe is the trading, licensed, bookable entity, and the evening is its
+ * own. The second palette below is the consumer livery for the aesthetics
+ * pages; the two are kept apart because one sells an evening and the other
+ * sells a consultation.
  */
 export const MEDLYFE_BRAND = {
   // Deep forest ground with the chartreuse accent from Medlyfe's own poster.
@@ -109,6 +114,13 @@ export const MEDLYFE_BRAND = {
 export const MEDLYFE_NAME = "Medlyfe Wellness and Longevity Centre";
 export const MEDLYFE_TAGLINE = "Feel Good, Look Good, Live Better.";
 
+/**
+ * The clinic of record on the aesthetics pages. Medlyfe, because it is the
+ * entity that exists and the one the aesthetics pilot runs under.
+ */
+export const LYFE_NAME = MEDLYFE_NAME;
+export const LYFE_SHORT = "Medlyfe";
+
 /** The platform. One word, set large, and the whole of the idea. */
 export const LYFE_EVENT_THEME = "Ageless";
 
@@ -117,9 +129,13 @@ export const LYFE_EVENT_THEME = "Ageless";
  *
  * A recurring Medlyfe platform rather than a one-off launch, so the naming is
  * layered: AGELESS is the platform, "A New Era of Health, Beauty and
- * Longevity" is the proposition, "The New Science of Ageing Well" is the panel,
- * and "The Art of Looking Like Yourself" is the featured fireside. Keeping
- * those four apart is what lets edition two reuse everything but the panel.
+ * Longevity" is the proposition, and "The New Science of Ageing Well" is the
+ * panel. Keeping those apart is what lets edition two reuse everything but the
+ * panel.
+ *
+ * Purely Medlyfe's evening from 8 October 2026: no featured fireside and no
+ * practice being introduced. Dr Kpaduwa sits on the panel as one voice of
+ * four, not as the subject of the evening.
  *
  * Venue address and the RSVP contact are still blank in the brief, so both
  * are environment variables and the page degrades honestly rather than
@@ -127,7 +143,6 @@ export const LYFE_EVENT_THEME = "Ageless";
  */
 export const LYFE_EVENT = {
   host: MEDLYFE_NAME,
-  withWhom: "Dr Chinwe Kpaduwa, MD FACS",
   theme: LYFE_EVENT_THEME,
   proposition: "A New Era of Health, Beauty and Longevity",
   standfirst:
@@ -136,10 +151,9 @@ export const LYFE_EVENT = {
   panelTitle: "The New Science of Ageing Well",
   panelStandfirst:
     "What changes in your body, brain and skin after 40, and what you can actually do about it.",
-  sessionTitle: "The Art of Looking Like Yourself",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "5:30 PM",
-  programme: "6:30 PM",
+  programme: "6:45 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
@@ -149,48 +163,54 @@ export const LYFE_EVENT = {
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
   places: 70,
-  footerLine: "Medlyfe introduces Lyfe Plastics and Dermatology.",
 } as const;
+
+/**
+ * How the seventy places are split, set by Debo on 8 October 2026. Guests are
+ * not tagged by bucket in the database, so this is the plan the list is
+ * invited against rather than a count the page enforces.
+ */
+export const LYFE_EVENT_ALLOCATION = [
+  { bucket: "Medbury corporate network", places: 30 },
+  { bucket: "Dr Itunu Akinware's guests", places: 10 },
+  { bucket: "Physicians who might refer", places: 10 },
+  { bucket: "General invitations: micro-influencers and curated picks", places: 20 },
+] as const;
 
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
     time: "5:30",
-    title: "Arrival and cocktails",
-    body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
+    title: "Arrival",
+    body: "Music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:30",
+    time: "6:45",
     title: "Welcome and opening film",
     body: "Dr Adedotun Ajelabi opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
   },
   {
-    time: "6:35",
+    time: "6:50",
     title: "The range",
     body: "Dr Adedotun Ajelabi on what modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical.",
   },
   {
-    time: "6:50",
+    time: "7:00",
     title: "The panel: The New Science of Ageing Well",
-    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
+    body: "Forty five minutes chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, food and training, beauty and stress, and what ageing does to Black skin.",
   },
   {
-    time: "7:35",
-    title: "Fireside: The Art of Looking Like Yourself",
-    body: "Dr Debo Odulana in conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics and the vision behind Lyfe Plastics and Dermatology.",
-  },
-  {
-    time: "8:00",
+    time: "7:45",
     title: "What can you actually do?",
     body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
   },
   {
-    time: "8:15",
+    time: "8:00",
     title: "Questions from the room",
     body: "A moderated conversation with the clinicians and speakers.",
   },
   {
-    time: "8:30",
+    time: "8:15",
     title: "Ageless After Hours",
     body: "Cocktails, music and conversations with the clinicians. Close at 9:30.",
   },
@@ -200,8 +220,8 @@ export const LYFE_EVENT_PROGRAMME = [
  * The panel, The New Science of Ageing Well.
  *
  * This is the running order, not a cast list, and the page renders it in
- * sequence: the opening address on the range, four seats on the inner, the
- * fireside on the outward, then the chair. Unfilled seats show as placeholders
+ * sequence: the opening address on the range, the chair, then the seats on the
+ * inner. Unfilled seats show as placeholders
  * with the subject named, which is honest and also quietly useful: a guest
  * reading "sleep, movement and physical function, to be announced" knows the
  * subject is covered.
@@ -256,7 +276,7 @@ export function lyfeHeadcount(
 
 export function lyfeConfirmUrl(token: string): string {
   const base = process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com";
-  return `${base.replace(/\/$/, "")}/lyfe/confirm/${token}`;
+  return `${base.replace(/\/$/, "")}/ageless/confirm/${token}`;
 }
 
 export interface LyfePanelSeat {
@@ -276,22 +296,30 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     subject:
       "The range. What modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical",
     name: "Dr Adedotun Ajelabi",
-    title: "Clinical Lead, Medlyfe",
-    portrait: null,
+    title:
+      "Head of Medicals, Medlyfe Wellness and Longevity Centre. Consultant Family Physician and Longevity Medicine Physician, FWACP",
+    portrait: "/lyfe/adedotun-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "In the chair",
     subject: "Moderating the panel and the questions from the room",
     name: "Dr Itunu Akinware",
     title: "Chief Executive, Medbury Healthcare Group",
-    portrait: null,
+
+    portrait: "/lyfe/itunu-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
-    subject: "Metabolism, weight, body composition, and the questions the room has about the new drugs",
+    subject: "Metabolism, weight and body composition. Hormones and the body as we age, and the questions the room has about the new drugs",
     name: "Dr Timi Adenuga",
-    title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim",
-    portrait: null,
+    title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim. ChM (Edinburgh), FWACS, MRCSEd",
+    portrait: "/lyfe/adenuga-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
@@ -304,35 +332,23 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
+    subject: "Maintaining beauty, and managing stress. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
-    portrait: null,
+
+    portrait: "/lyfe/joycee-portrait.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
   {
     seat: "The panel, on the inner",
-    // Taken from her own DFC Catalyst billing in this repo, where she spoke in
-    // September. She is the hormones seat the panel was missing.
     subject:
-      "Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring",
-    name: "Dr Folake Kofo-Idowu",
-    title: "Founder and Medical Director of Nelia. Double board certified physician",
-    portrait: null,
-  },
-  {
-    seat: "The panel, on the inner",
-    subject: "Andropause and men's health at midlife. The half of this conversation men never get invited to",
-    name: null,
-    title: null,
-    portrait: null,
-  },
-  {
-    seat: "The featured fireside, on the outward",
-    subject:
-      "Aesthetics, plastic surgery and looking like yourself. In conversation with Dr Debo Odulana",
+      "Ageing as a Black woman. Skin and aesthetic medicine, what the anti-ageing market is actually worth in a Black population, and where surgery does and does not belong",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
-    portrait: "/lyfe/chinwe-portrait-centred.jpg",
+    portrait: "/lyfe/chinwe-portrait.jpg",
+    portraitWidth: 682,
+    portraitHeight: 1024,
   },
 ];
 
@@ -726,9 +742,16 @@ export const LYFE_AFTERCARE = [
 ] as const;
 
 export const LYFE_CONSENT_TEXT =
-  "I agree that Lyfe Plastics and Dermatology and the clinic delivering my care may " +
-  "hold the details I have given and contact me by phone, WhatsApp or email about my " +
-  "enquiry. I understand I can ask for my details to be deleted at any time.";
+  "I agree that Medlyfe Wellness and Longevity Centre and the clinicians delivering " +
+  "my care may hold the details I have given and contact me by phone, WhatsApp or " +
+  "email about my enquiry. I understand I can ask for my details to be deleted at " +
+  "any time.";
+
+/** The evening's version, since it is purely Medlyfe's from 8 October 2026. */
+export const MEDLYFE_EVENT_CONSENT_TEXT =
+  "I agree that Medlyfe Wellness and Longevity Centre may hold the details I have " +
+  "given and contact me by phone, WhatsApp or email about the evening. I understand " +
+  "I can ask for my details to be deleted at any time.";
 
 // ─── Enum labels ──────────────────────────────────────────────────────────────
 // One source of truth for the form, the confirmation email, the internal
@@ -902,8 +925,8 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
     a: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Both are verifiable publicly and you are encouraged to check, because in this market the claim is made more often than it is true.",
   },
   {
-    q: "Why the hurry?",
-    a: `Her diary here is ${LYFE_CONSULT.hoursDisplay} on ${LYFE_CONSULT.dayNames.toLowerCase()}, which is ${LYFE_CONSULT.perWeek} half hours a week and no more. She is in Nigeria for a limited period. The dates on this page are the real ones.`,
+    q: "Why so few appointments?",
+    a: `Her diary is ${LYFE_CONSULT.hoursDisplay} on ${LYFE_CONSULT.dayNames.toLowerCase()}, which is ${LYFE_CONSULT.perWeek} half hours a week and no more. The dates on this page are the real ones.`,
   },
 ];
 
@@ -926,20 +949,33 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
  */
 export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
   {
-    name: "Lyfe Plastics & Dermatology",
-    role: "The practice",
-    body: "The plastic surgery and dermatology practice led by Dr Chinwe Kpaduwa, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
+    name: "Dr Chinwe Kpaduwa, MD FACS",
+    role: "The surgeon",
+    body: "Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained. She operates. The clinicians who deliver non-surgical treatment are registered, named before you book, and work to protocols she wrote and signs off.",
   },
   {
     name: "Medlyfe",
     role: "The licensed centre",
-    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that hosts the practice and takes the bookings. Longevity, infusion and health optimisation sit alongside the aesthetic side, which is the argument the whole evening is built on: how you feel and how you look are one appointment, not two.",
+    body: "Medlyfe Wellness and Longevity Centre is the licensed, trading entity that takes the bookings and where the consultation happens. Longevity, infusion and health optimisation sit alongside the aesthetic side, in one place.",
   },
   {
     name: "Medbury Healthcare",
     role: "The group",
     body: "Medlyfe is a Medbury Healthcare brand. The group runs specialist care, preventive health and wellness businesses in Nigeria, among them LifeCheck Preventive Health Centre, and is led by its chief executive Dr Itunu Akinware.",
   },
+];
+
+/**
+ * The same, for the AGELESS page. No practice is introduced on the night, so
+ * the first card is the centre itself.
+ */
+export const MEDLYFE_ABOUT: { name: string; role: string; body: string }[] = [
+  {
+    name: "Medlyfe",
+    role: "The host",
+    body: "Medlyfe Wellness and Longevity Centre is a licensed centre in Lagos for longevity, preventive health, infusion and health optimisation. Its clinical work is led by Dr Adedotun Ajelabi, a Consultant Family Physician with training in longevity and regenerative medicine. The argument of the evening is the centre's own: how you feel, how you function and how you look are one conversation, not three.",
+  },
+  LYFE_ABOUT[2],
 ];
 
 /**

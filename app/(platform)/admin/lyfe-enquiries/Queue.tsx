@@ -214,7 +214,7 @@ function EnquiryRow({
                 </a>
                 <a
                   href={`https://wa.me/${row.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                    `Hello ${row.fullName.split(" ")[0]}, this is the team at Lyfe Plastics and Dermatology. Thank you for your enquiry. Is now a good time for a short call?`,
+                    `Hello ${row.fullName.split(" ")[0]}, this is the team at Medlyfe. Thank you for your enquiry. Is now a good time for a short call?`,
                   )}`}
                   target="_blank"
                   rel="noreferrer"
