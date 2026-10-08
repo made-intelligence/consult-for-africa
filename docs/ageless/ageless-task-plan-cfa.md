@@ -18,7 +18,8 @@ AS AT
 - Thirteen days to the evening.
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
-- Owners inside CFA are named so Itunu knows who to call. Sally supports on Capital Club engagement.
+- Owners inside CFA are named so Itunu knows who to call.
+- Sally supports on Capital Club engagement. Opeoluwa handles press and media.
 
 ## What we need from Medlyfe
 
@@ -44,7 +45,7 @@ Everything else is ours.
 | Backdrop, step and repeat, signage | CFA | 14 Oct |
 | Print signage and backdrop | CFA | 17 Oct |
 | Takeaway piece for every guest | CFA | 15 Oct |
-| Social countdown set, 8 posts | CFA, Marketing | 10 Oct |
+| Social countdown set, 8 posts | CFA, with Opeoluwa | 10 Oct |
 
 ## Guest list and invitations
 
@@ -83,14 +84,14 @@ Everything else is ours.
 | Music | CFA | 17 Oct |
 | Technical rehearsal | CFA | 20 Oct |
 
-## Press and social
+## Press and social, with Opeoluwa
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Press pack: bios, photographs, release | CFA | 13 Oct |
-| Confirm BellaNaija, Guardian, BusinessDay placements | CFA, Marketing | 13 Oct |
-| Social countdown live | CFA, Marketing | 14 Oct |
-| Press list and accreditation | CFA | 17 Oct |
+| Press pack: bios, photographs, release | CFA for Opeoluwa | 13 Oct |
+| Confirm BellaNaija, Guardian, BusinessDay placements | Opeoluwa | 13 Oct |
+| Social countdown live | Opeoluwa | 14 Oct |
+| Press list and accreditation | Opeoluwa | 17 Oct |
 
 ## On the night
 
@@ -99,7 +100,7 @@ Everything else is ours.
 | Guest check-in against the confirmed list | CFA |
 | Speaker holding room and timings | CFA |
 | Stage manage, keep to the running order | CFA |
-| Photography direction | CFA, Marketing |
+| Photography direction | Opeoluwa |
 | Clinicians available through After Hours | CFA with Medlyfe |
 
 ## After
@@ -108,6 +109,6 @@ Everything else is ours.
 | --- | --- | --- |
 | Every lead from the night into the queue | CFA | 22 Oct |
 | First contact with every attendee | CFA | 23 Oct |
-| Photographs and recap film out | CFA, Marketing | 24 Oct |
-| Press recap placed | CFA, Marketing | 27 Oct |
+| Photographs and recap film out | Opeoluwa | 24 Oct |
+| Press recap placed | Opeoluwa | 27 Oct |
 | What worked, for edition two | CFA | 31 Oct |
