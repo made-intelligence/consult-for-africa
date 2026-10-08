@@ -43,7 +43,7 @@ Three names, three jobs. Keeping them apart is what lets edition two reuse every
 
 | Time | What |
 | --- | --- |
-| 5:30 | Arrival and cocktails |
+| 5:30 | Arrival |
 | 6:45 | Welcome and opening film |
 | 6:50 | The range. Dr Ajelabi, 10 minutes |
 | 7:00 | The panel, 45 minutes |

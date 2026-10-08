@@ -93,7 +93,7 @@ She moves the conversation on if it reaches who may perform what. That is a live
 
 | Time | What | Who |
 | --- | --- | --- |
-| 5:30 | Arrival and cocktails. Speakers in the room by 6:15 | Everyone |
+| 5:30 | Arrival. Speakers in the room by 6:15 | Everyone |
 | 6:45 | Welcome and opening film | Dr Ajelabi |
 | 6:50 | The range. 10 minutes | Dr Ajelabi |
 | 7:00 | The panel. 45 minutes | Chaired by Dr Akinware |

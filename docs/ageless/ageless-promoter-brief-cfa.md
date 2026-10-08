@@ -78,7 +78,7 @@ Dr Akinware and Ms Awosika still to send theirs.
 
 **The room.** Seventy places. Invitations go out from the register list.
 
-**The evening.** Cocktails, a panel, and an hour with the clinicians afterwards.
+**The evening.** A panel, then an hour with the clinicians over drinks.
 
 ## Bios
 

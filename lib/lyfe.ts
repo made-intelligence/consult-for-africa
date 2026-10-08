@@ -168,8 +168,8 @@ export const LYFE_EVENT_ALLOCATION = [
 export const LYFE_EVENT_PROGRAMME = [
   {
     time: "5:30",
-    title: "Arrival and cocktails",
-    body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
+    title: "Arrival",
+    body: "Music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
     time: "6:45",

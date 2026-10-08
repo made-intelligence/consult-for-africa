@@ -25,7 +25,7 @@ Four names do four separate jobs, and they are not interchangeable. AGELESS is t
 
 | Time | |
 | --- | --- |
-| 5:30 | Arrival and cocktails |
+| 5:30 | Arrival |
 | 6:45 | Welcome from Dr Adedotun Ajelabi, and the opening film |
 | 6:50 | The range. What modern medicine can now do about how we age |
 | 7:00 | The panel, The New Science of Ageing Well. Thirty five minutes |
