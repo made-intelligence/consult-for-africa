@@ -266,7 +266,7 @@ export async function PUT(req: NextRequest) {
 <p><b>${d.uploadedBy?.trim() || "Someone at Arabella"}</b> uploaded <b>${d.filename}</b> against section <b>${d.section}</b>.</p>
 ${d.note?.trim() ? `<p style="color:#475569">Their note: ${d.note.trim()}</p>` : ""}
 <p>That is <b>${total}</b> document${total === 1 ? "" : "s"} received so far.</p>
-<p><a href="https://www.consultforafrica.com/admin/arabella-survey" style="color:#0B3C5D">See what has come in</a></p>
+<p><a href="https://www.consultforafrica.com/admin/arabella-audit" style="color:#0B3C5D">See what has come in</a></p>
 </div>`
     );
   } catch (err) {
