@@ -6,20 +6,20 @@ FOR
 Speakers and panellists
 
 FROM
-Medlyfe, with Consult for Africa
+MedLYFE Wellness and Longevity Centre, with Consult for Africa
 
 EVENING
-Wednesday 21 October 2026
+Wednesday, 21 October 2026
 
 ---
 
 ## In short
 
-- **Wednesday 21 October. Capital Club, Lagos. Be in the room by 6:15pm.**
+- **Wednesday, 21 October 2026. Capital Club, Lagos. Be in the room by 6:15pm.**
 - **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
-- Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
-- **Each of you has your own ground.** Dr Adenuga on metabolism, weight and hormones. Dr Kpaduwa on ageing in Black skin, aesthetics and surgery. Gbemi Giwa on food and training. Joycee Awosika on beauty and stress.
+- Speaker focus is what to prepare to open with, two to three minutes.
+- 70 guests. The room is for women and men who care about prevention, performance, metabolic health, body composition, self-care, skin health, aesthetics and ageing with more energy and confidence.
 - No slides, no lectern. Cocktail dress.
 
 ## What we need from you
@@ -32,75 +32,102 @@ Wednesday 21 October 2026
 
 By **Friday 10 October**, or it misses the printed programme and the press pack.
 
-## The opening address
-
-**Dr Adedotun Ajelabi. 10 minutes.** You set the frame. The room should leave understanding that medicine now has a range of answers to ageing, from everyday to surgical.
-
-Cover:
-
-- What medicine can do now that it could not ten years ago.
-- Where the everyday ends and the medical begins.
-- What is established, and what is oversold.
-- What Medlyfe does with that range in practice.
-
 ## The panel
 
-**The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can do about it.
+**The Ageless Blueprint: Practical Steps to Look Good, Feel Well and Live Well as You Age.** How to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.
 
-45 minutes. Four seats, about eleven minutes each. Chaired by Dr Itunu Akinware.
+45 minutes. Four seats, about eleven minutes each. Chaired by Dr Debo Odulana.
 
 **Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
 
-### Dr Timi Adenuga, on metabolism, weight, hormones and the new drugs
+### Dr Adedotun Ajelabi
 
-- Why does the same diet stop working at 45?
-- The weight loss drugs. Who are they for, who should not take them, what is the honest result?
-- What happens when someone stops?
-- Is surgery ever the right first answer?
-- First thing to do tomorrow?
+**Can We Live to 100 and Still Live Well?**
 
-### Gbemi Giwa, on food and body composition
+Dr Ajelabi should set the tone for the evening by explaining longevity medicine in clear terms: the difference between lifespan and healthspan, what changes in the body through the 30s, 40s and 50s, and how preventive medicine, advanced diagnostics, AI and personalised optimisation can help people reduce risk, preserve vitality and avoid simply repeating the disease patterns they have seen in older generations.
 
-- Can you eat Nigerian food and change your body? What does that look like on a real plate?
-- What do people get wrong in the first month?
-- A woman of 45 who has never lifted. Where does she start?
-- What does a realistic twelve weeks look like?
-- What works and costs nothing?
+- What is longevity medicine, and how is it different from waiting until someone becomes ill?
+- What is the difference between lifespan and healthspan, and why should guests care about both now?
+- What changes in the body from the 30s through the 50s that people often ignore until disease appears?
+- How can advanced diagnostics, AI and preventive care help people see risk earlier and act sooner?
+- How can people avoid repeating the health patterns they have seen in their parents or older relatives?
+- What does MedLYFE do in practice to help a person understand and optimise their body for prevention, vitality and long life?
 
-### Joycee Awosika, on maintaining beauty and managing stress
+### Dr Timi Adenuga
 
-- What does maintaining beauty actually take, week to week, for a working woman in Lagos?
-- Ten years in this market. What do Nigerian women buy, and what do they say they want?
-- What is sold in Lagos that does not work?
-- Stress. What does it do to how people look, and what do you see in your clients?
-- What is the cheapest thing that works, that nobody will sell them?
+**Weight Metabolism and Longevity**
 
-### Dr Chinwe Kpaduwa, on ageing in Black skin, aesthetics and plastic surgery
+Dr Adenuga should connect metabolic health to longevity and healthspan. He should explain why weight is not only about appearance, how visceral fat, muscle mass, hormones and body composition affect risk, why men and women often gain or hold weight differently as they age, and what a serious medical approach can include: nutrition, supplementation, GLP-1 medicines, other metabolic support and bariatric surgery when clinically appropriate.
 
-- Ageing as a Black woman. What actually happens to Black skin over time, and how is it different?
-- Most anti-ageing marketing is built on white skin. What of it applies here, and what does not?
-- Which procedures are worth doing in a Black population, and which carry more risk on our skin?
-- Hormonal change shows up in skin. What do you see, and what helps?
-- What does looking like yourself mean in practice, and what do you refuse to do?
-- Travelling abroad for surgery. What goes wrong, and when?
+- Why does metabolic health matter for longevity and healthspan, not just size or appearance?
+- What should people know about visceral fat, muscle and body composition as they age?
+- Why do men and women often gain weight or hold fat differently in midlife?
+- How should someone think about their ideal weight, waist size or body composition target?
+- When should someone consider supplements, structured nutrition, GLP-1 medicines or other medical weight support? And are these new drugs safe?
+- Who is bariatric surgery or a sleeve really for, and when is it not the right answer?
+- What happens after treatment, and how do people maintain results once the first weight loss phase is over?
+
+### Gbemi Giwa
+
+**Lifestyle and Behaviour Change for Longevity**
+
+Gbemi should speak to the lifestyle and behaviour-change part of longevity. The emphasis is not only that people should eat more protein, lift weights or do cardio, but why those habits matter for ageing well and how busy adults can actually stay consistent. Her angle should cover Nigerian food, strength training, cardio fitness, recovery, habit formation and realistic systems that make change sustainable.
+
+- Everyone knows they should eat better and train. Why is consistency the hard part?
+- How should people eat for fat loss, muscle and longevity without abandoning Nigerian food?
+- What changes for men and women in the 30s, 40s and 50s around muscle, hormones, appetite and recovery?
+- Why do strength training, cardio fitness, VO2 max and mobility matter for ageing well?
+- How do you help people build habits that survive work, travel, children and Lagos life?
+- What does a realistic twelve week reset look like for someone who is busy and starting again?
+- What works, costs nothing and can start this week?
+
+### Joycee Awosika
+
+**Stress Management & Self Care and Longevity**
+
+Joycee should focus on self-care as a serious part of longevity. Her contribution should cover stress, burnout, recovery, mental wellbeing, nervous-system regulation and the practical ways high-performing adults can build care into their lives before exhaustion becomes their normal state. This should be about sustainable self-care, emotional regulation and recovery.
+
+- Why should self-care be seen as part of longevity, not as an indulgence?
+- How do stress and burnout affect energy, mood, sleep, decisions and the way people age?
+- What are the warning signs that a high-performing person is no longer recovering properly?
+- What practical self-care routines can busy men and women build into a real Lagos week?
+- How can people use spa, recovery, quiet time, therapy, community or personal rituals without turning self-care into another stressful task?
+- What works when someone already feels overwhelmed?
+
+### Dr Chinwe Kpaduwa, MD FACS
+
+**Aesthetics and Skin Ageing for Men and Women**
+
+Dr Chinwe should give guests a grounded medical view of aesthetics for men and women. She should explain how the face, skin, fat pads, fascia and facial structure change with age; what happens to skin quality, lines, sagging, pigmentation and hair; how women may experience body changes after pregnancy such as diastasis recti or loose skin; and how to think responsibly about skincare, supplements, nutrition, Botox, fillers, regenerative treatments, lasers and surgery. Black skin safety, scarring, pigmentation and natural-looking outcomes should remain central.
+
+- What actually happens to the face as we age: skin, collagen, fat pads, fascia, bone and facial structure?
+- How do ageing patterns and aesthetic concerns differ for women and men?
+- For women after pregnancy, what are the common body changes such as diastasis recti, loose skin or breast changes, and what can be done?
+- Where do skincare, sun protection, nutrition and supplements help, and where do they stop?
+- What do Botox, fillers, biostimulators, lasers or regenerative treatments actually do, and how should people approach them safely?
+- Hair loss affects many men and women. What are the common causes and medical or procedural options?
+- When does surgery become the right option, and how should people decide without chasing trends?
+- What is different about treating Black skin, including pigmentation, scarring and procedure risk?
+- What does looking like yourself mean in practice, and what would you refuse to do?
 
 ## The chair
 
-Dr Akinware keeps one argument moving across four people. She cuts in on generalities and makes sure each panellist is asked something only they can answer.
+Dr Debo Odulana, Consult for Africa.
 
-She moves the conversation on if it reaches who may perform what. That is a live regulatory question, not entertainment.
+Keep the discussion practical and mixed. Push each speaker to explain what changes with age, what can be done naturally, where medical support helps, what is being oversold, and what one action a guest can take this week.
+
+The conversation moves on if it reaches who may perform what. That is a live regulatory question, not entertainment.
 
 ## Running order
 
-| Time | What | Who |
-| --- | --- | --- |
-| 5:30 | Arrival. Speakers in the room by 6:15 | Everyone |
-| 6:45 | Welcome and opening film | Dr Ajelabi |
-| 6:50 | The range. 10 minutes | Dr Ajelabi |
-| 7:00 | The panel. 45 minutes | Chaired by Dr Akinware |
-| 7:45 | What you can actually do. 15 minutes | Medlyfe |
-| 8:00 | Questions from the room. 15 minutes | All speakers |
-| 8:15 | After Hours. Close 9:30 | Everyone |
+| Time | What |
+| --- | --- |
+| 5:30 | Arrival |
+| 6:45 | Welcome and opening film |
+| 6:50 | Can We Live to 100 and Still Live Well? |
+| 7:00 | The panel: The Ageless Blueprint |
+| 7:45 | Questions from the room |
+| 8:15 | Ageless After Hours |
 
 ## Rules for the stage
 
