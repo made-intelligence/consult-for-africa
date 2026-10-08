@@ -48,8 +48,7 @@ Everything else is ours.
 | Deliver and send invitations | Opeoluwa | 14 Oct |
 | Printed programme, content and design | CFA | 14 Oct |
 | Print the programme | Opeoluwa | 16 Oct |
-| Name badges and place cards, design | CFA | 15 Oct |
-| Print badges and place cards | Opeoluwa | 17 Oct |
+| Name badges and place cards, design and print | CFA | 17 Oct |
 | Backdrop, step and repeat, signage, design | CFA | 14 Oct |
 | Print signage and backdrop | Opeoluwa | 17 Oct |
 | Takeaway for every guest, decide what it is | Medlyfe | 13 Oct |
