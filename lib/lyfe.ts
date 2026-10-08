@@ -140,7 +140,7 @@ export const LYFE_EVENT = {
     "What changes in your body, brain and skin after 40, and what you can actually do about it.",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "5:30 PM",
-  programme: "6:30 PM",
+  programme: "6:45 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
   venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
@@ -172,32 +172,37 @@ export const LYFE_EVENT_PROGRAMME = [
     body: "Cocktails, music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:30",
+    time: "6:45",
     title: "Welcome and opening film",
     body: "Dr Adedotun Ajelabi opens the evening, followed by a short film asking how modern science is changing the way we look, feel, perform and live as we age.",
   },
   {
-    time: "6:35",
+    time: "6:50",
     title: "The range",
     body: "Dr Adedotun Ajelabi on what modern medicine can now do about how we age, and where each of it sits on the spectrum from everyday to surgical.",
   },
   {
-    time: "6:50",
+    time: "7:00",
     title: "The panel: The New Science of Ageing Well",
-    body: "Forty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
+    body: "Thirty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
   },
   {
     time: "7:35",
+    title: "Fireside: The Art of Looking Like Yourself",
+    body: "Dr Debo Odulana in conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics. Twenty minutes.",
+  },
+  {
+    time: "7:55",
     title: "What can you actually do?",
     body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
   },
   {
-    time: "7:50",
+    time: "8:05",
     title: "Questions from the room",
     body: "A moderated conversation with the clinicians and speakers.",
   },
   {
-    time: "8:05",
+    time: "8:15",
     title: "Ageless After Hours",
     body: "Cocktails, music and conversations with the clinicians. Close at 9:30.",
   },
@@ -343,6 +348,18 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
     name: null,
     title: null,
     portrait: null,
+  },
+  {
+    // Back on the evening from 8 October. One segment, not the headline. The
+    // evening is Medlyfe's and she does not get a section of her own.
+    seat: "The fireside",
+    subject:
+      "Aesthetics, and the art of looking like yourself. In conversation with Dr Debo Odulana",
+    name: "Dr Chinwe Kpaduwa, MD FACS",
+    title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
+    portrait: "/lyfe/chinwe-portrait.jpg",
+    portraitWidth: 682,
+    portraitHeight: 1024,
   },
 ];
 

@@ -15,7 +15,7 @@ Wednesday 21 October 2026
 
 ## In short
 
-- **Wednesday 21 October. Capital Club, Lagos. Be in the room by 6:00pm.**
+- **Wednesday 21 October. Capital Club, Lagos. Be in the room by 6:15pm.**
 - **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
 - Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
@@ -33,7 +33,7 @@ By **Friday 10 October**, or it misses the printed programme and the press pack.
 
 ## The opening address
 
-**Dr Adedotun Ajelabi. 15 minutes.** You set the frame. The room should leave understanding that medicine now has a range of answers to ageing, from everyday to surgical.
+**Dr Adedotun Ajelabi. 10 minutes.** You set the frame. The room should leave understanding that medicine now has a range of answers to ageing, from everyday to surgical.
 
 Cover:
 
@@ -46,7 +46,7 @@ Cover:
 
 **The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can do about it.
 
-45 minutes. Four seats. About nine minutes each. Chaired by Dr Itunu Akinware.
+35 minutes. About seven minutes each. Chaired by Dr Itunu Akinware.
 
 **Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
 
@@ -88,7 +88,7 @@ Open, on andropause and men's health. Same terms if filled.
 
 ## The fireside
 
-**Dr Chinwe Kpaduwa with Dr Debo Odulana. 25 minutes.** About judgement, not procedures.
+**Dr Chinwe Kpaduwa with Dr Debo Odulana. 20 minutes.** About judgement, not procedures.
 
 - What does "look like yourself" mean in practice, and what does it rule out?
 - What do you refuse to do?
@@ -106,14 +106,14 @@ She moves the conversation on if it reaches who may perform what. That is a live
 
 | Time | What | Who |
 | --- | --- | --- |
-| 5:30 | Arrival and cocktails. Speakers in the room by 6:00 | Everyone |
-| 6:30 | Welcome and opening film | Dr Ajelabi |
-| 6:35 | The range. 15 minutes | Dr Ajelabi |
-| 6:50 | The panel. 45 minutes | Chaired by Dr Akinware |
-| 7:35 | The fireside. 25 minutes | Dr Kpaduwa with Dr Odulana |
-| 8:00 | What you can actually do | Medlyfe |
-| 8:15 | Questions from the room | All speakers |
-| 8:30 | After Hours. Close 9:30 | Everyone |
+| 5:30 | Arrival and cocktails. Speakers in the room by 6:15 | Everyone |
+| 6:45 | Welcome and opening film | Dr Ajelabi |
+| 6:50 | The range. 10 minutes | Dr Ajelabi |
+| 7:00 | The panel. 35 minutes | Chaired by Dr Akinware |
+| 7:35 | The fireside. 20 minutes | Dr Kpaduwa with Dr Odulana |
+| 7:55 | What you can actually do. 10 minutes | Medlyfe |
+| 8:05 | Questions from the room. 10 minutes | All speakers |
+| 8:15 | After Hours. Close 9:30 | Everyone |
 
 ## Rules for the stage
 

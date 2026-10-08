@@ -30,7 +30,7 @@ We need names this week. Fifteen of the seventy are held for Medbury corporates,
 | Date | Wednesday 21 October 2026 |
 | Venue | Capital Club, Lagos |
 | Arrival | 5:30pm |
-| Programme | 6:30pm |
+| Programme | 6:45pm to 8:15pm |
 | Close | 9:30pm |
 | Places | 70, of which 15 are held for Medbury corporates |
 | Host | Medlyfe |

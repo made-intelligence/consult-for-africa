@@ -155,15 +155,18 @@ def build_place_cards(people):
 
 # ---------------------------------------------------------------- badges
 
-def build_badges(guests):
+def build_badges(people):
     """90 x 54 mm badges, eight to a sheet.
 
     First name large, because across a room at a cocktail evening that is the
-    only thing anybody actually reads. Blank badges are produced when no guest
-    list is present, for writing on at the door.
+    only thing anybody actually reads. Speakers get a badge as well as a place
+    card: they spend the hour before the programme in the room as guests.
+
+    A sheet of blanks is always appended, ruled for writing on, because some
+    of the seventy will arrive as somebody's plus one.
     """
     PER_SHEET = 8
-    rows = guests or [{"name": "", "line2": ""} for _ in range(PER_SHEET)]
+    rows = list(people) + [{"name": "", "line2": "", "blank": True} for _ in range(PER_SHEET)]
 
     def badge(g):
         full = (g.get("name") or "").strip()
@@ -172,14 +175,14 @@ def build_badges(guests):
         if first.rstrip(".").lower() in {"dr", "prof", "mr", "mrs", "ms", "miss"} and len(full.split(" ")) > 1:
             first = full.split(" ")[1]
         line2 = (g.get("line2") or "").strip()
+        if g.get("blank"):
+            body = '<div class="rule"></div><div class="rule short"></div>'
+        else:
+            body = f'<div class="first">{first}</div><div class="full">{full}</div><div class="org">{line2}</div>'
         return f"""
         <div class="badge cut">
           <div class="badge-top eyebrow">{EVENT_NAME}</div>
-          <div class="badge-body">
-            <div class="first">{first}</div>
-            <div class="full">{full}</div>
-            <div class="org">{line2}</div>
-          </div>
+          <div class="badge-body">{body}</div>
         </div>"""
 
     sheets = ""
@@ -200,6 +203,8 @@ def build_badges(guests):
       .first {{ font-size: 24pt; line-height: 1.05; }}
       .full {{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.5pt; color: #4A5C50; margin-top: 1.5mm; }}
       .org {{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8pt; color: #7A8980; margin-top: 0.8mm; }}
+      .rule {{ width: 62mm; border-bottom: 0.3mm solid #D7DED9; height: 9mm; }}
+      .rule.short {{ width: 44mm; height: 7mm; }}
     </style></head><body>{sheets}</body></html>"""
 
 
@@ -221,6 +226,7 @@ def build_takeaway(copies=70):
           <div class="eyebrow ev">{EVENT_NAME}</div>
         </div>
         <div class="card-body">
+         <div class="col-main">
           <h1>A consultation, not a quote</h1>
           <p class="lede">
             Thirty minutes with a plastic surgeon, by video. You will be told
@@ -232,14 +238,16 @@ def build_takeaway(copies=70):
             <li>Credited in full against treatment</li>
             <li>Aftercare planned before anything is booked</li>
           </ul>
+         </div>
+         <div class="col-side">
+          <img class="qr" src="{qr}" alt="Scan to book" />
+          <div class="book">Scan to book</div>
+          <div class="url">consultforafrica.com/lyfe</div>
+         </div>
         </div>
         <div class="card-foot">
-          <img class="qr" src="{qr}" alt="Scan to book" />
-          <div class="foot-text">
-            <div class="book">Scan to book, or visit</div>
-            <div class="url">consultforafrica.com/lyfe</div>
-            <div class="small">Medlyfe Wellness and Longevity Centre · Lekki, Lagos</div>
-          </div>
+          <span>Medlyfe Wellness and Longevity Centre · Lekki, Lagos</span>
+          <span>Consultations by video · Tuesdays and Wednesdays</span>
         </div>
       </div>"""
 
@@ -254,16 +262,25 @@ def build_takeaway(copies=70):
       .card-head {{ display: flex; justify-content: space-between; align-items: baseline; }}
       .mark {{ font-size: 11pt; letter-spacing: 0.3em; }}
       .ev {{ font-size: 8pt; color: #7A8980; }}
-      .card-body {{ flex: 1; padding-top: 9mm; }}
+      .card-body {{ flex: 1; padding-top: 9mm; display: flex; gap: 14mm; }}
+      .col-main {{ flex: 1; }}
+      .col-side {{
+        width: 46mm; flex: none; text-align: center;
+        border-left: 0.3mm solid {SAGE}; padding-left: 10mm;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+      }}
       h1 {{ font-size: 23pt; margin: 0 0 4mm; font-weight: normal; }}
-      .lede {{ font-size: 11.5pt; line-height: 1.5; margin: 0 0 5mm; max-width: 120mm; }}
+      .lede {{ font-size: 11.5pt; line-height: 1.5; margin: 0 0 5mm; }}
       ul {{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.8; margin: 0; padding-left: 5mm; color: #2E3C34; }}
-      .card-foot {{ display: flex; align-items: center; gap: 7mm; border-top: 0.3mm solid {SAGE}; padding-top: 6mm; }}
-      .qr {{ width: 26mm; height: 26mm; }}
-      .foot-text {{ font-family: "Helvetica Neue", Arial, sans-serif; }}
-      .book {{ font-size: 9pt; color: #4A5C50; }}
-      .url {{ font-size: 13pt; letter-spacing: 0.01em; margin-top: 1mm; }}
-      .small {{ font-size: 8pt; color: #7A8980; margin-top: 2mm; }}
+      .card-foot {{
+        display: flex; justify-content: space-between;
+        border-top: 0.3mm solid {SAGE}; padding-top: 5mm;
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        font-size: 8pt; color: #7A8980;
+      }}
+      .qr {{ width: 30mm; height: 30mm; }}
+      .book {{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8.5pt; color: #4A5C50; margin-top: 3mm; letter-spacing: 0.06em; text-transform: uppercase; }}
+      .url {{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.5pt; margin-top: 1.5mm; line-height: 1.3; }}
     </style></head><body>{sheets}</body></html>"""
 
 
@@ -279,11 +296,11 @@ def main():
     print(f"\nAGELESS print pack")
     print(f"  {EVENT_LINE}")
     print(f"  place cards : {len(people)} named")
-    print(f"  badges      : {len(guests) if guests else 'blank sheet (guests.csv is empty)'}")
+    print(f"  badges      : {len(people) + len(guests)} named, plus a sheet of ruled blanks")
     print()
 
     write_and_render("ageless-place-cards", build_place_cards(people))
-    write_and_render("ageless-badges", build_badges(guests))
+    write_and_render("ageless-badges", build_badges(people + guests))
     write_and_render("ageless-takeaway", build_takeaway(70))
 
     print("\nDrop the worked guest list into guests.csv (name,line2) and re-run.")

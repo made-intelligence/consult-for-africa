@@ -17,7 +17,7 @@ AS AT
 
 - **This is Medlyfe's evening.** It establishes Medlyfe as the place in Lagos for health, beauty and longevity.
 - Cocktail evening at the Capital Club, Lagos, Wednesday 21 October 2026.
-- Arrival 5:30pm, programme 6:30pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
+- Arrival 5:30pm, programme 6:45pm to 8:15pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
 - The evening shows Medlyfe's range: longevity, metabolic health, hormones, skin and aesthetics.
 - Dr Chinwe Kpaduwa's fireside is one segment of it, not the headline.
 - Built to recur. This is edition one.
@@ -46,19 +46,15 @@ Keeping them apart is what lets edition two reuse everything except the panel.
 | Time | What |
 | --- | --- |
 | 5:30 | Arrival and cocktails |
-| 6:30 | Welcome and opening film |
-| 6:35 | The range. Dr Ajelabi, 15 minutes |
-| 6:50 | The panel, 45 minutes |
-| 7:35 | The fireside, 25 minutes |
-| 8:00 | What you can actually do |
-| 8:15 | Questions from the room |
-| 8:30 | After Hours. Close 9:30 |
+| 6:45 | Welcome and opening film |
+| 6:50 | The range. Dr Ajelabi, 10 minutes |
+| 7:00 | The panel, 35 minutes |
+| 7:35 | The fireside, 20 minutes |
+| 7:55 | What you can actually do |
+| 8:05 | Questions from the room |
+| 8:15 | After Hours. Close 9:30 |
 
-Why 6:30 and not later:
-
-- The programme runs two hours.
-- After Hours needs its full hour. That is where guests talk to the clinicians.
-- An hour of arrival before it is the allowance for Victoria Island on a weekday.
+Ninety minutes of programme. Arrival and After Hours are where guests talk to the clinicians, so both are long on purpose.
 
 ## The stage
 
