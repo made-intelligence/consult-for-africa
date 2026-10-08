@@ -68,7 +68,7 @@ Why 6:30 and not later:
 | In the chair | Dr Itunu Akinware, Chief Executive, Medbury Healthcare Group |
 | Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
 | Panel | Gbemi Giwa, African Fat Loss Method. Food and body composition |
-| Panel | Joycee Awosika, ORÍKÌ Group. Vitality and energy |
+| Panel | Joycee Awosika, ORÍKÌ Group. Maintaining beauty and managing stress |
 | Panel | Dr Folake Kofo-Idowu, Nelia. Menopause and hormones |
 | Panel | One seat open. Andropause and men's health |
 | Fireside | Dr Chinwe Kpaduwa, MD FACS, with Dr Debo Odulana |

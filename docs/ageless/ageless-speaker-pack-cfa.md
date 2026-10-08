@@ -15,26 +15,21 @@ Wednesday 21 October 2026
 
 ## In short
 
-Cocktail evening, Capital Club Lagos, Wednesday 21 October. Seventy guests, mostly Lagos women and men over forty.
+- **Wednesday 21 October. Capital Club, Lagos. Be in the room by 6:00pm.**
+- **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
+- Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
+- Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
+- No slides, no lectern. Cocktail dress.
 
-Medlyfe hosts. It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology.
+## What we need from you
 
-Be in the room by 6:00pm. Send your bio and a photograph by Friday 10 October.
+| What | Detail |
+| --- | --- |
+| Bio | 80 to 100 words, written as you want to be introduced |
+| Photograph | Any good headshot, high resolution |
+| Corrections | Questions you would rather not be asked, or would rather be asked |
 
-The panel covers the inside of the body. The fireside covers the outside.
-
-## Running order
-
-| Time | What | Who |
-| --- | --- | --- |
-| 5:30 | Arrival and cocktails. Speakers in the room by 6:00 | Everyone |
-| 6:30 | Welcome and opening film | Dr Ajelabi |
-| 6:35 | The range. 15 minutes | Dr Ajelabi |
-| 6:50 | The panel. 45 minutes | Chaired by Dr Akinware |
-| 7:35 | The fireside. 25 minutes | Dr Kpaduwa with Dr Odulana |
-| 8:00 | What you can actually do | Medlyfe |
-| 8:15 | Questions from the room | All speakers |
-| 8:30 | After Hours. Close 9:30 | Everyone |
+By **Friday 10 October**, or it misses the printed programme and the press pack.
 
 ## The opening address
 
@@ -71,12 +66,13 @@ Cover:
 - What does a realistic twelve weeks look like?
 - What works and costs nothing?
 
-### Joycee Awosika, on vitality and energy
+### Joycee Awosika, on maintaining beauty and managing stress
 
+- What does maintaining beauty actually take, week to week, for a working woman in Lagos?
 - Ten years in this market. What do Nigerian women buy, and what do they say they want?
-- What is the gap, and what does it tell us?
 - What is sold in Lagos that does not work?
-- What is most underrated because nobody profits from it?
+- Stress. What does it do to how people look, and what do you see in your clients?
+- What is the cheapest thing that works, that nobody will sell them?
 
 ### Dr Folake Kofo-Idowu, on menopause and hormones
 
@@ -106,6 +102,19 @@ Dr Akinware keeps one argument moving across four people. She cuts in on general
 
 She moves the conversation on if it reaches who may perform what. That is a live regulatory question, not entertainment.
 
+## Running order
+
+| Time | What | Who |
+| --- | --- | --- |
+| 5:30 | Arrival and cocktails. Speakers in the room by 6:00 | Everyone |
+| 6:30 | Welcome and opening film | Dr Ajelabi |
+| 6:35 | The range. 15 minutes | Dr Ajelabi |
+| 6:50 | The panel. 45 minutes | Chaired by Dr Akinware |
+| 7:35 | The fireside. 25 minutes | Dr Kpaduwa with Dr Odulana |
+| 8:00 | What you can actually do | Medlyfe |
+| 8:15 | Questions from the room | All speakers |
+| 8:30 | After Hours. Close 9:30 | Everyone |
+
 ## Rules for the stage
 
 **No named prescription products.** No toxins, fillers or weight loss drugs by brand. ARCON requires approval before exposure, fines from ₦500,000, and the liability sits on Medlyfe rather than the speaker.
@@ -115,16 +124,6 @@ She moves the conversation on if it reaches who may perform what. That is a live
 **No before and after claims. No outcome promises.** "Most people see" is a claim. "In my experience, some people find" is not.
 
 **Do not debate scope of practice.** HEFAMAA has it live in Lagos now.
-
-## What we need from you
-
-| What | Detail |
-| --- | --- |
-| Bio | 80 to 100 words, written as you want to be introduced |
-| Photograph | Any good headshot, high resolution |
-| Corrections | Questions you would rather not be asked, or would rather be asked |
-
-By **Friday 10 October**, or it misses the printed programme and the press pack.
 
 ## Practicalities
 
@@ -138,3 +137,4 @@ By **Friday 10 October**, or it misses the printed programme and the press pack.
 | After Hours | Please stay. The useful conversations happen after 8:30 |
 
 Reply to this note with anything.
+

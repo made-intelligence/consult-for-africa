@@ -73,7 +73,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     firstName: "Joycee",
     email: null,
     org: "The ORÍKÌ Group",
-    slot: "the panel, on vitality and energy",
+    slot: "the panel, on maintaining beauty and managing stress",
     need: ["confirmation", "bio", "photo"],
     notes: "Spelling is Joycee with two e's on her own properties.",
   },

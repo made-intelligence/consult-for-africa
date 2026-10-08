@@ -50,7 +50,7 @@ A few places are kept for clinicians.
 | Dr Itunu Akinware | Chief Executive, Medbury Healthcare Group. Chairs the panel |
 | Dr Timi Adenuga | Lead Bariatric and Laparoscopic Surgeon, GetSlim. Metabolism, weight, the new drugs |
 | Gbemi Giwa | Founder, African Fat Loss Method. Food and body composition |
-| Joycee Awosika | Founder and Chief Executive, ORÍKÌ Group. Vitality and energy |
+| Joycee Awosika | Founder and Chief Executive, ORÍKÌ Group. Maintaining beauty and managing stress |
 | Dr Folake Kofo-Idowu | Founder and Medical Director, Nelia. Menopause and hormones |
 | Dr Chinwe Kpaduwa, MD FACS | Plastic surgeon, US board certified. The fireside |
 

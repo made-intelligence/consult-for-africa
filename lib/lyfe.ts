@@ -318,7 +318,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Vitality and energy. What ten years of building a wellness business says about what works and what only sells",
+    subject: "Maintaining beauty, and managing stress. What ten years of building a wellness business says about what works and what only sells",
     name: "Joycee Awosika",
     title: "Founder and Chief Executive, the ORÍKÌ Group",
     portrait: "/lyfe/adenuga-portrait.jpg",
