@@ -263,7 +263,7 @@ export function lyfeHeadcount(
 
 export function lyfeConfirmUrl(token: string): string {
   const base = process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com";
-  return `${base.replace(/\/$/, "")}/lyfe/confirm/${token}`;
+  return `${base.replace(/\/$/, "")}/ageless/confirm/${token}`;
 }
 
 export interface LyfePanelSeat {

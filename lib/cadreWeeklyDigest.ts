@@ -909,7 +909,7 @@ function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
     detail:
       "Medlyfe Wellness and Longevity Centre hosts an evening on what modern medicine can now do about how we age: metabolism, hormones, weight, energy and skin. Dr Adedotun Ajelabi opens it and Dr Itunu Akinware chairs the panel, with Dr Timi Adenuga on metabolic and bariatric care. The room holds seventy and ten places are kept for clinicians.",
     ctaLabel: "Register your interest",
-    href: "https://www.consultforafrica.com/lyfe?src=doctor",
+    href: "https://www.consultforafrica.com/ageless?src=doctor",
   };
 }
 

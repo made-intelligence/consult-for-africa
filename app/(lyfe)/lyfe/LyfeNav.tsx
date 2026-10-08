@@ -24,7 +24,7 @@ export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5 md:px-10">
         <Link
-          href={event ? "/lyfe" : "/lyfe/consult"}
+          href={event ? "/ageless" : "/lyfe/consult"}
           className="text-[12px] font-semibold uppercase"
           style={{
             color: event ? MB.lime : "#A87B4F",
@@ -44,13 +44,6 @@ export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
           </a>
         ) : (
           <div className="flex items-center gap-5">
-            <Link
-              href={event ? "/lyfe/consult" : "/lyfe"}
-              className="hidden text-[13.5px] sm:inline"
-              style={{ color: event ? MB.mist : "#4A4D56" }}
-            >
-              {event ? "Consultations" : "The evening"}
-            </Link>
             <Link
               href={event ? "/lyfe/consult" : "#book"}
               className="px-5 py-2.5 text-[13.5px] font-semibold"
