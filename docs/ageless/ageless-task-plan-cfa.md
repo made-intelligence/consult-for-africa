@@ -18,7 +18,7 @@ AS AT
 - Thirteen days to the evening.
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
-- Owners inside CFA are named so Itunu knows who to call.
+- Owners inside CFA are named so Itunu knows who to call. Sally supports on Capital Club engagement.
 
 ## What we need from Medlyfe
 
@@ -52,8 +52,8 @@ Everything else is ours.
 | --- | --- | --- |
 | Register interest page live | CFA | Done |
 | Invite and confirm flow, one link per guest | CFA | Done |
-| Build the invited list to about 140 | CFA, Sally | 10 Oct |
-| Ask Capital Club to mention it to members | CFA, Sally | 10 Oct |
+| Build the invited list to about 140 | CFA | 10 Oct |
+| Capital Club engagement: members list and a mention to members | CFA, supported by Sally | 10 Oct |
 | Send invitations | CFA | 14 Oct |
 | Chase unanswered invitations by phone | CFA | 17 Oct |
 | Close register interest | CFA | 16 Oct |
