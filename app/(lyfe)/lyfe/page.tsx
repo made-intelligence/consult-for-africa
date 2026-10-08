@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import {
-  LYFE_AFTERCARE,
-  LYFE_BRAND as C,
-  LYFE_DOORS,
-  consultSlots,
   LYFE_EVENT,
   LYFE_EVENT_PROGRAMME,
   LYFE_EVENT_TAKEAWAYS,
   LYFE_PANEL,
-  LYFE_NAME,
   LYFE_PHONE_DISPLAY,
-  LYFE_STANDARDS,
-  LYFE_SURGEON,
+  MEDLYFE_ABOUT,
+  MEDLYFE_NAME,
   MEDLYFE_BRAND as MB,
   whatsappLink,
 } from "@/lib/lyfe";
@@ -23,10 +16,20 @@ import LyfeNav from "./LyfeNav";
 import AboutGroup from "./AboutGroup";
 import StickyRsvp from "./StickyRsvp";
 
+const DESCRIPTION = `Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening hosted by ${LYFE_EVENT.host} on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}, on how modern science is changing the way we look, feel, perform and live as we age.`;
+
+// Absolute, so the tab and the link preview say Medlyfe rather than inheriting
+// the Lyfe Plastics template from the layout.
 export const metadata: Metadata = {
-  title: "Ageless",
-  description:
-    `Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening hosted by ${LYFE_EVENT.host} with ${LYFE_EVENT.withWhom} on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}, on how modern science is changing the way we look, feel, perform and live as we age.`,
+  title: { absolute: `Ageless | ${MEDLYFE_NAME}` },
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "en_NG",
+    siteName: MEDLYFE_NAME,
+    title: `Ageless: ${LYFE_EVENT.proposition}`,
+    description: DESCRIPTION,
+  },
 };
 
 /**
@@ -38,13 +41,14 @@ export const metadata: Metadata = {
  * below it. Reducing a page to one real call to action is the best evidenced
  * lift in landing page design, and two competing ones is how you halve both.
  *
- * The page opens in Medlyfe's livery and resolves into Lyfe's, which is
- * literally what "Medlyfe introduces Lyfe Plastics and Dermatology" means.
- * Medlyfe is the licensed, bookable host. Lyfe Plastics is introduced.
+ * Purely Medlyfe's evening from 8 October 2026, in Medlyfe's livery
+ * throughout. Dr Kpaduwa is no longer part of it, so the fireside, the
+ * consultation offers and the Lyfe Plastics section have gone, and the face of
+ * the page is Medlyfe's own Head of Medicals, who opens the evening.
  *
  * Still no hero video and nothing heavier than it needs to be: 86 per cent of
  * Nigerian traffic is mobile at about 15 Mbps and data costs 575 naira a
- * gigabyte. The only image on the page is her portrait, at 16KB.
+ * gigabyte. The images are the speakers' portraits and nothing else.
  */
 
 const display = "var(--lyfe-display), Georgia, serif";
@@ -78,25 +82,18 @@ export default async function LyfePage({
     medium: sp.utm_medium?.slice(0, 100) ?? null,
     campaign: sp.utm_campaign?.slice(0, 100) ?? null,
   };
-  // One job. The consultation lives on its own landing now.
+  // One job.
   const go = "EVENT_RSVP" as const;
 
-  // Her real diary, with what is already sold taken out. Faked scarcity
-  // reverses the effect it is reaching for, so the only number this page says
-  // out loud is one the database can stand behind.
   return (
-    <div style={{ background: MB.green, color: C.body, fontFamily: sans }}>
+    <div style={{ background: MB.green, color: MB.mist, fontFamily: sans }}>
       <LyfeNav on="event" />
       <Hero />
       <Evening />
-      <Surgeon />
-      <ConsultCta />
       <Panel />
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
-      <ThePractice />
-      <AboutGroup tone="dark" />
-      <ConsultCta />
+      <AboutGroup tone="dark" items={MEDLYFE_ABOUT} />
       <Footer />
       <StickyRsvp />
     </div>
@@ -183,12 +180,16 @@ function RsvpButton({ children = "Register your interest" }: { children?: React.
   );
 }
 
+/** The opening address. She is Medlyfe's clinical lead, so she fronts the page. */
+const HOST = LYFE_PANEL[0];
+
 /**
- * Her portrait in an arch, with a hairline proud of it and the foot faded
- * into the ground. A niche reads as a portrait that belongs in the page; a
- * rectangle reads as a photograph dropped on top of one.
+ * A portrait in an arch, with the foot faded into the ground. A niche reads as
+ * a portrait that belongs in the page; a rectangle reads as a photograph
+ * dropped on top of one.
  */
 function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: boolean }) {
+  if (!HOST.portrait) return null;
   return (
     <div className="relative" style={{ width: w, maxWidth: "100%" }}>
       <div
@@ -203,10 +204,10 @@ function ArchPortrait({ w = 300, priority = false }: { w?: number; priority?: bo
         }}
       >
         <Image
-          src={LYFE_SURGEON.portrait}
-          alt={LYFE_SURGEON.name}
-          width={LYFE_SURGEON.portraitWidth}
-          height={LYFE_SURGEON.portraitHeight}
+          src={HOST.portrait}
+          alt={HOST.name ?? MEDLYFE_NAME}
+          width={HOST.portraitWidth ?? 800}
+          height={HOST.portraitHeight ?? 1000}
           priority={priority}
           sizes="(max-width: 768px) 72vw, 340px"
           style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
@@ -235,7 +236,7 @@ function Hero() {
 
         <div className="mt-14 grid items-center gap-12 md:mt-20 md:grid-cols-[1.18fr_1fr] md:gap-16">
           <div>
-            <Eyebrow>With {LYFE_SURGEON.name}</Eyebrow>
+            <Eyebrow>Hosted by {MEDLYFE_NAME}</Eyebrow>
 
             <h1
               className="mt-6 text-[68px] leading-[0.95] md:text-[112px]"
@@ -290,17 +291,6 @@ function Hero() {
               </span>
             </div>
 
-            <p className="mt-6 text-[13.5px] leading-relaxed" style={{ color: MB.greenSoft }}>
-              Cannot make it?{" "}
-              <Link
-                href="/lyfe/consult"
-                className="font-semibold underline underline-offset-4"
-                style={{ color: MB.limeSoft }}
-              >
-                Book a consultation with {LYFE_SURGEON.shortName}
-              </Link>
-              .
-            </p>
           </div>
 
           <div className="flex justify-center md:justify-end">
@@ -388,52 +378,6 @@ function Evening() {
   );
 }
 
-/* ─── her ──────────────────────────────────────────────────────────────────── */
-
-function Surgeon() {
-  return (
-    <Section bg={MB.greenDeep}>
-      <div className="grid gap-12 md:grid-cols-[1fr_1.3fr] md:gap-16">
-        <div className="flex justify-center md:justify-start">
-          <ArchPortrait w={300} />
-        </div>
-        <div>
-          <Eyebrow>The featured fireside</Eyebrow>
-          <h2
-            className="mt-5 text-[30px] leading-[1.14] md:text-[40px]"
-            style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
-          >
-            &ldquo;{LYFE_EVENT.sessionTitle}&rdquo;
-          </h2>
-          <p className="mt-4 text-[16px] font-semibold" style={{ color: MB.limeSoft }}>
-            {LYFE_SURGEON.name}
-          </p>
-
-          <p className="mt-6 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-            What good aesthetic work should achieve, natural looking outcomes, and knowing when
-            not to intervene. An open conversation about why people consider plastic surgery, what
-            it can and cannot achieve, and how to approach it safely and with realistic
-            expectations, particularly as faces and bodies change with age. {LYFE_SURGEON.position}
-          </p>
-
-          <ul className="mt-8 grid gap-2.5">
-            {LYFE_SURGEON.credentials.map((cr) => (
-              <li
-                key={cr}
-                className="flex gap-3 text-[14.5px] leading-relaxed"
-                style={{ color: MB.mist }}
-              >
-                <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full" style={{ background: MB.lime }} />
-                {cr}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
 /* ─── the panel ────────────────────────────────────────────────────────────── */
 
 /**
@@ -479,8 +423,8 @@ function Panel() {
         </h2>
         <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
           {LYFE_EVENT.panelStandfirst} The evening opens on the range of what is now possible,
-          the panel stays with the inner, and the fireside turns outward to the face and the body.
-          One argument, carried through the evening.
+          and the panel takes it from there, with every answer ending in something you can act
+          on.
         </p>
       </div>
 
@@ -501,8 +445,8 @@ function Panel() {
                   <Image
                     src={seat.portrait}
                     alt={seat.name ?? seat.seat}
-                    width={seat.portraitWidth ?? LYFE_SURGEON.portraitWidth}
-                    height={seat.portraitHeight ?? LYFE_SURGEON.portraitHeight}
+                    width={seat.portraitWidth ?? 800}
+                    height={seat.portraitHeight ?? 1000}
                     sizes="190px"
                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
                   />
@@ -633,113 +577,6 @@ function Rsvp({
   );
 }
 
-/* ─── the secondary path ───────────────────────────────────────────────────── */
-
-/**
- * The one thing the evening is allowed to sell.
- *
- * No fee here. The invitation's job is the room, and a price on it turns a
- * guest into a prospect before they have agreed to be one. The number lives
- * on the page that is actually asking for the money.
- */
-function ConsultCta() {
-  return (
-    <section
-      className="px-6 py-12 md:px-10"
-      style={{ background: MB.greenDark, borderTop: `1px solid rgba(196,215,166,0.14)` }}
-    >
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-6">
-        <div className="max-w-xl">
-          <p
-            className="text-[10.5px] font-semibold uppercase"
-            style={{ color: MB.lime, letterSpacing: "0.18em" }}
-          >
-            Cannot make the evening?
-          </p>
-          <p className="mt-3 text-[17px] leading-relaxed" style={{ color: MB.white }}>
-            {LYFE_SURGEON.shortName} sees a small number of people privately before she travels,
-            by video, from wherever you are.
-          </p>
-        </div>
-        <Link
-          href="/lyfe/consult"
-          className="px-7 py-3.5 text-[15px] font-semibold"
-          style={{ background: MB.lime, color: MB.greenDeep }}
-        >
-          Book a consultation
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-function ThePractice() {
-  return (
-    <section style={{ background: C.ground }}>
-      <div className="mx-auto w-full max-w-5xl px-5 py-20 md:px-8 md:py-28">
-        <p
-          className="text-[11px] font-semibold uppercase"
-          style={{ color: C.bronze, letterSpacing: "0.18em" }}
-        >
-          {LYFE_EVENT.footerLine}
-        </p>
-        <h2
-          className="mt-5 max-w-2xl text-[30px] leading-[1.14] md:text-[42px]"
-          style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.02em" }}
-        >
-          Aesthetic care for the woman who wants to look rested, not rearranged.
-        </h2>
-        <p className="mt-5 max-w-2xl text-[16px] leading-relaxed" style={{ color: C.body }}>
-          This is the practice being introduced on the night. Treatment is delivered at the clinic
-          by registered clinicians, to protocols {LYFE_SURGEON.shortName} wrote and against a
-          standard she signs off.
-        </p>
-
-        <div className="mt-14 grid gap-x-12 gap-y-8 md:grid-cols-2">
-          {LYFE_STANDARDS.slice(0, 4).map((s) => (
-            <div key={s.title}>
-              <h3 className="text-[16.5px] font-semibold" style={{ color: C.ink }}>
-                {s.title}
-              </h3>
-              <p className="mt-2 text-[15px] leading-relaxed" style={{ color: C.body }}>
-                {s.body}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Aftercare, the piece of open ground nobody here has claimed. */}
-        <div className="mt-16">
-          <p
-            className="text-[11px] font-semibold uppercase"
-            style={{ color: C.bronze, letterSpacing: "0.16em" }}
-          >
-            The part nobody quotes for
-          </p>
-          <h3
-            className="mt-4 max-w-2xl text-[24px] leading-tight md:text-[30px]"
-            style={{ fontFamily: display, fontWeight: 600, color: C.ink }}
-          >
-            The surgery is not the expensive bit. Getting better is.
-          </h3>
-          <div className="mt-8 grid gap-x-12 gap-y-7 md:grid-cols-2">
-            {LYFE_AFTERCARE.map((a) => (
-              <div key={a.title}>
-                <h4 className="text-[16px] font-semibold" style={{ color: C.ink }}>
-                  {a.title}
-                </h4>
-                <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: C.body }}>
-                  {a.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ─── footer ───────────────────────────────────────────────────────────────── */
 
 function Footer() {
@@ -756,16 +593,11 @@ function Footer() {
               {LYFE_EVENT.host}. Consultations and treatment are provided at the clinic by
               clinicians registered with the Medical and Dental Council of Nigeria.
             </p>
-            <p className="mt-4">
-              {LYFE_SURGEON.name} is a promoter of {LYFE_NAME} and the surgeon who sets its clinical
-              standard. She designs the protocols and trains and signs off the clinicians who
-              deliver treatment.
-            </p>
           </div>
           <div>
             <p>
               Nothing on this page is a diagnosis, a recommendation or a promise of a result. All
-              procedures carry risk. Whether any treatment is appropriate for you is a clinical
+              treatment carries risk. Whether any treatment is appropriate for you is a clinical
               decision taken at a consultation, after an examination, and it is sometimes no.
             </p>
             <p className="mt-4">

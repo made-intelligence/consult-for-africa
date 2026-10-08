@@ -15,9 +15,9 @@ Wednesday 21 October 2026
 
 ## The evening, in one paragraph
 
-AGELESS is a cocktail evening at the Capital Club, Lagos, for seventy guests. Mostly Lagos women and men over forty who already spend on how they look and feel, and who have never had the whole subject put in front of them by people who actually know. It is hosted by Medlyfe and it introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology. It is a conversation, not a sales floor, and the room will be able to tell the difference inside five minutes.
+AGELESS is a cocktail evening at the Capital Club, Lagos, for seventy guests. Mostly Lagos women and men over forty who already spend on how they look and feel, and who have never had the whole subject put in front of them by people who actually know. It is hosted by Medlyfe Wellness and Longevity Centre. It is a conversation, not a sales floor, and the room will be able to tell the difference inside five minutes.
 
-The argument running through the night is that how you feel and how you look are one appointment and not two. The panel takes the inner. The fireside turns outward.
+The argument running through the night is that how you feel and how you look are one appointment and not two. The address sets out the range, and the panel turns it into things people can act on.
 
 ## Where you come in
 
@@ -27,10 +27,9 @@ The argument running through the night is that how you feel and how you look are
 | 6:30 | Welcome from Dr Adedotun Ajelabi, and the opening film |
 | 6:35 | The range. Dr Ajelabi on what modern medicine can now do about how we age |
 | 6:50 | **The panel, 45 minutes.** Chaired by Dr Itunu Akinware |
-| 7:35 | The fireside with Dr Chinwe Kpaduwa, in conversation with Dr Debo Odulana |
-| 8:00 | What you can actually do |
-| 8:15 | Questions from the room |
-| 8:30 | Ageless After Hours. Close at 9:30 |
+| 7:35 | What you can actually do |
+| 7:50 | Questions from the room |
+| 8:05 | Ageless After Hours. Close at 9:30 |
 
 ## The panel
 
@@ -77,7 +76,7 @@ Capital Club, Lagos. Please be in the room by six, which gives half an hour befo
 
 Dress is cocktail. The room will be dressed.
 
-Microphones are handheld on the panel and lapel for the address and the fireside. There are no slides and no lectern. If you want a single image behind you, send it with your bio and we will see whether it earns its place.
+Microphones are handheld on the panel and lapel for the address. There are no slides and no lectern. If you want a single image behind you, send it with your bio and we will see whether it earns its place.
 
 You are welcome for the whole evening and we would rather you stayed for After Hours than left at half past eight. The conversations that matter to everyone in this room, including you, happen with a drink in hand after the programme ends.
 

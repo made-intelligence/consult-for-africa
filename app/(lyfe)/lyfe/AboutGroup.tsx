@@ -10,8 +10,10 @@ import { LYFE_ABOUT } from "@/lib/lyfe";
  */
 export default function AboutGroup({
   tone,
+  items = LYFE_ABOUT,
 }: {
   tone: "dark" | "light";
+  items?: { name: string; role: string; body: string }[];
 }) {
   const dark = tone === "dark";
   const ink = dark ? "#FFFFFF" : "#15161A";
@@ -32,8 +34,8 @@ export default function AboutGroup({
           Who stands behind this
         </p>
 
-        <div className="mt-9 grid gap-x-10 gap-y-10 md:grid-cols-3">
-          {LYFE_ABOUT.map((a) => (
+        <div className={`mt-9 grid gap-x-10 gap-y-10 ${items.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+          {items.map((a) => (
             <div key={a.name} className="border-t pt-6" style={{ borderColor: line }}>
               <p
                 className="text-[10px] font-semibold uppercase"
