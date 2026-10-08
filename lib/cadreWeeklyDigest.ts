@@ -4,6 +4,7 @@ import { nextCatalystEvent, type DfcCatalystEvent } from "@/lib/cadreHealth/dfcC
 
 /** She leaves in November, and the slot removes itself when she does. */
 const LYFE_REFERRALS_CLOSE = new Date("2026-11-03T00:00:00+01:00");
+const STOPPED_BY_DEBO = true;
 import { randomBytes } from "crypto";
 import type { CadreDigestAsk } from "@prisma/client";
 
@@ -899,6 +900,10 @@ function buildCatalyst(ctx: WeekContext): CadreDigestContent["catalyst"] {
  * is worse than one that never mentioned her.
  */
 function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
+  // Stopped 8 October 2026 at Debo's instruction: Dr Kpaduwa is no longer part
+  // of the AGELESS evening, so the digest stops offering her for referrals.
+  // Do not restore without his say-so.
+  if (STOPPED_BY_DEBO) return null;
   if (!ctx.referralsOpen) return null;
   return {
     headline: "A board certified plastic surgeon in Lagos, taking referrals until early November",
