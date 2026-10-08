@@ -6,6 +6,7 @@ import {
   LYFE_EVENT_TAKEAWAYS,
   LYFE_PANEL,
   LYFE_PHONE_DISPLAY,
+  lyfeInviter,
   MEDLYFE_ABOUT,
   MEDLYFE_NAME,
   MEDLYFE_BRAND as MB,
@@ -30,6 +31,20 @@ export const metadata: Metadata = {
     siteName: MEDLYFE_NAME,
     title: `Medlyfe presents Ageless: ${LYFE_EVENT.proposition}`,
     description: DESCRIPTION,
+    images: [
+      {
+        url: "/medlyfe-og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Medlyfe presents Ageless",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Medlyfe presents Ageless: ${LYFE_EVENT.proposition}`,
+    description: DESCRIPTION,
+    images: ["/medlyfe-og.jpg"],
   },
 };
 
@@ -74,14 +89,18 @@ export default async function LyfePage({
     utm_source?: string;
     utm_medium?: string;
     utm_campaign?: string;
+    i?: string;
     go?: string;
   }>;
 }) {
   const sp = await searchParams;
+  // Every inviter sends their own link, so the key on the URL is worth more
+  // than a utm_source somebody pasted. It wins when both are present.
+  const inviter = lyfeInviter(sp.i);
   const utm = {
-    source: sp.utm_source?.slice(0, 100) ?? null,
-    medium: sp.utm_medium?.slice(0, 100) ?? null,
-    campaign: sp.utm_campaign?.slice(0, 100) ?? null,
+    source: inviter?.key ?? sp.utm_source?.slice(0, 100) ?? null,
+    medium: inviter ? "invite" : (sp.utm_medium?.slice(0, 100) ?? null),
+    campaign: inviter ? "ageless" : (sp.utm_campaign?.slice(0, 100) ?? null),
   };
   // One job.
   const go = "EVENT_RSVP" as const;
@@ -89,6 +108,7 @@ export default async function LyfePage({
   return (
     <div style={{ background: MB.green, color: MB.mist, fontFamily: sans }}>
       <LyfeNav on="event" />
+      {inviter?.credit ? <InvitedBy name={inviter.credit} /> : null}
       <Hero />
       <Evening />
       <Panel />
@@ -261,6 +281,23 @@ function SpeakerMontage({ priority = false }: { priority?: boolean }) {
           </figcaption>
         </figure>
       ))}
+    </div>
+  );
+}
+
+/**
+ * A personal link should say so. Someone who opens a page a colleague sent
+ * them is reading it as a recommendation, and the line costs one strip.
+ */
+function InvitedBy({ name }: { name: string }) {
+  return (
+    <div style={{ background: MB.lime }}>
+      <p
+        className="mx-auto w-full max-w-5xl px-5 py-2.5 text-[12.5px] md:px-8"
+        style={{ color: MB.greenDeep }}
+      >
+        Invited by <strong>{name}</strong>
+      </p>
     </div>
   );
 }
@@ -555,7 +592,47 @@ function WhatYouLeaveWith() {
           </div>
         ))}
       </div>
+
+      <ConsultLink />
     </Section>
+  );
+}
+
+/**
+ * The evening is not the only door.
+ *
+ * Seventy places against a list several people are working means most of the
+ * people who read this page will not be in the room, and the whole point of
+ * the panel is that somebody leaves wanting to act. Sending them away with
+ * nothing to do is the March failure in a different costume.
+ */
+function ConsultLink() {
+  return (
+    <div
+      className="mt-12 flex flex-col gap-5 p-7 md:flex-row md:items-center md:justify-between md:p-9"
+      style={{ background: MB.green, border: `1px solid ${MB.greenSoft}33` }}
+    >
+      <div>
+        <p
+          className="text-[10.5px] font-semibold uppercase"
+          style={{ color: MB.lime, letterSpacing: "0.18em" }}
+        >
+          Whether or not you are in the room
+        </p>
+        <p className="mt-3 max-w-xl text-[17px] leading-relaxed" style={{ color: MB.white }}>
+          Medlyfe consults on longevity and preventive health, metabolism,
+          weight and hormones, skin and aesthetic medicine, and surgery with Dr
+          Chinwe Kpaduwa.
+        </p>
+      </div>
+      <a
+        href="/lyfe/consult"
+        className="shrink-0 px-7 py-3.5 text-center text-[14.5px] font-semibold"
+        style={{ background: MB.lime, color: MB.greenDeep }}
+      >
+        Book a consultation
+      </a>
+    </div>
   );
 }
 
@@ -640,6 +717,15 @@ function Footer() {
             <p style={{ color: MB.mist }}>
               {LYFE_EVENT.host}. Consultations and treatment are provided at the clinic by
               clinicians registered with the Medical and Dental Council of Nigeria.
+            </p>
+            <p className="mt-4">
+              <a
+                href="/lyfe/consult"
+                className="font-semibold underline underline-offset-4"
+                style={{ color: MB.lime }}
+              >
+                Book a consultation
+              </a>
             </p>
           </div>
           <div>
