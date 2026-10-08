@@ -21,7 +21,8 @@ AS AT
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
 - Sally supports on Capital Club engagement.
-- Opeoluwa handles graphics, print, invitations, press and media.
+- CFA designs the programme, badges, backdrop and takeaway. Opeoluwa prints them.
+- Opeoluwa handles invitations, social, press and media.
 
 ## What we need from Medlyfe
 
@@ -35,7 +36,7 @@ AS AT
 
 Everything else is ours.
 
-## Graphics, print and invitations, with Opeoluwa
+## Design and print
 
 | Task | Owner | Due |
 | --- | --- | --- |
@@ -43,12 +44,14 @@ Everything else is ours.
 | Invitation copy, personalised per guest | CFA | Done |
 | Print invitations | Opeoluwa | 13 Oct |
 | Deliver and send invitations | Opeoluwa | 14 Oct |
-| Printed programme, content and sign off | Medlyfe with CFA | 14 Oct |
-| Printed programme, design and print | Opeoluwa | 15 Oct |
-| Name badges and place cards | Opeoluwa | 15 Oct |
-| Backdrop, step and repeat, signage | Opeoluwa | 14 Oct |
+| Printed programme, content and design | CFA | 14 Oct |
+| Print the programme | Opeoluwa | 16 Oct |
+| Name badges and place cards, design | CFA | 15 Oct |
+| Print badges and place cards | Opeoluwa | 17 Oct |
+| Backdrop, step and repeat, signage, design | CFA | 14 Oct |
 | Print signage and backdrop | Opeoluwa | 17 Oct |
-| Takeaway piece for every guest | Opeoluwa, copy from CFA | 15 Oct |
+| Takeaway piece for every guest, written and designed | CFA | 15 Oct |
+| Print the takeaway | Opeoluwa | 17 Oct |
 | Social countdown set, 8 posts | Opeoluwa | 10 Oct |
 
 ## Guest list and invitations
