@@ -174,8 +174,145 @@ export const LYFE_EVENT_ALLOCATION = [
   { bucket: "Medbury corporate network", places: 30 },
   { bucket: "Dr Itunu Akinware's guests", places: 10 },
   { bucket: "Physicians who might refer", places: 10 },
-  { bucket: "General invitations: micro-influencers and curated picks", places: 20 },
+  { bucket: "PBN", places: 10 },
+  { bucket: "General invitations: micro-influencers and curated picks", places: 10 },
 ] as const;
+
+/**
+ * Who is handing the evening out, and the link each of them sends.
+ *
+ * Seventy places against a list that several people are working means the
+ * only question that matters afterwards is whose names actually came. So
+ * every inviter gets their own link rather than the bare address, the key
+ * lands on the row in `utmSource`, and the queue can be read by inviter
+ * without anybody keeping a parallel spreadsheet.
+ *
+ * `places` is the allocation this person is drawing against, not a limit the
+ * page enforces. Applying is not a place: the team still chooses, and the
+ * invitation to confirm goes out afterwards.
+ *
+ * Keys are short because they are typed into WhatsApp by hand when a link
+ * gets mangled, and they are not secrets. Anybody can guess another key; the
+ * worst case is a name filed under the wrong inviter, which the coordinator
+ * can see and fix.
+ */
+export interface LyfeInviter {
+  /** The ?i= value. Short, lowercase, no punctuation. */
+  key: string;
+  /** How they are credited in the queue. */
+  name: string;
+  /** Shown to the guest: "Invited by ...". Null means no personal line. */
+  credit: string | null;
+  /** Which row of LYFE_EVENT_ALLOCATION they draw from. */
+  bucket: string;
+  /** The allocation they are working against. */
+  places: number;
+  /** Why they hold it, for the sheet of links. */
+  note?: string;
+}
+
+export const LYFE_INVITERS: LyfeInviter[] = [
+  {
+    key: "itunu",
+    name: "Dr Itunu Akinware",
+    credit: "Dr Itunu Akinware",
+    bucket: "Dr Itunu Akinware's guests",
+    places: 10,
+    note: "Host and chair. Her own guests.",
+  },
+  {
+    key: "yomi",
+    name: "Yomi",
+    credit: "Medbury Healthcare",
+    bucket: "Medbury corporate network",
+    places: 30,
+    note: "Holds the Medbury corporate contacts, which is the largest block.",
+  },
+  {
+    key: "pbn",
+    name: "PBN",
+    credit: null,
+    bucket: "PBN",
+    places: 10,
+    note: "Ten places given to PBN to fill.",
+  },
+  {
+    key: "sally",
+    name: "Sally",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 10,
+    note: "Promotion, and the Capital Club relationship.",
+  },
+  {
+    key: "ajelabi",
+    name: "Dr Adedotun Ajelabi",
+    credit: "Dr Adedotun Ajelabi",
+    bucket: "Physicians who might refer",
+    places: 10,
+    note: "Opens the evening. Her clinical contacts.",
+  },
+  {
+    key: "adenuga",
+    name: "Dr Timi Adenuga",
+    credit: "Dr Timi Adenuga",
+    bucket: "Physicians who might refer",
+    places: 10,
+    note: "Panel. GetSlim's referring network.",
+  },
+  {
+    key: "kpaduwa",
+    name: "Dr Chinwe Kpaduwa",
+    credit: "Dr Chinwe Kpaduwa",
+    bucket: "Physicians who might refer",
+    places: 10,
+    note: "Panel.",
+  },
+  {
+    key: "gbemi",
+    name: "Gbemi Giwa",
+    credit: "Gbemi Giwa",
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 10,
+    note: "Panel. Ninety five thousand across Instagram and TikTok.",
+  },
+  {
+    key: "joycee",
+    name: "Joycee Awosika",
+    credit: "Joycee Awosika",
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 10,
+    note: "Panel. The ORÍKÌ client list.",
+  },
+  {
+    key: "opeoluwa",
+    name: "Opeoluwa",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 10,
+    note: "Press and media.",
+  },
+  {
+    key: "cfa",
+    name: "Consult for Africa",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 10,
+    note: "The general link, and the one to use when nobody specific sent them.",
+  },
+];
+
+export function lyfeInviter(key: string | null | undefined): LyfeInviter | null {
+  if (!key) return null;
+  const k = key.trim().toLowerCase();
+  return LYFE_INVITERS.find((i) => i.key === k) ?? null;
+}
+
+/** The link an inviter sends. */
+export function lyfeInviteLink(key: string): string {
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.consultforafrica.com";
+  return `${base}/ageless?i=${encodeURIComponent(key)}`;
+}
 
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
@@ -346,9 +483,9 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
       "Ageing as a Black woman. Skin and aesthetic medicine, what the anti-ageing market is actually worth in a Black population, and where surgery does and does not belong",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
-    portrait: "/lyfe/chinwe-portrait.jpg",
-    portraitWidth: 682,
-    portraitHeight: 1024,
+    portrait: "/lyfe/chinwe-portrait-centred-800.jpg",
+    portraitWidth: 800,
+    portraitHeight: 1000,
   },
 ];
 
@@ -487,6 +624,66 @@ export const LYFE_CONSULT = {
 } as const;
 
 /** The days spelled out, for copy that needs them inline. */
+/**
+ * What a guest can actually book at Medlyfe.
+ *
+ * The page used to be one consultation with one surgeon. Medlyfe is a
+ * longevity centre and the evening sells its whole range, so somebody who
+ * leaves AGELESS wanting their bloods read should not land on a plastic
+ * surgery booking page.
+ *
+ * Only Dr Kpaduwa's carries a price, because it is the only one with a
+ * published fee, a live diary and payment behind it. The rest take an enquiry
+ * and the coordinator calls, which is honest: inventing a fee for a clinic's
+ * service is the same error as inventing a practice name. Add prices here as
+ * Medlyfe confirms them.
+ */
+export interface LyfeConsultOption {
+  key: "LONGEVITY" | "METABOLIC" | "SKIN" | "SURGERY";
+  name: string;
+  who: string;
+  body: string;
+  /** Null means the coordinator calls back rather than the page taking money. */
+  fee: string | null;
+  /** The one line under the price or the action. */
+  meta: string;
+}
+
+export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
+  {
+    key: "LONGEVITY",
+    name: "Longevity and preventive health",
+    who: "The Medlyfe clinical team, led by Dr Adedotun Ajelabi",
+    body: "Where you actually are, measured rather than guessed. Diagnostics, risk, and a plan for the next year. The starting point if you do not yet know what you are treating.",
+    fee: null,
+    meta: "Tell us what you are thinking about and a coordinator will call you.",
+  },
+  {
+    key: "METABOLIC",
+    name: "Metabolism, weight and hormones",
+    who: "Medlyfe, with referral where surgery is the question",
+    body: "Why the same diet stopped working, what the newer drugs do and do not do, and what happens when somebody stops. Including when the honest answer is that you do not need them.",
+    fee: null,
+    meta: "Tell us what you are thinking about and a coordinator will call you.",
+  },
+  {
+    key: "SKIN",
+    name: "Skin and aesthetic medicine",
+    who: "Registered clinicians, to protocols Dr Kpaduwa wrote and signs off",
+    body: "Skin, injectables and regenerative treatment. Most of what changes how you look sits here rather than in an operating theatre, and most people should start here.",
+    fee: null,
+    meta: "Tell us what you are thinking about and a coordinator will call you.",
+  },
+  {
+    key: "SURGERY",
+    name: "Plastic surgery, with Dr Chinwe Kpaduwa",
+    who: "Board certified by the American Board of Plastic Surgery, FACS",
+    body: "Half an hour with her, by video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you should be doing anything at all.",
+    fee: "₦150,000",
+    meta: "Put towards the total cost of your surgery if you go ahead.",
+  },
+];
+
 export const LYFE_CONSULT_SCHEDULE = `${LYFE_CONSULT.dayNames}, ${LYFE_CONSULT.hoursDisplay} ${LYFE_CONSULT.timezone}`;
 
 export interface ConsultSlot {

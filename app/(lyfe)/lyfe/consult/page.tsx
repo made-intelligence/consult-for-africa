@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   LYFE_BRAND as C,
   LYFE_CONSULT,
+  LYFE_CONSULT_OPTIONS,
   LYFE_CONSULT_FAQ,
   LYFE_CONSULT_PROOF,
   LYFE_CONSULT_SCHEDULE,
@@ -21,9 +22,9 @@ import AboutGroup from "../AboutGroup";
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
 
-const TITLE = "Consult a board certified plastic surgeon in Lagos";
+const TITLE = "Consultations at Medlyfe, Lagos";
 const DESCRIPTION =
-  "Half an hour with Dr Chinwe Kpaduwa, MD FACS, by video. Board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. ₦150,000, put towards the total if you go on to have surgery. Eight appointments a week.";
+  "Longevity and preventive health, metabolism and hormones, skin and aesthetic medicine, and plastic surgery with Dr Chinwe Kpaduwa, MD FACS, board certified by the American Board of Plastic Surgery. Lagos.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -156,24 +157,32 @@ export default async function ConsultPage({
               className="mt-6 text-[38px] leading-[1.04] md:text-[56px]"
               style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.025em" }}
             >
-              Half an hour with the surgeon herself.
+              Start with the right appointment.
             </h1>
 
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
-              {LYFE_CONSULT.blurb}
+              Medlyfe covers longevity and preventive health, metabolism, weight
+              and hormones, skin and aesthetic medicine, and surgery. Four
+              different conversations, and the one you need is often not the one
+              you came for. Tell us what you are thinking about and we will say
+              which it is.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a
-                href="#book"
+                href="#options"
                 className="px-8 py-4 text-[15px] font-semibold"
                 style={{ background: C.ink, color: C.ground }}
               >
-                Book for {LYFE_CONSULT.feeDisplay}
+                See the four
               </a>
-              <p className="text-[14px] leading-snug" style={{ color: C.muted }}>
-                {LYFE_CONSULT.feeNote}
-              </p>
+              <a
+                href="#book"
+                className="text-[15px] font-semibold underline underline-offset-4"
+                style={{ color: C.bronzeDeep }}
+              >
+                Book Dr Kpaduwa, {LYFE_CONSULT.feeDisplay}
+              </a>
             </div>
 
             <p className="mt-6 text-[14.5px]" style={{ color: C.bronzeDeep }}>
@@ -224,6 +233,78 @@ export default async function ConsultPage({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── what you can actually book ───────────────────────────────── */}
+      <section id="options" style={{ background: C.groundWarm }} className="px-6 py-16 md:px-10 md:py-20">
+        <div className="mx-auto w-full max-w-5xl">
+          <h2
+            className="text-[27px] leading-tight md:text-[34px]"
+            style={{ fontFamily: display, fontWeight: 600, color: C.ink }}
+          >
+            Four consultations.
+          </h2>
+          <p className="mt-3 max-w-2xl text-[16px] leading-relaxed" style={{ color: C.body }}>
+            Most people need the first or the third. Say what you are thinking
+            about and we will tell you which, including when the answer is that
+            you do not need an appointment at all.
+          </p>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {LYFE_CONSULT_OPTIONS.map((o) => {
+              const bookable = o.fee !== null;
+              return (
+                <div
+                  key={o.key}
+                  className="flex flex-col p-7"
+                  style={{
+                    background: C.ground,
+                    border: `1px solid ${bookable ? C.bronze : C.line}`,
+                  }}
+                >
+                  <h3 className="text-[19px] leading-snug" style={{ fontFamily: display, fontWeight: 600, color: C.ink }}>
+                    {o.name}
+                  </h3>
+                  <p className="mt-1.5 text-[13px] leading-snug" style={{ color: C.bronzeDeep }}>
+                    {o.who}
+                  </p>
+                  <p className="mt-4 flex-1 text-[15px] leading-relaxed" style={{ color: C.body }}>
+                    {o.body}
+                  </p>
+                  <div className="mt-6">
+                    {bookable ? (
+                      <>
+                        <a
+                          href="#book"
+                          className="inline-block px-6 py-3 text-[14.5px] font-semibold"
+                          style={{ background: C.ink, color: C.ground }}
+                        >
+                          Book for {o.fee}
+                        </a>
+                        <p className="mt-3 text-[13.5px] leading-snug" style={{ color: C.muted }}>
+                          {o.meta}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <a
+                          href="#book"
+                          className="inline-block px-6 py-3 text-[14.5px] font-semibold"
+                          style={{ background: "transparent", color: C.ink, border: `1px solid ${C.ink}` }}
+                        >
+                          Ask about this
+                        </a>
+                        <p className="mt-3 text-[13.5px] leading-snug" style={{ color: C.muted }}>
+                          {o.meta}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
