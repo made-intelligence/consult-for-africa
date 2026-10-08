@@ -16,7 +16,7 @@ AS AT
 ## In short
 
 - Thirteen days to the evening.
-- Seventy places. **Fifteen are held for Medbury corporates** and Yomi attends, so fifty four are ours to fill.
+- Seventy places. **Fifteen are held for Medbury corporates**, whose contacts come from Yomi. Yomi attends. Fifty four places are ours to fill.
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
@@ -34,7 +34,7 @@ AS AT
 | Medlyfe logo, vector or high resolution | 9 Oct | Every printed piece |
 | Names for the invited list | 10 Oct | Fifty four open places needs about 110 invited |
 | The guest takeaway, decided and produced | 20 Oct | Every guest leaves with it |
-| The 15 Medbury corporate names | 13 Oct | They hold 15 of the 70 and are not invited from our list |
+| The 15 Medbury corporate names, from Yomi | 11 Oct | They hold 15 of the 70 and are not invited from our list |
 
 Everything else is ours.
 
@@ -64,7 +64,9 @@ Everything else is ours.
 | Build the invited list to about 110 | CFA | 10 Oct |
 | Hold a place for Yomi | CFA | Done |
 | Hold 15 places for Medbury corporates | CFA | Done |
-| Medbury corporate names and invitations | Medlyfe with CFA | 13 Oct |
+| Medbury corporate names | Yomi | 11 Oct |
+| Invite the 15 Medbury corporates | CFA | 14 Oct |
+| Chase the Medbury fifteen to confirm | Yomi with CFA | 17 Oct |
 | Capital Club engagement: members list and a mention to members | CFA, supported by Sally | 10 Oct |
 | Send invitations | Opeoluwa | 14 Oct |
 | Chase unanswered invitations by phone | CFA | 17 Oct |
