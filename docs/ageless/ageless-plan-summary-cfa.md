@@ -27,7 +27,7 @@ Cutting from 130 to 70 helps more than it costs. Seventy is a room where people 
 
 ## What the evening has to do
 
-AGELESS is the platform and it is built to recur. The proposition is a new era of health, beauty and longevity. The panel is *The New Science of Ageing Well*. The fireside is *The Art of Looking Like Yourself*, with Dr Chinwe Kpaduwa. Keeping those four names apart is what lets edition two reuse everything but the panel.
+AGELESS is the platform and it is built to recur. The proposition is a new era of health, beauty and longevity. The panel is *The Ageless Blueprint*. There is no fireside. Keeping those names apart is what lets edition two reuse everything but the panel.
 
 Medlyfe hosts, in the footer. That is a regulatory position rather than a courtesy: Medlyfe is the licensed, bookable entity. No practice is introduced, because the practice name that was being used does not exist. Dr Kpaduwa is named as a clinician and sets the clinical standard. Every piece of copy already survives that distinction and it should hold on the night.
 
@@ -60,7 +60,7 @@ Six jobs. One is filled.
 
 | Job | State |
 | --- | --- |
-| The fireside subject | Dr Chinwe Kpaduwa. Filled |
+| The panel seat on skin and aesthetics | Dr Chinwe Kpaduwa. Filled |
 | Longevity and health optimisation | Four candidates. First call Dr Moyosore Makinde |
 | Metabolic health and hormones | Four candidates. First call Dr Afokoghene Isiavwe |
 | Performance and physical function | Four candidates. First call Ngozi Ojora |
@@ -96,7 +96,7 @@ Two people have just joined the team and are not named against anything above. T
 | --- | --- |
 | **The MedLYFE logo file** | Everything currently carries a rebuilt mark drawn from measured geometry off a flattened poster. It is close, it is not theirs. One file fixes every asset at once |
 | **RSVP name and direct line** | Invitations and the page carry a placeholder number. Nobody can reply to a placeholder |
-| **Dr Kpaduwa's MDCN position** | She can do the fireside as the founder who sets the standard. She cannot be held out as available to treat patients until registration is settled, and the exposure sits on the clinic, not on her |
+| **Dr Kpaduwa's MDCN position** | She can take a panel seat as a clinician speaking to her subject. She cannot be held out as available to treat patients until registration is settled, and the exposure sits on the clinic, not on her |
 | **Three CFA relationships on the panel list** | Dr Chito Nwana, Dr Uju Rapu and Iwosan each need a decision from Debo before anyone telephones them |
 | **The convening partner** | If GAIA or an equivalent is in, twelve seats fill themselves. If not, those twelve come off personal lists and the calling starts sooner |
 | **Two stage risks, both fixed by briefing the chair once** | HEFAMAA has scope of practice live in Lagos, so a panel drifting into who may inject is a regulatory moment. And a clinician praising a named treatment from a stage you host is closer to an advertisement than it feels, with the ARCON liability on the advertiser. Discuss categories, not the menu |

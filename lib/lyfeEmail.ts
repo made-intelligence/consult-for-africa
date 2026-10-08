@@ -531,6 +531,7 @@ export async function emailLyfeSpeakerConfirm({
   bio,
   questions,
   chairSet,
+  focus,
   deadline,
   fromName,
 }: {
@@ -540,6 +541,8 @@ export async function emailLyfeSpeakerConfirm({
   subject?: string;
   bio?: string;
   questions?: string[];
+  /** What to prepare to open with. Dr Akinware added this on her review. */
+  focus?: string;
   /** The chair is asking, not answering, so she gets the whole set by seat. */
   chairSet?: { name: string; subject?: string; questions?: string[] }[];
   deadline: string;
@@ -565,6 +568,16 @@ export async function emailLyfeSpeakerConfirm({
          .join("")}`
     : "";
 
+  // The single most useful thing in her review: not where the conversation
+  // goes, but where each speaker should start. It sits above the questions
+  // because it is what they have to prepare.
+  const focusBlock = focus
+    ? `<p style="margin:0 0 6px;font-weight:700;">${chairSet?.length ? "Chairing direction" : "What to prepare, two to three minutes"}</p>
+       <table cellpadding="0" cellspacing="0" style="margin:0 0 18px;width:100%;">
+         <tr><td style="background:${MEDLYFE_BRAND.limeSoft};border-left:3px solid ${MEDLYFE_BRAND.green};padding:14px 16px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.ink};">${esc(focus)}</td></tr>
+       </table>`
+    : "";
+
   const qBlock = questions?.length
     ? `<p style="margin:0 0 6px;font-weight:700;">What you will be asked</p>
        <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
@@ -578,8 +591,9 @@ export async function emailLyfeSpeakerConfirm({
      <p style="margin:0 0 14px;">Everything for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong>, ${esc(LYFE_EVENT.venueName)}. Please be in the room by 6:15pm. The programme runs ${esc(LYFE_EVENT.programme)} to 8:15pm, then drinks until ${esc(LYFE_EVENT.close)}.</p>
 
      <p style="margin:0 0 6px;font-weight:700;">Your part</p>
-     <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Debo Odulana, four seats, about eleven minutes each.</p>
+     <p style="margin:0 0 18px;">You are ${slot.startsWith("the ") ? "" : "on "}<strong>${esc(slot)}</strong>${subject && !/^(host|panel chair)/i.test(subject) ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Debo Odulana, four seats, about eleven minutes each.</p>
 
+     ${focusBlock}
      ${bioBlock}
      ${chairBlock}
      ${qBlock}

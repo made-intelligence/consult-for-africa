@@ -33,9 +33,9 @@ AS AT
 
 | Name | What it is |
 | --- | --- |
-| AGELESS | Medlyfe's platform, built to recur |
-| A New Era of Health, Beauty and Longevity | Medlyfe's proposition |
-| The New Science of Ageing Well | The panel |
+| AGELESS | MedLYFE's platform, built to recur |
+| A New Era of Health, Beauty and Longevity | MedLYFE's proposition |
+| The Ageless Blueprint | The panel |
 
 Three names, three jobs. Keeping them apart is what lets edition two reuse everything except the panel.
 
@@ -45,10 +45,9 @@ Three names, three jobs. Keeping them apart is what lets edition two reuse every
 | --- | --- |
 | 5:30 | Arrival |
 | 6:45 | Welcome and opening film |
-| 6:50 | The range. Dr Ajelabi, 10 minutes |
+| 6:50 | Can We Live to 100 and Still Live Well? Dr Ajelabi, 10 minutes |
 | 7:00 | The panel, 45 minutes |
-| 7:45 | What you can actually do |
-| 8:00 | Questions from the room |
+| 7:45 | Questions from the room |
 | 8:15 | After Hours. Close 9:30 |
 
 
@@ -58,16 +57,17 @@ Ninety minutes of programme. Arrival and After Hours are long on purpose, becaus
 
 | Role | Who |
 | --- | --- |
-| Opening address | Dr Adedotun Ajelabi, Clinical Lead, Medlyfe |
-| In the chair | Dr Itunu Akinware, Chief Executive, Medbury Healthcare Group |
-| Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, hormones, the new drugs |
-| Panel | Gbemi Giwa, African Fat Loss Method. Food and body composition |
-| Panel | Joycee Awosika, ORÍKÌ Group. Maintaining beauty and managing stress |
-| Panel | Dr Chinwe Kpaduwa, MD FACS. Ageing as a Black woman, aesthetics, and where surgery belongs |
+| Opening address | Dr Adedotun Ajelabi, Head of Medicals, MedLYFE |
+| Host | Dr Itunu Akinware, Chief Executive, Medbury Healthcare Group |
+| In the chair | Dr Debo Odulana, Founding Partner, Consult for Africa |
+| Panel | Dr Timi Adenuga, GetSlim. Weight, Metabolism and Longevity |
+| Panel | Gbemi Giwa, African Fat Loss Method. Lifestyle and Behaviour Change for Longevity |
+| Panel | Joycee Awosika, ORÍKÌ Group. Stress Management, Self Care and Longevity |
+| Panel | Dr Chinwe Kpaduwa, MD FACS. Aesthetics and Skin Ageing for Men and Women |
 
 - The panel is experiential, delivered by people with the credentials to be believed.
 - Every answer ends in something a guest can do that week.
-- Medlyfe opens the evening and chairs the panel. Both of the most authoritative positions on the stage are Medlyfe's.
+- MedLYFE opens the evening. Dr Akinware hosts and asked Dr Odulana to chair in her place.
 
 ## How guests get in
 

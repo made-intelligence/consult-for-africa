@@ -220,17 +220,31 @@ const HOST = LYFE_PANEL[0];
  * the drop on alternate columns is what stops it.
  */
 /**
- * Three across, two down, so the centre of the block is the top middle cell.
- * Dr Adenuga sits there by name rather than by his place in the running order,
- * which is what the panel list below the hero is for.
+ * Three across, two down, set by hand rather than by the running order.
+ *
+ * Two of the six are men and in panel order they land side by side, which
+ * reads as a block rather than a room. One to a row, both in the centre
+ * column, keeps the grid even and keeps Dr Adenuga in the middle of the top
+ * row where he was put.
+ *
+ * Anybody not named here falls in behind in panel order, so adding a seat
+ * does not break the grid, it just lands at the end.
  */
-const MONTAGE_CENTRE = "Dr Timi Adenuga";
+const MONTAGE_ORDER = [
+  "Dr Adedotun Ajelabi",
+  "Dr Timi Adenuga",
+  "Gbemi Giwa",
+  "Joycee Awosika",
+  "Dr Debo Odulana",
+  "Dr Chinwe Kpaduwa, MD FACS",
+];
 
 function montageOrder(seats: LyfePanelSeat[]) {
-  const centre = seats.findIndex((s) => s.name === MONTAGE_CENTRE);
-  if (centre < 0) return seats;
-  const rest = seats.filter((_, i) => i !== centre);
-  return [rest[0], seats[centre], ...rest.slice(1)];
+  const rank = (s: LyfePanelSeat) => {
+    const i = MONTAGE_ORDER.indexOf(s.name ?? "");
+    return i < 0 ? MONTAGE_ORDER.length : i;
+  };
+  return [...seats].sort((a, b) => rank(a) - rank(b));
 }
 
 function SpeakerMontage({ priority = false }: { priority?: boolean }) {
