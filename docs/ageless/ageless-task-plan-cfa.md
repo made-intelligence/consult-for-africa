@@ -20,7 +20,7 @@ AS AT
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
-- Sally supports on Capital Club engagement.
+- Sally supports on Capital Club engagement, and owns Joycee Awosika with Dr Akinware.
 - CFA designs the programme, badges, backdrop and takeaway. Opeoluwa prints them.
 - Opeoluwa handles invitations, social, press and media.
 
@@ -76,7 +76,8 @@ Everything else is ours.
 | Speaker pack to all seven | CFA | 9 Oct |
 | Collect bios and photographs | CFA | 10 Oct |
 | Fill the fifth seat, andropause and men's health | CFA, Debo | 13 Oct |
-| Confirm Joycee Awosika and Dr Adenuga | CFA | 10 Oct |
+| Confirm Joycee Awosika, and get her bio and photograph | Sally with Dr Akinware | 10 Oct |
+| Confirm Dr Timi Adenuga | CFA | 10 Oct |
 | Brief the chair | CFA, Debo | 17 Oct |
 | Run of show to all speakers | CFA | 19 Oct |
 

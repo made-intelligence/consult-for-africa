@@ -75,7 +75,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     org: "The ORÍKÌ Group",
     slot: "the panel, on maintaining beauty and managing stress",
     need: ["confirmation", "bio", "photo"],
-    notes: "Spelling is Joycee with two e's on her own properties.",
+    notes: "Spelling is Joycee with two e's on her own properties. Sally and Dr Akinware own confirming her and getting the bio and photograph.",
   },
   {
     name: "Dr Folake Kofo-Idowu",
