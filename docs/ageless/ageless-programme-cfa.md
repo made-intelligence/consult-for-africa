@@ -60,10 +60,10 @@ Ninety minutes of programme. Arrival and After Hours are long on purpose, becaus
 | --- | --- |
 | Opening address | Dr Adedotun Ajelabi, Clinical Lead, Medlyfe |
 | In the chair | Dr Itunu Akinware, Chief Executive, Medbury Healthcare Group |
-| Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
+| Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, hormones, the new drugs |
 | Panel | Gbemi Giwa, African Fat Loss Method. Food and body composition |
 | Panel | Joycee Awosika, ORÍKÌ Group. Maintaining beauty and managing stress |
-| Panel | Dr Chinwe Kpaduwa, MD FACS. Aesthetics, and hormones and the body |
+| Panel | Dr Chinwe Kpaduwa, MD FACS. Ageing as a Black woman, aesthetics, and where surgery belongs |
 
 - The panel is experiential, delivered by people with the credentials to be believed.
 - Every answer ends in something a guest can do that week.

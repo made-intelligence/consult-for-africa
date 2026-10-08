@@ -48,10 +48,10 @@ A few places are kept for clinicians.
 | --- | --- |
 | Dr Adedotun Ajelabi | Clinical Lead, Medlyfe. Opens on what medicine can now do about ageing |
 | Dr Itunu Akinware | Chief Executive, Medbury Healthcare Group. Chairs the panel |
-| Dr Timi Adenuga | Lead Bariatric and Laparoscopic Surgeon, GetSlim. Metabolism, weight, the new drugs |
+| Dr Timi Adenuga | Lead Bariatric and Laparoscopic Surgeon, GetSlim. Metabolism, weight, hormones, the new drugs |
 | Gbemi Giwa | Founder, African Fat Loss Method. Food and body composition |
 | Joycee Awosika | Founder and Chief Executive, ORÍKÌ Group. Maintaining beauty and managing stress |
-| Dr Chinwe Kpaduwa, MD FACS | Plastic surgeon, US board certified. Aesthetics, and hormones and the body |
+| Dr Chinwe Kpaduwa, MD FACS | Plastic surgeon, US board certified. Ageing as a Black woman, aesthetics, and where surgery belongs |
 
 ## The faces
 

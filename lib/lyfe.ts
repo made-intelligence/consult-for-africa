@@ -330,7 +330,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   {
     seat: "The panel, on the inner",
     subject:
-      "Aesthetics, and the art of looking like yourself. Hormones and the body as we age, and where surgery does and does not belong",
+      "Ageing as a Black woman. Skin and aesthetic medicine, what the anti-ageing market is actually worth in a Black population, and where surgery does and does not belong",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
     portrait: "/lyfe/chinwe-portrait.jpg",

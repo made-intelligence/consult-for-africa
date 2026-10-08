@@ -139,18 +139,20 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     firstName: "Dr Kpaduwa",
     email: null,
     org: "Lyfe Plastics & Dermatology",
-    slot: "the panel, on aesthetics and the body",
-    subject: "Aesthetics, hormones and the body, and where surgery belongs",
+    slot: "the panel, on ageing in Black skin, aesthetics and plastic surgery",
+    subject:
+      "Ageing as a Black woman. Skin, aesthetics, and what anti-ageing marketing is worth in a Black population",
     questions: [
-      "What does looking like yourself mean in practice, and what does it rule out?",
-      "What do you refuse to do?",
-      "Hormones and the body. What do you see in patients that is hormonal rather than surgical?",
+      "Ageing as a Black woman. What actually happens to Black skin over time, and how is it different?",
+      "Most anti-ageing marketing is built on white skin. What of it applies here, and what does not?",
+      "Which procedures are worth doing in a Black population, and which carry more risk on our skin?",
+      "Hormonal change shows up in skin. What do you see, and what helps?",
+      "What does looking like yourself mean in practice, and what do you refuse to do?",
       "Travelling abroad for surgery. What goes wrong, and when?",
-      "What do you wish people asked before surgery?",
     ],
     need: [],
     bio: "Dr Chinwe Kpaduwa is a plastic surgeon, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained, with a craniofacial fellowship at Nationwide Children's Hospital.",
-    notes: "Reached directly by Debo. Bio and portrait on file.",
+    notes: "Reached directly by Debo. Bio and portrait on file. Her ground is ageing in Black skin, aesthetic medicine and plastic surgery, and what the anti-ageing market is actually worth to a Black population. Hormones and metabolism belong to Dr Adenuga; she takes hormones no further than what they do to skin.",
   },
 ];
 

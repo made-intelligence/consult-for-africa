@@ -11,6 +11,7 @@ import {
   MEDLYFE_BRAND as MB,
   whatsappLink,
 } from "@/lib/lyfe";
+import type { LyfePanelSeat } from "@/lib/lyfe";
 import EnquiryForm from "@/app/(lyfe)/lyfe/EnquiryForm";
 import LyfeNav from "@/app/(lyfe)/lyfe/LyfeNav";
 import AboutGroup from "@/app/(lyfe)/lyfe/AboutGroup";
@@ -198,8 +199,24 @@ const HOST = LYFE_PANEL[0];
  * Staggered on purpose: a flat grid of headshots reads as a conference, and
  * the drop on alternate columns is what stops it.
  */
+/**
+ * Three across, two down, so the centre of the block is the top middle cell.
+ * Dr Adenuga sits there by name rather than by his place in the running order,
+ * which is what the panel list below the hero is for.
+ */
+const MONTAGE_CENTRE = "Dr Timi Adenuga";
+
+function montageOrder(seats: LyfePanelSeat[]) {
+  const centre = seats.findIndex((s) => s.name === MONTAGE_CENTRE);
+  if (centre < 0) return seats;
+  const rest = seats.filter((_, i) => i !== centre);
+  return [rest[0], seats[centre], ...rest.slice(1)];
+}
+
 function SpeakerMontage({ priority = false }: { priority?: boolean }) {
-  const faces = LYFE_PANEL.filter((s) => s.portrait && s.name).slice(0, 6);
+  const faces = montageOrder(
+    LYFE_PANEL.filter((s) => s.portrait && s.name).slice(0, 6),
+  );
   if (!faces.length) return null;
 
   return (

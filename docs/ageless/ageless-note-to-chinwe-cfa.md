@@ -36,8 +36,9 @@ Wednesday 21 October 2026
 ## Your part
 
 - Panel, 7:00 to 7:45. Four seats, chaired by Dr Akinware, eleven minutes each.
-- Your subjects: aesthetics and looking like yourself, hormones and the body, and where surgery belongs.
-- You and Dr Adenuga share hormones. It is what the room most wants and nobody else on the panel can answer it.
+- Your subjects: ageing as a Black woman, what the anti-ageing market is actually worth in a Black population, aesthetic medicine, and where surgery belongs.
+- You are the only person on the stage who can hold that. US board certified, California trained, practising in Lagos.
+- Hormones and metabolism go to Dr Adenuga. You take hormones only as far as what they do to skin.
 - No slides, no lectern, handheld microphone.
 - Please stay for After Hours, 8:15 to 9:30. That is where people ask what they would not ask from a seat.
 - Everyone who attends is contacted within 48 hours. Your booking page is live, and clinic visits in Lekki and VI are being arranged.

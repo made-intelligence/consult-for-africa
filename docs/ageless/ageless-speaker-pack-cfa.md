@@ -19,7 +19,7 @@ Wednesday 21 October 2026
 - **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
 - Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
-- **Dr Adenuga and Dr Kpaduwa are both asked to cover hormones and the body.** It is the subject the room most wants and the two surgeons share it.
+- **Dr Adenuga holds hormones and metabolism.** Dr Kpaduwa holds ageing in Black skin, aesthetics and surgery, and goes no further on hormones than what they do to skin.
 - No slides, no lectern. Cocktail dress.
 
 ## What we need from you
@@ -51,7 +51,7 @@ Cover:
 
 **Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
 
-### Dr Timi Adenuga, on metabolism, weight and the new drugs
+### Dr Timi Adenuga, on metabolism, weight, hormones and the new drugs
 
 - Why does the same diet stop working at 45?
 - The weight loss drugs. Who are they for, who should not take them, what is the honest result?
@@ -75,13 +75,14 @@ Cover:
 - Stress. What does it do to how people look, and what do you see in your clients?
 - What is the cheapest thing that works, that nobody will sell them?
 
-### Dr Chinwe Kpaduwa, on aesthetics and the body
+### Dr Chinwe Kpaduwa, on ageing in Black skin, aesthetics and plastic surgery
 
-- What does "look like yourself" mean in practice, and what does it rule out?
-- What do you refuse to do?
-- Hormones and the body. What do you see in patients that is hormonal rather than surgical?
+- Ageing as a Black woman. What actually happens to Black skin over time, and how is it different?
+- Most anti-ageing marketing is built on white skin. What of it applies here, and what does not?
+- Which procedures are worth doing in a Black population, and which carry more risk on our skin?
+- Hormonal change shows up in skin. What do you see, and what helps?
+- What does looking like yourself mean in practice, and what do you refuse to do?
 - Travelling abroad for surgery. What goes wrong, and when?
-- What do you wish people asked before surgery?
 
 ## The chair
 
