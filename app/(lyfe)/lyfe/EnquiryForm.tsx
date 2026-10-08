@@ -208,7 +208,7 @@ export default function EnquiryForm({
         </h3>
         <p className="mt-3 leading-relaxed" style={{ color: C.body }}>
           {done === "EVENT_RSVP"
-            ? `Your interest is registered. The room holds ${LYFE_EVENT.places} and invitations go out from this list, so you will hear from us either way before ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
+            ? `Thank you. We have you down and we will write back before ${LYFE_EVENT.date} with a link of your own. Keep an eye on your email, including the junk folder.`
             : "A coordinator will call you within one working day to arrange the time and tell you what it costs. Nothing has been charged. If you would rather not wait for the phone to ring, message us and we will pick it up straight away."}
         </p>
         <a
