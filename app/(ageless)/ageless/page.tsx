@@ -18,31 +18,31 @@ import LyfeNav from "@/app/(lyfe)/lyfe/LyfeNav";
 import AboutGroup from "@/app/(lyfe)/lyfe/AboutGroup";
 import StickyRsvp from "@/app/(lyfe)/lyfe/StickyRsvp";
 
-const DESCRIPTION = `Medlyfe presents Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}, on how modern science is changing the way we look, feel, perform and live as we age.`;
+const DESCRIPTION = `MedLYFE presents Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ${LYFE_EVENT.standfirst}`;
 
 // Absolute, so the tab and the link preview say Medlyfe rather than inheriting
 // the aesthetics template from the layout.
 export const metadata: Metadata = {
-  title: { absolute: "Medlyfe presents Ageless" },
+  title: { absolute: "MedLYFE presents Ageless" },
   description: DESCRIPTION,
   openGraph: {
     type: "website",
     locale: "en_NG",
     siteName: MEDLYFE_NAME,
-    title: `Medlyfe presents Ageless: ${LYFE_EVENT.proposition}`,
+    title: `MedLYFE presents Ageless: ${LYFE_EVENT.proposition}`,
     description: DESCRIPTION,
     images: [
       {
         url: "/medlyfe-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Medlyfe presents Ageless",
+        alt: "MedLYFE presents Ageless",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Medlyfe presents Ageless: ${LYFE_EVENT.proposition}`,
+    title: `MedLYFE presents Ageless: ${LYFE_EVENT.proposition}`,
     description: DESCRIPTION,
     images: ["/medlyfe-og.jpg"],
   },
@@ -507,9 +507,7 @@ function Panel() {
           {LYFE_EVENT.panelTitle}
         </h2>
         <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-          {LYFE_EVENT.panelStandfirst} The evening opens on the range of what is now possible,
-          and the panel takes it from there, with every answer ending in something you can act
-          on.
+          {LYFE_EVENT.panelStandfirst}
         </p>
       </div>
 

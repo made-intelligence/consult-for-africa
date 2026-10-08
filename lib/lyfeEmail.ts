@@ -578,7 +578,7 @@ export async function emailLyfeSpeakerConfirm({
      <p style="margin:0 0 14px;">Everything for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong>, ${esc(LYFE_EVENT.venueName)}. Please be in the room by 6:15pm. The programme runs ${esc(LYFE_EVENT.programme)} to 8:15pm, then drinks until ${esc(LYFE_EVENT.close)}.</p>
 
      <p style="margin:0 0 6px;font-weight:700;">Your part</p>
-     <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Itunu Akinware, four seats, about eleven minutes each.</p>
+     <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Debo Odulana, four seats, about eleven minutes each.</p>
 
      ${bioBlock}
      ${chairBlock}
