@@ -19,7 +19,7 @@ AGELESS is a cocktail evening at the Capital Club, Lagos, on Wednesday 21 Octobe
 
 Medlyfe hosts. It puts Medlyfe in front of a Lagos audience already spending on how they look and feel, through a conversation about ageing rather than a pitch for surgery. Her window in the country sets the date. The evening is built to run again, and this edition carries the format, identity, film library and guest list that later editions inherit.
 
-Four names do four separate jobs, and they are not interchangeable. AGELESS is the platform, built to recur. A New Era of Health, Beauty and Longevity is the proposition for this edition. The New Science of Ageing Well is the panel, and The Art of Looking Like Yourself is Dr Kpaduwa's fireside. The panel carries a standfirst of its own: what changes in your body, brain and skin after 40, and what you can actually do about it.
+Three names do three separate jobs, and they are not interchangeable. AGELESS is the platform, built to recur. A New Era of Health, Beauty and Longevity is the proposition for this edition. The Ageless Blueprint is the panel, and it carries a standfirst of its own: how to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.
 
 ## The running order
 
@@ -27,11 +27,9 @@ Four names do four separate jobs, and they are not interchangeable. AGELESS is t
 | --- | --- |
 | 5:30 | Arrival |
 | 6:45 | Welcome from Dr Adedotun Ajelabi, and the opening film |
-| 6:50 | The range. What modern medicine can now do about how we age |
-| 7:00 | The panel, The New Science of Ageing Well. Thirty five minutes |
-| 7:35 | The fireside, The Art of Looking Like Yourself |
-| 7:55 | What you can actually do |
-| 8:05 | Questions from the room |
+| 6:50 | Can We Live to 100 and Still Live Well? Dr Ajelabi |
+| 7:00 | The panel, The Ageless Blueprint. Forty five minutes |
+| 7:45 | Questions from the room |
 | 8:15 | Ageless After Hours. Close at 9:30 |
 
 Ninety minutes of programme. Arrival and After Hours are both long on purpose, because that is where guests talk to the clinicians.
@@ -41,7 +39,8 @@ Ninety minutes of programme. Arrival and After Hours are both long on purpose, b
 | Role | Who, and on what |
 | --- | --- |
 | Opening address | Dr Adedotun Ajelabi, Clinical Lead, Medlyfe. The range, everyday to surgical |
-| In the chair | Dr Itunu Akinware |
+| Host | Dr Itunu Akinware |
+| In the chair | Dr Debo Odulana |
 | Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
 | Panel | Gbemi Giwa, the African Fat Loss Method. Food and body composition |
 | Panel | Joycee Awosika, the ORÍKÌ Group. Vitality and energy |

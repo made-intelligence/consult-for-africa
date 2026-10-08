@@ -59,6 +59,8 @@ async function main() {
         bio: s.bio,
         questions: s.questions,
         chairSet: s.name === CHAIR ? panelSet() : undefined,
+      focus: s.focus,
+        focus: s.focus,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });
@@ -79,6 +81,8 @@ async function main() {
         bio: s.bio,
         questions: s.questions,
         chairSet: s.name === CHAIR ? panelSet() : undefined,
+      focus: s.focus,
+        focus: s.focus,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });
@@ -103,6 +107,8 @@ async function main() {
         bio: s.bio,
         questions: s.questions,
         chairSet: s.name === CHAIR ? panelSet() : undefined,
+      focus: s.focus,
+        focus: s.focus,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });
