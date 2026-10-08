@@ -64,7 +64,7 @@ Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
 Dr Itunu Akinware|
 ::
 
-Download at consultforafrica.com/lyfe/ plus the file name: adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg, joycee-portrait.jpg, chinwe-portrait.jpg.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg.
+Download at consultforafrica.com/lyfe/ plus the file name: adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg, joycee-portrait.jpg, chinwe-portrait.jpg.
 
 Use only these. Do not take pictures from Instagram for printed or paid work. We do not hold the licence.
 
