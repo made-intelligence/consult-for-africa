@@ -4,23 +4,23 @@
 
 Prepared by Dr Debo Odulana, Founding Partner, Consult for Africa
 For Dr Chito Nwana and the Arabella Women's Health leadership
-Issued 29 September 2026  /  On site from Friday 2 October 2026
+Issued 8 October 2026  /  Audit under way, written diagnostic by the end of November
 
 ---
 
 ## A note before the list
 
-Dr Chito, thank you for confirming the engagement. We start with you on Friday and I want the first week to be worth something to you rather than a week of us finding our way around, so this list is what we need in order to arrive already working.
+Dr Chito, thank you again for getting this started. What follows is everything we need for the audit, with the eight items that matter most at the front.
 
-You said the gap has never been strategy, it has been execution, and I agreed with you in writing. That agreement is what shapes this document. We are not coming to write you a view of the Abuja women's health market. We are coming to establish what Arabella actually earns today, where the money and the patients leak out between the first enquiry and the bank account, and whether the operation can carry the premium promise the brand is about to make. Everything below serves one of those three questions.
+We have agreed to do the audit first and on its own. The marketing, the payer transition, the pharmacy supply work and the rest of what we discussed in the proposals all come after it, and what this finds will decide their order and their shape. So this list asks only what the audit needs. Where a question touches one of those later pieces, it is because the answer tells us something about how Arabella runs today.
 
-I want to say three things plainly up front.
+You said the gap has never been strategy, it has been execution, and I agreed with you in writing. We are not here to write a view of the Abuja women's health market. We want to establish what Arabella actually earns today, where the money and the patients leak out between the first enquiry and the bank account, and whether the operation can carry the premium promise the brand is about to make.
 
-Nothing in this list is a test. Where a record does not exist, tell us it does not exist. The absence is itself a finding and it is almost always a more useful one than a tidy file would have been, because it tells us where the business is running on memory rather than on a system. We would rather see the real spreadsheet, the WhatsApp group where bookings get confirmed and the notebook at the front desk than a version assembled for our benefit. Assembling it costs your team a week and tells us nothing about how Arabella runs on an ordinary Tuesday.
+Nothing in this list is a test. Where a record does not exist, tell us so. That absence tells us where the business runs on memory rather than on a system, which is usually more useful than a tidy file. We would rather see the real spreadsheet, the WhatsApp group where bookings get confirmed and the notebook at the front desk than anything assembled for our benefit.
 
-The second is about the transition, and it is the thing I most want to look at carefully. Arabella is a new legal entity with its own RC number and Tabitha is the business it succeeds. That succession is being asked to carry a great deal of weight all at once: the HMO panels are to treat Arabella as the continuation of Tabitha for tariff purposes, the patients are to meet Arabella as something new and more premium, and the reactivation of the existing patient base depends on the new company being able to contact the old company's patients lawfully and without it feeling like a cold call. Those three claims need to rest on one consistent set of documents. Section A exists to find out whether they do. If they do not, we would all rather know that in week one than in month four when an HMO medical director asks.
+I do want to look carefully at the succession from Tabitha. Arabella is a new company with its own RC number, and a lot now rests on that change at once: the HMO panels, the patients' sense of who is treating them, and whether the new company may lawfully contact the old company's patients. Section A is there to see whether one consistent set of documents supports all of that. Better we find a gap now than have an HMO medical director find it later.
 
-The third is confidentiality. Your numbers, your case records, your tariffs and your staff's answers do not leave Consult for Africa. They are not shared with any other client of ours, they are not shared with any hospital or HMO except in the specific documents you approve and sign, and nothing is disclosed to any third party unless you tell us in writing.
+Your numbers, case records, tariffs and your staff's answers stay with Consult for Africa. They are not shared with any other client of ours or with any third party unless you tell us in writing.
 
 Warm regards,
 Dr Debo Odulana
@@ -29,28 +29,32 @@ Dr Debo Odulana
 
 ## How to send it
 
-Please nominate one point of contact who can chase the rest of the team. Tolu is the obvious choice if that works for her, and it helps us if requests go through one person rather than through you.
+Please nominate one point of contact who can chase the rest of the team. Tolu is the obvious choice if that suits, and it helps us if requests go through one person rather than through you.
 
 **Everything for this audit lives on one private page: consultforafrica.com/ArabellaProject.** It carries this document, an uploader that takes files straight from a phone or a laptop and tags them to the section they answer, and the four short surveys. Send things as you find them rather than waiting until you have everything, and come back to it as often as you like. The page is not listed anywhere and is not indexed. If you would rather use a shared folder in Google Drive or OneDrive, that is equally fine: make one with a sub-folder per lettered section below and give us access to it, so that nothing is lost in a thread.
 
 Exports from a system beat typed summaries every time. A raw CSV or Excel export from the billing software, the accounting package or the appointment book is worth more to us than a neat table someone had to retype, and it carries no transcription error. Photographs of paper registers are fine and often better than nothing. Read access to a system, even for one week, is better than any export at all.
 
-Where something is commercially or personally sensitive, mark it and send it anyway, because it is handled under the confidentiality above. Where a question is easier answered in conversation than in writing, write "discuss" against it and we will cover it on site.
+Where something is commercially or personally sensitive, mark it and send it anyway, because it is handled under the confidentiality above.
+
+Patient records are the exception. Please do not upload anything that identifies a patient by name, phone number or address, including the patient database itself. For the analysis we need local identifiers, not names, and we will look at the full database with you on site, on your own machine. Before any identifiable patient data leaves Arabella we will put a short data processing agreement in front of you, because the Nigeria Data Protection Act makes Arabella responsible for whoever it shares patient data with.
+
+Where a question is easier answered in conversation than in writing, write "discuss" against it and we will cover it on site.
 
 ---
 
-## Before Friday: the eight that matter most
+## The eight that matter most
 
-These eight unlock everything else and they are what we will be working from while we are with you. If the week runs away, send these and nothing else.
+These eight unlock everything else. If time is short, send these first and let the rest follow.
 
 | # | What we need | Why it is first |
 |---|---|---|
-| 1 | Arabella's certificate of incorporation and RC number, and the CAC status report | Nothing in the payer workstream can begin without it, and every introduction letter quotes it |
-| 2 | The list of Tabitha's HMO panels, with tariff schedules and the contact name at each | It is the single most valuable asset in the transition and the hardest to rebuild if it is lost |
-| 3 | The revenue record, monthly, last 12 months, split by service line and by payer | This becomes the agreed baseline, and the baseline is the number every later judgement is measured against |
-| 4 | Bank statements for every business account, last 6 months | The only unarguable record of what actually came in, as opposed to what was invoiced |
+| 1 | Arabella's certificate of incorporation and RC number, and the CAC status report | Every finding about the succession from Tabitha is checked against it |
+| 2 | The list of Tabitha's HMO panels, with tariff schedules and the contact name at each | The panels are the most valuable thing the succession has to carry, and the hardest to rebuild if they are lost |
+| 3 | The revenue record, monthly, last 12 months, split by service line and by payer | This becomes the baseline, the number every later judgement is measured against |
+| 4 | Bank statements for every business account, last 12 months | The only unarguable record of what actually came in, as opposed to what was invoiced |
 | 5 | The current price list and package architecture: maternity, gynaecology surgery, fertility | We cannot see yield or leakage without knowing the list |
-| 6 | The patient database export, in whatever form it exists | The reactivation case rests on it, and its quality is unknown until we open it |
+| 6 | A description of the patient database: where it is held, how many records, and which fields it carries. Not the records themselves | Its quality decides what the list is worth, and we will open it with you on site |
 | 7 | Full staff list with role, employment type, days worked per week and reporting line | Establishment against service is where specialist centres quietly fail |
 | 8 | Whatever facility registration and licences are held, including for the fertility service | Category registered against service delivered is a live exposure, and it is worse in a new entity |
 
@@ -161,7 +165,9 @@ This is the most important dataset in the audit. One row per patient episode, la
 
 ## H. The patient database and the right to contact it
 
-- The full export of the existing patient database, with every field it holds
+Please answer this section in writing and do not upload the database itself. We will go through it with you on site.
+
+- The list of fields the database holds, with a screenshot of one record with the personal details covered
 - How it was built, what system it sits in, when it was last cleaned, and who has access to it today
 - How many records carry a working phone number, how many carry an email, and how many carry a usable clinical history
 - **On what basis each patient's contact details were collected, and what they were told they would be used for.** If a consent or privacy notice was ever signed or displayed, we need to see it
@@ -209,7 +215,7 @@ This is the most important dataset in the audit. One row per patient episode, la
 
 ## L. Technology, records and information security
 
-This section supports the technology and records review, which runs in the first week and is delivered as a written report with a prioritised roadmap.
+This section supports the technology and records review, which is delivered alongside the diagnostic as a written report with a prioritised roadmap.
 
 - Every system in use, with its name, what it is used for, who the vendor is and what is paid for it: clinical records, billing, accounting, pharmacy, payroll, point of sale, appointments, messaging
 - Read access for the review, or an administrator walkthrough of each
@@ -225,32 +231,30 @@ This section supports the technology and records review, which runs in the first
 - Any prior incident: a lost device, a compromised account, a ransomware demand, or records that went missing
 - Google Business Profile, Google Ads and Meta Business accounts: who owns them, who has admin, and what has been spent
 
-## M. Brand, marketing and what has already been tried
+## M. Marketing, referrals and what has already been tried
 
-- Every brand asset held for both names: logo files, colour and type specifications, photography, and who owns the copyright
-- The signage, print and stationery currently in use, and how much of it still carries the old name
-- All social media accounts for both entities, with follower counts and admin access
-- **HERcast:** episode list, publishing cadence, listener numbers by platform, where it is hosted, who edits it, and any sponsorship or commercial arrangement
+- How much of the signage, print and stationery in use still carries the old name
+- The social media accounts for both entities, with follower counts, and which entity owns each
+- **HERcast:** listener numbers by platform, and any sponsorship or commercial arrangement
 - Everything spent on marketing in the last 12 months, by channel, and whatever is known about what it produced
 - Any agency, freelancer, photographer or media contract, current or lapsed, and what is owed
-- Any press coverage, award, speaking appearance or media list already held
 - Referral sources as they are today: which GPs, physiotherapists, diagnostic centres or individuals send patients here, how many each sent in 12 months, and whether anyone tracks it
 - **Any referrer who has stopped**, if that is known, and what is understood about why
 - What the enquiry volume looks like: how many people ask about a service each month, through which channel, and how many convert
 
 ---
 
-## What the first two weeks look like from your side
+## How the audit runs from here
 
 So that your team knows what is coming and nobody is surprised by a request.
 
-| When | What happens | What we need from the team |
+| Stage | What happens | What we need from the team |
 |---|---|---|
-| Friday 2 October | We arrive. Walkthrough of the whole premises with you, then with the front desk, theatre, ward, laboratory, pharmacy and the fertility unit. The technology and records review opens | An hour of your time, and permission for us to talk to anyone |
-| Week 1 | Records and systems reviewed. Revenue reconstructed from the ledger and traced to the bank. The baseline agreed with you. Payer file assembled and the introduction letter drafted for your signature | The eight priority items, and the shared folder populated |
-| Week 1 | Short conversations with staff, individually and confidentially. Nothing anyone says is attributed to them | Twenty minutes per person, scheduled around clinical work |
-| Week 2 | Patient journey traced end to end on live cases. Pharmacy and stock counted. Findings tested with you before anything is written | Access to the day as it actually runs |
-| End of Week 2 | Written diagnostic delivered: what Arabella earns, where it leaks, what the operation can carry, and what to fix in what order. Technology and records report with a prioritised roadmap | A session with you to walk through it |
+| Records | Records and systems reviewed. Revenue reconstructed from the ledger and traced to the bank, and the baseline agreed with you | The eight priority items, then the rest as it is found |
+| Conversations | Short conversations with staff, individually and confidentially. Nothing anyone says is attributed to them. The four surveys run alongside | Twenty minutes per person, scheduled around clinical work |
+| On site | Patient journey traced end to end on live cases. Pharmacy and stock counted. The patient database reviewed with you | Access to the day as it actually runs |
+| Findings | Findings tested with you before anything is written | An hour of your time |
+| By the end of November | Written diagnostic: what Arabella earns, where it leaks, what the operation can carry, and what to fix in what order. Technology and records report with a prioritised roadmap | A session with you to walk through it |
 
 *Two working practices, so that they are agreed rather than assumed. We will ask staff questions directly and confidentially, because a team tells an outsider things it will not put in front of the founder, and none of it is reported back with a name attached. And we will trace real patients through the real process rather than sampling broadly, because ten episodes followed completely tells you more than a hundred counted partially, and every gap we find that way is specific rather than theoretical.*
 
@@ -258,7 +262,7 @@ So that your team knows what is coming and nobody is surprised by a request.
 
 ## One last thing
 
-If something on this list does not exist, the honest answer helps us more than a reconstruction. If something exists but is embarrassing, send it anyway. We have not yet audited a healthcare business in Nigeria where everything was in place, and the ones that improved fastest were the ones that showed us the real thing in week one.
+If something on this list does not exist, the honest answer helps us more than a reconstruction. If something exists but is embarrassing, send it anyway. We have not yet audited a healthcare business in Nigeria where everything was in place, and the ones that improved fastest were the ones that showed us the real thing at the start.
 
 Anything at all, call me directly.
 
