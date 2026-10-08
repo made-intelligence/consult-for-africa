@@ -34,6 +34,29 @@ async function main() {
     console.log();
   }
 
+  // --clear=<address> sends every version to one reviewer. Names are shown,
+  // addresses are not: the host clearing the copy has no need of the other
+  // speakers' personal addresses.
+  const clearTo = args.find((a) => a.startsWith("--clear="))?.split("=")[1];
+
+  if (clearTo) {
+    console.log(`CLEARANCE: sending all ${targets.length} versions to ${clearTo}\n`);
+    for (const s of targets) {
+      await emailLyfeSpeakerConfirm({
+        to: clearTo,
+        firstName: `${s.firstName}  [for clearance: this is ${s.name}'s copy]`,
+        slot: s.slot,
+        subject: s.subject,
+        bio: s.bio,
+        questions: s.questions,
+        deadline: DEADLINE,
+        fromName: FROM_NAME,
+      });
+      console.log(`  sent ${s.name}'s version`);
+    }
+    return;
+  }
+
   if (test) {
     // Every speaker's version, all to Debo, so he reads what each will get.
     console.log(`TEST: sending all ${targets.length} versions to ${TEST_TO}\n`);
