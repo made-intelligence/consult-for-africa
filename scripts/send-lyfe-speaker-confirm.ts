@@ -12,7 +12,7 @@ import { LYFE_SPEAKERS } from "@/lib/lyfeSpeakers";
 import { emailLyfeSpeakerConfirm } from "@/lib/lyfeEmail";
 
 /** The chair asks rather than answers, so she gets every panellist's set. */
-const CHAIR = "Dr Itunu Akinware";
+const CHAIR = "Dr Debo Odulana";
 const panelSet = () =>
   LYFE_SPEAKERS.filter((s) => s.name !== CHAIR && s.slot.startsWith("the panel")).map((s) => ({
     name: s.name,

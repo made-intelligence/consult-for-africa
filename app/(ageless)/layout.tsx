@@ -24,14 +24,23 @@ const sans = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Medlyfe presents Ageless",
-    template: "%s | Medlyfe Wellness and Longevity Centre",
+    default: "MedLYFE presents Ageless",
+    template: "%s | MedLYFE Wellness and Longevity Centre",
   },
   openGraph: {
     type: "website",
     locale: "en_NG",
-    siteName: "Medlyfe Wellness and Longevity Centre",
+    siteName: "MedLYFE Wellness and Longevity Centre",
+    images: [
+      {
+        url: "/medlyfe-og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "MedLYFE presents Ageless",
+      },
+    ],
   },
+  twitter: { card: "summary_large_image", images: ["/medlyfe-og.jpg"] },
   // The Medlyfe mark. The file is named for Lyfe but it has always been
   // Medlyfe's monogram.
   icons: {

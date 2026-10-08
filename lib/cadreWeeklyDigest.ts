@@ -2,8 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { greetingFor } from "@/lib/cadreSalutation";
 import { nextCatalystEvent, type DfcCatalystEvent } from "@/lib/cadreHealth/dfcCatalystEvents";
 
-/** She leaves in November, and the slot removes itself when she does. */
-const LYFE_REFERRALS_CLOSE = new Date("2026-11-03T00:00:00+01:00");
+/**
+ * The slot that offered Dr Kpaduwa for referrals carries the AGELESS evening
+ * instead from 8 October 2026, at Debo's instruction: she is no longer part of
+ * it, and ten of its seventy places are kept for physicians who might refer.
+ * It removes itself once the evening has happened.
+ */
+const AGELESS_CLOSE = new Date("2026-10-21T21:30:00+01:00");
 import { randomBytes } from "crypto";
 import type { CadreDigestAsk } from "@prisma/client";
 
@@ -148,7 +153,7 @@ export interface WeekContext {
   showcase: DigestShowcase | null;
   /** The next DFC Catalyst session, or null when there is none to announce. */
   catalyst: DfcCatalystEvent | null;
-  /** True while Dr Kpaduwa is still in the country and taking referrals. */
+  /** True until the AGELESS evening has happened. */
   referralsOpen: boolean;
   /**
    * Emails that have already answered the Medipark survey, so nobody is asked
@@ -172,7 +177,7 @@ export interface CadreDigestContent {
   onlyYou: { kind: string; label: string; headline: string; detail: string; ctaLabel: string; href: string; tone: "URGENT" | "NEUTRAL" | "GOOD" };
   ask: { ask: CadreDigestAsk; label: string; headline: string; detail: string; ctaLabel: string; href: string; done: boolean };
   catalyst: { headline: string; detail: string; ctaLabel: string; href: string } | null;
-  referral: { headline: string; detail: string; ctaLabel: string; href: string } | null;
+  referral: { label: string; headline: string; detail: string; ctaLabel: string; href: string } | null;
   medipark: { headline: string; detail: string; ctaLabel: string; href: string } | null;
   prize: { won: boolean; headline: string; detail: string; ctaLabel: string; href: string };
   showcase: DigestShowcase | null;
@@ -472,7 +477,7 @@ export async function buildWeekContext(
     mezoReady,
     showcase,
     catalyst: nextCatalystEvent(now),
-    referralsOpen: now.getTime() < LYFE_REFERRALS_CLOSE.getTime(),
+    referralsOpen: now.getTime() < AGELESS_CLOSE.getTime(),
     mediparkAnswered,
     awards,
     awardsIssued: awards.size,
@@ -892,20 +897,22 @@ function buildCatalyst(ctx: WeekContext): CadreDigestContent["catalyst"] {
 }
 
 /**
- * A colleague taking referrals, for as long as that is true.
- *
- * It drops itself the day she leaves rather than waiting for somebody to
- * remember, because a digest that keeps offering a surgeon who has flown home
- * is worse than one that never mentioned her.
+ * The AGELESS evening, for the clinicians on the list. Ten of the seventy
+ * places are kept for physicians, so this is a genuine invitation rather than
+ * an advertisement, and it says so.
  */
 function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
-  if (!ctx.referralsOpen) return null;
+  // Off, 8 October 2026. Debo: a thousand clinicians cannot be invited to ten
+  // seats. This slot waits for the Medlyfe clinician network to replace it.
+  const OFF = true;
+  if (OFF || !ctx.referralsOpen) return null;
   return {
-    headline: "A board certified plastic surgeon in Lagos, taking referrals until early November",
+    label: "An evening on ageing well",
+    headline: "AGELESS, Wednesday 21 October, Capital Club Lagos",
     detail:
-      "Dr Chinwe Kpaduwa is board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons, both publicly verifiable. Body after childbirth, breast surgery including reduction and reconstruction, facial work, and the keloid and scarring cases that are common here and poorly served. If an operation is not the right answer she says so.",
-    ctaLabel: "Refer someone, or speak to her yourself",
-    href: "https://www.consultforafrica.com/lyfe/consult?src=doctor",
+      "MedLYFE Wellness and Longevity Centre hosts an evening on what modern medicine can now do about how we age: metabolism, hormones, weight, energy and skin. Dr Adedotun Ajelabi opens it and Dr Itunu Akinware chairs the panel, with Dr Timi Adenuga on metabolic and bariatric care. The room holds seventy and ten places are kept for clinicians.",
+    ctaLabel: "Register your interest",
+    href: "https://www.consultforafrica.com/ageless?src=doctor",
   };
 }
 
@@ -1026,7 +1033,7 @@ export function renderDigestHtml(
       ? [block(TONES.CATALYST, "DFC Catalyst Series", d.catalyst.headline, d.catalyst.detail, d.catalyst.ctaLabel, abs(baseUrl, d.catalyst.href))]
       : []),
     ...(d.referral
-      ? [block(TONES.GOOD, "For your patients", d.referral.headline, d.referral.detail, d.referral.ctaLabel, abs(baseUrl, d.referral.href))]
+      ? [block(TONES.GOOD, d.referral.label, d.referral.headline, d.referral.detail, d.referral.ctaLabel, abs(baseUrl, d.referral.href))]
       : []),
     block(TONES.PRIZE, d.prize.won ? "Yours this week" : "Five a week", d.prize.headline, d.prize.detail, d.prize.ctaLabel, abs(baseUrl, d.prize.href)),
   ];
@@ -1049,7 +1056,7 @@ export function renderDigestHtml(
     `${d.ask.label.toUpperCase()}: ${endSentence(d.ask.headline)} ${d.ask.detail} ${abs(baseUrl, d.ask.href)}`,
     ...(d.medipark ? [`HELP US DESIGN IT: ${d.medipark.headline} ${d.medipark.detail} ${abs(baseUrl, d.medipark.href)}`] : []),
     ...(d.catalyst ? [`DFC CATALYST SERIES: ${d.catalyst.headline}. ${d.catalyst.detail} ${abs(baseUrl, d.catalyst.href)}`] : []),
-    ...(d.referral ? [`FOR YOUR PATIENTS: ${d.referral.headline}. ${d.referral.detail} ${abs(baseUrl, d.referral.href)}`] : []),
+    ...(d.referral ? [`${d.referral.label.toUpperCase()}: ${d.referral.headline}. ${d.referral.detail} ${abs(baseUrl, d.referral.href)}`] : []),
     `${d.prize.headline}. ${d.prize.detail} ${abs(baseUrl, d.prize.href)}`,
     ...(d.showcase ? [`${d.showcase.kind === "MEMBER" ? "MEMBER OF THE WEEK" : "SPECIALTY SPOTLIGHT"}: ${d.showcase.headline}. ${d.showcase.detail} ${abs(baseUrl, d.showcase.href)}`] : []),
   ];

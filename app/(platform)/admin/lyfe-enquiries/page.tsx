@@ -5,7 +5,9 @@ import {
   NICOTINE_LABELS,
   WEIGHT_TREND_LABELS,
   lyfeHeadcount,
+  lyfeInviteLink,
   LYFE_EVENT_ALLOCATION,
+  LYFE_INVITERS,
   minutesWaiting,
   waitingLabel,
 } from "@/lib/lyfe";
@@ -77,6 +79,30 @@ export default async function LyfeEnquiriesPage() {
   const interested = rsvps.filter((e) => e.eventStage === "INTERESTED").length;
   const waitlist = rsvps.filter((e) => e.eventStage === "WAITLIST").length;
   const clinicians = rsvps.filter((e) => e.isClinician).length;
+
+  // Several people are working the same seventy places, so the only question
+  // worth answering afterwards is whose names actually came. The inviter key
+  // rides on utmSource, set by the ?i= on the link each of them sends.
+  const byInviter = LYFE_INVITERS.map((inv) => {
+    const mine = rsvps.filter((e) => e.utmSource === inv.key);
+    return {
+      key: inv.key,
+      name: inv.name,
+      bucket: inv.bucket,
+      places: inv.places,
+      note: inv.note ?? null,
+      link: lyfeInviteLink(inv.key),
+      applied: mine.length,
+      invited: mine.filter((e) => e.eventStage === "INVITED").length,
+      confirmed: mine.filter((e) => e.eventStage === "CONFIRMED").length,
+      declined: mine.filter((e) => e.eventStage === "DECLINED").length,
+      heads: lyfeHeadcount(mine).confirmed,
+    };
+  });
+  // Anybody who arrived without one of our links, so the gap is visible
+  // rather than quietly absorbed into a bucket.
+  const KEYS = new Set(LYFE_INVITERS.map((i) => i.key));
+  const unattributed = rsvps.filter((e) => !e.utmSource || !KEYS.has(e.utmSource));
 
   const rows: Row[] = [...entries]
     .sort((a, b) => {
@@ -154,7 +180,7 @@ export default async function LyfeEnquiriesPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10">
       <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-700">
-        Medlyfe Wellness and Longevity Centre
+        MedLYFE Wellness and Longevity Centre
       </p>
       <h1 className="mt-2 text-3xl font-bold text-slate-900">The enquiry queue</h1>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
@@ -202,15 +228,135 @@ export default async function LyfeEnquiriesPage() {
         />
       </div>
 
-      <p className="mt-6 text-[13px] leading-relaxed text-gray-500">
-        Places by source:{" "}
-        {LYFE_EVENT_ALLOCATION.map((a) => `${a.bucket} ${a.places}`).join(" · ")}
-      </p>
+      <InviterTable rows={byInviter} unattributed={unattributed.length} />
 
       <div className="mt-10">
         <Queue rows={rows} />
       </div>
     </div>
+  );
+}
+
+/**
+ * Who is bringing whom, with the link each of them sends.
+ *
+ * The allocation used to be a sentence of static numbers, which told nobody
+ * whether Yomi's thirty were coming. This counts the rows against it, and
+ * carries the link so a coordinator chasing an inviter can copy it straight
+ * out of the page rather than reconstructing it.
+ */
+function InviterTable({
+  rows,
+  unattributed,
+}: {
+  unattributed: number;
+  rows: {
+    key: string;
+    name: string;
+    bucket: string;
+    places: number;
+    note: string | null;
+    link: string;
+    applied: number;
+    invited: number;
+    confirmed: number;
+    declined: number;
+    heads: number;
+  }[];
+}) {
+  const total = rows.reduce(
+    (a, r) => ({
+      places: a.places + 0,
+      applied: a.applied + r.applied,
+      confirmed: a.confirmed + r.confirmed,
+      heads: a.heads + r.heads,
+    }),
+    { places: 0, applied: 0, confirmed: 0, heads: 0 },
+  );
+
+  return (
+    <section className="mt-10">
+      <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-gray-500">
+        Who is bringing whom
+      </h2>
+      <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-gray-500">
+        Each person sends their own link. Applying is not a place: the team
+        still chooses, and the invitation to confirm goes out afterwards. Only
+        confirmed counts against the seventy.
+      </p>
+
+      <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200">
+        <table className="w-full min-w-[820px] text-left text-[13px]">
+          <thead className="bg-gray-50 text-[11px] uppercase tracking-[0.1em] text-gray-500">
+            <tr>
+              <th className="px-3 py-2.5 font-semibold">Inviter</th>
+              <th className="px-3 py-2.5 font-semibold">Drawing against</th>
+              <th className="px-3 py-2.5 text-right font-semibold">Places</th>
+              <th className="px-3 py-2.5 text-right font-semibold">Applied</th>
+              <th className="px-3 py-2.5 text-right font-semibold">Invited</th>
+              <th className="px-3 py-2.5 text-right font-semibold">Confirmed</th>
+              <th className="px-3 py-2.5 text-right font-semibold">Heads</th>
+              <th className="px-3 py-2.5 font-semibold">Their link</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {rows.map((r) => (
+              <tr key={r.key} className="align-top">
+                <td className="px-3 py-2.5">
+                  <span className="font-semibold text-gray-900">{r.name}</span>
+                  {r.note ? (
+                    <span className="mt-0.5 block text-[11.5px] leading-snug text-gray-500">
+                      {r.note}
+                    </span>
+                  ) : null}
+                </td>
+                <td className="px-3 py-2.5 text-gray-600">{r.bucket}</td>
+                <td className="px-3 py-2.5 text-right tabular-nums text-gray-600">
+                  {r.places}
+                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums text-gray-900">
+                  {r.applied || "—"}
+                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums text-gray-600">
+                  {r.invited || "—"}
+                </td>
+                <td className="px-3 py-2.5 text-right font-semibold tabular-nums text-gray-900">
+                  {r.confirmed || "—"}
+                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums text-gray-600">
+                  {r.heads || "—"}
+                </td>
+                <td className="px-3 py-2.5">
+                  <code className="select-all break-all text-[11.5px] text-gray-500">
+                    {r.link}
+                  </code>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot className="bg-gray-50 text-[12.5px] font-semibold text-gray-700">
+            <tr>
+              <td className="px-3 py-2.5" colSpan={3}>
+                Total
+              </td>
+              <td className="px-3 py-2.5 text-right tabular-nums">{total.applied}</td>
+              <td className="px-3 py-2.5" />
+              <td className="px-3 py-2.5 text-right tabular-nums">{total.confirmed}</td>
+              <td className="px-3 py-2.5 text-right tabular-nums">{total.heads}</td>
+              <td className="px-3 py-2.5" />
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {unattributed > 0 ? (
+        <p className="mt-3 text-[12.5px] text-gray-500">
+          {unattributed} {unattributed === 1 ? "person" : "people"} arrived
+          without one of these links, so nobody is credited with them. Usually
+          a forwarded address rather than a forwarded link.
+        </p>
+      ) : null}
+    </section>
   );
 }
 

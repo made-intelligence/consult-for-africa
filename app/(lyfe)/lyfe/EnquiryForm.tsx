@@ -9,6 +9,8 @@ import {
   LYFE_CONSENT_TEXT,
   MEDLYFE_EVENT_CONSENT_TEXT,
   LYFE_CONSULT,
+  LYFE_CONSULT_OPTIONS,
+  type LyfeConsultOptionKey,
   LYFE_CONSULT_SCHEDULE,
   LYFE_DOORS,
   LYFE_EVENT,
@@ -79,6 +81,10 @@ export default function EnquiryForm({
   const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
   const [step, setStep] = useState(initialIntent === "CONSULTATION" ? 1 : 2);
   const [slotAt, setSlotAt] = useState<string>("");
+  // Which of the four they are asking for. The page takes a request rather
+  // than a payment now, so the coordinator picks the time and, where there is
+  // a fee, takes it on the call.
+  const [service, setService] = useState<LyfeConsultOptionKey | "">("");
   const [pathway, setPathway] = useState<Pathway | "">("");
   const [concerns, setConcerns] = useState<Concern[]>([]);
   const [timing, setTiming] = useState<Timing | "">("");
@@ -127,7 +133,7 @@ export default function EnquiryForm({
     if (!phone.trim()) return setError("We need a number we can call or message.");
     if (!email.trim()) return setError("Please give us an email as well.");
     if (!rsvp && !timing) return setError("Please tell us roughly when you are thinking about this.");
-    if (!rsvp && !slotAt) return setError("Please choose a time in Dr Kpaduwa's diary.");
+    if (!rsvp && !service) return setError("Please tell us which consultation you are asking about.");
     if (!source) return setError("Please tell us how you found us. It genuinely helps.");
     if (!consent) return setError("We need your agreement before we can hold your details.");
 
@@ -141,7 +147,9 @@ export default function EnquiryForm({
           email: email.trim(),
           phone: phone.trim(),
           intent,
-          slotAt: rsvp ? null : slotAt,
+          // No slot from the page any more. The coordinator books it.
+          slotAt: null,
+          requestedService: rsvp ? null : service || null,
           guestCount: rsvp ? guestCount : null,
           isClinician: rsvp ? isClinician : null,
           pathway: rsvp ? "UNSURE" : pathway || "UNSURE",
@@ -201,11 +209,11 @@ export default function EnquiryForm({
         <p className="mt-3 leading-relaxed" style={{ color: C.body }}>
           {done === "EVENT_RSVP"
             ? `Your interest is registered. The room holds ${LYFE_EVENT.places} and invitations go out from this list, so you will hear from us either way before ${LYFE_EVENT.date}. Keep an eye on your email, including the junk folder.`
-            : "A coordinator will call you shortly. If you would rather not wait for the phone to ring, message us and we will pick it up straight away."}
+            : "A coordinator will call you within one working day to arrange the time and tell you what it costs. Nothing has been charged. If you would rather not wait for the phone to ring, message us and we will pick it up straight away."}
         </p>
         <a
           href={whatsappLink(
-            `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "registered my interest in the evening" : "booked a consultation"} through your website.`,
+            `Hello, I am ${fullName.trim()}. I have just ${done === "EVENT_RSVP" ? "registered my interest in the evening" : "asked for a consultation"} through your website.`,
           )}
           className="mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
           style={{ background: MB.greenDeep, color: "#FFFFFF" }}
@@ -248,34 +256,27 @@ export default function EnquiryForm({
       {/* Consultation, step one: the time, then what it is about */}
       {!rsvp && step === 1 && (
         <>
-          <Head>Choose your half hour</Head>
+          <Head>Which consultation?</Head>
           <p className="mt-2.5 text-sm leading-relaxed" style={{ color: C.body }}>
-            {LYFE_CONSULT_SCHEDULE}. These are the times still open.
+            Pick the nearest one. If it turns out to be the wrong one we will
+            say so, and tell you which it should be.
           </p>
 
-          {slots.length === 0 ? (
-            <p
-              className="mt-5 rounded-xl px-4 py-4 text-sm leading-relaxed"
-              style={{ background: C.greenTint, color: C.ink }}
-            >
-              Her diary is full for the next three weeks. Message us on WhatsApp and we will
-              tell you the moment the next one opens.
-            </p>
-          ) : (
-            <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-              {slots.slice(0, 8).map((slot) => (
-                <Choice
-                  key={slot.iso}
-                  checked={slotAt === slot.iso}
-                  onSelect={() => setSlotAt(slot.iso)}
-                  label={`${slot.day}, ${slot.time}`}
-                />
-              ))}
-            </div>
-          )}
+          <div className="mt-5 grid gap-2.5">
+            {LYFE_CONSULT_OPTIONS.map((o) => (
+              <Choice
+                key={o.key}
+                checked={service === o.key}
+                onSelect={() => setService(o.key)}
+                label={o.fee ? `${o.name} — ${o.fee}` : o.name}
+              />
+            ))}
+          </div>
 
           <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: C.muted }}>
-            {LYFE_CONSULT.feeDisplay} for {LYFE_CONSULT.minutes} minutes. {LYFE_CONSULT.feeNote}
+            {service === "SURGERY"
+              ? `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa. ${LYFE_CONSULT.feeNote} Nothing is taken here; a coordinator arranges the time and the payment.`
+              : "Nothing is taken here. A coordinator calls you to arrange the time and tell you what it costs before anything is booked."}
           </p>
 
           <Legend className="mt-7">What are you thinking about?</Legend>

@@ -7,7 +7,13 @@
  *
  *   npx tsx scripts/dump-ageless-content.ts > /tmp/ageless.json
  */
-import { LYFE_EVENT, LYFE_EVENT_PROGRAMME, LYFE_EVENT_ALLOCATION } from "@/lib/lyfe";
+import {
+  LYFE_EVENT,
+  LYFE_EVENT_PROGRAMME,
+  LYFE_EVENT_ALLOCATION,
+  LYFE_EVENT_ROOM,
+  LYFE_EVENT_TONE,
+} from "@/lib/lyfe";
 import { LYFE_SPEAKERS } from "@/lib/lyfeSpeakers";
 
 const out = {
@@ -27,12 +33,15 @@ const out = {
     host: LYFE_EVENT.host,
   },
   allocation: LYFE_EVENT_ALLOCATION,
+  room: LYFE_EVENT_ROOM,
+  tone: LYFE_EVENT_TONE,
   programme: LYFE_EVENT_PROGRAMME,
   speakers: LYFE_SPEAKERS.map((s) => ({
     name: s.name,
     org: s.org,
     slot: s.slot,
     subject: s.subject ?? null,
+    focus: s.focus ?? null,
     bio: s.bio ?? null,
     questions: s.questions ?? [],
     outstanding: s.need,
