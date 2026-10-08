@@ -20,7 +20,7 @@ AS AT
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
-- Sally supports on Capital Club engagement, and owns Joycee Awosika with Dr Akinware.
+- Sally owns the Capital Club relationship, and Joycee Awosika with Dr Akinware.
 - CFA designs the programme, badges and backdrop. Opeoluwa prints them.
 - Medlyfe handles the takeaway, end to end.
 - Opeoluwa handles invitations, social, press and media.
@@ -29,7 +29,7 @@ AS AT
 
 | What | Needed by | What it unblocks |
 | --- | --- | --- |
-| Capital Club street address | 9 Oct | Invitations cannot print or send |
+| Capital Club street address, via Sally | 9 Oct | Invitations cannot print or send |
 | RSVP contact name and direct line | 9 Oct | Invitations and the website |
 | Medlyfe logo, vector or high resolution | 9 Oct | Every printed piece |
 | Names for the invited list | 10 Oct | Fifty four open places needs about 110 invited |
@@ -67,7 +67,7 @@ Everything else is ours.
 | Medbury corporate names | Yomi | 11 Oct |
 | Invite the 15 Medbury corporates | CFA | 14 Oct |
 | Chase the Medbury fifteen to confirm | Yomi with CFA | 17 Oct |
-| Capital Club engagement: members list and a mention to members | CFA, supported by Sally | 10 Oct |
+| Capital Club engagement: members list and a mention to members | Sally | 10 Oct |
 | Send invitations | Opeoluwa | 14 Oct |
 | Chase unanswered invitations by phone | CFA | 17 Oct |
 | Close register interest | CFA | 16 Oct |
@@ -89,12 +89,12 @@ Everything else is ours.
 
 | Task | Owner | Due |
 | --- | --- | --- |
-| Capital Club walkthrough | CFA | 13 Oct |
+| Capital Club walkthrough | Sally with CFA | 13 Oct |
 | Stage and seating layout | CFA | 14 Oct |
 | AV: handheld and lapel mics, screen, playback | CFA | 15 Oct |
 | Opening film, 60 to 90 seconds | CFA, Kalkulus | 17 Oct |
 | Photographer and videographer booked | CFA | 13 Oct |
-| Catering and cocktails confirmed | CFA with venue | 15 Oct |
+| Catering and cocktails confirmed | Sally | 15 Oct |
 | Music | CFA | 17 Oct |
 | Technical rehearsal | CFA | 20 Oct |
 
