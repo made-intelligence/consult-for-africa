@@ -11,6 +11,15 @@
 import { LYFE_SPEAKERS } from "@/lib/lyfeSpeakers";
 import { emailLyfeSpeakerConfirm } from "@/lib/lyfeEmail";
 
+/** The chair asks rather than answers, so she gets every panellist's set. */
+const CHAIR = "Dr Itunu Akinware";
+const panelSet = () =>
+  LYFE_SPEAKERS.filter((s) => s.name !== CHAIR && s.slot.startsWith("the panel")).map((s) => ({
+    name: s.name,
+    subject: s.subject,
+    questions: s.questions,
+  }));
+
 const DEADLINE = "4pm tomorrow, Thursday 9 October";
 const FROM_NAME = process.env.LYFE_SENDER_NAME || "Dr Debo Odulana";
 const TEST_TO = process.env.LYFE_TEST_TO || "dodulana@gmail.com";
@@ -49,6 +58,7 @@ async function main() {
         subject: s.subject,
         bio: s.bio,
         questions: s.questions,
+        chairSet: s.name === CHAIR ? panelSet() : undefined,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });
@@ -68,6 +78,7 @@ async function main() {
         subject: s.subject,
         bio: s.bio,
         questions: s.questions,
+        chairSet: s.name === CHAIR ? panelSet() : undefined,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });
@@ -91,6 +102,7 @@ async function main() {
         subject: s.subject,
         bio: s.bio,
         questions: s.questions,
+        chairSet: s.name === CHAIR ? panelSet() : undefined,
         deadline: DEADLINE,
         fromName: FROM_NAME,
       });

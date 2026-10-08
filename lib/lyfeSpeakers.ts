@@ -74,9 +74,7 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     slot: "the chair",
     subject: "In the chair",
     questions: [
-      "You are chairing rather than speaking to a subject.",
-      "Your job is to keep one argument moving across four people and cut in when an answer drifts into generality.",
-      "The full panel question set follows separately.",
+      "You are chairing rather than speaking to a subject. The questions you will put are below.",
     ],
     need: [],
     bio: "Dr Itunu Akinware is a medical doctor with an MBA from Lagos Business School specialising in healthcare management. She began as a Medical Officer before moving into business development, shaped by research and collaborations in the UAE, UK, USA and India. She has consulted for the International Finance Corporation of the World Bank Group and served as Executive Secretary of the Healthcare Federation of Nigeria. Under her leadership Medbury Healthcare has expanded into Medbury Services, Diagnostics, Aesthetics, Pharmaceuticals and Wellness. She also invests in Nigerian healthcare startups.",

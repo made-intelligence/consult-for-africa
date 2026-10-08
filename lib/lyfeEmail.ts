@@ -503,6 +503,7 @@ export async function emailLyfeSpeakerConfirm({
   subject,
   bio,
   questions,
+  chairSet,
   deadline,
   fromName,
 }: {
@@ -512,6 +513,8 @@ export async function emailLyfeSpeakerConfirm({
   subject?: string;
   bio?: string;
   questions?: string[];
+  /** The chair is asking, not answering, so she gets the whole set by seat. */
+  chairSet?: { name: string; subject?: string; questions?: string[] }[];
   deadline: string;
   fromName: string;
 }): Promise<void> {
@@ -521,6 +524,19 @@ export async function emailLyfeSpeakerConfirm({
          <tr><td style="background:${LYFE_BRAND.groundWarm};border-left:3px solid ${LYFE_BRAND.bronze};padding:14px 16px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.body};">${esc(bio)}</td></tr>
        </table>`
     : `<p style="margin:0 0 18px;"><strong>We do not have a bio for you.</strong> Eighty to a hundred words, written the way you would want to be introduced from a stage.</p>`;
+
+  const chairBlock = chairSet?.length
+    ? `<p style="margin:0 0 6px;font-weight:700;">The questions you will put</p>
+       <p style="margin:0 0 14px;font-size:13.5px;color:${LYFE_BRAND.muted};">A brief, not a script. Cut in when an answer finishes on a generality, and make sure every answer ends in something a guest can do this week.</p>
+       ${chairSet
+         .map(
+           (p) => `<p style="margin:0 0 4px;font-weight:600;font-size:14px;color:${LYFE_BRAND.ink};">${esc(p.name)}${p.subject ? `, on ${esc(p.subject.toLowerCase())}` : ""}</p>
+             <ul style="margin:0 0 14px;padding-left:20px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.body};">
+               ${(p.questions ?? []).map((q) => `<li style="margin:0 0 4px;">${esc(q)}</li>`).join("")}
+             </ul>`,
+         )
+         .join("")}`
+    : "";
 
   const qBlock = questions?.length
     ? `<p style="margin:0 0 6px;font-weight:700;">What you will be asked</p>
@@ -538,6 +554,7 @@ export async function emailLyfeSpeakerConfirm({
      <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Itunu Akinware, four seats, about eleven minutes each.</p>
 
      ${bioBlock}
+     ${chairBlock}
      ${qBlock}
 
      <table cellpadding="0" cellspacing="0" style="margin:0 0 20px;width:100%;">
