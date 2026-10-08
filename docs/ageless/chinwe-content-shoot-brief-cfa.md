@@ -322,7 +322,7 @@ Each one gives the subject, the movement, the light, the palette and the length.
 
 Palettes, so the library stays coherent:
 **Medlyfe** deep forest green #1F3A2E, chartreuse #C4D7A6, white.
-**Lyfe Plastics** near-black #15161A, bronze #A87B4F, warm paper #FAF7F2.
+**Aesthetics pages** near-black #15161A, bronze #A87B4F, warm paper #FAF7F2.
 
 ### Title and quote beds
 

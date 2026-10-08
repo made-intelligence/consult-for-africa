@@ -17,7 +17,7 @@ AS AT
 
 AGELESS is a cocktail evening at the Capital Club, Lagos, on Wednesday 21 October. Arrival at half past five, programme from a quarter to seven to a quarter past eight, close at half past nine. Seventy places.
 
-Medlyfe hosts. It introduces Dr Chinwe Kpaduwa and Lyfe Plastics and Dermatology to a Lagos audience already spending on how they look and feel, through a conversation about ageing rather than a pitch for surgery. Her window in the country sets the date. The evening is built to run again, and this edition carries the format, identity, film library and guest list that later editions inherit.
+Medlyfe hosts. It puts Medlyfe in front of a Lagos audience already spending on how they look and feel, through a conversation about ageing rather than a pitch for surgery. Her window in the country sets the date. The evening is built to run again, and this edition carries the format, identity, film library and guest list that later editions inherit.
 
 Four names do four separate jobs, and they are not interchangeable. AGELESS is the platform, built to recur. A New Era of Health, Beauty and Longevity is the proposition for this edition. The New Science of Ageing Well is the panel, and The Art of Looking Like Yourself is Dr Kpaduwa's fireside. The panel carries a standfirst of its own: what changes in your body, brain and skin after 40, and what you can actually do about it.
 

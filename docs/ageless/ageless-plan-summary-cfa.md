@@ -29,7 +29,7 @@ Cutting from 130 to 70 helps more than it costs. Seventy is a room where people 
 
 AGELESS is the platform and it is built to recur. The proposition is a new era of health, beauty and longevity. The panel is *The New Science of Ageing Well*. The fireside is *The Art of Looking Like Yourself*, with Dr Chinwe Kpaduwa. Keeping those four names apart is what lets edition two reuse everything but the panel.
 
-MedLYFE hosts and Lyfe Plastics and Dermatology is introduced, in the footer. That is a regulatory position rather than a courtesy: MedLYFE is the licensed, bookable entity, and Dr Kpaduwa sets the clinical standard and is introduced. Every piece of copy already survives that distinction and it should hold on the night.
+Medlyfe hosts, in the footer. That is a regulatory position rather than a courtesy: Medlyfe is the licensed, bookable entity. No practice is introduced, because the practice name that was being used does not exist. Dr Kpaduwa is named as a clinician and sets the clinical standard. Every piece of copy already survives that distinction and it should hold on the night.
 
 ## What is already built and live
 
