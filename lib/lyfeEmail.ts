@@ -488,3 +488,70 @@ export async function emailLyfeSpeakerAsk({
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: your bio and a photograph`, html);
 }
+
+/**
+ * Everything one speaker needs, and one thing to do.
+ *
+ * Sent per person so nobody sees anyone else's address, and carrying only
+ * their own slot, bio and questions. A seven person pack asks a busy
+ * clinician to find themselves in it; this does the finding for them.
+ */
+export async function emailLyfeSpeakerConfirm({
+  to,
+  firstName,
+  slot,
+  subject,
+  bio,
+  questions,
+  deadline,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  slot: string;
+  subject?: string;
+  bio?: string;
+  questions?: string[];
+  deadline: string;
+  fromName: string;
+}): Promise<void> {
+  const bioBlock = bio
+    ? `<p style="margin:0 0 6px;font-weight:700;">Your bio, as we will print it</p>
+       <table cellpadding="0" cellspacing="0" style="margin:0 0 18px;width:100%;">
+         <tr><td style="background:${LYFE_BRAND.groundWarm};border-left:3px solid ${LYFE_BRAND.bronze};padding:14px 16px;font-size:14px;line-height:1.65;color:${LYFE_BRAND.body};">${esc(bio)}</td></tr>
+       </table>`
+    : `<p style="margin:0 0 18px;"><strong>We do not have a bio for you.</strong> Eighty to a hundred words, written the way you would want to be introduced from a stage.</p>`;
+
+  const qBlock = questions?.length
+    ? `<p style="margin:0 0 6px;font-weight:700;">What you will be asked</p>
+       <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+         ${questions.map((q) => `<li style="margin:0 0 6px;">${esc(q)}</li>`).join("")}
+       </ul>
+       <p style="margin:0 0 18px;font-size:13.5px;color:${LYFE_BRAND.muted};">A brief, not a script. Tell us what you would rather be asked.</p>`
+    : "";
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Everything for ${esc(LYFE_EVENT_THEME)} on <strong>${esc(LYFE_EVENT.date)}</strong>, ${esc(LYFE_EVENT.venueName)}. Please be in the room by 6:15pm. The programme runs ${esc(LYFE_EVENT.programme)} to 8:15pm, then drinks until ${esc(LYFE_EVENT.close)}.</p>
+
+     <p style="margin:0 0 6px;font-weight:700;">Your part</p>
+     <p style="margin:0 0 18px;">You are on <strong>${esc(slot)}</strong>${subject ? `, speaking to <strong>${esc(subject)}</strong>` : ""}. The panel is 7:00 to 7:45, chaired by Dr Itunu Akinware, four seats, about eleven minutes each.</p>
+
+     ${bioBlock}
+     ${qBlock}
+
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 20px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:16px 18px;font-size:14px;line-height:1.7;color:#FFFFFF;">
+         <strong>One thing to do.</strong> Reply by <strong>${esc(deadline)}</strong> confirming the bio and your subject are right, or send the corrections. After that it goes live on the site, into the printed programme and to the press.
+       </td></tr>
+     </table>
+
+     <p style="margin:0 0 14px;">No slides and no lectern. Dress is cocktail. Please stay for the hour after the programme, which is when guests actually talk to you.</p>
+     <p style="margin:0 0 6px;">With thanks,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">${esc(LYFE_EVENT.host)}</p>`,
+    `Your part in ${LYFE_EVENT_THEME}. Please confirm by ${deadline}.`,
+  );
+
+  await notifyInternal(to, `${LYFE_EVENT_THEME}: please confirm your details`, html);
+}

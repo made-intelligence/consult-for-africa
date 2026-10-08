@@ -88,11 +88,11 @@ All seven on file.
 
 **Dr Timi Adenuga.** Lead Bariatric and Laparoscopic Surgeon at GetSlim, Victoria Island. Edinburgh and Portsmouth trained, around a thousand procedures. GetSlim is the only Nigerian clinic openly running a GLP-1 programme.
 
-**Dr Itunu Akinware.** Chief Executive of Medbury Healthcare Group, which runs specialist care, preventive health and wellness businesses in Nigeria.
+**Dr Itunu Akinware.** Medical doctor with a medical doctor with an MBA from Lagos Business School specialising in healthcare management. She began as a Medical Officer before moving into business development, shaped by research and collaborations in the UAE, UK, USA and India. She has consulted for the International Finance Corporation of the World Bank Group and served as Executive Secretary of the Healthcare Federation of Nigeria. Under her leadership Medbury Healthcare has expanded into Medbury Services, Diagnostics, Aesthetics, Pharmaceuticals and Wellness. She also invests in Nigerian healthcare startups.
 
 **Dr Adedotun Ajelabi.** Clinical Lead at Medlyfe.
 
-**Joycee Awosika.** Founder and Chief Executive of the ORÍKÌ Group: spas and hair restoration centres across several African countries, manufacturing in Nigeria, a training institute and an app. Spelling is Joycee, two e's.
+**Joycee Awosika.** an award winning entrepreneur, energy economist and global speaker, and Founder and Managing Director of the ORÍKÌ Group. Since founding ORÍKÌ in 2015 she has built a vertically integrated wellness and beauty business spanning more than sixteen wellness destinations across Nigeria, Kenya, Uganda and the UAE, FSC Manufacturing serving over a hundred brands, Anoint Hair Restoration, the UNWIND technology platform, the ORÍKÌ Training Institute and the ORÍKÌ Foundation. She chairs the Nigeria Wellness Spa Technical Committee. Spelling is Joycee, two e's.
 
 ## Three things never to say
 
