@@ -21,7 +21,7 @@ Cocktail evening at the Capital Club, Lagos, Wednesday 21 October. Seventy place
 
 Send everyone to **consultforafrica.com/lyfe**. They register interest. We invite from that list.
 
-We need names this week. Of the seventy: 20 Capital Club members, 15 Medbury corporates, 10 of Dr Akinware's guests, 10 doctors, 15 open. Invite about twice each number.
+We need names this week. Of the seventy: 20 Capital Club members, 15 Medbury corporates, 10 of Dr Akinware's guests, 10 doctors, 10 PBN, 5 general invites. Invite about twice each number.
 
 ## The event
 
@@ -32,7 +32,7 @@ We need names this week. Of the seventy: 20 Capital Club members, 15 Medbury cor
 | Arrival | 5:30pm |
 | Programme | 6:45pm to 8:15pm |
 | Close | 9:30pm |
-| Places | 70. 20 Capital Club, 15 Medbury corporates, 10 Dr Akinware's, 10 doctors, 15 open |
+| Places | 70. 20 Capital Club, 15 Medbury corporates, 10 Dr Akinware's, 10 doctors, 10 PBN, 5 general |
 | Host | Medlyfe |
 | Register | consultforafrica.com/lyfe |
 

@@ -16,7 +16,7 @@ AS AT
 ## In short
 
 - Thirteen days to the evening.
-- Seventy places, allocated in the next table. Fifteen are open.
+- Seventy places, allocated in the next table.
 - **CFA delivers all of it.** Design, print, guest list, speakers, venue, press, the night and the follow up.
 - Medlyfe supplies four things only. They are in the next table and nothing can start without them.
 - Owners inside CFA are named so Itunu knows who to call.
@@ -33,7 +33,8 @@ AS AT
 | Medbury corporates | 15 | Yomi |
 | Dr Akinware's guests | 10 | Dr Akinware |
 | Doctors | 10 | CFA |
-| Open, from the register interest list | 15 | CFA |
+| PBN | 10 | CFA |
+| General invites | 5 | CFA |
 | **Total** | **70** | |
 
 Invite about twice the allocation in each row. People say yes and do not come.
@@ -77,6 +78,7 @@ Everything else is ours.
 | Build the list against the allocation, about 140 invited | CFA | 10 Oct |
 | Capital Club members list, 40 names for 20 places | Sally | 10 Oct |
 | Doctors list, 20 names for 10 places | CFA | 10 Oct |
+| PBN list, 20 names for 10 places | CFA | 10 Oct |
 | Hold 15 places for Medbury corporates | CFA | Done |
 | Medbury corporate names | Yomi | 11 Oct |
 | Invite the 15 Medbury corporates | CFA | 14 Oct |

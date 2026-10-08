@@ -83,7 +83,8 @@ Ninety minutes of programme. Arrival and After Hours are long on purpose, becaus
 | Medbury corporates | 15 |
 | Dr Akinware's guests | 10 |
 | Doctors | 10 |
-| Open, from the register interest list | 15 |
+| PBN | 10 |
+| General invites | 5 |
 
 - Invite about twice each allocation. People say yes and do not come.
 
