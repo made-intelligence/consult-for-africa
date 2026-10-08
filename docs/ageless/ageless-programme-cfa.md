@@ -19,7 +19,7 @@ AS AT
 - Cocktail evening at the Capital Club, Lagos, Wednesday 21 October 2026.
 - Arrival 5:30pm, programme 6:45pm to 8:15pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
 - The evening shows Medlyfe's range: longevity, metabolic health, hormones, skin and aesthetics.
-- Dr Chinwe Kpaduwa's fireside is one segment of it, not the headline.
+- Dr Chinwe Kpaduwa sits on the panel. One voice of six, not the headline.
 - Built to recur. This is edition one.
 
 ## The argument
@@ -27,19 +27,17 @@ AS AT
 - How you feel and how you look are one appointment, not two. That is what Medlyfe is built on.
 - Medlyfe already does the inside: longevity, infusion, metabolic health, preventive care.
 - The panel is that argument made in public, by people with the credentials to be believed.
-- The fireside turns outward to the face and the body, which is the other half of the same centre.
 - Nobody in this room has had the whole subject explained by people who actually know.
 
-## Four names, four jobs
+## Three names, three jobs
 
 | Name | What it is |
 | --- | --- |
 | AGELESS | Medlyfe's platform, built to recur |
 | A New Era of Health, Beauty and Longevity | Medlyfe's proposition |
 | The New Science of Ageing Well | The panel |
-| The Art of Looking Like Yourself | Dr Kpaduwa's fireside |
 
-Keeping them apart is what lets edition two reuse everything except the panel.
+Three names, three jobs. Keeping them apart is what lets edition two reuse everything except the panel.
 
 ## The running order
 
@@ -48,13 +46,12 @@ Keeping them apart is what lets edition two reuse everything except the panel.
 | 5:30 | Arrival and cocktails |
 | 6:45 | Welcome and opening film |
 | 6:50 | The range. Dr Ajelabi, 10 minutes |
-| 7:00 | The panel, 35 minutes |
-| 7:35 | The fireside, 20 minutes |
-| 7:55 | What you can actually do |
-| 8:05 | Questions from the room |
+| 7:00 | The panel, 50 minutes |
+| 7:50 | What you can actually do |
+| 8:00 | Questions from the room |
 | 8:15 | After Hours. Close 9:30 |
 
-Ninety minutes of programme. Arrival and After Hours are where guests talk to the clinicians, so both are long on purpose.
+Ninety minutes of programme. Arrival and After Hours are long on purpose, because that is where guests talk to the clinicians.
 
 ## The stage
 
@@ -65,9 +62,7 @@ Ninety minutes of programme. Arrival and After Hours are where guests talk to th
 | Panel | Dr Timi Adenuga, GetSlim. Metabolism, weight, the new drugs |
 | Panel | Gbemi Giwa, African Fat Loss Method. Food and body composition |
 | Panel | Joycee Awosika, ORÍKÌ Group. Maintaining beauty and managing stress |
-| Panel | Dr Folake Kofo-Idowu, Nelia. Menopause and hormones |
-| Panel | One seat open. Andropause and men's health |
-| Fireside | Dr Chinwe Kpaduwa, MD FACS, with Dr Debo Odulana |
+| Panel | Dr Chinwe Kpaduwa, MD FACS. Aesthetics, and hormones and the body |
 
 - The panel is experiential, delivered by people with the credentials to be believed.
 - Every answer ends in something a guest can do that week.

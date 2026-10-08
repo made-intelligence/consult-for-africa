@@ -77,17 +77,6 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     need: ["confirmation", "bio", "photo"],
     notes: "Spelling is Joycee with two e's on her own properties. Sally and Dr Akinware own confirming her and getting the bio and photograph.",
   },
-  {
-    name: "Dr Folake Kofo-Idowu",
-    firstName: "Dr Kofo-Idowu",
-    email: "folake@iyewo.com",
-    org: "Nelia, and Doctors for Change",
-    slot: "the panel",
-    need: ["photo"],
-    bio: "Dr Folake Kofo-Idowu is a double board certified physician, founder and Medical Director of Nelia and its women's health service line Nelia Oasi. She practises across internal medicine, metabolic health and infectious diseases, and her work is in evidence-based menopause care, hormone optimisation and preventative women's medicine.",
-    notes:
-      "Bio taken from her own DFC Catalyst billing in this repo, where she spoke in September. Vice President of Doctors for Change. She is the hormones seat the panel was missing, so the ask to her is now only for a photograph.",
-  },
 ];
 
 /** Everyone we can actually write to today. */

@@ -184,20 +184,15 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "7:00",
     title: "The panel: The New Science of Ageing Well",
-    body: "Thirty five minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
+    body: "Fifty minutes on the inner, chaired by Dr Itunu Akinware. Metabolism, hormones, weight and energy, how they change as we age and what can be done about them.",
   },
   {
-    time: "7:35",
-    title: "Fireside: The Art of Looking Like Yourself",
-    body: "Dr Debo Odulana in conversation with Dr Chinwe Kpaduwa on her philosophy of aesthetics. Twenty minutes.",
-  },
-  {
-    time: "7:55",
+    time: "7:50",
     title: "What can you actually do?",
     body: "A practical introduction to the ways people can take action across health, longevity, performance, skin and aesthetics.",
   },
   {
-    time: "8:05",
+    time: "8:00",
     title: "Questions from the room",
     body: "A moderated conversation with the clinicians and speakers.",
   },
@@ -305,7 +300,7 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    subject: "Metabolism, weight, body composition, and the questions the room has about the new drugs",
+    subject: "Metabolism, weight and body composition. Hormones and the body as we age, and the questions the room has about the new drugs",
     name: "Dr Timi Adenuga",
     title: "Lead Bariatric and Laparoscopic Surgeon, GetSlim. ChM (Edinburgh), FWACS, MRCSEd",
     portrait: "/lyfe/adenuga-portrait.jpg",
@@ -332,29 +327,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel, on the inner",
-    // Taken from her own DFC Catalyst billing in this repo, where she spoke in
-    // September. She is the hormones seat the panel was missing.
     subject:
-      "Menopause, hormone optimisation and preventative women's medicine. What changes after 40, and what is worth measuring",
-    name: "Dr Folake Kofo-Idowu",
-    title: "Founder and Medical Director of Nelia. Double board certified physician",
-    portrait: "/lyfe/folake-portrait.jpg",
-    portraitWidth: 800,
-    portraitHeight: 1000,
-  },
-  {
-    seat: "The panel, on the inner",
-    subject: "Andropause and men's health at midlife. The half of this conversation men never get invited to",
-    name: null,
-    title: null,
-    portrait: null,
-  },
-  {
-    // Back on the evening from 8 October. One segment, not the headline. The
-    // evening is Medlyfe's and she does not get a section of her own.
-    seat: "The fireside",
-    subject:
-      "Aesthetics, and the art of looking like yourself. In conversation with Dr Debo Odulana",
+      "Aesthetics, and the art of looking like yourself. Hormones and the body as we age, and where surgery does and does not belong",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
     portrait: "/lyfe/chinwe-portrait.jpg",

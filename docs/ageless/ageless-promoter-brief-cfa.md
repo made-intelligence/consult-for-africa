@@ -17,7 +17,7 @@ Wednesday 21 October 2026
 
 Sell an evening, not a seminar.
 
-Cocktail evening at the Capital Club, Lagos, Wednesday 21 October. Seventy places. A panel, a fireside with a US board certified plastic surgeon, and an hour afterwards with the clinicians still in the room.
+Cocktail evening at the Capital Club, Lagos, Wednesday 21 October. Seventy places. A panel including a US board certified plastic surgeon, and an hour afterwards with the clinicians still in the room.
 
 Send everyone to **consultforafrica.com/lyfe**. They register interest. We invite from that list.
 
@@ -51,8 +51,7 @@ A few places are kept for clinicians.
 | Dr Timi Adenuga | Lead Bariatric and Laparoscopic Surgeon, GetSlim. Metabolism, weight, the new drugs |
 | Gbemi Giwa | Founder, African Fat Loss Method. Food and body composition |
 | Joycee Awosika | Founder and Chief Executive, ORÍKÌ Group. Maintaining beauty and managing stress |
-| Dr Folake Kofo-Idowu | Founder and Medical Director, Nelia. Menopause and hormones |
-| Dr Chinwe Kpaduwa, MD FACS | Plastic surgeon, US board certified. The fireside |
+| Dr Chinwe Kpaduwa, MD FACS | Plastic surgeon, US board certified. Aesthetics, and hormones and the body |
 
 ## The faces
 
@@ -60,13 +59,12 @@ A few places are kept for clinicians.
 Dr Chinwe Kpaduwa|public/lyfe/chinwe-portrait.jpg
 Dr Adedotun Ajelabi|public/lyfe/adedotun-portrait.jpg
 Dr Timi Adenuga|public/lyfe/adenuga-portrait.jpg
-Dr Folake Kofo-Idowu|public/lyfe/folake-portrait.jpg
 Gbemi Giwa|public/lyfe/gbemi-portrait.jpg
 Dr Itunu Akinware|
 Joycee Awosika|
 ::
 
-Download at consultforafrica.com/lyfe/ plus the file name: chinwe-portrait.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, folake-portrait.jpg, gbemi-portrait.jpg.
+Download at consultforafrica.com/lyfe/ plus the file name: chinwe-portrait.jpg, adedotun-portrait.jpg, adenuga-portrait.jpg, gbemi-portrait.jpg.
 
 Use only these. Do not take pictures from Instagram for printed or paid work. We do not hold the licence.
 
@@ -80,13 +78,11 @@ Dr Akinware and Ms Awosika still to send theirs.
 
 **The room.** Seventy places. Invitations go out from the register list.
 
-**The evening.** Cocktails, a panel, a fireside, and an hour with the clinicians afterwards.
+**The evening.** Cocktails, a panel, and an hour with the clinicians afterwards.
 
 ## Bios
 
 **Dr Chinwe Kpaduwa, MD FACS.** Plastic surgeon, board certified by the American Board of Plastic Surgery and a Fellow of the American College of Surgeons. Harvard educated, California trained, craniofacial fellowship at Nationwide Children's Hospital.
-
-**Dr Folake Kofo-Idowu.** Double board certified physician. Founder and Medical Director of Nelia and its women's health line Nelia Oasi. Internal medicine, metabolic health and infectious diseases, working in evidence-based menopause care, hormone optimisation and preventative women's medicine.
 
 **Gbemi Giwa.** Award winning fitness and nutrition coach, over a decade in practice. Founder of the African Fat Loss Method. Over 95,000 followers across Instagram and TikTok. Covered by Women's Health Middle East, Cosmopolitan Middle East, Entrepreneur, The National and Emirates Woman. Has worked with Nike and Apple.
 

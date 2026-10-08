@@ -19,6 +19,7 @@ Wednesday 21 October 2026
 - **Send your bio and a photograph by Friday 10 October**, or you miss the printed programme.
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
 - Seventy guests. Lagos women and men over forty. A cocktail evening, not a seminar.
+- **Dr Adenuga and Dr Kpaduwa are both asked to cover hormones and the body.** It is the subject the room most wants and the two surgeons share it.
 - No slides, no lectern. Cocktail dress.
 
 ## What we need from you
@@ -46,7 +47,7 @@ Cover:
 
 **The New Science of Ageing Well.** What changes in your body, brain and skin after 40, and what you can do about it.
 
-35 minutes. About seven minutes each. Chaired by Dr Itunu Akinware.
+50 minutes. Four seats, about twelve minutes each. Chaired by Dr Itunu Akinware.
 
 **Rule: every answer ends in something a guest can do this week.** The chair will come back to anyone who finishes on a generality.
 
@@ -74,27 +75,13 @@ Cover:
 - Stress. What does it do to how people look, and what do you see in your clients?
 - What is the cheapest thing that works, that nobody will sell them?
 
-### Dr Folake Kofo-Idowu, on menopause and hormones
-
-- What changes, and when does it start? Most of the room thinks fifty.
-- What should a woman of 40 be measuring, and how often?
-- Hormone therapy. What is the evidence, and why is it hard to get here?
-- What do Nigerian doctors get wrong about perimenopause?
-- She recognises herself tonight. What does she do tomorrow?
-
-### Fifth seat
-
-Open, on andropause and men's health. Same terms if filled.
-
-## The fireside
-
-**Dr Chinwe Kpaduwa with Dr Debo Odulana. 20 minutes.** About judgement, not procedures.
+### Dr Chinwe Kpaduwa, on aesthetics and the body
 
 - What does "look like yourself" mean in practice, and what does it rule out?
 - What do you refuse to do?
+- Hormones and the body. What do you see in patients that is hormonal rather than surgical?
 - Travelling abroad for surgery. What goes wrong, and when?
 - What do you wish people asked before surgery?
-- What has changed in your field in five years?
 
 ## The chair
 
@@ -109,10 +96,9 @@ She moves the conversation on if it reaches who may perform what. That is a live
 | 5:30 | Arrival and cocktails. Speakers in the room by 6:15 | Everyone |
 | 6:45 | Welcome and opening film | Dr Ajelabi |
 | 6:50 | The range. 10 minutes | Dr Ajelabi |
-| 7:00 | The panel. 35 minutes | Chaired by Dr Akinware |
-| 7:35 | The fireside. 20 minutes | Dr Kpaduwa with Dr Odulana |
-| 7:55 | What you can actually do. 10 minutes | Medlyfe |
-| 8:05 | Questions from the room. 10 minutes | All speakers |
+| 7:00 | The panel. 50 minutes | Chaired by Dr Akinware |
+| 7:50 | What you can actually do. 10 minutes | Medlyfe |
+| 8:00 | Questions from the room. 15 minutes | All speakers |
 | 8:15 | After Hours. Close 9:30 | Everyone |
 
 ## Rules for the stage
@@ -132,7 +118,7 @@ She moves the conversation on if it reaches who may perform what. That is a live
 | Venue | Capital Club, Lagos |
 | Arrive | In the room by 6:00pm |
 | Dress | Cocktail |
-| Audio | Handheld on the panel, lapel for the address and fireside |
+| Audio | Handheld on the panel, lapel for the address |
 | Slides | None. No lectern. One image behind you if it earns its place |
 | After Hours | Please stay. The useful conversations happen after 8:30 |
 
