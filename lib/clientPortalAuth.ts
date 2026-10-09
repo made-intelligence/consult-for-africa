@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { cookies } from "next/headers";
 
@@ -50,5 +51,14 @@ export async function getClientPortalSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get("client_portal_token")?.value;
   if (!token) return null;
-  return verifyClientPortalToken(token);
+  const session = verifyClientPortalToken(token);
+  if (!session) return null;
+  // A signed token outlives a revoked contact, so check access is still on.
+  // Without this, "Remove access" on /client/team would wait for the token to expire.
+  const contact = await prisma.clientContact.findUnique({
+    where: { id: session.sub },
+    select: { isPortalEnabled: true, clientId: true },
+  });
+  if (!contact?.isPortalEnabled || contact.clientId !== session.clientId) return null;
+  return session;
 }

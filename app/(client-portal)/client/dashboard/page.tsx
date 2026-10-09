@@ -556,7 +556,7 @@ export default async function ClientDashboardPage() {
           </div>
         )}
         {/* Quick Links */}
-        <div className="grid md:grid-cols-3 gap-4 mt-8">
+        <div className="grid md:grid-cols-2 gap-4 mt-8">
           <Link
             href="/client/invoices"
             className="group rounded-2xl bg-white p-6 transition-all hover:shadow-md"
@@ -566,6 +566,19 @@ export default async function ClientDashboardPage() {
               <div>
                 <p className="text-sm font-semibold" style={{ color: "#0F2744" }}>Invoices</p>
                 <p className="text-xs text-gray-500 mt-1">View and pay your invoices online</p>
+              </div>
+              <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&rarr;</span>
+            </div>
+          </Link>
+          <Link
+            href="/client/team"
+            className="group rounded-2xl bg-white p-6 transition-all hover:shadow-md"
+            style={{ border: "1px solid #e5eaf0" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold" style={{ color: "#0F2744" }}>Your team</p>
+                <p className="text-xs text-gray-500 mt-1">Invite colleagues to this portal</p>
               </div>
               <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&rarr;</span>
             </div>
