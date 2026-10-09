@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Briefcase, FileText, BookOpen } from "lucide-react";
+import { LayoutDashboard, Briefcase, FileText, BookOpen, Users } from "lucide-react";
 import BottomTabBar from "@/components/shared/BottomTabBar";
 
 export default function ClientBottomTabs() {
@@ -12,6 +12,7 @@ export default function ClientBottomTabs() {
         { label: "Projects", href: "/client/projects", icon: Briefcase },
         { label: "Invoices", href: "/client/invoices", icon: FileText },
         { label: "Knowledge", href: "/client/knowledge", icon: BookOpen },
+        { label: "Team", href: "/client/team", icon: Users },
       ]}
     />
   );
