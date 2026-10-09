@@ -660,6 +660,7 @@ model Engagement {
   meetings           Meeting[]
   ndas               Nda[]
   impactMetrics      EngagementImpactMetric[]
+  dashboards         EngagementDashboard[]
   knowledgeAssets    KnowledgeAsset[]
   frameworks         EngagementFramework[]
   staffingRequests   StaffingRequest[]
@@ -1496,6 +1497,35 @@ model EngagementImpactMetric {
 
   @@index([engagementId], map: "ProjectImpactMetric_projectId_idx")
   @@map("ProjectImpactMetric")
+}
+
+/// A client-facing dashboard built from the client's own data during an
+/// engagement. One row per version: an analysis script writes a DRAFT, a
+/// partner reviews it at /admin/client-dashboards and publishes it, and the
+/// client portal shows the latest PUBLISHED row. `data` follows
+/// lib/client-dashboard/types.ts and holds aggregates only, never patient or
+/// staff level records.
+model EngagementDashboard {
+  id           String                    @id @default(cuid())
+  engagementId String
+  engagement   Engagement                @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  title        String
+  asOf         DateTime
+  data         Json
+  status       EngagementDashboardStatus @default(DRAFT)
+  publishedAt  DateTime?
+  publishedBy  String?
+  source       String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([engagementId, status])
+}
+
+enum EngagementDashboardStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 model KnowledgeAsset {
