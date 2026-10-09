@@ -173,9 +173,10 @@ export const LYFE_SPEAKERS: LyfeSpeaker[] = [
     // practice, so the centre stands in its place.
     org: "MedLYFE Wellness and Longevity Centre",
     slot: "the panel, on skin ageing, aesthetics, body changes, hair loss and responsible procedure choices",
-    subject: "Aesthetics and Skin Ageing for Men and Women",
+    subject:
+      "Maintaining Beauty Aesthetics and Skin for Men and Women as they age",
     focus:
-      "Dr Chinwe should give guests a grounded medical view of aesthetics for men and women. She should explain how the face, skin, fat pads, fascia and facial structure change with age; what happens to skin quality, lines, sagging, pigmentation and hair; how women may experience body changes after pregnancy such as diastasis recti or loose skin; and how to think responsibly about skincare, supplements, nutrition, Botox, fillers, regenerative treatments, lasers and surgery. Black skin safety, scarring, pigmentation and natural-looking outcomes should remain central.",
+      "Dr Chinwe should give guests a grounded medical view of aesthetics for men and women. She should explain how the face, skin, fat pads, fascia and facial structure change with age; what happens to skin quality, lines, sagging, pigmentation and hair; how women may experience body changes after pregnancy such as diastasis recti or loose skin; and how to think responsibly about skincare, beauty supplements, nutrition, Botox, fillers, regenerative treatments, lasers and surgery. Black skin safety, scarring, pigmentation and natural-looking outcomes should remain central.",
     questions: [
       "What actually happens to the face as we age: skin, collagen, fat pads, fascia, bone and facial structure?",
       "How do ageing patterns and aesthetic concerns differ for women and men?",
