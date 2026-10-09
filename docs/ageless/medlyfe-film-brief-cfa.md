@@ -15,11 +15,12 @@ Friday 9 October 2026
 
 ## In short
 
-- **One film, 75 to 90 seconds.** It introduces MedLYFE, and it has to keep doing that for months.
+- **One film, 90 seconds, built to sell.** It introduces MedLYFE and asks for a booking, and it has to keep doing both for months.
 - **First outing** is 6:45pm on Wednesday 21 October at Capital Club, Lagos, as the evening opens.
 - **After that it is the standing introduction**: the website hero, the first thing on every discovery call, reception, the sales deck, the WhatsApp forward.
 - **So nothing in it is about the event.** No date, no venue, no guests, no AGELESS. It must not expire on the 22nd.
 - **It carries the discovery deck's spine**, not a new story. Same argument, same words, so the film and the call agree.
+- **It ends on an instruction with a price on it.** Start with a Longevity Day, from ₦50,000, Lekki.
 - **Half a day at the centre.** One location, three setups, one person to camera.
 - **Shoot Tuesday 13 or Wednesday 14 October.** Final file by Monday 19 October.
 - No patients. No before and after. No drug brand names. The section on what must not be in it is not negotiable.
@@ -44,50 +45,68 @@ If you cannot hold Monday 19 October, say so on Saturday. That is as useful to u
 
 ## What the film has to do
 
-Somebody meets MedLYFE for the first time. Ninety seconds later they should hold one idea: there is a gap between how long you live and how well you live, and this is a medical centre that measures you and closes it.
+It sells. That is the job, and it is worth saying plainly because the easy version of this film is an explainer that leaves everybody better informed and nobody booked.
 
-That is the discovery deck's own argument, and the film does not invent a second one. A prospect who watches the film and then sits through the call should hear the same thing twice, in the same words. Two different stories is how a centre sounds improvised.
+A guest at Capital Club or somebody who lands on the website should finish it holding four things:
 
+- **There is a gap between how long I will live and how well.** It is years long and it is coming for me.
+- **I want what they are describing.** Energy, capability, not becoming the patient my father became.
+- **These people measure before they prescribe.** That is a reason to trust them rather than the clinic advertising a drip.
+- **I can start on a day, for fifty thousand naira, in Lekki.** It is not a membership and it is not out of reach.
+
+The fourth is the one most films like this leave out, and it is the one that produces a booking. The biggest barrier is not disbelief. It is a quiet assumption that longevity medicine is for people in California.
+
+### What selling does not mean here
+
+- **No promised outcome.** Not a number of years, not a result, not a cure. Desire is legal; a claim is not.
+- **The payoff is felt, not listed.** "More good years, lower risk, better quality of life" is a bullet on a slide. On film it has to be a specific picture of a life.
 - **It is not a clinic tour.** Rooms are the setting, not the subject.
 - **It is not a list of services.** The pyramid has six layers and naming them all in ninety seconds reads as a menu.
-- **It is not aspirational stock.** No sunrises, no yoga on a beach, no stethoscope on a desk.
+- **No stock aspiration.** No sunrises, no yoga on a beach, no stethoscope on a desk.
 - **It is not about the evening.** It opens AGELESS and hands to Dr Ajelabi, but nothing in the picture, the words or the end card refers to the event. It has to be as right in March as it is on the 21st.
 
 ## The film
 
-Ninety seconds, give or take. Picture and sound against the clock.
+Ninety seconds. Picture and sound against the clock.
 
-The lifespan and healthspan bars on slide two of the discovery deck are the one graphic in the film. Animate them: two lines from birth, one running to the end, one stopping short, and the gap between them opening up. That gap is the whole proposition and it is worth eight seconds.
+The lifespan and healthspan bars on slide two of the discovery deck are the one graphic in the film. Animate them: two lines from birth, one running on, one stopping short, the gap opening between them. That gap is the proposition and it is worth eight seconds.
 
 | Time | Picture | Sound |
 | --- | --- | --- |
 | 0:00 | Black. The MedLYFE mark resolves, small, centred | Room tone, then a low sustained note |
 | 0:04 | Dr Ajelabi, seated, to camera, daylight | **Line one** |
-| 0:14 | The two bars animate. Lifespan runs on. Healthspan stops short. The gap opens | Music enters |
-| 0:22 | Dr Ajelabi, to camera | **Line two** |
-| 0:30 | Close: a blood sample into an analyser. Hands, gloves, no faces | Music |
-| 0:36 | Close: real numbers appearing on a screen. Readouts, not motion graphics | |
-| 0:42 | Dr Ajelabi, to camera | **Line three** |
-| 0:54 | The infusion room, empty, in daylight. Slow push | Music lifts |
-| 1:00 | Close: a measurement being taken on a colleague, not a patient | |
-| 1:06 | Dr Ajelabi, to camera | **Line four** |
-| 1:16 | Hold on her. She does not smile on cue | Music resolves |
-| 1:20 | Card: MedLYFE Wellness and Longevity Centre. Live Better for Longer | |
-| 1:26 | Black | Out |
+| 0:12 | The two bars animate. Lifespan runs on. Healthspan stops short. The gap opens and holds | Music enters |
+| 0:20 | Dr Ajelabi, to camera | **Line two** |
+| 0:32 | Close: a blood sample into an analyser. Hands, gloves, no faces | Music |
+| 0:38 | Close: real numbers appearing on a screen. Readouts, not motion graphics | |
+| 0:44 | Dr Ajelabi, to camera | **Line three** |
+| 0:52 | Close: a measurement being taken on a colleague, not a patient | |
+| 0:58 | Dr Ajelabi, to camera | **Line four** |
+| 1:06 | The infusion room, empty, in daylight. Slow push. Then one clean wide of the centre | Music lifts |
+| 1:12 | Dr Ajelabi, to camera | **Line five** |
+| 1:22 | Card: **Start with a Longevity Day. From ₦50,000.** Lekki, Lagos | Music resolves |
+| 1:26 | Card: MedLYFE Wellness and Longevity Centre. Live Better for Longer | |
+| 1:30 | Black | Out |
+
+The last eight seconds are the ones that pay for the film. The end card is not a logo, it is an instruction with a price and a place on it.
 
 ### What she says
 
-Four lines, learned rather than read. No autocue if it can be avoided; an earpiece is better than a wandering eye. Three of the four are lifted from the discovery deck on purpose.
+Five lines, learned rather than read. No autocue if it can be avoided; an earpiece is better than a wandering eye. Lines three and four are lifted from the discovery deck intact.
 
-> **One.** Lifespan is how long you live. Healthspan is how well you live.
+> **One.** Lifespan is how long you live. Healthspan is how well you live. For most people there is a gap at the end, and it is years long.
 
-> **Two.** For most people there is a gap at the end. Years spent in decline. Closing that gap is the whole of our work.
+> **Two.** Nobody comes to us asking to live forever. They ask to still have energy at fifty five. To be the one still travelling at seventy. To not become the patient they watched their father become.
 
 > **Three.** We don't guess. We test, then we act.
 
 > **Four.** We do not prescribe transformation before we understand the person.
 
-If she would rather say it in her own words, that is better than these words, with one exception: lines three and four are MedLYFE's own and should survive intact. They are the two sentences in the deck that sound like a position rather than a brochure.
+> **Five.** It starts with a day. We measure you properly, you sit with a doctor, and you leave with a plan built on your own numbers rather than somebody's general advice.
+
+If she would rather say it in her own words, that is better than these words, with two exceptions. Lines three and four are MedLYFE's own and should survive intact; they are the two sentences in the deck that sound like a position rather than a brochure.
+
+Line two is the one to spend time on at the recce. It is the only line that makes somebody want this rather than understand it, and it will be better if it comes out of her own consulting room than out of this document. Ask her what patients actually say when they first sit down, and use that.
 
 ## On camera
 
@@ -133,7 +152,7 @@ A film that does six jobs is worth six times a film that does one, which is the 
 | Website hero, muted | 1920 x 1080, no audio track, graded to sit behind text. Under 4MB, so it loads on Lagos 4G |
 | Vertical | 1080 x 1920, burned-in captions |
 | Square | 1080 x 1080, burned-in captions |
-| A 30 second cut | From the same material, 16:9 and 9:16, for paid social and for a cold audience who will not give you ninety seconds |
+| A 30 second cut | From the same material, 16:9 and 9:16. This is the sales cut: the gap, one line of want, and the end card. For paid social and for a cold audience who will not give you ninety seconds |
 | Stills | 15 or more frames, retouched, full and web resolution |
 | Project files and masters | Every rush, plus the project, on physical media. We will want to re-cut this in six months without re-shooting |
 
@@ -157,7 +176,7 @@ One further point, for the website version only. A film shown to an invited room
 - Access to the centre for the shoot day, and for the recce on Monday 12 October.
 - Dr Ajelabi, for a maximum of two hours inside the shoot day.
 - Two staff for the clinical inserts.
-- The MedLYFE mark, brand colours and the end card specification.
+- The MedLYFE mark, brand colours and the end card specification, including the current entry price.
 - The discovery call deck, which is where the argument and two of the four lines come from. Read it before the recce.
 - A named person on set who can approve a shot on the spot, so the day does not stop for a telephone call.
 
@@ -175,7 +194,7 @@ Itemised, so pre-production, the day and post can be weighed separately.
 | 6 | Edit, to two rounds of notes |
 | 7 | Grade and online |
 | 8 | Sound mix and music licence |
-| 9 | Motion graphics: mark resolve, the lifespan and healthspan animation, lower third, end card |
+| 9 | Motion graphics: mark resolve, the lifespan and healthspan animation, lower third, and the two end cards |
 | 10 | Versioning: the master, the muted hero, vertical, square and the 30 second cut |
 | 11 | Media, delivery and archive |
 | 12 | Anything you believe is missing from this list |
