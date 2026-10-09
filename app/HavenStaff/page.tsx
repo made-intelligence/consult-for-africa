@@ -7,6 +7,7 @@ import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
 import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
 import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
+import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -114,6 +115,7 @@ export default async function HavenStaffPage() {
   let lastWeek: ScoreRow[] = [];
   const period = isoWeek();
   let waiting: WaitingItem[] = [];
+  let todayTasks: TodayTask[] = [];
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -134,6 +136,34 @@ export default async function HavenStaffPage() {
     ]);
     people = dir;
     waiting = await whatsWaiting(session);
+
+    // Today's tickable tasks. Separate from the waiting list because these are
+    // things you do here rather than somewhere else, and a link to a checkbox
+    // is one tap more than a checkbox.
+    const day = new Date();
+    const forDate = new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate()));
+    const meRow = await prisma.staffMember.findUnique({
+      where: { id: session.sub },
+      select: { position: true, department: true },
+    });
+    const allTasks = await prisma.staffTask.findMany({
+      where: { clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY"] } },
+      select: { id: true, title: true, why: true, roles: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    const [done, flags] = await Promise.all([
+      prisma.staffTaskCompletion.findMany({ where: { staffId: session.sub, forDate }, select: { taskId: true } }),
+      prisma.staffTaskFlag.findMany({ where: { staffId: session.sub, resolvedAt: null }, select: { taskId: true } }),
+    ]);
+    const doneIds = new Set(done.map((d) => d.taskId));
+    const flaggedIds = new Set(flags.map((f) => f.taskId));
+    const hay = `${meRow?.position ?? ""} ${meRow?.department ?? ""}`.toLowerCase();
+    todayTasks = allTasks
+      .filter((x) => x.roles.length === 0 || x.roles.some((r) => {
+        const n = r.toLowerCase().replace(/^every /, "").replace(/s$/, "");
+        return hay.includes(n) || n.includes("everybody") || n.includes("all ");
+      }))
+      .map((x) => ({ id: x.id, title: x.title, why: x.why, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
     entitlement = me?.annualLeaveDays ?? 20;
     myDepartment = me?.department ?? "";
 
@@ -233,8 +263,13 @@ export default async function HavenStaffPage() {
             <section id="today" style={{ marginTop: 40 }}>
               <Eyebrow>{`Hello ${session.name.split(" ")[0]}`}</Eyebrow>
               <h2 style={{ color: NAVY, fontSize: 25, lineHeight: 1.2, margin: "8px 0 0", letterSpacing: "-0.01em" }}>
-                {waiting.length === 0 ? "Nothing is waiting on you" : "Waiting on you"}
+                {waiting.length === 0 && todayTasks.every((x) => x.done) ? "Nothing is waiting on you" : "Today"}
               </h2>
+              {todayTasks.length > 0 && (
+                <div style={{ marginTop: 20 }}>
+                  <TodayTasks tasks={todayTasks} />
+                </div>
+              )}
               {waiting.length === 0 ? (
                 <p style={{ color: MUTED, fontSize: 16, lineHeight: 1.65, margin: "10px 0 0" }}>
                   Everything is up to date. Have a look at the team notes, or tell us what is broken.
