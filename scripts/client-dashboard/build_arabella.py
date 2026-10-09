@@ -231,7 +231,7 @@ data = dict(
                          detail=f"The list shows {reg_2026} new registrations this year. The sales record shows {registrations_paid} registration fees. Some will be package patients whose fee is included, and the rest is worth checking at the front desk.",
                          source="Patient list, sales record"),
                     dict(tone="neutral", headline="Before anyone on the list is contacted",
-                         detail="Most of these records were created under Tabitha. Contacting them as Arabella needs a lawful basis under the Nigeria Data Protection Act, which is one of the questions in section H of the request.",
+                         detail="Most of these patients registered when the practice was Tabitha. Writing to them about their own care is straightforward. Before any marketing, they should be told about the change of name and given an easy way to opt out, which the Nigeria Data Protection Act expects and which section H of the request covers.",
                          source="Information request"),
                 ]),
             ],
@@ -271,8 +271,8 @@ data = dict(
             blocks=[
                 dict(kind="checks", title="What has come in", note="Against the information request", items=[
                     dict(label="Sales record", status="partial", detail=(
-                        f"Every payment logged with its service and how it was paid, and it agrees with its own summary sheet in every month but April, where the two are ₦20,000 apart. But it is still headed Tabitha Medical Centre, "
-                        f"the summary stops at July, {L['issues'].get('date with day and month swapped', 0) + L['issues'].get('date typed as text', 0)} of {L['rows']} dates are typed as text or have the day and month swapped, and there is no patient number.")),
+                        f"Every payment logged with its service and how it was paid, and it agrees with its own summary sheet in every month but April, where the two are ₦20,000 apart. It is still headed Tabitha Medical Centre, which will change with the new name. "
+                        f"The summary stops at July, {L['issues'].get('date with day and month swapped', 0) + L['issues'].get('date typed as text', 0)} of {L['rows']} dates are typed as text or have the day and month swapped, and there is no patient number.")),
                     dict(label="Price list", status="partial", detail="More than 300 items priced. The laparoscopic procedures are still marked TBD, there are no fertility or IVF prices although fertility brought in ₦6m, and the Platinum package price is mistyped."),
                     dict(label="HMO panels", status="partial", detail="Seven named: Henner, Allianz, AXA Mansard, Leadway, Reliance, ECOWAS on retainer, and Clearline. Tariffs are to follow."),
                     dict(label="Staff list", status="ok", detail="Roles, employment type, days and reporting lines for everyone, plus ten visiting consultants. No embryologist is named for the fertility service."),
