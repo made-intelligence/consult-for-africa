@@ -22,23 +22,7 @@ Friday 9 October 2026
 - **It carries the discovery deck's spine**, not a new story. Same argument, same words, so the film and the call agree.
 - **Half a day at the centre.** One location, three setups, one person to camera.
 - **Shoot Tuesday 13 or Wednesday 14 October.** Final file by Monday 19 October.
-- **There is a second block** that can ride the same production. See below.
 - No patients. No before and after. No drug brand names. The section on what must not be in it is not negotiable.
-
-## Two blocks, one production
-
-The shoot briefed for Thursday 8 October did not go ahead, so the library it was to produce does not exist and the crew is not committed. Dr Chinwe Kpaduwa is in Lagos for the evening on the 21st, which gives a window that did not exist a week ago.
-
-| | What | When |
-| --- | --- | --- |
-| **A** | The opening film. This document | Fixed. Delivered Monday 19 October |
-| **B** | Dr Kpaduwa's educational library, as briefed on 6 October | Movable. Around her availability, before or after the 21st |
-
-**Block A is the one with a deadline, and it is the one to quote first.** If taking both at once costs you the 19 October delivery, do not take both. The film is cued in a room on a fixed date and the library is not.
-
-If you can take both, say what the combined day or days look like and what it saves against quoting them apart. One crew call, one kit hire and one grade across two blocks should be worth something to us both, and we would rather you told us the number than discovered it later.
-
-Block B's deliverables, locations and conditions are unchanged from the brief of 6 October. Nothing in this document replaces it.
 
 ## The deadline governs everything
 
@@ -198,8 +182,6 @@ Itemised, so pre-production, the day and post can be weighed separately.
 
 Quote the half day as a half day. If you can only crew a full day, quote that as well and we will decide.
 
-Then, separately and underneath, quote Block B against the lines in the brief of 6 October, and give us the saving if both are taken as one production.
-
 ## Rights
 
 Full, perpetual, worldwide, across every medium, to MedLYFE Wellness and Longevity Centre. Music cleared on the same basis, with the licence supplied.
@@ -210,6 +192,5 @@ You are welcome to use the finished film in your own portfolio and showreel, and
 
 1. Whether you can crew Tuesday 13 or Wednesday 14 October.
 2. Whether you can deliver the event master by Monday 19 October.
-3. The quotation for Block A, and separately for Block B.
-4. Whether taking both as one production changes either the price or the 19 October date.
-5. Anything in this brief you would do differently. We would rather hear it now than see it in the cut.
+3. The quotation.
+4. Anything in this brief you would do differently. We would rather hear it now than see it in the cut.
