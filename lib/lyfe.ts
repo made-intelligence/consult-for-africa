@@ -487,7 +487,8 @@ export const LYFE_PANEL: LyfePanelSeat[] = [
   },
   {
     seat: "The panel",
-    subject: "Aesthetics and Skin Ageing for Men and Women",
+    subject:
+      "Maintaining Beauty Aesthetics and Skin for Men and Women as they age",
     name: "Dr Chinwe Kpaduwa, MD FACS",
     title: "Plastic surgeon, board certified by the American Board of Plastic Surgery",
     portrait: "/lyfe/chinwe-portrait-centred-800.jpg",

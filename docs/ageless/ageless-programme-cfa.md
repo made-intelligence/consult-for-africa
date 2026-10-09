@@ -63,7 +63,7 @@ Ninety minutes of programme. Arrival and After Hours are long on purpose, becaus
 | Panel | Dr Timi Adenuga, GetSlim. Weight, Metabolism and Longevity |
 | Panel | Gbemi Giwa, African Fat Loss Method. Lifestyle and Behaviour Change for Longevity |
 | Panel | Joycee Awosika, ORÍKÌ Group. Stress Management, Self Care and Longevity |
-| Panel | Dr Chinwe Kpaduwa, MD FACS. Aesthetics and Skin Ageing for Men and Women |
+| Panel | Dr Chinwe Kpaduwa, MD FACS. Maintaining Beauty Aesthetics and Skin for Men and Women as they age |
 
 - The panel is experiential, delivered by people with the credentials to be believed.
 - Every answer ends in something a guest can do that week.

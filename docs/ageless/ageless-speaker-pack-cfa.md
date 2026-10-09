@@ -96,9 +96,9 @@ Joycee should focus on self-care as a serious part of longevity. Her contributio
 
 ### Dr Chinwe Kpaduwa, MD FACS
 
-**Aesthetics and Skin Ageing for Men and Women**
+**Maintaining Beauty Aesthetics and Skin for Men and Women as they age**
 
-Dr Chinwe should give guests a grounded medical view of aesthetics for men and women. She should explain how the face, skin, fat pads, fascia and facial structure change with age; what happens to skin quality, lines, sagging, pigmentation and hair; how women may experience body changes after pregnancy such as diastasis recti or loose skin; and how to think responsibly about skincare, supplements, nutrition, Botox, fillers, regenerative treatments, lasers and surgery. Black skin safety, scarring, pigmentation and natural-looking outcomes should remain central.
+Dr Chinwe should give guests a grounded medical view of aesthetics for men and women. She should explain how the face, skin, fat pads, fascia and facial structure change with age; what happens to skin quality, lines, sagging, pigmentation and hair; how women may experience body changes after pregnancy such as diastasis recti or loose skin; and how to think responsibly about skincare, beauty supplements, nutrition, Botox, fillers, regenerative treatments, lasers and surgery. Black skin safety, scarring, pigmentation and natural-looking outcomes should remain central.
 
 - What actually happens to the face as we age: skin, collagen, fat pads, fascia, bone and facial structure?
 - How do ageing patterns and aesthetic concerns differ for women and men?
