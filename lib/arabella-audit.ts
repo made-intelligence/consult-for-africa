@@ -16,43 +16,54 @@ export type RequestSection = {
   hint: string;
 };
 
-/** The eight that turn a walkthrough into an audit. Ordered as in the document. */
+/** What has arrived, so the page thanks people for it rather than asking again. Update as things land. */
+export const RECEIVED: { what: string; status: "in" | "partly"; note: string }[] = [
+  { what: "Company certificate", status: "in", note: "RC 1802696, incorporated June 2021" },
+  { what: "Sales record, January to September 2026", status: "in", note: "Still to come: October to December 2025" },
+  { what: "Price list", status: "partly", note: "Laparoscopic and fertility prices still to come" },
+  { what: "HMO list", status: "partly", note: "Tariffs, contracts and amounts owed still to come" },
+  { what: "Staff list", status: "in", note: "Roles, days and reporting lines" },
+  { what: "Pharmacy stock register", status: "partly", note: "Unit costs still to come" },
+  { what: "Patient list", status: "in", note: "4,379 records" },
+];
+
+/**
+ * The eight we need next, after the first uploads. Ordered as in the
+ * document. Kept as PRIORITY_EIGHT so the admin page's chase list follows.
+ */
 export const PRIORITY_EIGHT: { n: number; what: string; why: string; section: string }[] = [
-  { n: 1, section: "A", what: "Arabella's certificate of incorporation, RC number and CAC status report", why: "Every finding about the succession from Tabitha is checked against it" },
-  { n: 2, section: "G", what: "The list of Tabitha's HMO panels, with tariff schedules and the contact at each", why: "The most valuable thing the succession has to carry, and the hardest to rebuild if lost" },
-  { n: 3, section: "D", what: "The revenue record, monthly, last 12 months, by service line and by payer", why: "This becomes the baseline, the number every later judgement is measured against" },
-  { n: 4, section: "D", what: "Bank statements for every business account, last 12 months", why: "The only unarguable record of what came in, as opposed to what was invoiced" },
-  { n: 5, section: "F", what: "The price list and package architecture: maternity, gynaecology surgery, fertility", why: "We cannot see yield or leakage without knowing the list" },
-  { n: 6, section: "H", what: "A description of the patient database: where it is held, how many records, which fields. Not the records themselves", why: "Its quality decides what the list is worth, and we will open it with you on site" },
-  { n: 7, section: "K", what: "Full staff list with role, employment type, days worked and reporting line", why: "Establishment against service is where specialist centres quietly fail" },
-  { n: 8, section: "C", what: "Facility registration and licences, including for the fertility service", why: "Category registered against service delivered is a live exposure, and worse in a new entity" },
+  { n: 1, section: "C", what: "Bank statements for every account the practice is paid into, last 12 months", why: "The only way to confirm that what the record says came in reached the bank" },
+  { n: 2, section: "E", what: "Monthly costs, last 12 months: salaries, rent, power, drugs bought, tests sent out", why: "Without costs nobody can say which services make money" },
+  { n: 3, section: "D", what: "For each HMO and company account: tariff, contract, and what it owes today", why: "Insurers paid under 2% of this year's takings" },
+  { n: 4, section: "F", what: "Fertility: who does the embryology, cycles started this year, and the price of a cycle", why: "Fertility brought in \u20A66m and is not on the price list or the staff list" },
+  { n: 5, section: "F", what: "Laboratory: tests done on site and sent out, to whom, and the cost of each", why: "The largest line in the sales record, at 30%" },
+  { n: 6, section: "F", what: "Maternity this year: women booked, babies delivered here, and those who delivered elsewhere", why: "Two to four packages in nine months, against where the brand is pointed" },
+  { n: 7, section: "B", what: "The facility registration certificate, and the name it is in", why: "Whether it covers what is delivered, and whether it moves to Arabella" },
+  { n: 8, section: "D", what: "Prices for the laparoscopic procedures marked TBD", why: "Surgery cannot be quoted without a price" },
 ];
 
 export const REQUEST_SECTIONS: RequestSection[] = [
-  { key: "A", title: "The two entities, and what the succession rests on", hint: "CAC documents for both, any transfer or novation agreement, what moved and what did not, and who holds the patient records" },
-  { key: "B", title: "Ownership, governance and how decisions get made", hint: "Shareholding, directors, bank mandate, who signs off what, loans and director's money in" },
-  { key: "C", title: "Licensing, regulatory standing and insurance", hint: "Facility registration, MDCN and nursing licences, the fertility service and its laboratory, indemnity, waste, data protection" },
-  { key: "D", title: "Money, in and out", hint: "Management accounts, bank statements, trial balance, asset register, the monthly fixed cost run rate" },
-  { key: "E", title: "The service ledger", hint: "One row per episode: service, payer, quoted, invoiced, collected, direct cost, outcome. Maternity, surgery and fertility each have their own counts" },
-  { key: "F", title: "Pricing and the package architecture", hint: "The price list, what a maternity package includes and excludes, how a quote is built, and quotes that did not convert" },
-  { key: "G", title: "Payers: HMO, corporate and self pay", hint: "Panels and tariffs, receivables ageing, rejections and their reasons, the authorisation process, corporate accounts" },
-  { key: "H", title: "The patient database and the right to contact it", hint: "Answered in writing, not uploaded: the fields, how it was built, what patients were told, and anyone who asked not to be contacted" },
-  { key: "I", title: "Clinical governance, safety and the patient journey", hint: "Protocols for the emergencies that actually happen, consent forms, incidents, the escalation route, and the journey as it runs" },
-  { key: "J", title: "Pharmacy, stock and the formulary", hint: "Stock list with expiry, purchases, margin, stockouts, cold chain, and when it was last physically counted" },
-  { key: "K", title: "People", hint: "Staff list, organogram, contracts, rota, turnover, training, and how tasks are assigned and checked today" },
-  { key: "L", title: "Technology, records and information security", hint: "Every system and who administers it, backups and the last restore test, access control, devices, the website and ad accounts" },
-  { key: "M", title: "Marketing, referrals and what has already been tried", hint: "Old-name signage, social accounts, HERcast audience, marketing spend and what it produced, and who refers patients today" },
+  { key: "A", title: "The company and the change of name", hint: "CAC status report, Tabitha's registration and closure, what still sits in Tabitha's name, governance, loans" },
+  { key: "B", title: "Licences, insurance and compliance", hint: "Facility registration, practising licences, fertility, pharmacy and laboratory registrations, indemnity, waste, data protection" },
+  { key: "C", title: "Money in", hint: "Sales record for October to December 2025, bank statements, the two largest payments, registrations, cash handling" },
+  { key: "D", title: "Prices, packages and who pays", hint: "Missing prices, what packages include, HMO tariffs and contracts, what insurers and companies owe" },
+  { key: "E", title: "Money out", hint: "Monthly costs, payroll, purchases, tests sent out, the cafe, marketing spend, management accounts" },
+  { key: "F", title: "How each service runs", hint: "Maternity, fertility, surgery, laboratory, pharmacy and wellness: activity, staffing and costs" },
+  { key: "G", title: "Clinical safety", hint: "Emergency protocols and drills, consent forms, incidents, sterilisation, infection prevention, complaints" },
+  { key: "H", title: "Patients and where they come from", hint: "Privacy notices and opt-outs, follow-up booking, the patient journey, referrers, enquiries, HERcast" },
+  { key: "I", title: "People", hint: "Contracts, rota, cover, leavers, training, and how tasks are given out and checked" },
+  { key: "J", title: "Systems and records", hint: "Every system and who administers it, backups, access, devices, the website and ad accounts" },
 ];
 
 /** Sections offered in the uploader, priority first and a catch-all last. */
 export const UPLOAD_SECTIONS: RequestSection[] = [
-  { key: "priority", title: "One of the eight priority items", hint: "The eight that matter most" },
+  { key: "priority", title: "One of the eight we need next", hint: "Bank statements, costs, HMO amounts owed, fertility, laboratory, maternity, registration, missing prices" },
   ...REQUEST_SECTIONS,
   { key: "other", title: "Something else", hint: "Anything you think we should see that we did not ask for" },
 ];
 
 export const sectionLabel = (key: string): string => {
-  if (key === "priority") return "Priority eight";
+  if (key === "priority") return "Priority items";
   if (key === "other") return "Other";
   const s = REQUEST_SECTIONS.find((x) => x.key === key);
   return s ? `${s.key}. ${s.title}` : key;
@@ -97,7 +108,7 @@ export const DOCUMENTS = [
   {
     href: "/arabella/arabella-audit-information-request-cfa.pdf",
     title: "Information and data request",
-    pages: "10 pages",
-    blurb: "Everything we have asked for, section by section, with the eight that matter most at the front and how the audit runs from here at the back.",
+    pages: "7 pages",
+    blurb: "What has come in, the eight we need next, and the full list in ten sections. Revised 9 October.",
   },
 ];

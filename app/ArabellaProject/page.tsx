@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import DocumentUploader from "@/components/arabella/DocumentUploader";
-import { DOCUMENTS, PRIORITY_EIGHT, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
+import { DOCUMENTS, PRIORITY_EIGHT, RECEIVED, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
 
 // One link for Dr Chito and the Arabella team: the request document, the four
 // surveys, and somewhere to put the answers. Deliberately not indexed.
@@ -28,7 +28,7 @@ const card = {
 const STAGES: { when: string; what: string }[] = [
   {
     when: "Records",
-    what: "Records and systems reviewed. Revenue rebuilt from the ledger and traced to the bank, and the baseline agreed with you.",
+    what: "Revenue rebuilt from the sales record and traced to the bank, and costs put against each service, so we can see what each one makes.",
   },
   {
     when: "Conversations",
@@ -138,12 +138,42 @@ export default function ArabellaProjectPage() {
           </div>
         </section>
 
-        {/* 2. The eight */}
+        {/* 2. What has come in */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
-            eyebrow="Start with these"
-            title="The eight that matter most"
-            lead="These eight unlock everything else. If time is short, send these first and let the rest follow."
+            eyebrow="Thank you"
+            title="What has come in"
+            lead="All of this arrived within a day of asking. Where something is only partly in, the note says what is still missing."
+          />
+          <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+            {RECEIVED.map((r, i) => (
+              <div
+                key={r.what}
+                style={{ display: "flex", gap: 12, alignItems: "baseline", padding: "12px 18px", borderTop: i === 0 ? "none" : `1px solid #F1F5F9` }}
+              >
+                <span
+                  style={{
+                    flex: "0 0 auto", fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "3px 9px",
+                    background: r.status === "in" ? "#DCFCE7" : "#FEF3C7", color: r.status === "in" ? "#166534" : "#92400E",
+                  }}
+                >
+                  {r.status === "in" ? "\u2713 In" : "Partly in"}
+                </span>
+                <span style={{ flex: 1 }}>
+                  <span style={{ display: "block", fontSize: 15, color: "#1F2937" }}>{r.what}</span>
+                  <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2 }}>{r.note}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. The eight */}
+        <section style={{ marginTop: 40 }}>
+          <SectionHeading
+            eyebrow="Next"
+            title="The eight we need next"
+            lead="Reading what came in showed us exactly what we still cannot see. These eight close the biggest gaps, so if time is short, send these first."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {PRIORITY_EIGHT.map((p, i) => (
@@ -173,7 +203,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Send it to us"
             title="Upload what you have"
-            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it. Please do not upload anything that names a patient, including the patient database: we will look at that with you on site."
+            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it. Clinical case notes that name a patient we would rather see with you on site."
           />
           <DocumentUploader />
         </section>
@@ -183,7 +213,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="For reference"
             title="Everything we have asked for"
-            lead="The full list, with the detail under each heading, is in the request above."
+            lead="The full list, in ten sections with each question asked once, is in the request above."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {REQUEST_SECTIONS.map((s, i) => (
