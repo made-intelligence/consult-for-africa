@@ -117,8 +117,8 @@ const EXT_TO_MIME: Record<string, string> = {
   opus: "audio/ogg",
 };
 
-/** Letters of the information request, plus a catch-all. */
-const SECTIONS = /^([A-M]|priority|other)$/;
+/** Letters of the information request (A to J since the 9 October revision), plus a catch-all. */
+const SECTIONS = /^([A-J]|priority|other)$/;
 
 // Per-IP limiter, same shape as the generic public uploader.
 const hits = new Map<string, { n: number; resetAt: number }>();
