@@ -15,8 +15,9 @@ Friday 9 October 2026
 
 ## In short
 
-- **One film, 90 seconds, built to sell.** It introduces MedLYFE and asks for a booking, and it has to keep doing both for months.
-- **First outing** is 6:30pm on Wednesday 21 October at Capital Club, Lagos, as the evening opens.
+- **Two films, not one.** A 90 second introduction built to sell, and a 10 minute opening film on ageing that opens the evening. They do different jobs and only one of them has a life after 21 October.
+- **The introduction film, 90 seconds.** It introduces MedLYFE and asks for a booking, and it has to keep doing both for months.
+- **The opening film, 10 minutes.** It fills the 6:30pm slot at Capital Club. References for the kind of film this is are in the next section.
 - **After that it is the standing introduction**: the website hero, the first thing on every discovery call, reception, the sales deck, the WhatsApp forward.
 - **So nothing in it is about the event.** No date, no venue, no guests, no AGELESS. It must not expire on the 22nd.
 - **It carries the discovery deck's spine**, not a new story. Same argument, same words, so the film and the call agree.
@@ -24,6 +25,23 @@ Friday 9 October 2026
 - **Half a day at the centre.** One location, three setups, one person to camera.
 - **Shoot Tuesday 13 or Wednesday 14 October.** Final file by Monday 19 October.
 - No patients. No before and after. No drug brand names. The section on what must not be in it is not negotiable.
+
+## The opening film: the reference
+
+Ten minutes, and a different film from the introduction. It opens the evening at 6:30pm and its
+job is to put the room in the right frame before Dr Ajelabi speaks at 6:40.
+
+Dr Akinware sent two references for the kind of film she wants on ageing:
+
+- https://youtu.be/hfQo8HYmmWQ
+- https://youtu.be/2Ka3a3X5RRw
+
+Treat these as the tone and the treatment, not the script. The subject is the one the evening is
+about: what changes in energy, strength, sleep, weight, skin, mood and recovery as we age, and
+what longevity medicine can now do about it.
+
+The rules below on what must not appear apply to this film as well. No patients, no before and
+after, no drug brand names.
 
 ## The deadline governs everything
 
