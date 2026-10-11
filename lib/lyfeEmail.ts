@@ -55,7 +55,7 @@ const FLYER_URL =
   "/lyfe/ageless-invitation.jpg";
 
 const LIST_FOOTER =
-  "You are receiving this because you are on the invitation list for Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+  "You are receiving this because you are on the invitation list for Ageless, hosted by MedLYFE and The Lyfe Place. Reply at any time and we will remove your details.";
 const SPEAKER_FOOTER =
   "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
 
@@ -454,15 +454,15 @@ export async function emailLyfeListInvite({
 }): Promise<void> {
   // The host signs this, not a person. An invitation from an individual
   // invites a reply to that individual, and 110 of those is not the plan.
-  const signature = from?.trim() || "The MedLYFE team";
+  const signature = from?.trim() || "MedLYFE and The Lyfe Place";
   const where = LYFE_EVENT.venueAddress
     ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
     : LYFE_EVENT.venueName;
 
   const html = layout(
     `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-     <p style="margin:0 0 14px;">As we get older, many of us begin to notice the changes: energy is not quite the same, sleep feels different, recovery takes longer, weight shifts, skin changes, and we start asking bigger questions about how to stay well, strong, vibrant and confident for longer.</p>
-     <p style="margin:0 0 14px;">We are hosting an intimate evening to explore new knowledge, tools and advancements that are changing how we understand ageing, and how we can apply them in practical ways to look well, feel good, live well and stay healthy as we age.</p>
+     <p style="margin:0 0 14px;">As we get older, many of us begin to notice changes in our energy, sleep, weight, skin, mood, recovery and overall performance. Sometimes these changes feel gradual; other times, they make us pause and ask what it really means to age well.</p>
+     <p style="margin:0 0 14px;">We are hosting an intimate evening to explore how new knowledge, medical advancements and practical lifestyle approaches are changing the way we understand ageing. The conversation will look at how we can maintain vitality, beauty, strength, clarity and confidence for longer: not just by living longer, but by living well.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td align="center" style="padding:0 0 22px;">
          <a href="${link}"><img src="${FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
@@ -478,7 +478,7 @@ export async function emailLyfeListInvite({
          ${esc(where)}
        </td></tr>
      </table>
-     <p style="margin:0 0 14px;">A panel on what changes in energy, strength, sleep, weight, skin, mood and recovery as we age, and what can actually be done about it. Joycee Awosika of the OR&Iacute;K&Igrave; Group, Gbemi Giwa of the African Fat Loss Method, the bariatric surgeon Dr Timi Adenuga, the plastic surgeon Dr Chinwe Kpaduwa MD FACS and Dr Adedotun Ajelabi of ${esc(MEDLYFE_NAME)}, chaired by Dr Debo Odulana.</p>
+     <p style="margin:0 0 14px;">The evening will bring together perspectives across longevity medicine, preventive health, metabolic wellness, skin and aesthetics, fitness, nutrition, stress, recovery and self-care, with practical insights guests can relate to and apply.</p>
      <p style="margin:0 0 20px;">We would love for you to be in the room.</p>
      <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
        <tr><td style="background:${MEDLYFE_BRAND.green};">
@@ -486,8 +486,7 @@ export async function emailLyfeListInvite({
        </td></tr>
      </table>
      <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
-     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile.</p>
-     <p style="margin:0 0 14px;">Once you register your interest, our team will follow up with confirmation details.</p>
+     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Once you register your interest, our team will follow up with confirmation details.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,

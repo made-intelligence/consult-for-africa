@@ -19,31 +19,31 @@ import LyfeNav from "@/app/(lyfe)/lyfe/LyfeNav";
 import AboutGroup from "@/app/(lyfe)/lyfe/AboutGroup";
 import StickyRsvp from "@/app/(lyfe)/lyfe/StickyRsvp";
 
-const DESCRIPTION = `MedLYFE presents Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ${LYFE_EVENT.standfirst}`;
+const DESCRIPTION = `MedLYFE and The Lyfe Place present Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ${LYFE_EVENT.standfirst}`;
 
 // Absolute, so the tab and the link preview say Medlyfe rather than inheriting
 // the aesthetics template from the layout.
 export const metadata: Metadata = {
-  title: { absolute: "MedLYFE presents Ageless" },
+  title: { absolute: "MedLYFE and The Lyfe Place present Ageless" },
   description: DESCRIPTION,
   openGraph: {
     type: "website",
     locale: "en_NG",
     siteName: MEDLYFE_NAME,
-    title: `MedLYFE presents Ageless: ${LYFE_EVENT.proposition}`,
+    title: `MedLYFE and The Lyfe Place present Ageless: ${LYFE_EVENT.proposition}`,
     description: DESCRIPTION,
     images: [
       {
         url: "/medlyfe-og.jpg",
         width: 1200,
         height: 630,
-        alt: "MedLYFE presents Ageless",
+        alt: "MedLYFE and The Lyfe Place present Ageless",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `MedLYFE presents Ageless: ${LYFE_EVENT.proposition}`,
+    title: `MedLYFE and The Lyfe Place present Ageless: ${LYFE_EVENT.proposition}`,
     description: DESCRIPTION,
     images: ["/medlyfe-og.jpg"],
   },
@@ -337,7 +337,7 @@ function Hero() {
 
         <div className="mt-14 grid items-center gap-12 md:mt-20 md:grid-cols-[1.18fr_1fr] md:gap-16">
           <div>
-            <Eyebrow>Medlyfe presents</Eyebrow>
+            <Eyebrow>Medlyfe and The Lyfe Place present</Eyebrow>
 
             <h1
               className="mt-6 text-[68px] leading-[0.95] md:text-[112px]"

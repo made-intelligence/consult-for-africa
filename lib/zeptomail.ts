@@ -23,6 +23,8 @@ export interface ZeptoMailSendInput {
   replyTo?: ZeptoMailRecipient;
   /** Optional inline tracking tags - shows up in ZeptoMail logs */
   trackingTag?: string;
+  /** Base64 content. ZeptoMail caps a message at 15MB including these. */
+  attachments?: { name: string; content: string; mimeType: string }[];
 }
 
 export interface ZeptoMailSendResult {
@@ -64,6 +66,13 @@ export async function sendViaZeptoMail(input: ZeptoMailSendInput): Promise<Zepto
       reply_to: [{ address: input.replyTo.email, name: input.replyTo.name }],
     }),
     ...(input.trackingTag && { track_clicks: true, track_opens: true }),
+    ...(input.attachments?.length && {
+      attachments: input.attachments.map((a) => ({
+        name: a.name,
+        content: a.content,
+        mime_type: a.mimeType,
+      })),
+    }),
   };
 
   try {
@@ -117,6 +126,7 @@ export async function sendTransactionalEmail({
   subject,
   html,
   text,
+  attachments,
 }: {
   from: string;
   replyTo?: string;
@@ -124,6 +134,7 @@ export async function sendTransactionalEmail({
   subject: string;
   html: string;
   text?: string;
+  attachments?: { name: string; content: string; mimeType: string }[];
 }): Promise<ZeptoMailSendResult> {
   return sendViaZeptoMail({
     from: parseAddress(from),
@@ -132,5 +143,6 @@ export async function sendTransactionalEmail({
     htmlbody: html,
     textbody: text,
     replyTo: replyTo ? parseAddress(replyTo) : undefined,
+    attachments,
   });
 }
