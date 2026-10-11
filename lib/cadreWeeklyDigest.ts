@@ -910,7 +910,7 @@ function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
     label: "An evening on ageing well",
     headline: "AGELESS, Wednesday 21 October, Capital Club Lagos",
     detail:
-      "MedLYFE Wellness and Longevity Centre hosts an evening on what modern medicine can now do about how we age: metabolism, hormones, weight, energy and skin. Dr Adedotun Ajelabi opens it and Dr Itunu Akinware chairs the panel, with Dr Timi Adenuga on metabolic and bariatric care. The room holds seventy and ten places are kept for clinicians.",
+      "MedLYFE Wellness and Longevity Centre hosts an evening on what modern medicine can now do about how we age: metabolism, hormones, weight, energy and skin. It opens with a short film, Dr Adedotun Ajelabi gives the opening address and Dr Debo Odulana chairs the panel, with Dr Timi Adenuga on metabolic and bariatric care. The room holds seventy and ten places are kept for clinicians.",
     ctaLabel: "Register your interest",
     href: "https://www.consultforafrica.com/ageless?src=doctor",
   };

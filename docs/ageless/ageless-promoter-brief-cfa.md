@@ -29,8 +29,8 @@ We need names this week. Of the seventy: 20 Capital Club members, 15 Medbury cor
 | --- | --- |
 | Date | Wednesday 21 October 2026 |
 | Venue | Capital Club, Lagos |
-| Arrival | 5:30pm |
-| Programme | 6:45pm to 8:15pm |
+| Arrival | 6:00pm |
+| Programme | 6:30pm to 8:15pm |
 | Close | 9:30pm |
 | Places | 70. 20 Capital Club, 15 Medbury corporates, 10 Dr Akinware's, 10 doctors, 10 PBN, 5 general |
 | Host | Medlyfe |

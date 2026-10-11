@@ -17,7 +17,7 @@ AS AT
 
 - **This is Medlyfe's evening.** It establishes Medlyfe as the place in Lagos for health, beauty and longevity.
 - Cocktail evening at the Capital Club, Lagos, Wednesday 21 October 2026.
-- Arrival 5:30pm, programme 6:45pm to 8:15pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
+- Arrival 6:00pm, programme 6:30pm to 8:15pm, close 9:30pm. Seventy guests, Lagos women and men over forty.
 - The evening shows Medlyfe's range: longevity, metabolic health, hormones, skin and aesthetics.
 - Dr Chinwe Kpaduwa sits on the panel.
 - Built to recur. This is edition one.
@@ -43,9 +43,9 @@ Three names, three jobs. Keeping them apart is what lets edition two reuse every
 
 | Time | What |
 | --- | --- |
-| 5:30 | Arrival |
-| 6:45 | Welcome and opening film |
-| 6:50 | Can We Live to 100 and Still Live Well? Dr Ajelabi, 10 minutes |
+| 6:00 | Arrival |
+| 6:30 | The opening film |
+| 6:40 | Can We Live to 100 and Still Live Well? Dr Ajelabi, 20 minutes |
 | 7:00 | The panel, 45 minutes |
 | 7:45 | Questions from the room |
 | 8:15 | After Hours. Close 9:30 |
