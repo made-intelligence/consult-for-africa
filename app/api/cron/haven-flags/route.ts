@@ -48,7 +48,21 @@ export async function GET(req: NextRequest) {
       select: { id: true, roles: true, graceHours: true, flagLevel: true },
     }),
     prisma.staffMember.findMany({
-      where: { clientId: client.id, isActive: true, NOT: { department: "BOARD" } },
+      // Nobody who has never signed in. You cannot fail to record something you
+      // have never been shown, and the first run of this flagged sixteen people
+      // eighty-eight times for exactly that. A chase arriving before the
+      // onboarding is not a chase, it is an accusation, and it costs the
+      // reporting culture far more than the tasks are worth.
+      //
+      // The consequence is deliberate: until somebody is onboarded, the only
+      // thing that reaches them is the invitation. Flags begin the day they
+      // first sign in.
+      where: {
+        clientId: client.id,
+        isActive: true,
+        NOT: { department: "BOARD" },
+        lastLoginAt: { not: null },
+      },
       select: { id: true, position: true, department: true },
     }),
   ]);
