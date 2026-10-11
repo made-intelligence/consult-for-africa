@@ -122,9 +122,9 @@ The conversation moves on if it reaches who may perform what. That is a live reg
 
 | Time | What |
 | --- | --- |
-| 5:30 | Arrival |
+| 6:00 | Arrival |
 | 6:30 | The opening film |
-| 6:50 | Can We Live to 100 and Still Live Well? |
+| 6:35 | Can We Live to 100 and Still Live Well? |
 | 7:00 | The panel: The Ageless Blueprint |
 | 7:45 | Questions from the room |
 | 8:15 | Ageless After Hours |

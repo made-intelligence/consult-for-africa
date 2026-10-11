@@ -154,7 +154,7 @@ export const LYFE_EVENT = {
   panelStandfirst:
     "How to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
-  arrival: "5:30 PM",
+  arrival: "6:00 PM",
   programme: "6:30 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
@@ -335,7 +335,7 @@ export const LYFE_EVENT_TONE =
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
-    time: "5:30",
+    time: "6:00",
     title: "Arrival",
     body: "Music, photographs and conversation. A social evening rather than a health seminar.",
   },
@@ -345,7 +345,7 @@ export const LYFE_EVENT_PROGRAMME = [
     body: "As we age, we begin to notice changes in energy, strength, sleep, weight, skin, mood and recovery. This session explores how longevity medicine helps to slow age-related decline, maintain vitality, beauty and performance while extending lifespan.",
   },
   {
-    time: "6:50",
+    time: "6:35",
     title: "Can We Live to 100 and Still Live Well?",
     body: "Dr Adedotun Ajelabi introduces longevity medicine, the difference between lifespan and healthspan, and how advanced diagnostics, AI and preventive care can help people understand and optimise their bodies before disease takes hold.",
   },
