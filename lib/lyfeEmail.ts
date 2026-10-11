@@ -484,7 +484,7 @@ export async function emailLyfeListInvite({
        </td></tr>
      </table>
      <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
-     <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places} and we are keeping it that size on purpose, so we are curating rather than filling it. Registering an interest is not yet a place; the confirmation follows.</p>
+     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Once you register your interest, our team will follow up with confirmation details.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,
