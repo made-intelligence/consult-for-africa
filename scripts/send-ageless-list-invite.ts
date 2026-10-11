@@ -37,7 +37,6 @@ const TEST_TO =
 const TEST_NAME = args.find((a) => a.startsWith("--as="))?.split("=")[1] || "Debo";
 const CSV = "docs/ageless/lists/invite-list.csv";
 const LEDGER = "docs/ageless/lists/sent.csv";
-const FROM = process.env.LYFE_SENDER_NAME || "Debo Odulana";
 const LINK = lyfeInviteLink("list");
 
 /** "Dr. Orode Doherty" greets as Orode. Titles are not first names. */
@@ -72,7 +71,7 @@ async function main() {
   if (test) {
     console.log(`TEST: one invitation to ${TEST_TO}, addressed to ${TEST_NAME}\n`);
     await emailLyfeListInvite({
-      to: TEST_TO, firstName: TEST_NAME, link: LINK, from: FROM,
+      to: TEST_TO, firstName: TEST_NAME, link: LINK,
     });
     console.log(`  sent. link in it: ${LINK}`);
     return;
@@ -127,7 +126,7 @@ async function main() {
   for (const r of targets) {
     try {
       await emailLyfeListInvite({
-        to: r.email, firstName: firstNameOf(r.name), link: LINK, from: FROM,
+        to: r.email, firstName: firstNameOf(r.name), link: LINK,
       });
       ok++;
       if (!existsSync(LEDGER)) appendFileSync(LEDGER, "email,name,sentAt\n");

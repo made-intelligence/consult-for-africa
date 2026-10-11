@@ -452,7 +452,9 @@ export async function emailLyfeListInvite({
   link: string;
   from?: string | null;
 }): Promise<void> {
-  const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
+  // The host signs this, not a person. An invitation from an individual
+  // invites a reply to that individual, and 110 of those is not the plan.
+  const signature = from?.trim() || "The MedLYFE team";
   const where = LYFE_EVENT.venueAddress
     ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
     : LYFE_EVENT.venueName;
@@ -484,7 +486,8 @@ export async function emailLyfeListInvite({
        </td></tr>
      </table>
      <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
-     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Once you register your interest, our team will follow up with confirmation details.</p>
+     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile.</p>
+     <p style="margin:0 0 14px;">Once you register your interest, our team will follow up with confirmation details.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,
