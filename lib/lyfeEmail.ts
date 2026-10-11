@@ -494,7 +494,11 @@ export async function emailLyfeListInvite({
     LIST_FOOTER,
   );
 
-  await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
+  await notifyInternal(
+    to,
+    `An Invitation to ${LYFE_EVENT_THEME}: Look, Feel and Live Well`,
+    html,
+  );
 }
 
 /** Sent the moment somebody confirms, so they have the details in writing. */
