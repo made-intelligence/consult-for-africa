@@ -37,7 +37,7 @@ export default function VisitPage() {
         <div className="mx-auto grid w-full max-w-5xl gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
           <div>
             <p className="text-[10.5px] font-semibold uppercase" style={{ color: C.bronze, letterSpacing: "0.2em" }}>
-              {LYFE_VISIT.name} &middot; Lekki and Victoria Island
+              {LYFE_VISIT.name} &middot; {LYFE_VISIT.week}
             </p>
             <h1
               className="mt-6 text-[36px] leading-[1.06] md:text-[52px]"
@@ -46,8 +46,8 @@ export default function VisitPage() {
               She is doing rounds.
             </h1>
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
-              {LYFE_SURGEON.name} is visiting practices across Lekki and Victoria Island to meet
-              the doctors who would refer to her, and to say in person what she does, what she will
+              {LYFE_SURGEON.name} is visiting practices across Ikoyi, Victoria Island and Lekki
+              this week to meet the doctors who would refer to her, and to say in person what she does, what she will
               not do, and where the line sits.
             </p>
             <p className="mt-4 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
@@ -116,8 +116,8 @@ export default function VisitPage() {
             Put your practice on the round.
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed" style={{ color: C.body }}>
-            Five questions. Her diary in Lagos is short and the visits are planned area by area,
-            so the sooner you are on the list the easier it is to fit you in.
+            Tick the times that suit you and we will call to confirm. The visits are planned area by
+            area, so the sooner you are on the list the easier it is to fit you in.
           </p>
           <div className="mt-9">
             <VisitForm />
