@@ -193,7 +193,7 @@ export const LYFE_EVENT_ALLOCATION = [
  * without anybody keeping a parallel spreadsheet.
  *
  * `places` is the allocation this person is drawing against, not a limit the
- * page enforces. Applying is not a place: the team still chooses, and the
+ * page enforces. Registering an interest is not yet a place: the team curates
  * invitation to confirm goes out afterwards.
  *
  * Keys are short because they are typed into WhatsApp by hand when a link
