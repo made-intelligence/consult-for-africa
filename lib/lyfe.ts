@@ -244,12 +244,12 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     note: "Ten places given to PBN to fill, taken from general.",
   },
   {
-    key: "sally",
-    name: "Sally",
+    key: "ccl",
+    name: "Capital Club Lagos",
     credit: null,
     bucket: "General invitations: micro-influencers and curated picks",
     places: 10,
-    note: "Promotion, and the Capital Club relationship.",
+    note: "Worked by Sally, who holds the Capital Club relationship.",
   },
   {
     key: "ajelabi",

@@ -8,8 +8,8 @@ Each person sends their own link. Applying is not a place: the team still choose
 | --- | --- | --- | --- |
 | Dr Itunu Akinware | Dr Itunu Akinware's guests | 10 | https://www.consultforafrica.com/ageless?i=itunu |
 | Yomi | Medbury corporate network | 30 | https://www.consultforafrica.com/ageless?i=yomi |
-| PBN | PBN | 10 | https://www.consultforafrica.com/ageless?i=pbn |
-| Sally | General invitations: micro-influencers and curated picks | 10 | https://www.consultforafrica.com/ageless?i=sally |
+| PBN | General invitations: micro-influencers and curated picks | 10 | https://www.consultforafrica.com/ageless?i=pbn |
+| Capital Club Lagos | General invitations: micro-influencers and curated picks | 10 | https://www.consultforafrica.com/ageless?i=ccl |
 | Dr Adedotun Ajelabi | Physicians who might refer | 10 | https://www.consultforafrica.com/ageless?i=ajelabi |
 | Dr Timi Adenuga | Physicians who might refer | 10 | https://www.consultforafrica.com/ageless?i=adenuga |
 | Dr Chinwe Kpaduwa | Physicians who might refer | 10 | https://www.consultforafrica.com/ageless?i=kpaduwa |
