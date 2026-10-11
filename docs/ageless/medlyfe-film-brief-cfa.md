@@ -16,7 +16,7 @@ Friday 9 October 2026
 ## In short
 
 - **One film, 90 seconds, built to sell.** It introduces MedLYFE and asks for a booking, and it has to keep doing both for months.
-- **First outing** is 6:45pm on Wednesday 21 October at Capital Club, Lagos, as the evening opens.
+- **First outing** is 6:30pm on Wednesday 21 October at Capital Club, Lagos, as the evening opens.
 - **After that it is the standing introduction**: the website hero, the first thing on every discovery call, reception, the sales deck, the WhatsApp forward.
 - **So nothing in it is about the event.** No date, no venue, no guests, no AGELESS. It must not expire on the 22nd.
 - **It carries the discovery deck's spine**, not a new story. Same argument, same words, so the film and the call agree.

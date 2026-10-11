@@ -155,7 +155,7 @@ export const LYFE_EVENT = {
     "How to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
   arrival: "5:30 PM",
-  programme: "6:45 PM",
+  programme: "6:30 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
   // From the printed invitation, 11 October. The brief never supplied it and
@@ -340,7 +340,7 @@ export const LYFE_EVENT_PROGRAMME = [
     body: "Music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:45",
+    time: "6:30",
     title: "Welcome and opening film",
     body: "Dr Adedotun Ajelabi opens the evening, followed by a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
   },
