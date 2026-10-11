@@ -49,6 +49,13 @@ type Letterhead = "lyfe" | "medlyfe";
 /** Why an Ageless mail arrived. The clinic default is wrong for both. */
 const INVITED_FOOTER =
   "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+/** The printed invitation, served from the site so the email and the page cannot differ. */
+const FLYER_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.consultforafrica.com") +
+  "/lyfe/ageless-invitation.jpg";
+
+const LIST_FOOTER =
+  "You are receiving this because you are on the invitation list for Ageless, hosted by MedLYFE and The Lyfe Place. Reply at any time and we will remove your details.";
 const SPEAKER_FOOTER =
   "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
 
@@ -183,7 +190,7 @@ export async function emailLyfeConfirmation({
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by ${esc(LYFE_EVENT.host)}.</p>
+       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by MedLYFE and The Lyfe Place.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -198,7 +205,7 @@ export async function emailLyfeConfirmation({
        <p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
-       <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
+       <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
       `Your interest in ${LYFE_EVENT_THEME} is registered.`,
       "medlyfe",
       INVITED_FOOTER,
@@ -423,6 +430,84 @@ export async function emailLyfeInvitation({
   );
 
   await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
+}
+
+/**
+ * The invitation sent to the event list.
+ *
+ * Different from emailLyfeInvitation, which carries a token and tells somebody
+ * their place is held. Nobody on the list has been chosen yet, so this one
+ * asks them to register an interest and says plainly that the room is curated.
+ * Saying so is the honest version and it is also what stops seventy places
+ * being promised two hundred times.
+ */
+export async function emailLyfeListInvite({
+  to,
+  firstName,
+  link,
+  from,
+  onBehalfOf,
+}: {
+  to: string;
+  firstName: string;
+  link: string;
+  from?: string | null;
+  /**
+   * Set when the address belongs to somebody's office rather than to them.
+   * The letter then greets whoever opens it and asks for the forward, instead
+   * of opening "Dear Andrew" in Marion's inbox, which reads as a mailshot that
+   * did not check who it was writing to.
+   */
+  onBehalfOf?: string | null;
+}): Promise<void> {
+  // The host signs this, not a person. An invitation from an individual
+  // invites a reply to that individual, and 110 of those is not the plan.
+  const signature = from?.trim() || "MedLYFE and The Lyfe Place";
+  const where = LYFE_EVENT.venueAddress
+    ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
+    : LYFE_EVENT.venueName;
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     ${onBehalfOf ? `<p style="margin:0 0 14px;">We are writing in the hope that ${esc(onBehalfOf)} will join us for an evening on ${esc(LYFE_EVENT.date)}, and would be grateful if you would pass this on.</p>` : ""}
+     <p style="margin:0 0 14px;">As we get older, many of us begin to notice changes in our energy, sleep, weight, skin, mood, recovery and overall performance. Sometimes these changes feel gradual; other times, they make us pause and ask what it really means to age well.</p>
+     <p style="margin:0 0 14px;">We are hosting an intimate evening to explore how new knowledge, medical advancements and practical lifestyle approaches are changing the way we understand ageing. The conversation will look at how we can maintain vitality, beauty, strength, clarity and confidence for longer: not just by living longer, but by living well.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+       <tr><td align="center" style="padding:0 0 22px;">
+         <a href="${link}"><img src="${FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
+       </td></tr>
+     </table>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <strong style="font-size:18px;">${esc(LYFE_EVENT_THEME)}</strong><br>
+         <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.proposition)}</span>
+         <br><br>
+         <strong>${esc(LYFE_EVENT.date)}</strong><br>
+         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+         ${esc(where)}
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;">The evening will bring together perspectives across longevity medicine, preventive health, metabolic wellness, skin and aesthetics, fitness, nutrition, stress, recovery and self-care, with practical insights guests can relate to and apply.</p>
+     <p style="margin:0 0 20px;">We would love for you to be in the room.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};">
+         <a href="${link}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Register your interest</a>
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
+     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Once you register your interest, our team will follow up with confirmation details.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
+    `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,
+    "medlyfe",
+    LIST_FOOTER,
+  );
+
+  await notifyInternal(
+    to,
+    `An Invitation to ${LYFE_EVENT_THEME}: Look, Feel and Live Well`,
+    html,
+  );
 }
 
 /** Sent the moment somebody confirms, so they have the details in writing. */
