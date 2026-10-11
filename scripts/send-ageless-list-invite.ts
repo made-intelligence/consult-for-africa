@@ -29,7 +29,12 @@ const args = process.argv.slice(2);
 const send = args.includes("--send");
 const test = args.includes("--test");
 const size = Number(args.find((a) => a.startsWith("--size="))?.split("=")[1] ?? 0);
-const TEST_TO = process.env.LYFE_TEST_TO || "dodulana@gmail.com";
+const TEST_TO =
+  args.find((a) => a.startsWith("--to="))?.split("=")[1] ||
+  process.env.LYFE_TEST_TO ||
+  "dodulana@gmail.com";
+/** Who the preview is addressed to. A host should not be asked to register. */
+const TEST_NAME = args.find((a) => a.startsWith("--as="))?.split("=")[1] || "Debo";
 const CSV = "docs/ageless/lists/invite-list.csv";
 const LEDGER = "docs/ageless/lists/sent.csv";
 const FROM = process.env.LYFE_SENDER_NAME || "Debo Odulana";
@@ -65,9 +70,9 @@ async function main() {
   }
 
   if (test) {
-    console.log(`TEST: one invitation to ${TEST_TO}\n`);
+    console.log(`TEST: one invitation to ${TEST_TO}, addressed to ${TEST_NAME}\n`);
     await emailLyfeListInvite({
-      to: TEST_TO, firstName: "Debo", link: LINK, from: FROM,
+      to: TEST_TO, firstName: TEST_NAME, link: LINK, from: FROM,
     });
     console.log(`  sent. link in it: ${LINK}`);
     return;

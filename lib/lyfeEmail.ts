@@ -459,7 +459,8 @@ export async function emailLyfeListInvite({
 
   const html = layout(
     `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-     <p style="margin:0 0 14px;">We are hosting an evening on what modern medicine can now do about how we age, and we would like you to be in the room.</p>
+     <p style="margin:0 0 14px;">As we get older, many of us begin to notice the changes: energy is not quite the same, sleep feels different, recovery takes longer, weight shifts, skin changes, and we start asking bigger questions about how to stay well, strong, vibrant and confident for longer.</p>
+     <p style="margin:0 0 14px;">We are hosting an intimate evening to explore new knowledge, tools and advancements that are changing how we understand ageing, and how we can apply them in practical ways to look well, feel good, live well and stay healthy as we age.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td align="center" style="padding:0 0 22px;">
          <a href="${link}"><img src="${FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
@@ -476,6 +477,7 @@ export async function emailLyfeListInvite({
        </td></tr>
      </table>
      <p style="margin:0 0 14px;">A panel on what changes in energy, strength, sleep, weight, skin, mood and recovery as we age, and what can actually be done about it. Joycee Awosika of the OR&Iacute;K&Igrave; Group, Gbemi Giwa of the African Fat Loss Method, the bariatric surgeon Dr Timi Adenuga, the plastic surgeon Dr Chinwe Kpaduwa MD FACS and Dr Adedotun Ajelabi of ${esc(MEDLYFE_NAME)}, chaired by Dr Debo Odulana.</p>
+     <p style="margin:0 0 20px;">We would love for you to be in the room.</p>
      <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
        <tr><td style="background:${MEDLYFE_BRAND.green};">
          <a href="${link}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Register your interest</a>
@@ -485,7 +487,7 @@ export async function emailLyfeListInvite({
      <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places} and we are keeping it that size on purpose, so we are curating rather than filling it. Registering an interest is not yet a place; the confirmation follows.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
-    `${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}. ${LYFE_EVENT.proposition}`,
+    `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,
     "medlyfe",
     LIST_FOOTER,
   );
