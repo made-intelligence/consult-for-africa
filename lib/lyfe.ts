@@ -300,6 +300,14 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     note: "Press and media.",
   },
   {
+    key: "list",
+    name: "The event invite list",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 70,
+    note: "The invitation list worked by email and WhatsApp. Not one person's contacts.",
+  },
+  {
     key: "cfa",
     name: "Consult for Africa",
     credit: null,

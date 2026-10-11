@@ -1,0 +1,6 @@
+# Personal contact details. The list holds names, personal emails and mobile
+# numbers for people who have not asked to hear from us, so it stays on the
+# machine that sends from it and out of the repository. NDPA 2023.
+*.csv
+!.gitignore
+!README.md

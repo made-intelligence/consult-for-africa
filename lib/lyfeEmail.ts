@@ -49,6 +49,13 @@ type Letterhead = "lyfe" | "medlyfe";
 /** Why an Ageless mail arrived. The clinic default is wrong for both. */
 const INVITED_FOOTER =
   "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+/** The printed invitation, served from the site so the email and the page cannot differ. */
+const FLYER_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.consultforafrica.com") +
+  "/lyfe/ageless-invitation.jpg";
+
+const LIST_FOOTER =
+  "You are receiving this because you are on the invitation list for Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
 const SPEAKER_FOOTER =
   "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
 
@@ -420,6 +427,67 @@ export async function emailLyfeInvitation({
     `An invitation to ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}.`,
     "medlyfe",
     INVITED_FOOTER,
+  );
+
+  await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
+}
+
+/**
+ * The invitation sent to the event list.
+ *
+ * Different from emailLyfeInvitation, which carries a token and tells somebody
+ * their place is held. Nobody on the list has been chosen yet, so this one
+ * asks them to register an interest and says plainly that the room is curated.
+ * Saying so is the honest version and it is also what stops seventy places
+ * being promised two hundred times.
+ */
+export async function emailLyfeListInvite({
+  to,
+  firstName,
+  link,
+  from,
+}: {
+  to: string;
+  firstName: string;
+  link: string;
+  from?: string | null;
+}): Promise<void> {
+  const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
+  const where = LYFE_EVENT.venueAddress
+    ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
+    : LYFE_EVENT.venueName;
+
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">We are hosting an evening on what modern medicine can now do about how we age, and we would like you to be in the room.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+       <tr><td align="center" style="padding:0 0 22px;">
+         <a href="${link}"><img src="${FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
+       </td></tr>
+     </table>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <strong style="font-size:18px;">${esc(LYFE_EVENT_THEME)}</strong><br>
+         <span style="color:${MEDLYFE_BRAND.limeSoft};">${esc(LYFE_EVENT.proposition)}</span>
+         <br><br>
+         <strong>${esc(LYFE_EVENT.date)}</strong><br>
+         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+         ${esc(where)}
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;">A panel on what changes in energy, strength, sleep, weight, skin, mood and recovery as we age, and what can actually be done about it. Joycee Awosika of the OR&Iacute;K&Igrave; Group, Gbemi Giwa of the African Fat Loss Method, the bariatric surgeon Dr Timi Adenuga, the plastic surgeon Dr Chinwe Kpaduwa MD FACS and Dr Adedotun Ajelabi of ${esc(MEDLYFE_NAME)}, chaired by Dr Debo Odulana.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};">
+         <a href="${link}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Register your interest</a>
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
+     <p style="margin:0 0 14px;">The room holds ${LYFE_EVENT.places} and we are keeping it that size on purpose, so we are curating rather than filling it. Registering an interest is not yet a place; the confirmation follows.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
+    `${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}. ${LYFE_EVENT.proposition}`,
+    "medlyfe",
+    LIST_FOOTER,
   );
 
   await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
