@@ -8,6 +8,7 @@ import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
 import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
 import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
+import { periodKey, ON_TODAY, type Cadence } from "@/lib/havenTaskPeriod";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -140,22 +141,36 @@ export default async function HavenStaffPage() {
     // Today's tickable tasks. Separate from the waiting list because these are
     // things you do here rather than somewhere else, and a link to a checkbox
     // is one tap more than a checkbox.
-    const day = new Date();
-    const forDate = new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate()));
+
     const meRow = await prisma.staffMember.findUnique({
       where: { id: session.sub },
       select: { position: true, department: true },
     });
     const allTasks = await prisma.staffTask.findMany({
-      where: { clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY"] } },
-      select: { id: true, title: true, why: true, roles: true },
+      where: { clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
+      select: { id: true, title: true, why: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     });
+    // Daily and weekly completions key to different dates, so both periods are
+    // fetched and matched per task rather than assuming one.
+    const periods: string[] = Array.from(
+      new Set(allTasks.map((x: { cadence: string }) => periodKey(x.cadence as Cadence).toISOString()))
+    );
     const [done, flags] = await Promise.all([
-      prisma.staffTaskCompletion.findMany({ where: { staffId: session.sub, forDate }, select: { taskId: true } }),
+      prisma.staffTaskCompletion.findMany({
+        where: { staffId: session.sub, forDate: { in: periods.map((p: string) => new Date(p)) } },
+        select: { taskId: true, forDate: true },
+      }),
       prisma.staffTaskFlag.findMany({ where: { staffId: session.sub, resolvedAt: null }, select: { taskId: true } }),
     ]);
-    const doneIds = new Set(done.map((d) => d.taskId));
+    const doneIds = new Set(
+      done
+        .filter((d: { taskId: string; forDate: Date }) => {
+          const task = allTasks.find((x: { id: string }) => x.id === d.taskId);
+          return task && d.forDate.getTime() === periodKey(task.cadence as Cadence).getTime();
+        })
+        .map((d: { taskId: string }) => d.taskId)
+    );
     const flaggedIds = new Set(flags.map((f) => f.taskId));
     const hay = `${meRow?.position ?? ""} ${meRow?.department ?? ""}`.toLowerCase();
     todayTasks = allTasks
