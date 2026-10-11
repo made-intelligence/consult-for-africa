@@ -732,7 +732,7 @@ function Invitation({ link }: { link: string }) {
   const share =
     `You are invited to AGELESS, an evening hosted by MedLYFE and The Lyfe Place on ` +
     `${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ` +
-    `${LYFE_EVENT.proposition}. ${LYFE_EVENT.places} places. Apply here: ${link}`;
+    `${LYFE_EVENT.proposition}. ${LYFE_EVENT.places} places. Register your interest: ${link}`;
 
   return (
     <section className="px-6 py-16 md:px-10 md:py-24" style={{ background: MB.limeSoft }}>
@@ -781,8 +781,9 @@ function Invitation({ link }: { link: string }) {
             style={{ color: MB.green }}
           >
             Send them the invitation. The link inside it is yours, so whoever
-            comes through it is counted to you. Applying is not a place: we
-            still choose the room, and the confirmation follows.
+            comes through it is counted to you. Registering an interest is
+            not yet a place: we curate the room, and the confirmation
+            follows.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">

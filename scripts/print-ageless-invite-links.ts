@@ -15,7 +15,7 @@ const BLURB =
   `You are invited to AGELESS, an evening hosted by Medlyfe on ${LYFE_EVENT.date} ` +
   `at ${LYFE_EVENT.venueName}. A panel on what changes in your body, brain and skin ` +
   `after 40, and what you can actually do about it. ${LYFE_EVENT.places} places. ` +
-  `Apply here:`;
+  `Register your interest here:`;
 
 if (md) {
   console.log("## AGELESS invitation links\n");
@@ -23,8 +23,9 @@ if (md) {
     `${LYFE_EVENT.date}. ${LYFE_EVENT.venueName}. ${LYFE_EVENT.places} places.\n`,
   );
   console.log(
-    "Each person sends their own link. Applying is not a place: the team still " +
-      "chooses, and the invitation to confirm goes out afterwards.\n",
+    "Each person sends their own link. Registering an interest is not yet a place: " +
+      "the team still curates the room, and the invitation to confirm goes out "
+    + "afterwards.\n",
   );
   console.log("| Who | Drawing against | Places | Link |");
   console.log("| --- | --- | --- | --- |");

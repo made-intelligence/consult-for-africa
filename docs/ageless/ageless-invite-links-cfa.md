@@ -2,7 +2,7 @@
 
 Wednesday, 21 October 2026. Capital Club, Lagos. 70 places.
 
-Each person sends their own link. Applying is not a place: the team still chooses, and the invitation to confirm goes out afterwards.
+Each person sends their own link. Registering an interest is not yet a place: the team still curates the room, and the invitation to confirm goes out afterwards.
 
 | Who | Drawing against | Places | Link |
 | --- | --- | --- | --- |
@@ -20,5 +20,5 @@ Each person sends their own link. Applying is not a place: the team still choose
 
 ### The message to send
 
-You are invited to AGELESS, an evening hosted by Medlyfe on Wednesday, 21 October 2026 at Capital Club, Lagos. A panel on what changes in your body, brain and skin after 40, and what you can actually do about it. 70 places. Apply here: <your link above>
+You are invited to AGELESS, an evening hosted by Medlyfe on Wednesday, 21 October 2026 at Capital Club, Lagos. A panel on what changes in your body, brain and skin after 40, and what you can actually do about it. 70 places. Register your interest here: <your link above>
 
