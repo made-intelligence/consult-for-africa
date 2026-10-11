@@ -46,9 +46,16 @@ function matches(roles: string[], position: string, department: string) {
 export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]> {
   const me = await prisma.staffMember.findUnique({
     where: { id: session.sub },
-    select: { id: true, position: true, department: true },
+    select: { id: true, position: true, department: true, lastLoginAt: true, createdAt: true },
   });
   if (!me) return [];
+
+  // Somebody on their first day sees today and nothing before it. Arriving to
+  // a fortnight of things you were never told about is how a person decides
+  // the thing is not for them, and the people slowest to start are exactly the
+  // ones this has to work for.
+  const firstDay =
+    !me.lastLoginAt || Date.now() - me.lastLoginAt.getTime() < 60 * 60 * 1000;
 
   const today = dayKey();
   const week = isoWeek();
@@ -98,7 +105,7 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     ]);
 
   // An unresolved flag outranks everything. It is already late by definition.
-  for (const f of openFlags) {
+  for (const f of firstDay ? [] : openFlags) {
     items.push({
       kind: "FLAG",
       title: f.task.title,
