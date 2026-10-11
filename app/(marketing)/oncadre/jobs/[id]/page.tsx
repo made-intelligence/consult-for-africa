@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { getCadreSession } from "@/lib/cadreAuth";
+import { signCvToken } from "@/lib/cadreHealth/cvRequest";
 import ApplyButtonClient from "./ApplyButton";
 import ExpressApplyForm from "./ExpressApplyForm";
 import ApplyIntent from "./ApplyIntent";
@@ -95,11 +96,18 @@ export default async function JobDetailPage({
 
   // Check if user already applied
   let hasApplied = false;
+  // Set when the member has no CV: the apply button then asks for one.
+  let cvUploadAction: string | null = null;
   if (session) {
     const existingMatch = await prisma.cadreMandateMatch.findUnique({
       where: { mandateId_professionalId: { mandateId: job.id, professionalId: session.sub } },
     });
     hasApplied = !!existingMatch;
+    const pro = await prisma.cadreProfessional.findUnique({
+      where: { id: session.sub },
+      select: { cvFileUrl: true },
+    });
+    if (pro && !pro.cvFileUrl) cvUploadAction = `/api/cadre/cv/${signCvToken(session.sub)}`;
   }
 
   // Average salary context
@@ -446,7 +454,7 @@ export default async function JobDetailPage({
                   </p>
                 </div>
               ) : session ? (
-                <ApplyButtonClient jobId={job.id} />
+                <ApplyButtonClient jobId={job.id} cvUploadAction={cvUploadAction} />
               ) : (
                 <ApplyIntent jobId={job.id} defaultCadre={job.cadre} />
               )}

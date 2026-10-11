@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { handler } from "@/lib/api-handler";
+import { signCvToken } from "@/lib/cadreHealth/cvRequest";
 
 const schema = z.object({
   name: z.string().min(2).max(100),
@@ -94,5 +95,9 @@ export const POST = handler(async function POST(
     ok: true,
     professionalId: professional.id,
     isNew: !professional.passwordHash,
+    // The form uploads the CV straight after. Only issued where there is no CV
+    // yet: anyone can type any email into this form, and that must not let
+    // them replace a CV someone else put on file.
+    cvToken: professional.cvFileUrl ? null : signCvToken(professional.id),
   });
 });

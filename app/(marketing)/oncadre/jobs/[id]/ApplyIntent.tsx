@@ -13,7 +13,7 @@ export default function ApplyIntent({ jobId, defaultCadre }: { jobId: string; de
   return (
     <div className="text-center">
       <p className="text-sm font-semibold text-gray-900 mb-1">Interested in this role?</p>
-      <p className="text-xs text-gray-500 mb-4">Apply in 30 seconds. No account needed.</p>
+      <p className="text-xs text-gray-500 mb-4">No account needed. Have your CV ready.</p>
       <button
         onClick={() => setShowForm(true)}
         className="w-full rounded-xl py-3 text-sm font-semibold text-white transition hover:opacity-90"
