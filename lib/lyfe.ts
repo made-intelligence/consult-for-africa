@@ -342,7 +342,7 @@ export const LYFE_EVENT_PROGRAMME = [
   {
     time: "6:30",
     title: "The opening film",
-    body: "The evening opens with a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
+    body: "As we age, we begin to notice changes in energy, strength, sleep, weight, skin, mood and recovery. This session explores how longevity medicine helps to slow age-related decline, maintain vitality, beauty and performance while extending lifespan.",
   },
   {
     time: "6:50",
