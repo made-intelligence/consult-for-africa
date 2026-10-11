@@ -190,7 +190,7 @@ export async function emailLyfeConfirmation({
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by ${esc(LYFE_EVENT.host)}.</p>
+       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by MedLYFE and The Lyfe Place.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -205,7 +205,7 @@ export async function emailLyfeConfirmation({
        <p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
-       <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
+       <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
       `Your interest in ${LYFE_EVENT_THEME} is registered.`,
       "medlyfe",
       INVITED_FOOTER,
