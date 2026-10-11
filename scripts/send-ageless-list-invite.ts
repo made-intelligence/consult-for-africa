@@ -35,6 +35,13 @@ const TEST_TO =
   "dodulana@gmail.com";
 /** Who the preview is addressed to. A host should not be asked to register. */
 const TEST_NAME = args.find((a) => a.startsWith("--as="))?.split("=")[1] || "Debo";
+/**
+ * An identical copy, for whoever needs to see what went out. Not a true CC:
+ * the recipient is not shown it and the copy still reads "Dear <them>", which
+ * is the point. Threading a real CC through would mean changing the send path
+ * every product on the platform uses, for one person's visibility.
+ */
+const CC = args.find((a) => a.startsWith("--cc="))?.split("=")[1] || null;
 const CSV = "docs/ageless/lists/invite-list.csv";
 const LEDGER = "docs/ageless/lists/sent.csv";
 const LINK = lyfeInviteLink("list");
@@ -70,10 +77,13 @@ async function main() {
 
   if (test) {
     console.log(`TEST: one invitation to ${TEST_TO}, addressed to ${TEST_NAME}\n`);
-    await emailLyfeListInvite({
-      to: TEST_TO, firstName: TEST_NAME, link: LINK,
-    });
-    console.log(`  sent. link in it: ${LINK}`);
+    await emailLyfeListInvite({ to: TEST_TO, firstName: TEST_NAME, link: LINK });
+    console.log(`  sent to ${TEST_TO}`);
+    if (CC) {
+      await emailLyfeListInvite({ to: CC, firstName: TEST_NAME, link: LINK });
+      console.log(`  copy to ${CC}, reading exactly as ${TEST_TO} received it`);
+    }
+    console.log(`  link in it: ${LINK}`);
     return;
   }
 
