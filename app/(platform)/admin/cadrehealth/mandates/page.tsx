@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { Plus } from "lucide-react";
 import ClickableRow from "./ClickableRow";
+import { RequestCvsButton } from "@/components/cadrehealth/RequestCvsButton";
+import { applicantsWithoutCv } from "@/lib/cadreHealth/cvRequest";
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-emerald-50 text-emerald-700",
@@ -23,6 +25,7 @@ export default async function MandatesPage() {
       facility: { select: { name: true } },
     },
   });
+  const withoutCv = (await applicantsWithoutCv()).length;
 
   return (
     <div className="space-y-6">
@@ -35,6 +38,8 @@ export default async function MandatesPage() {
             {mandates.length} mandate{mandates.length !== 1 ? "s" : ""} total
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-3">
+        <RequestCvsButton count={withoutCv} />
         <Link
           href="/admin/cadrehealth/mandates/create"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B3C5D] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0A3350] hover:shadow-md"
@@ -42,6 +47,7 @@ export default async function MandatesPage() {
           <Plus className="h-4 w-4" />
           Create Mandate
         </Link>
+        </div>
       </div>
 
       {mandates.length === 0 ? (
