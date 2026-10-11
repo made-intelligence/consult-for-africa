@@ -446,11 +446,19 @@ export async function emailLyfeListInvite({
   firstName,
   link,
   from,
+  onBehalfOf,
 }: {
   to: string;
   firstName: string;
   link: string;
   from?: string | null;
+  /**
+   * Set when the address belongs to somebody's office rather than to them.
+   * The letter then greets whoever opens it and asks for the forward, instead
+   * of opening "Dear Andrew" in Marion's inbox, which reads as a mailshot that
+   * did not check who it was writing to.
+   */
+  onBehalfOf?: string | null;
 }): Promise<void> {
   // The host signs this, not a person. An invitation from an individual
   // invites a reply to that individual, and 110 of those is not the plan.
@@ -461,6 +469,7 @@ export async function emailLyfeListInvite({
 
   const html = layout(
     `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     ${onBehalfOf ? `<p style="margin:0 0 14px;">We are writing in the hope that ${esc(onBehalfOf)} will join us for an evening on ${esc(LYFE_EVENT.date)}, and would be grateful if you would pass this on.</p>` : ""}
      <p style="margin:0 0 14px;">As we get older, many of us begin to notice changes in our energy, sleep, weight, skin, mood, recovery and overall performance. Sometimes these changes feel gradual; other times, they make us pause and ask what it really means to age well.</p>
      <p style="margin:0 0 14px;">We are hosting an intimate evening to explore how new knowledge, medical advancements and practical lifestyle approaches are changing the way we understand ageing. The conversation will look at how we can maintain vitality, beauty, strength, clarity and confidence for longer: not just by living longer, but by living well.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">

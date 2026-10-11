@@ -53,18 +53,20 @@ function firstNameOf(full: string): string {
   return (parts[0] || full).replace(/[“”"']/g, "");
 }
 
-function rows(): { name: string; email: string }[] {
+function rows(): { name: string; email: string; onBehalfOf: string }[] {
   if (!existsSync(CSV)) return [];
   const [head, ...lines] = readFileSync(CSV, "utf8").trim().split(/\r?\n/);
   const cols = head.split(",").map((c) => c.trim().toLowerCase());
   const iName = cols.indexOf("name");
   const iMail = cols.indexOf("email");
-  const out: { name: string; email: string }[] = [];
+  const iFor = cols.indexOf("onbehalfof");
+  const out: { name: string; email: string; onBehalfOf: string }[] = [];
   for (const line of lines) {
     const cells = line.match(/("[^"]*"|[^,]+)/g)?.map((c) => c.replace(/^"|"$/g, "").trim()) ?? [];
     const name = cells[iName] ?? "";
     const email = (cells[iMail] ?? "").toLowerCase();
-    if (name && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) out.push({ name, email });
+    const onBehalfOf = iFor >= 0 ? (cells[iFor] ?? "") : "";
+    if (name && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) out.push({ name, email, onBehalfOf });
   }
   return out;
 }
@@ -126,7 +128,8 @@ async function main() {
   if (!send) {
     console.log("DRY RUN. --test writes one to you, --send goes live.\n");
     for (const r of targets.slice(0, 20)) {
-      console.log(`  ${firstNameOf(r.name).padEnd(14)} ${r.name.padEnd(30)} ${r.email}`);
+      const via = r.onBehalfOf ? `  (for ${r.onBehalfOf})` : "";
+      console.log(`  ${firstNameOf(r.name).padEnd(12)} ${r.name.padEnd(26)} ${r.email}${via}`);
     }
     if (targets.length > 20) console.log(`  ... and ${targets.length - 20} more`);
     return;
@@ -136,7 +139,10 @@ async function main() {
   for (const r of targets) {
     try {
       await emailLyfeListInvite({
-        to: r.email, firstName: firstNameOf(r.name), link: LINK,
+        to: r.email,
+        firstName: firstNameOf(r.name),
+        link: LINK,
+        onBehalfOf: r.onBehalfOf || null,
       });
       ok++;
       if (!existsSync(LEDGER)) appendFileSync(LEDGER, "email,name,sentAt\n");
