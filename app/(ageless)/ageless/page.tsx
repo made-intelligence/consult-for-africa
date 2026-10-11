@@ -7,6 +7,7 @@ import {
   LYFE_PANEL,
   LYFE_PHONE_DISPLAY,
   lyfeInviter,
+  lyfeInviteLink,
   MEDLYFE_ABOUT,
   MEDLYFE_NAME,
   MEDLYFE_BRAND as MB,
@@ -114,6 +115,7 @@ export default async function LyfePage({
       <Panel />
       <WhatYouLeaveWith />
       <Rsvp utm={utm} initialIntent={go} />
+      <Invitation link={inviter ? lyfeInviteLink(inviter.key) : lyfeInviteLink("cfa")} />
       <AboutGroup tone="dark" items={MEDLYFE_ABOUT} />
       <Footer />
       <StickyRsvp />
@@ -715,6 +717,102 @@ function Rsvp({
 }
 
 /* ─── footer ───────────────────────────────────────────────────────────────── */
+
+/**
+ * The printed invitation, on the page.
+ *
+ * It sits after the form rather than before it, so it never competes with the
+ * one thing this page is for. Its job is the second share: a guest who has
+ * applied, or an inviter working their list, needs the artwork and a link in
+ * one tap rather than hunting for a file somebody sent them on WhatsApp in
+ * September. The link carried is the inviter's own, so a forward still lands
+ * attributed to whoever started the chain.
+ */
+function Invitation({ link }: { link: string }) {
+  const share =
+    `You are invited to AGELESS, an evening hosted by MedLYFE and The Lyfe Place on ` +
+    `${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ` +
+    `${LYFE_EVENT.proposition}. ${LYFE_EVENT.places} places. Apply here: ${link}`;
+
+  return (
+    <section className="px-6 py-16 md:px-10 md:py-24" style={{ background: MB.limeSoft }}>
+      <div className="mx-auto grid w-full max-w-5xl items-center gap-12 md:grid-cols-[minmax(0,420px)_1fr] md:gap-16">
+        <div
+          className="relative mx-auto w-full max-w-[420px]"
+          style={{ transform: "rotate(-1.6deg)" }}
+        >
+          <div
+            className="overflow-hidden rounded-[14px]"
+            style={{
+              boxShadow:
+                "0 1px 2px rgba(15,30,23,0.10), 0 18px 44px -12px rgba(15,30,23,0.38)",
+            }}
+          >
+            <Image
+              src="/lyfe/ageless-invitation.jpg"
+              alt={`Invitation to Ageless, ${LYFE_EVENT.date}, ${LYFE_EVENT.venueName}`}
+              width={1080}
+              height={1350}
+              sizes="(max-width: 768px) 86vw, 420px"
+              className="block h-auto w-full"
+            />
+          </div>
+        </div>
+
+        <div>
+          <p
+            className="text-[10.5px] font-semibold uppercase"
+            style={{ color: MB.greenSoft, letterSpacing: "0.18em" }}
+          >
+            Pass it on
+          </p>
+          <h2
+            className="mt-4 text-[27px] leading-[1.12] md:text-[34px]"
+            style={{
+              fontFamily: "var(--lyfe-display), Georgia, serif",
+              fontWeight: 600,
+              color: MB.greenDark,
+            }}
+          >
+            Know someone who should be in the room?
+          </h2>
+          <p
+            className="mt-5 max-w-md text-[15px] leading-relaxed"
+            style={{ color: MB.green }}
+          >
+            Send them the invitation. The link inside it is yours, so whoever
+            comes through it is counted to you. Applying is not a place: we
+            still choose the room, and the confirmation follows.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(share)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-full px-7 py-3.5 text-[14px] font-semibold transition-opacity hover:opacity-90"
+              style={{ background: MB.greenDeep, color: MB.limeSoft }}
+            >
+              Share on WhatsApp
+            </a>
+            <a
+              href="/lyfe/ageless-invitation.jpg"
+              download="AGELESS-invitation.jpg"
+              className="inline-flex items-center rounded-full border px-7 py-3.5 text-[14px] font-semibold transition-colors hover:bg-white"
+              style={{ borderColor: MB.greenSoft, color: MB.greenDeep }}
+            >
+              Save the image
+            </a>
+          </div>
+
+          <p className="mt-6 text-[12.5px]" style={{ color: MB.greenSoft }}>
+            RSVP {LYFE_EVENT.rsvpBy}. {LYFE_EVENT.venueAddress}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function Footer() {
   return (

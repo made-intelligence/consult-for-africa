@@ -158,7 +158,11 @@ export const LYFE_EVENT = {
   programme: "6:45 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
-  venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
+  // From the printed invitation, 11 October. The brief never supplied it and
+  // the page rendered no address at all until now.
+  venueAddress:
+    process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS ||
+    "6 Elsie Femi Pearse Street, Victoria Island, Lagos",
   // Moved with the date. Five clear working days before, which is what a
   // curated 70-person room needs to be chased properly. Confirm it.
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Friday, 16 October",
@@ -1154,7 +1158,7 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
  * or from publicly verifiable credentials. Nothing asserts a site count, a
  * founding year or a patient number, because none of those is on file here.
  */
-export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
+export const LYFE_ABOUT: { name: string; role?: string; body: string }[] = [
   {
     name: "Dr Chinwe Kpaduwa, MD FACS",
     role: "The surgeon",
@@ -1176,11 +1180,17 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
  * The same, for the AGELESS page. No practice is introduced on the night, so
  * the first card is the centre itself.
  */
-export const MEDLYFE_ABOUT: { name: string; role: string; body: string }[] = [
+export const MEDLYFE_ABOUT: { name: string; role?: string; body: string }[] = [
   {
     name: "MedLYFE",
     role: "The host",
     body: "MedLYFE Wellness and Longevity Centre is a licensed centre in Lagos for longevity, preventive health, infusion and health optimisation. Its clinical work is led by Dr Adedotun Ajelabi, a Consultant Family Physician with training in longevity and regenerative medicine. The argument of the evening is the centre's own: how you feel, how you function and how you look are one conversation, not three.",
+  },
+  {
+    name: "The Lyfe Place",
+    // Under construction. MedLYFE trades from its own address until it opens,
+    // so nothing here may read as though the centre is already inside it.
+    body: "The Lyfe Place is a wellness park: one destination where longevity medicine, fitness, nutrition, aesthetics and recovery sit side by side, so looking after yourself is somewhere you go rather than errands scattered across a city. It is the home the group is building for care of this kind, and MedLYFE moves in when it opens.",
   },
   LYFE_ABOUT[2],
 ];
