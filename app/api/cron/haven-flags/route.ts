@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { periodKey } from "@/lib/havenTaskPeriod";
 
 /**
  * Raise flags on tasks that were not recorded in time.
@@ -44,8 +45,8 @@ export async function GET(req: NextRequest) {
 
   const [tasks, staff] = await Promise.all([
     prisma.staffTask.findMany({
-      where: { clientId: client.id, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY"] } },
-      select: { id: true, roles: true, graceHours: true, flagLevel: true },
+      where: { clientId: client.id, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
+      select: { id: true, roles: true, graceHours: true, flagLevel: true, cadence: true },
     }),
     prisma.staffMember.findMany({
       // Nobody who has never signed in. You cannot fail to record something you
@@ -75,24 +76,32 @@ export async function GET(req: NextRequest) {
 
   let raised = 0;
   for (const t of tasks) {
-    const hoursSince = (now.getTime() - target.getTime()) / 3600000;
+    // A weekly task is only late once its week has closed. Chasing somebody on
+    // Tuesday for a task they have until Sunday to do is how a chase stops
+    // being believed.
+    const period = t.cadence === "WEEKLY"
+      ? periodKey("WEEKLY", new Date(now.getTime() - 7 * 24 * 3600 * 1000))
+      : target;
+    const hoursSince = (now.getTime() - period.getTime()) / 3600000;
     if (hoursSince < t.graceHours) continue;
 
-    const owed = staff.filter((s) => appliesTo(t.roles, s.position, s.department));
+    const owed = staff.filter((s: { position: string; department: string }) =>
+      appliesTo(t.roles, s.position, s.department)
+    );
     if (owed.length === 0) continue;
 
     const done = await prisma.staffTaskCompletion.findMany({
-      where: { taskId: t.id, forDate: target, staffId: { in: owed.map((o) => o.id) } },
+      where: { taskId: t.id, forDate: period, staffId: { in: owed.map((o: { id: string }) => o.id) } },
       select: { staffId: true },
     });
-    const doneIds = new Set(done.map((d) => d.staffId));
+    const doneIds = new Set(done.map((d: { staffId: string }) => d.staffId));
 
     for (const s of owed) {
       if (doneIds.has(s.id)) continue;
       // One flag per level per person per day. A task undone for a week
       // escalates once, not seven times.
       const made = await prisma.staffTaskFlag.createMany({
-        data: [{ taskId: t.id, staffId: s.id, forDate: target, level: t.flagLevel }],
+        data: [{ taskId: t.id, staffId: s.id, forDate: period, level: t.flagLevel }],
         skipDuplicates: true,
       });
       raised += made.count;

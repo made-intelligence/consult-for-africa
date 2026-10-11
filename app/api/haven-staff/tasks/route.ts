@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getStaffSession } from "@/lib/staffAuth";
+import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
 
 // Tick a task, or untick it.
 //
@@ -17,11 +18,6 @@ const schema = z.object({
   note: z.string().max(500).optional(),
 });
 
-/** Midnight UTC, matching how completions are keyed everywhere else. */
-function dayKey(d = new Date()) {
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-}
-
 export async function POST(req: NextRequest) {
   const session = await getStaffSession();
   if (!session) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
@@ -31,13 +27,14 @@ export async function POST(req: NextRequest) {
 
   const task = await prisma.staffTask.findUnique({
     where: { id: parsed.data.taskId },
-    select: { id: true, clientId: true, isActive: true },
+    select: { id: true, clientId: true, isActive: true, cadence: true },
   });
   if (!task || task.clientId !== session.clientId || !task.isActive) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const forDate = dayKey();
+  // A weekly task ticked on Thursday must still read as ticked on Friday.
+  const forDate = periodKey(task.cadence as Cadence);
 
   if (!parsed.data.done) {
     // Unticking is allowed. Somebody who ticks the wrong row and cannot undo it
