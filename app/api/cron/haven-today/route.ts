@@ -71,6 +71,39 @@ ${i.detail ? `<div style="color:#64748b;font-size:14px;margin-top:2px">${i.detai
 </div>`;
 }
 
+/**
+ * For somebody who has not signed in yet. Deliberately carries no list, no
+ * count and no reference to anything outstanding: the point is that joining
+ * late costs them nothing, because the alternative is a team where the people
+ * who were slow to start quietly stop trying.
+ */
+function welcomeText(firstName: string) {
+  return `Hello ${firstName},
+
+Your page at Haven is set up and waiting for you. Nothing has been missed and nothing is outstanding; it only starts when you do.
+
+  ${SITE}/HavenStaff
+
+Put in your email and we will send you a six-digit code. There is no password.
+
+Inside you will find everyone's name, role and number in one place, a short list for your own day, and somewhere to ask for leave from your phone.
+
+If it is not working, or you would rather somebody walked you through it on shift, say so and one of us will come and sit with you.
+
+Consult for Africa`;
+}
+
+function welcomeHtml(firstName: string) {
+  return `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.6;color:#1F2937;max-width:520px">
+<p>Hello ${firstName},</p>
+<p>Your page at Haven is set up and waiting for you. Nothing has been missed and nothing is outstanding; it only starts when you do.</p>
+<p style="margin:22px 0"><a href="${SITE}/HavenStaff" style="background:#0B3C5D;color:#fff;text-decoration:none;padding:13px 24px;border-radius:10px;font-weight:600;display:inline-block">Open your page</a></p>
+<p>Put in your email and we will send you a six-digit code. There is no password.</p>
+<p style="color:#64748b;font-size:14px">If it is not working, or you would rather somebody walked you through it on shift, say so and one of us will come and sit with you.</p>
+<p style="color:#64748b;font-size:14px">Consult for Africa</p>
+</div>`;
+}
+
 export async function GET(req: NextRequest) {
   // Fails CLOSED. The first version of this read `if (secret && ...)`, which
   // meant that with CRON_SECRET unset the endpoint was open to anybody and
@@ -86,7 +119,7 @@ export async function GET(req: NextRequest) {
 
   const staff = await prisma.staffMember.findMany({
     where: { clientId: client.id, isActive: true, NOT: { email: null } },
-    select: { id: true, name: true, email: true, tiers: true },
+    select: { id: true, name: true, email: true, tiers: true, lastLoginAt: true },
   });
 
   let sent = 0;
@@ -95,6 +128,30 @@ export async function GET(req: NextRequest) {
 
   for (const s of staff) {
     try {
+      const firstNameEarly = s.name.replace(/^(Dr|Mr|Mrs|Ms)\s+/i, "").split(" ")[0];
+
+      // Nobody who has not started yet gets a list of things waiting on them.
+      // To somebody who has never seen the page, "four things waiting on you"
+      // reads as a debt they did not know they had, and by week three it reads
+      // as a place they are already behind. They get an invitation instead,
+      // twice a week rather than daily, and it says plainly that nothing has
+      // been missed.
+      if (!s.lastLoginAt) {
+        const day = new Date().getUTCDay();
+        if (day !== 1 && day !== 4) { skipped++; continue; }
+        await sendTransactionalEmail({
+          from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
+          replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
+          to: s.email!,
+          subject: "Your Haven staff page is waiting whenever you are",
+          text: welcomeText(firstNameEarly),
+          html: welcomeHtml(firstNameEarly),
+        });
+        sent++;
+        await new Promise((r) => setTimeout(r, 250));
+        continue;
+      }
+
       const items = await whatsWaiting({
         sub: s.id,
         clientId: client.id,
