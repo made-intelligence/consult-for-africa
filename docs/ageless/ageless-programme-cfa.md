@@ -44,7 +44,7 @@ Three names, three jobs. Keeping them apart is what lets edition two reuse every
 | Time | What |
 | --- | --- |
 | 5:30 | Arrival |
-| 6:30 | Welcome and opening film |
+| 6:30 | The opening film |
 | 6:50 | Can We Live to 100 and Still Live Well? Dr Ajelabi, 10 minutes |
 | 7:00 | The panel, 45 minutes |
 | 7:45 | Questions from the room |

@@ -257,7 +257,7 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     credit: "Dr Adedotun Ajelabi",
     bucket: "Physicians who might refer",
     places: 10,
-    note: "Opens the evening. Her clinical contacts.",
+    note: "Gives the opening address. Her clinical contacts.",
   },
   {
     key: "adenuga",
@@ -341,8 +341,8 @@ export const LYFE_EVENT_PROGRAMME = [
   },
   {
     time: "6:30",
-    title: "Welcome and opening film",
-    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
+    title: "The opening film",
+    body: "The evening opens with a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
   },
   {
     time: "6:50",
