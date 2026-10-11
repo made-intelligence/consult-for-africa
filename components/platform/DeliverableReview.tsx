@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AssignDeliverable from "@/components/platform/AssignDeliverable";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -306,6 +307,15 @@ export default function DeliverableReview({
             className="mt-4 pt-4 flex flex-wrap gap-4 text-xs text-gray-400"
             style={{ borderTop: "1px solid #f0f0f0" }}
           >
+            {!deliverable.assignment && (
+              // Unowned is the normal state here, not an edge case: 180 of 199
+              // deliverables had nobody against them, so this says so plainly
+              // rather than leaving a blank row.
+              <span className="flex items-center gap-1" style={{ color: "#B45309" }}>
+                <User size={11} />
+                Nobody assigned
+              </span>
+            )}
             {deliverable.assignment && (
               <span className="flex items-center gap-1">
                 <User size={11} />
@@ -330,6 +340,15 @@ export default function DeliverableReview({
               </span>
             )}
           </div>
+
+          {isEM && (
+            <div className="mt-4">
+              <AssignDeliverable
+                deliverableId={deliverable.id}
+                currentAssigneeName={deliverable.assignment?.consultant.name ?? null}
+              />
+            </div>
+          )}
 
           {deliverable.fileUrl && (
             <a
