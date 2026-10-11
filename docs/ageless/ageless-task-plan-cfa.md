@@ -108,7 +108,7 @@ Everything else is ours.
 | Capital Club walkthrough | Sally with CFA | 13 Oct |
 | Stage and seating layout | CFA | 14 Oct |
 | AV: handheld and lapel mics, screen, playback | CFA | 15 Oct |
-| Opening film, 60 to 90 seconds | CFA, Kalkulus | 17 Oct |
+| Opening film, 10 minutes | CFA, Kalkulus | 17 Oct |
 | Photographer and videographer booked | CFA | 13 Oct |
 | Catering and cocktails confirmed | Sally | 15 Oct |
 | Music | CFA | 17 Oct |

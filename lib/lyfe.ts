@@ -345,7 +345,7 @@ export const LYFE_EVENT_PROGRAMME = [
     body: "As we age, we begin to notice changes in energy, strength, sleep, weight, skin, mood and recovery. This session explores how longevity medicine helps to slow age-related decline, maintain vitality, beauty and performance while extending lifespan.",
   },
   {
-    time: "6:35",
+    time: "6:40",
     title: "Can We Live to 100 and Still Live Well?",
     body: "Dr Adedotun Ajelabi introduces longevity medicine, the difference between lifespan and healthspan, and how advanced diagnostics, AI and preventive care can help people understand and optimise their bodies before disease takes hold.",
   },

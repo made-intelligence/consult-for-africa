@@ -27,7 +27,7 @@ Three names do three separate jobs, and they are not interchangeable. AGELESS is
 | --- | --- |
 | 6:00 | Arrival |
 | 6:30 | The opening film |
-| 6:35 | Can We Live to 100 and Still Live Well? Dr Ajelabi |
+| 6:40 | Can We Live to 100 and Still Live Well? Dr Ajelabi |
 | 7:00 | The panel, The Ageless Blueprint. Forty five minutes |
 | 7:45 | Questions from the room |
 | 8:15 | Ageless After Hours. Close at 9:30 |
