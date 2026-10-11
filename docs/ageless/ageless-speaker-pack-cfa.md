@@ -122,33 +122,9 @@ The conversation moves on if it reaches who may perform what. That is a live reg
 
 | Time | What |
 | --- | --- |
-| 5:30 | Arrival |
-| 6:45 | Welcome and opening film |
-| 6:50 | Can We Live to 100 and Still Live Well? |
+| 6:00 | Arrival |
+| 6:30 | The opening film |
+| 6:40 | Can We Live to 100 and Still Live Well? |
 | 7:00 | The panel: The Ageless Blueprint |
 | 7:45 | Questions from the room |
 | 8:15 | Ageless After Hours |
-
-## Rules for the stage
-
-**No named prescription products.** No toxins, fillers or weight loss drugs by brand. ARCON requires approval before exposure, fines from ₦500,000, and the liability sits on Medlyfe rather than the speaker.
-
-**Do not pitch your own practice.** MDCN treats self-advertisement by a doctor as a disciplinary matter. You will be introduced properly.
-
-**No before and after claims. No outcome promises.** "Most people see" is a claim. "In my experience, some people find" is not.
-
-**Do not debate scope of practice.** HEFAMAA has it live in Lagos now.
-
-## Practicalities
-
-| | |
-| --- | --- |
-| Venue | Capital Club, Lagos |
-| Arrive | In the room by 6:00pm |
-| Dress | Cocktail |
-| Audio | Handheld on the panel, lapel for the address |
-| Slides | None. No lectern. One image behind you if it earns its place |
-| After Hours | Please stay. The useful conversations happen after 8:30 |
-
-Reply to this note with anything.
-

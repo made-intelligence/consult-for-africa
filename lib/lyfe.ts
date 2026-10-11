@@ -154,11 +154,15 @@ export const LYFE_EVENT = {
   panelStandfirst:
     "How to translate longevity science into daily choices across metabolism, movement, stress, nutrition, skin, aesthetics and preventive medicine.",
   date: process.env.NEXT_PUBLIC_LYFE_EVENT_DATE || "Wednesday, 21 October 2026",
-  arrival: "5:30 PM",
-  programme: "6:45 PM",
+  arrival: "6:00 PM",
+  programme: "6:30 PM",
   close: "9:30 PM",
   venueName: process.env.NEXT_PUBLIC_LYFE_EVENT_VENUE || "Capital Club, Lagos",
-  venueAddress: process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS || null,
+  // From the printed invitation, 11 October. The brief never supplied it and
+  // the page rendered no address at all until now.
+  venueAddress:
+    process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS ||
+    "6 Elsie Femi Pearse Street, Victoria Island, Lagos",
   // Moved with the date. Five clear working days before, which is what a
   // curated 70-person room needs to be chased properly. Confirm it.
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Friday, 16 October",
@@ -189,7 +193,7 @@ export const LYFE_EVENT_ALLOCATION = [
  * without anybody keeping a parallel spreadsheet.
  *
  * `places` is the allocation this person is drawing against, not a limit the
- * page enforces. Applying is not a place: the team still chooses, and the
+ * page enforces. Registering an interest is not yet a place: the team curates
  * invitation to confirm goes out afterwards.
  *
  * Keys are short because they are typed into WhatsApp by hand when a link
@@ -240,12 +244,12 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     note: "Ten places given to PBN to fill, taken from general.",
   },
   {
-    key: "sally",
-    name: "Sally",
+    key: "ccl",
+    name: "Capital Club Lagos",
     credit: null,
     bucket: "General invitations: micro-influencers and curated picks",
     places: 10,
-    note: "Promotion, and the Capital Club relationship.",
+    note: "Worked by Sally, who holds the Capital Club relationship.",
   },
   {
     key: "ajelabi",
@@ -253,7 +257,7 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     credit: "Dr Adedotun Ajelabi",
     bucket: "Physicians who might refer",
     places: 10,
-    note: "Opens the evening. Her clinical contacts.",
+    note: "Gives the opening address. Her clinical contacts.",
   },
   {
     key: "adenuga",
@@ -331,17 +335,17 @@ export const LYFE_EVENT_TONE =
 /** The run of show, with the times from the brief. */
 export const LYFE_EVENT_PROGRAMME = [
   {
-    time: "5:30",
+    time: "6:00",
     title: "Arrival",
     body: "Music, photographs and conversation. A social evening rather than a health seminar.",
   },
   {
-    time: "6:45",
-    title: "Welcome and opening film",
-    body: "Dr Adedotun Ajelabi opens the evening, followed by a short film on the new practical possibilities in ageing well: prevention, performance, vitality, skin health and how daily choices now connect with modern diagnostics and medicine.",
+    time: "6:30",
+    title: "The opening film",
+    body: "As we age, we begin to notice changes in energy, strength, sleep, weight, skin, mood and recovery. This session explores how longevity medicine helps to slow age-related decline, maintain vitality, beauty and performance while extending lifespan.",
   },
   {
-    time: "6:50",
+    time: "6:40",
     title: "Can We Live to 100 and Still Live Well?",
     body: "Dr Adedotun Ajelabi introduces longevity medicine, the difference between lifespan and healthspan, and how advanced diagnostics, AI and preventive care can help people understand and optimise their bodies before disease takes hold.",
   },
@@ -1154,7 +1158,7 @@ export const LYFE_CONSULT_PROOF: { stat: string; line: string }[] = [
  * or from publicly verifiable credentials. Nothing asserts a site count, a
  * founding year or a patient number, because none of those is on file here.
  */
-export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
+export const LYFE_ABOUT: { name: string; role?: string; body: string }[] = [
   {
     name: "Dr Chinwe Kpaduwa, MD FACS",
     role: "The surgeon",
@@ -1176,11 +1180,17 @@ export const LYFE_ABOUT: { name: string; role: string; body: string }[] = [
  * The same, for the AGELESS page. No practice is introduced on the night, so
  * the first card is the centre itself.
  */
-export const MEDLYFE_ABOUT: { name: string; role: string; body: string }[] = [
+export const MEDLYFE_ABOUT: { name: string; role?: string; body: string }[] = [
   {
     name: "MedLYFE",
     role: "The host",
     body: "MedLYFE Wellness and Longevity Centre is a licensed centre in Lagos for longevity, preventive health, infusion and health optimisation. Its clinical work is led by Dr Adedotun Ajelabi, a Consultant Family Physician with training in longevity and regenerative medicine. The argument of the evening is the centre's own: how you feel, how you function and how you look are one conversation, not three.",
+  },
+  {
+    name: "The Lyfe Place",
+    // Under construction. MedLYFE trades from its own address until it opens,
+    // so nothing here may read as though the centre is already inside it.
+    body: "The Lyfe Place is a wellness park: one destination where longevity medicine, fitness, nutrition, aesthetics and recovery sit side by side, so looking after yourself is somewhere you go rather than errands scattered across a city. It is the home the group is building for care of this kind, and MedLYFE moves in when it opens.",
   },
   LYFE_ABOUT[2],
 ];

@@ -13,7 +13,7 @@ export default function AboutGroup({
   items = LYFE_ABOUT,
 }: {
   tone: "dark" | "light";
-  items?: { name: string; role: string; body: string }[];
+  items?: { name: string; role?: string; body: string }[];
 }) {
   const dark = tone === "dark";
   const ink = dark ? "#FFFFFF" : "#15161A";
@@ -37,14 +37,16 @@ export default function AboutGroup({
         <div className={`mt-9 grid gap-x-10 gap-y-10 ${items.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
           {items.map((a) => (
             <div key={a.name} className="border-t pt-6" style={{ borderColor: line }}>
-              <p
-                className="text-[10px] font-semibold uppercase"
-                style={{ color: accent, letterSpacing: "0.14em" }}
-              >
-                {a.role}
-              </p>
+              {a.role ? (
+                <p
+                  className="text-[10px] font-semibold uppercase"
+                  style={{ color: accent, letterSpacing: "0.14em" }}
+                >
+                  {a.role}
+                </p>
+              ) : null}
               <h3
-                className="mt-2.5 text-[19px] leading-snug"
+                className={`${a.role ? "mt-2.5" : ""} text-[19px] leading-snug`}
                 style={{
                   fontFamily: "var(--lyfe-display), Georgia, serif",
                   fontWeight: 600,
