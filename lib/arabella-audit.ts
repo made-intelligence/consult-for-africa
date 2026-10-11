@@ -25,6 +25,7 @@ export const RECEIVED: { what: string; status: "in" | "partly"; note: string }[]
   { what: "Staff list", status: "in", note: "Roles, days and reporting lines" },
   { what: "Pharmacy stock register", status: "partly", note: "Unit costs still to come" },
   { what: "Patient list", status: "in", note: "4,379 records" },
+  { what: "Bank statements, First Bank", status: "partly", note: "Tabitha and Arabella accounts, two years. Still to come: the GTB and Access accounts" },
 ];
 
 /**
@@ -32,7 +33,7 @@ export const RECEIVED: { what: string; status: "in" | "partly"; note: string }[]
  * document. Kept as PRIORITY_EIGHT so the admin page's chase list follows.
  */
 export const PRIORITY_EIGHT: { n: number; what: string; why: string; section: string }[] = [
-  { n: 1, section: "C", what: "Bank statements for every account the practice is paid into, last 12 months", why: "The only way to confirm that what the record says came in reached the bank" },
+  { n: 1, section: "C", what: "Bank statements for the GTB and Access accounts, last 12 months (First Bank is in, thank you)", why: "The only way to confirm that what the record says came in reached the bank" },
   { n: 2, section: "E", what: "Monthly costs, last 12 months: salaries, rent, power, drugs bought, tests sent out", why: "Without costs nobody can say which services make money" },
   { n: 3, section: "D", what: "For each HMO and company account: tariff, contract, and what it owes today", why: "Insurers paid under 2% of this year's takings" },
   { n: 4, section: "F", what: "Fertility: who does the embryology, cycles started this year, and the price of a cycle", why: "Fertility brought in \u20A66m and is not on the price list or the staff list" },
