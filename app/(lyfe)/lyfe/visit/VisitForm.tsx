@@ -11,6 +11,11 @@ export default function VisitForm() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [times, setTimes] = useState<string[]>([]);
+  // Only windows still ahead of us, so the link keeps working all week.
+  const [open] = useState(() => LYFE_VISIT.windows.filter((w) => new Date(w.ends).getTime() > Date.now()));
+  const toggle = (label: string) =>
+    setTimes((t) => (t.includes(label) ? t.filter((x) => x !== label) : [...t, label]));
   const [company, setCompany] = useState(""); // honeypot
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -18,6 +23,10 @@ export default function VisitForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (times.length === 0) {
+      setError("Pick at least one time that suits you.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -25,7 +34,7 @@ export default function VisitForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName, facilityName, clinicianRole, facilityArea, email, phone, notes, company,
+          fullName, facilityName, clinicianRole, facilityArea, email, phone, notes, times, company,
         }),
       });
       const b = await res.json().catch(() => ({}));
@@ -46,8 +55,8 @@ export default function VisitForm() {
           Thank you, {first}.
         </p>
         <p className="mt-3 text-[15px] leading-relaxed" style={{ color: C.body }}>
-          Someone will call to agree a time that fits your list. Her diary in Lagos is short, so
-          the visits are being planned area by area.
+          We will call to confirm the time. The visits are being planned area by area, so we
+          may suggest a slot close to the one you chose.
         </p>
       </div>
     );
@@ -102,12 +111,30 @@ export default function VisitForm() {
         </label>
       </div>
 
+      <fieldset>
+        <legend className="text-[13px] font-semibold" style={{ color: C.ink }}>
+          When suits you <span style={{ color: C.muted, fontWeight: 400 }}>tick every time that works</span>
+        </legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {[...open.map((w) => w.label), LYFE_VISIT.laterLabel].map((label) => {
+            const on = times.includes(label);
+            return (
+              <label key={label} className="flex cursor-pointer items-center gap-3 border p-3 text-[14.5px]"
+                style={{ borderColor: on ? C.ink : C.line, background: on ? C.groundWarm : "#fff", color: C.ink }}>
+                <input type="checkbox" checked={on} onChange={() => toggle(label)} />
+                {label}
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
+
       <label className="block">
         <span className="text-[13px] font-semibold" style={{ color: C.ink }}>
           Anything useful <span style={{ color: C.muted, fontWeight: 400 }}>optional</span>
         </span>
         <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} className={field} style={style}
-          placeholder="The kind of cases you see, days that suit, anyone else who should be there" />
+          placeholder="The kind of cases you see, the address, anyone else who should be there" />
       </label>
 
       <button type="submit" disabled={busy}

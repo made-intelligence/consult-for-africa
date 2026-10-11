@@ -1218,6 +1218,27 @@ export const LYFE_VISIT = {
     "Other",
   ],
   minutes: 30,
+  /** The week of the round, as the page says it. */
+  week: "Tuesday 13 to Friday 16 October",
+  /**
+   * The windows a practice can pick from, in Lagos time. Tuesday and Wednesday
+   * stop at 11 because 11 to 1 is her consultation block. A window that has
+   * ended drops off the form by itself, so the link can stay in the group all
+   * week. Held as text in the notes, never as slotAt, which is the paid
+   * consultation diary.
+   */
+  windows: [
+    { key: "tue-am", label: "Tuesday 13 Oct, 9 to 11am", ends: "2026-10-13T11:00:00+01:00" },
+    { key: "tue-pm", label: "Tuesday 13 Oct, 2 to 5pm", ends: "2026-10-13T17:00:00+01:00" },
+    { key: "wed-am", label: "Wednesday 14 Oct, 9 to 11am", ends: "2026-10-14T11:00:00+01:00" },
+    { key: "wed-pm", label: "Wednesday 14 Oct, 2 to 5pm", ends: "2026-10-14T17:00:00+01:00" },
+    { key: "thu-am", label: "Thursday 15 Oct, 10am to 1pm", ends: "2026-10-15T13:00:00+01:00" },
+    { key: "thu-pm", label: "Thursday 15 Oct, 2 to 5pm", ends: "2026-10-15T17:00:00+01:00" },
+    { key: "fri-am", label: "Friday 16 Oct, 10am to 1pm", ends: "2026-10-16T13:00:00+01:00" },
+    { key: "fri-pm", label: "Friday 16 Oct, 2 to 5pm", ends: "2026-10-16T17:00:00+01:00" },
+  ],
+  /** For a practice that wants her but not this week. */
+  laterLabel: "None of these, the following week",
   /** What she actually does on a visit, so nobody expects a sales call. */
   whatHappens: [
     {

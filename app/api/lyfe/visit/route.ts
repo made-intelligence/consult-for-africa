@@ -21,6 +21,7 @@ const schema = z.object({
   email: z.string().trim().toLowerCase().email().max(200),
   phone: z.string().trim().min(7).max(40),
   notes: z.string().trim().max(2000).optional().nullable(),
+  times: z.array(z.string().trim().min(1).max(80)).min(1, "Pick at least one time that suits you.").max(12),
   company: z.string().max(200).optional(),
 });
 
@@ -46,6 +47,11 @@ export const POST = handler(async (req: NextRequest) => {
   // Honeypot. A bot fills every field it is given.
   if (d.company) return NextResponse.json({ ok: true });
 
+  // The times they ticked lead the notes, so the coordinator reads them first.
+  // Not slotAt: that column is the paid consultation diary.
+  const when = `Times that suit: ${d.times.join("; ")}`;
+  const notes = [when, d.notes].filter(Boolean).join("\n\n");
+
   const entry = await prisma.lyfeEnquiry.create({
     data: {
       fullName: d.fullName,
@@ -59,7 +65,7 @@ export const POST = handler(async (req: NextRequest) => {
       pathway: "UNSURE",
       based: "LAGOS",
       format: "IN_PERSON",
-      notes: d.notes || null,
+      notes,
       source: "A_DOCTOR",
       sourcePath: req.headers.get("referer") ?? null,
       consentedAt: new Date(),
@@ -83,7 +89,7 @@ export const POST = handler(async (req: NextRequest) => {
       concerns: [],
       timing: null,
       based: entry.based,
-      travelFrom: `${d.clinicianRole} at ${d.facilityName}, ${d.facilityArea}`,
+      travelFrom: `${d.clinicianRole} at ${d.facilityName}, ${d.facilityArea}. ${when}`,
       format: entry.format,
       heightReported: null,
       weightReported: null,
