@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
+import { periodKey } from "@/lib/havenTaskPeriod";
 
 /**
  * Raise flags on tasks that were not recorded in time.
