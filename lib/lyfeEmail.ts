@@ -256,6 +256,8 @@ export interface LyfeInternalInput {
   source: keyof typeof SOURCE_LABELS;
   sourceDetail: string | null;
   utmCampaign: string | null;
+  /** The ?src= or ?i= on the link they came through. */
+  utmSource?: string | null;
 }
 
 /**
@@ -311,6 +313,7 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
        ${row("Consultation", rsvp ? null : FORMAT_LABELS[input.format])}
        ${row("Found us via", SOURCE_LABELS[input.source])}
        ${row("Specifically", input.sourceDetail)}
+       ${row("Link", input.utmSource ?? null)}
        ${row("Campaign", input.utmCampaign)}
      </table>
 
