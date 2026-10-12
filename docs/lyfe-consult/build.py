@@ -6,8 +6,8 @@
 Each group gets its own ?src= tag on the QR and the printed link, so the
 requests that come back can be traced to the group that sent them. Add a group
 to GROUPS and rerun. Writes consult-flyer-<slug>.png (1080 x 1350, for
-posting) and consult-flyer-print.pdf (A4), then the same set again in MedLYFE's
-own livery as consult-flyer-<slug>-medlyfe.png and consult-flyer-print-medlyfe.pdf.
+posting) and consult-flyer-print.pdf (A4), then MedLYFE's own copy in its
+livery on ?src=medlyfe: consult-flyer-medlyfe.png and consult-flyer-medlyfe-print.pdf.
 
 Copy rules: the page is the clinic's, and the flyer says what the page says.
 No superlatives, no comparison with other surgeons, no before and after, no
@@ -182,10 +182,14 @@ def render(html, out, w, h, png):
 
 
 if __name__ == "__main__":
-    for theme, suffix in (("cfa", ""), ("medlyfe", "-medlyfe")):
-        t = THEMES[theme]
-        for slug in GROUPS:
-            if slug == "print":
-                render(flyer(slug, 794, 1123, 794 / 1080, t), os.path.join(HERE, f"consult-flyer-print{suffix}.pdf"), 794, 1123, False)
-            else:
-                render(flyer(slug, 1080, 1350, 1.0, t), os.path.join(HERE, f"consult-flyer-{slug}{suffix}.png"), 1080, 1350, True)
+    t = THEMES["cfa"]
+    for slug in GROUPS:
+        if slug == "print":
+            render(flyer(slug, 794, 1123, 794 / 1080, t), os.path.join(HERE, "consult-flyer-print.pdf"), 794, 1123, False)
+        else:
+            render(flyer(slug, 1080, 1350, 1.0, t), os.path.join(HERE, f"consult-flyer-{slug}.png"), 1080, 1350, True)
+    # MedLYFE's own copy, for their team to send out. One tag, so their
+    # requests are told apart from the groups' in the queue.
+    t = THEMES["medlyfe"]
+    render(flyer("medlyfe", 1080, 1350, 1.0, t), os.path.join(HERE, "consult-flyer-medlyfe.png"), 1080, 1350, True)
+    render(flyer("medlyfe", 794, 1123, 794 / 1080, t), os.path.join(HERE, "consult-flyer-medlyfe-print.pdf"), 794, 1123, False)
