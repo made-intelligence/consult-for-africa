@@ -55,7 +55,7 @@ def qr_uri(url):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-PORTRAIT = data_uri(os.path.join(ROOT, "public/lyfe/chinwe-portrait.jpg"), "image/jpeg")
+PORTRAIT = data_uri(os.path.join(HERE, "chinwe-smiling.png"), "image/png")
 QR = qr_uri(URL)
 
 POINTS = [
@@ -93,9 +93,8 @@ def flyer(w, h, scale):
   .when {{ margin-top: {s(30)}; padding: {s(18)} {s(22)}; background: {INK}; color: {GROUND}; }}
   .when .d {{ font-family: Fraunces, Georgia, serif; font-size: {s(31)}; font-weight: 600; }}
   .when .a {{ font-size: {s(18)}; letter-spacing: 0.14em; text-transform: uppercase; margin-top: {s(6)}; color: #D9C3A6; }}
-  .photo {{ width: {s(330)}; flex: none; }}
-  .arch {{ border-top-left-radius: 9999px; border-top-right-radius: 9999px; overflow: hidden; background: #0B0D12; }}
-  .arch img {{ display: block; width: 100%; height: {s(440)}; object-fit: cover; object-position: 63% 32%; background: #0B0D12; }}
+  .photo {{ width: {s(340)}; flex: none; padding-top: {s(40)}; }}
+  .portrait {{ display: block; width: 100%; height: auto; }}
   .cred {{ margin-top: {s(16)}; font-size: {s(16.5)}; line-height: 1.5; color: {BODY}; }}
   .cred b {{ color: {INK}; font-weight: 600; display: block; font-size: {s(19)}; }}
   .points {{ background: {WARM}; padding: {s(30)} {s(72)}; display: grid; gap: {s(16)}; }}
@@ -123,7 +122,7 @@ def flyer(w, h, scale):
         <div class="a">Ikoyi &middot; Victoria Island &middot; Lekki</div></div>
     </div>
     <div class="photo">
-      <div class="arch"><img src="{PORTRAIT}" alt=""></div>
+      <img class="portrait" src="{PORTRAIT}" alt="">
       <div class="cred"><b>Dr Chinwe Kpaduwa, MD FACS</b>
         Board certified plastic surgeon (ABPS)<br>Harvard educated, California trained</div>
     </div>
