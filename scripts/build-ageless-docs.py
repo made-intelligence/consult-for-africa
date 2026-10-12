@@ -44,6 +44,8 @@ PACK = {
         "AGELESS  ·  Plan summary", "Consult for Africa  ·  Confidential"),
     "ageless-note-to-chinwe-cfa": (
         "AGELESS  ·  For Dr Kpaduwa", f"Consult for Africa  ·  {EVENING}"),
+    "shoot-replan-session-cfa": (
+        "Medlyfe  ·  The content shoot", f"Consult for Africa  ·  {TODAY}"),
 }
 
 

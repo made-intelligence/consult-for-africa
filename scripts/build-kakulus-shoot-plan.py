@@ -202,9 +202,9 @@ STORIES = [
         "send": "Anyone who has asked who will actually treat them, or how often Dr Kpaduwa is in Lagos.",
         "frames": [
             ("Open", "Wide two-shot, seated at an angle. She introduces the physician as the person who is in the room when she is not."),
-            ("Turn", "Singles. How they work together: what she signs off, what he does, how a case is handed between them."),
+            ("Turn", "Singles. How they work together: what Dr Kpaduwa signs off, what Dr Ajelabi does, how a case is handed between them."),
             ("Heart", "Two-shot. A real example, without a patient: the call at the weekend and what happens next."),
-            ("Close", "He says what a patient should ask him. She says why she trusts him with her patients."),
+            ("Close", "Dr Ajelabi says what a patient should ask her. Dr Kpaduwa says why she trusts her with her patients."),
         ],
         "card": "MedLYFE. The team who treats you, by name.",
     },
@@ -252,7 +252,7 @@ SCHEDULE = [
     ["14:25", "Studio", "Wrap. Change to look three"],
     ["14:35", "Travel", "<i>To MedLYFE, 25 Admiralty Way. 25 minutes allowed</i>"],
     ["15:00", "MedLYFE, inside i-Fitness, 25 Admiralty Way, Lekki Phase 1", "Arrive. Crew lights the consultation room. <i>Dr Kpaduwa rests for 20 minutes, then a touch-up</i>"],
-    ["15:15", "Clinic", "Physician arrives for briefing; her artist checks his shine"],
+    ["15:15", "Clinic", "Physician arrives for briefing; her artist checks the physician for shine"],
     ["15:30", "Clinic, consultation room", "<b>Story 7, Your consultation (long).</b> Dr Kpaduwa alone"],
     ["16:15", "Clinic", "<i>Break, 10 minutes.</i> Change to look four"],
     ["16:25", "Clinic, consultation room", "<b>Story 8, Who looks after you (long),</b> with MedLYFE's physician"],
@@ -319,7 +319,7 @@ def build():
     s.append(P("Makeup", "h2"))
     s.append(P("Dr Kpaduwa brings her own makeup and her own artist, who is on set all day and directs her look. Our director will ask for touch-ups between "
                "stories and before every still, and will flag shine under the studio light, but the artist has the final word on her face. "
-               "MedLYFE's physician needs powder only. We will ask her artist to check him before Story 8, and we carry blotting papers if not."))
+               "MedLYFE's physician needs powder only. We will ask her artist to check her before Story 8, and we carry blotting papers if not."))
 
     s.append(P("Wardrobe: four options, one per setting", "h2"))
     s.append(P("Dr Kpaduwa's own clothes, chosen by her. These are the brief for each look, not a styling decision. Please bring all four; "
