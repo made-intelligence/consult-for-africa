@@ -40,6 +40,8 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 **"Privilege"** means the Surgeon's grant, recorded on the Mezo platform, to perform a named procedure, at a named Partner Facility or network-wide, independently or under supervision.
 
+**"Surgeon-owned Facility"** means a Partner Facility in which the Surgeon, or a member of the Surgeon's immediate family, holds ten per cent (10%) or more of the shares or profits, or which the Surgeon otherwise controls or manages.
+
 **"Surgeon Fee"** means the professional fee payable to the Surgeon for a Case under Schedule 2.
 
 ## 2. ENGAGEMENT
@@ -96,9 +98,25 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 6.2 **No further Surgeon Fee is payable** for a return to theatre or a readmission within the Episode of Care that arises from the index operation.
 
-6.3 Facility and other costs of an Outlier are handled under the Case Bundle's rules. Mezo carries the facility cost of a return to theatre within the Episode of Care, save where Schedule 2 provides otherwise for a procedure.
+6.3 Facility and other costs of an Outlier are handled under the Case Bundle's rules. Mezo carries the facility cost of a return to theatre within the Episode of Care, save where Schedule 2 provides otherwise for a procedure, and save in a Surgeon-owned Facility, where Clause 6A applies.
 
 6.4 The Surgeon shall report any serious adverse event to Mezo within twenty-four (24) hours and take part in Mezo Surgery's morbidity and mortality review. The review is for learning and is conducted in confidence.
+
+## 6A. SURGEON-OWNED FACILITIES
+
+6A.1 **Disclosure.** The Surgeon shall declare every Surgeon-owned Facility in Schedule 1 on signing, and any change within fourteen (14) days. Before a Case is booked at a Surgeon-owned Facility, the patient shall be told in writing that the Surgeon has an interest in it and that the patient may ask for the Case at another Partner Facility.
+
+6A.2 **Separate facility agreement.** A Surgeon-owned Facility is used only under its own Facility Partnership Agreement with Mezo. The facility's share of the All-in Price is set in that agreement and paid to the facility, not to the Surgeon, and never forms part of the Surgeon Fee. The Surgeon Fee under Schedule 2 is unchanged by where the Case takes place.
+
+6A.3 **Allocation.** Mezo decides which Partner Facility hosts a Case, on the patient's needs, the patient's choice, safety and value. The Surgeon shall not make a Case conditional on its being done at a Surgeon-owned Facility.
+
+6A.4 **Complications.** In a Surgeon-owned Facility, the facility cost of a return to theatre or a readmission within the Episode of Care is carried by the facility, not by Mezo, and no further charge is made to the patient.
+
+6A.5 **Standards and audit.** A Surgeon-owned Facility meets the same accreditation, theatre and WHO checklist standards as any other Partner Facility. Mezo may audit it on reasonable notice, and its outcomes are recorded and reviewed under Clauses 6.4 and 8 by a clinician who has no interest in it.
+
+6A.6 **Mezo-sourced Patients.** Clause 11 applies in full. A Mezo-sourced Patient seen at a Surgeon-owned Facility remains a Mezo Surgery patient for the Episode of Care and for any later procedure within the period in Clause 11.1.
+
+6A.7 **Records.** The Surgeon-owned Facility holds the clinical record of the Case and shall give Mezo the records it needs to administer the Case, to record outcomes and to answer any complaint or claim.
 
 ## 7. THE REFERRING DOCTOR
 
@@ -152,7 +170,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 14.3 Mezo may end this Contract at once if the Surgeon's registration, licence or indemnity cover lapses, or if the Surgeon commits a serious breach or conduct that puts patients at risk.
 
-14.4 On termination, the Surgeon shall complete or properly hand over every open Case, and Clauses 6, 7.2, 8.2, 10, 11 and 13 survive.
+14.4 On termination, the Surgeon shall complete or properly hand over every open Case, and Clauses 6, 6A.4, 6A.7, 7.2, 8.2, 10, 11 and 13 survive.
 
 ## 15. DISPUTES AND GENERAL
 
@@ -173,6 +191,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 | Partner Facilities preferred | |
 | Contact for referrals (named person, number) | |
 | Disclosed interests (devices, suppliers, distributors) | |
+| Surgeon-owned Facilities (name, address, nature and size of interest) | |
 
 ## SCHEDULE 2: COMMERCIAL TERMS
 
@@ -184,6 +203,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 | Episode of Care | 90 days, unless the fee table sets another period |
 | Minimum indemnity cover | NGN [ ] per claim |
 | Late patient cancellation | [ ] |
+| Surgeon-owned Facility | Facility share set in its own Facility Partnership Agreement; Surgeon Fee unchanged |
 
 ## EXECUTION
 
