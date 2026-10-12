@@ -78,6 +78,14 @@ export const LYFE_WHATSAPP =
   process.env.NEXT_PUBLIC_LYFE_WHATSAPP?.replace(/[^0-9]/g, "") || "2349138138553";
 export const LYFE_PHONE_DISPLAY = "+234 913 813 8553";
 
+/**
+ * The bookings line, which is not the centre's switchboard. From Dr
+ * Akinware's flyer of 12 October: a consultation is arranged by a
+ * coordinator on this number, and nothing is taken on the page.
+ */
+export const LYFE_BOOKING_DISPLAY = "0703 052 7269";
+export const LYFE_BOOKING_WHATSAPP = "2347030527269";
+
 export function whatsappLink(message: string): string {
   return `https://wa.me/${LYFE_WHATSAPP}?text=${encodeURIComponent(message)}`;
 }
@@ -534,6 +542,8 @@ export const LYFE_EVENT_TAKEAWAY = "A thoughtfully designed Ageless takeaway";
 export const LYFE_SURGEON = {
   name: "Dr Chinwe Kpaduwa, MD FACS",
   shortName: "Dr Chinwe Kpaduwa",
+  /** How she is introduced in one line. Dr Akinware's flyer, 12 October. */
+  strap: "Plastic surgeon and aesthetics specialist",
   // Cropped so she sits in the middle of the frame. The original has her right
   // of centre; the crop also stops above the KD mark on her scrubs, which would
   // otherwise be cut in half at the left edge.
@@ -628,15 +638,51 @@ export const LYFE_CONSULT = {
    * bought is her judgement and nothing else on the page sells that.
    */
   blurb:
-    "Half an hour with Dr Kpaduwa herself, in person at Medlyfe or by video if you are not in Lagos. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
+    "Thirty minutes with Dr Kpaduwa, in person at MedLYFE or by video. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
   /**
-   * Dr Kpaduwa's own wording. Note the narrowing: it goes towards surgery, not
-   * towards any treatment. A non-surgical course does not carry the credit,
-   * and saying "treatment" would quietly promise that it does.
+   * Dr Akinware's wording, from her flyer edit of 12 October. It widens the
+   * credit from surgery to any procedure, and it is careful twice over: "if
+   * you require one" leaves the clinical decision open, and "decide to
+   * proceed" leaves the commercial one open.
    */
-  feeNote: "Put towards the total cost of your surgery if you go ahead.",
+  feeNote:
+    "Put towards the cost of a procedure if you require one and decide to proceed.",
   note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
 } as const;
+
+/**
+ * What she does, in her own grouping.
+ *
+ * From Dr Akinware's flyer edit of 12 October. The page had never said what
+ * the surgeon actually operates on, which left a reader to guess, and the
+ * guess in this market is usually one procedure. Five groups, named plainly.
+ *
+ * Note what is not here: no claim of a result, no before and after, and no
+ * device or drug brand name. Naming a procedure is description, which is
+ * allowed; naming an outcome is a claim, which is not.
+ */
+export const LYFE_PROCEDURES: { group: string; body: string }[] = [
+  {
+    group: "Face",
+    body: "Eyelids, face lift, neck lift and facial rejuvenation.",
+  },
+  {
+    group: "Breast",
+    body: "Reduction, lift, enlargement, breast reconstruction, and correcting earlier surgery.",
+  },
+  {
+    group: "Body",
+    body: "Tummy tuck, liposuction, body contouring and mommy makeover.",
+  },
+  {
+    group: "Skin and aesthetics",
+    body: "Injectables, scar revision, skin rejuvenation, peels and regenerative aesthetics.",
+  },
+  {
+    group: "Reconstruction",
+    body: "Scars, wound revision, deformities, breast reconstruction, and living with the result of an earlier operation.",
+  },
+];
 
 /** The days spelled out, for copy that needs them inline. */
 /**
@@ -695,9 +741,9 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
     key: "SURGERY",
     name: "Plastic surgery, with Dr Chinwe Kpaduwa",
     who: "Board certified by the American Board of Plastic Surgery, FACS",
-    body: "Half an hour with her, in person at Medlyfe or by video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you should be doing anything at all.",
+    body: "Thirty minutes with her, in person at MedLYFE or by video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you should be doing anything at all.",
     fee: "₦150,000",
-    meta: "Put towards the total cost of your surgery if you go ahead.",
+    meta: "Put towards the cost of a procedure if you require one and decide to proceed.",
   },
 ];
 

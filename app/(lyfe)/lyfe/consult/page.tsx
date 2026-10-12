@@ -3,8 +3,11 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import {
   LYFE_BRAND as C,
+  LYFE_BOOKING_DISPLAY,
+  LYFE_BOOKING_WHATSAPP,
   LYFE_CONSULT,
   LYFE_CONSULT_OPTIONS,
+  LYFE_PROCEDURES,
   LYFE_CONSULT_FAQ,
   LYFE_CONSULT_PROOF,
   LYFE_CONSULT_SCHEDULE,
@@ -157,33 +160,60 @@ export default async function ConsultPage({
               className="mt-6 text-[38px] leading-[1.04] md:text-[56px]"
               style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.025em" }}
             >
-              Start with the right appointment.
+              Thirty minutes with a plastic surgeon.
             </h1>
 
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
-              Medlyfe covers longevity and preventive health, metabolism, weight
-              and hormones, skin and aesthetic medicine, and surgery. Four
-              different conversations, and the one you need is often not the one
-              you came for. Tell us what you are thinking about and we will say
-              which it is.
+              A consultation with <strong>{LYFE_SURGEON.shortName}</strong>, in
+              person at MedLYFE or by video. You bring what you are thinking
+              about; she tells you what is involved, what she would and would
+              not do, and whether you should be doing anything at all.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <div
+              className="mt-8 p-6"
+              style={{ background: C.bronzeTint, borderLeft: `3px solid ${C.bronze}` }}
+            >
+              <p
+                className="text-[22px]"
+                style={{ fontFamily: display, fontWeight: 600, color: C.ink }}
+              >
+                {LYFE_CONSULT.feeDisplay}, in person or by video
+              </p>
+              <p className="mt-1.5 text-[14px] leading-snug" style={{ color: C.body }}>
+                {LYFE_CONSULT.feeNote}
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a
-                href="#options"
+                href="#book"
                 className="px-8 py-4 text-[15px] font-semibold"
                 style={{ background: C.ink, color: C.ground }}
               >
-                See the four
+                Request a consultation
               </a>
               <a
-                href="#book"
+                href="#options"
                 className="text-[15px] font-semibold underline underline-offset-4"
                 style={{ color: C.bronzeDeep }}
               >
-                Request a consultation
+                Or see all four consultations
               </a>
             </div>
+
+            <p className="mt-5 text-[14.5px] leading-snug" style={{ color: C.body }}>
+              For bookings, call or WhatsApp{" "}
+              <a
+                href={`https://wa.me/${LYFE_BOOKING_WHATSAPP}`}
+                className="font-semibold underline underline-offset-4"
+                style={{ color: C.bronzeDeep }}
+              >
+                {LYFE_BOOKING_DISPLAY}
+              </a>
+              . A coordinator calls you to arrange the time. Nothing is taken on
+              this page.
+            </p>
 
             <p className="mt-6 text-[14.5px]" style={{ color: C.bronzeDeep }}>
               {open > 0
@@ -210,7 +240,10 @@ export default async function ConsultPage({
             <p className="mt-5 text-[15px] font-semibold" style={{ color: C.ink }}>
               {LYFE_SURGEON.name}
             </p>
-            <ul className="mt-2 space-y-1">
+            <p className="mt-1 text-[13.5px]" style={{ color: C.bronzeDeep }}>
+              {LYFE_SURGEON.strap}
+            </p>
+            <ul className="mt-2.5 space-y-1">
               {LYFE_SURGEON.credentials.map((c) => (
                 <li key={c} className="text-[13.5px] leading-snug" style={{ color: C.body }}>
                   {c}
@@ -233,6 +266,30 @@ export default async function ConsultPage({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── what she operates on ─────────────────────────────────────── */}
+      <section className="px-6 py-14 md:px-10 md:py-20" style={{ background: C.ink }}>
+        <div className="mx-auto w-full max-w-5xl">
+          <p
+            className="text-[10.5px] font-semibold uppercase"
+            style={{ color: C.bronze, letterSpacing: "0.2em" }}
+          >
+            What she does
+          </p>
+          <div className="mt-9 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+            {LYFE_PROCEDURES.map((p) => (
+              <div key={p.group} className="border-t pt-5" style={{ borderColor: "#3A3C44" }}>
+                <h3 className="text-[17px] font-semibold" style={{ color: C.ground }}>
+                  {p.group}
+                </h3>
+                <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: "#B6B8C0" }}>
+                  {p.body}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
