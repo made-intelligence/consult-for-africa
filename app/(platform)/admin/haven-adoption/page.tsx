@@ -54,8 +54,8 @@ export default async function HavenAdoptionPage() {
     where: { clientId: client.id, isActive: true },
     select: { id: true, cadence: true },
   });
-  const periods = Array.from(
-    new Set(tasks.map((t: { cadence: string }) => periodKey(t.cadence as Cadence).toISOString()))
+  const periods: string[] = Array.from(
+    new Set((tasks as { cadence: string }[]).map((t) => periodKey(t.cadence as Cadence).toISOString()))
   );
   const completions = await prisma.staffTaskCompletion.findMany({
     where: { forDate: { in: periods.map((p: string) => new Date(p)) } },
@@ -83,7 +83,7 @@ export default async function HavenAdoptionPage() {
 
   return (
     <>
-      <TopBar />
+      <TopBar title="Haven: who has started" />
       <main style={{ maxWidth: 940, margin: "0 auto", padding: "28px 20px 80px", fontFamily: "system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" }}>
         <div style={{ color: GOLD, fontWeight: 700, fontSize: 11.5, letterSpacing: ".14em", textTransform: "uppercase" }}>
           Haven Paediatric Centre
