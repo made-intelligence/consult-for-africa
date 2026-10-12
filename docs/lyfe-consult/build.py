@@ -46,14 +46,18 @@ THEMES = {
 }
 
 PHONE = "+234 913 813 8553"
+# The bookings line from Dr Akinware's flyer edit, 12 October. Not the
+# centre switchboard: a coordinator picks this one up.
+BOOKING = "0703 052 7269"
 CLINIC = "MedLYFE Wellness and Longevity Centre"
 
 # Matches LYFE_SURGEON_WORK in lib/lyfe.ts.
 WORK = [
-    ("Face", "Facial ageing, eyelids and facial balance."),
-    ("Breast", "Reduction, lift, enlargement, and correcting earlier surgery."),
-    ("Body", "Tummy tuck, contouring, and the body after children."),
-    ("Reconstruction", "Scars, and living with the result of an earlier operation."),
+    ("Face", "Eyelids, face lift, neck lift and facial rejuvenation."),
+    ("Breast", "Reduction, lift, enlargement, breast reconstruction, and correcting earlier surgery."),
+    ("Body", "Tummy tuck, liposuction, body contouring and mommy makeover."),
+    ("Skin &amp; Aesthetics", "Injectables, scar revision, skin rejuvenation, peels and regenerative aesthetics."),
+    ("Reconstruction", "Scars, wound revision, deformities, breast reconstruction, and living with the result of an earlier operation."),
 ]
 
 
@@ -129,6 +133,7 @@ def flyer(slug, w, h, scale, t):
   .ask h2 {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK}; font-size: {s(38)};
     line-height: 1.1; letter-spacing: -0.02em; }}
   .ask p {{ font-size: {s(20)}; line-height: 1.45; margin-top: {s(12)}; }}
+  .ask p.book {{ color: {BRONZE}; font-weight: 600; margin-top: {s(10)}; }}
   .ask .url {{ color: {INK}; font-weight: 600; margin-top: {s(14)}; font-size: {s(19)}; }}
   .foot {{ flex: none; background: {t["foot_bg"]}; padding: {s(22)} {s(72)}; }}
   .foot .c {{ color: {t["foot_c"]}; font-size: {s(17)}; }}
@@ -142,12 +147,12 @@ def flyer(slug, w, h, scale, t):
         video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you
         should be doing anything at all.</p>
       <div class="fee"><div class="d">&#8358;150,000, in person or by video</div>
-        <div class="a">Put towards the cost of your surgery if you go ahead</div></div>
+        <div class="a">Put towards the cost of a procedure if you require one and decide to proceed</div></div>
     </div>
     <div class="photo">
       <img class="portrait" src="{portrait_uri(GROUND)}" alt="">
       <div class="cred"><b>Dr Chinwe Kpaduwa, MD FACS</b>
-        Board certified plastic surgeon (ABPS)<br>Harvard educated, California trained</div>
+        Plastic surgeon and aesthetics specialist<br>Harvard educated, California trained</div>
     </div>
   </div>
   <div class="work"><h2>What she does</h2><div class="grid">{work}</div></div>
@@ -155,6 +160,7 @@ def flyer(slug, w, h, scale, t):
     <img src="{qr_uri(url)}" alt="">
     <div>
       <h2>Request a consultation.</h2>
+      <p class="book">For bookings, call or WhatsApp {BOOKING}</p>
       <p>A coordinator calls you to arrange the time. Nothing is taken on the page.</p>
       <div class="url">{shown}</div>
     </div>
