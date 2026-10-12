@@ -12,6 +12,8 @@ import {
   LYFE_PHONE_DISPLAY,
   LYFE_SOCIAL,
   LYFE_SURGEON,
+  LYFE_SURGEON_RECORD,
+  LYFE_SURGEON_WORK,
   consultSlots,
   whatsappLink,
 } from "@/lib/lyfe";
@@ -234,6 +236,37 @@ export default async function ConsultPage({
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* ── what she does ─────────────────────────────────────────────── */}
+      <section className="px-6 pb-16 md:px-10 md:pb-20">
+        <div className="mx-auto w-full max-w-5xl border-t pt-12" style={{ borderColor: C.line }}>
+          <h2
+            className="text-[27px] leading-tight md:text-[34px]"
+            style={{ fontFamily: display, fontWeight: 600, color: C.ink }}
+          >
+            What Dr Kpaduwa does.
+          </h2>
+          <p className="mt-3 max-w-2xl text-[16px] leading-relaxed" style={{ color: C.body }}>
+            Cosmetic and reconstructive plastic surgery of the face, breast and body.{" "}
+            {LYFE_SURGEON_RECORD}
+          </p>
+          <div className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {LYFE_SURGEON_WORK.map((w) => (
+              <div key={w.t} className="border-t pt-5" style={{ borderColor: C.bronze }}>
+                <h3 className="text-[17.5px] font-semibold" style={{ color: C.ink }}>
+                  {w.t}
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed" style={{ color: C.body }}>
+                  {w.b}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 max-w-2xl text-[15px] leading-relaxed" style={{ color: C.muted }}>
+            {LYFE_SURGEON.position}
+          </p>
         </div>
       </section>
 

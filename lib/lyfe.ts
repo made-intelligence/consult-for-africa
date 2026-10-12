@@ -561,6 +561,35 @@ export const LYFE_SURGEON = {
     "Her argument, made publicly and consistently, is that the best work is the work nobody can point at, that ageing is not a problem to be solved, and that knowing when not to operate matters more than the menu.",
 } as const;
 
+/**
+ * What she does, for the consultation page. Drawn from her own practice's
+ * description (cosmetic face, breast and body surgery, and reconstruction) and
+ * her CV. Areas, not a menu: no procedure is promised before a consultation,
+ * and nothing here claims she is better than anyone else.
+ */
+export const LYFE_SURGEON_WORK: { t: string; b: string }[] = [
+  {
+    t: "Face",
+    b: "Facial ageing, eyelids and facial balance. Her stated aim is the result nobody can point at.",
+  },
+  {
+    t: "Breast",
+    b: "Reduction, lift and enlargement, and correcting earlier breast surgery.",
+  },
+  {
+    t: "Body, and the body after children",
+    b: "Tummy tuck, contouring and the combined procedures women ask about after pregnancy.",
+  },
+  {
+    t: "Reconstruction and revision",
+    b: "Scars, and living with the result of an earlier operation. Fellowship trained in craniofacial surgery at Nationwide Children's Hospital.",
+  },
+];
+
+/** The West Africa record, from her CV. The answer to "who is she to us". */
+export const LYFE_SURGEON_RECORD =
+  "She has taught reconstructive surgery in West Africa since 2011, co-founded a partnership on hospital quality in Nigeria in 2014, and practises in Beverly Hills.";
+
 export const LYFE_PATHWAY_COPY = {
   AESTHETIC: {
     label: "An aesthetic consultation",
