@@ -45,7 +45,7 @@ export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
         ) : (
           <div className="flex items-center gap-5">
             <Link
-              href={event ? "/lyfe/consult" : "#book"}
+              href={on === "consult" ? "#book" : "/lyfe/consult"}
               className="px-5 py-2.5 text-[13.5px] font-semibold"
               style={
                 event
