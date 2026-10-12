@@ -66,9 +66,14 @@ export default async function HavenAdoptionPage() {
     ticks.set(c.staffId, (ticks.get(c.staffId) ?? 0) + 1);
   }
 
-  const signedIn = staff.filter((s) => s.lastLoginAt);
-  const never = staff.filter((s) => !s.lastLoginAt);
-  const activeWeek = staff.filter(
+  type Row = {
+    id: string; name: string; position: string; department: string;
+    lastLoginAt: Date | null; email: string | null;
+  };
+  const rows = staff as Row[];
+  const signedIn = rows.filter((s) => s.lastLoginAt);
+  const never = rows.filter((s) => !s.lastLoginAt);
+  const activeWeek = rows.filter(
     (s) => s.lastLoginAt && Date.now() - s.lastLoginAt.getTime() < 7 * 864e5
   );
 
@@ -85,13 +90,13 @@ export default async function HavenAdoptionPage() {
         </div>
         <h1 style={{ color: NAVY, fontSize: 28, margin: "8px 0 0", letterSpacing: "-0.02em" }}>Who has started</h1>
         <p style={{ color: MUTED, fontSize: 15.5, lineHeight: 1.6, margin: "8px 0 0", maxWidth: 620 }}>
-          The one number that matters this fortnight, and the names behind it. Sprint 1 target is 15 of {staff.length}
+          The one number that matters this fortnight, and the names behind it. Sprint 1 target is 15 of {rows.length}
           {" "}signed in by 24 October.
         </p>
 
         <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
           {[
-            ["Signed in at least once", `${signedIn.length} of ${staff.length}`, signedIn.length >= 15 ? GOOD : NAVY],
+            ["Signed in at least once", `${signedIn.length} of ${rows.length}`, signedIn.length >= 15 ? GOOD : NAVY],
             ["Used it in the last 7 days", String(activeWeek.length), NAVY],
             ["Never signed in", String(never.length), never.length > 0 ? "#B0392B" : GOOD],
           ].map(([label, value, colour]) => (
@@ -128,7 +133,7 @@ export default async function HavenAdoptionPage() {
         <section style={{ marginTop: 32 }}>
           <h2 style={{ color: NAVY, fontSize: 20, margin: "0 0 14px" }}>Everyone</h2>
           <div style={{ border: `1px solid ${LINE}`, borderRadius: 12, overflow: "hidden" }}>
-            {staff.map((s, i) => {
+            {rows.map((s, i) => {
               const n = ticks.get(s.id) ?? 0;
               return (
                 <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "#fff", borderTop: i === 0 ? "none" : `1px solid ${LINE}` }}>
