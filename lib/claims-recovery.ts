@@ -4,8 +4,8 @@
  * One definition shared by the public page, the receivables check, the
  * enquiry route and the admin funnel, so the copy and the numbers cannot drift.
  *
- * The early payment line (60% of vetted claims within 48 hours) depends on a
- * funding partner signing. Until ADVANCE_LIVE is true the public page only
+ * The early payment line (60% of payor-accepted claims within 48 hours)
+ * depends on the funding partner signing. Until ADVANCE_LIVE is true the public page only
  * invites interest in it and never promises it.
  */
 
@@ -15,23 +15,42 @@ export const SERVICE_PATH = "/services/claims-recovery";
 export const LEAD_SOURCE = "CLAIMS_RECOVERY";
 export const SERVICE_LINE_HOOK = "Claims Recovery & Early Payment";
 
-/** Flip when the funding partner has signed and the first advance has moved. */
-export const ADVANCE_LIVE = false;
+/**
+ * On when Carbon has signed the facility agreement. An env var, so the pilot
+ * can open without a deploy: RECOVERY_ADVANCE_LIVE=true.
+ */
+export const ADVANCE_LIVE = process.env.RECOVERY_ADVANCE_LIVE === "true";
+export const FUNDER = "Carbon";
 export const ADVANCE_RATE = 0.6;
 export const ADVANCE_HOURS = 48;
 
 /**
- * The funding partner's discount. One time, not monthly, and deducted at
- * disbursement rather than recovered out of the payor's settlement.
+ * Pilot terms agreed with Carbon, 12 October 2026.
  *
- * Carbon buys the vetted claim at a discount and pays within the window. The
- * hospital pays once, knows the number before it accepts, and owes nothing
- * further however long the payor then takes. That last part is what makes it
- * sellable: the hospital is buying certainty, and the risk of a payor going
- * slow stops being theirs.
+ * Carbon lends 60% of a claim the payor has already accepted, with full
+ * recourse to the hospital. Its interest is 2.5% a month (30-day months) on
+ * the days the money is out, with the payor's expected time to pay as the
+ * minimum. That minimum is taken as a discount at disbursement; days beyond it
+ * accrue daily and come out of the payor's remittance. Our fee is a fixed 1%
+ * of the advance, withheld at disbursement and released once Carbon has been
+ * repaid and nothing on the hospital's book is overdue.
  */
-export const DISCOUNT_LOW = 0.04;
-export const DISCOUNT_HIGH = 0.05;
+export const MONTHLY_RATE = 0.025;
+export const CFA_FEE_RATE = 0.01;
+export const DEFAULT_MIN_DAYS = 60;
+/** An advance is due by this many days at most, whatever the payor's record. */
+export const MAX_DUE_DAYS = 120;
+/** Private HMOs only: no NHIA, state scheme, military or corporate payors. */
+export const FUNDABLE_PAYER_TYPES = ["HMO"];
+/** A hospital draws once payors covering this share of its HMO billing have signed the acknowledgment letter. */
+export const ACK_COVERAGE = 0.6;
+
+/** Carbon's interest plus our fee on an advance out for `days`, minimum period applied. */
+export function advanceCost(advance: number, days: number, minDays = DEFAULT_MIN_DAYS) {
+  const interest = (advance * MONTHLY_RATE * Math.max(days, minDays)) / 30;
+  const fee = advance * CFA_FEE_RATE;
+  return { interest, fee, total: interest + fee };
+}
 
 /** The conversion offer: a free review of a sample of claims. */
 export const SAMPLE_SIZE = 20;
@@ -72,18 +91,10 @@ export type CheckResult = {
   inDispute: number;
   /** Released for good by getting paid 30 days faster. */
   per30Days: number;
-  /**
-   * The gross advance against vetted claims, before the funding partner's
-   * discount. The discount comes off at disbursement, so the hospital
-   * receives less than this and the label has to say so.
-   */
+  /** The advance against claims the payors have accepted, before the discount. */
   earlyPayment: number;
-  /** What the discount costs over the expected wait, at both ends of the range. */
-  discountLow: number;
-  discountHigh: number;
-  /** What actually lands, after the discount is deducted at disbursement. */
-  netLow: number;
-  netHigh: number;
+  /** Interest and fee over the hospital's own days to pay, minimum period applied. */
+  cost: number;
 };
 
 /**
@@ -97,19 +108,12 @@ export function check({ monthlyBilled, daysToPay, queriedPct }: CheckInput): Che
   const outstanding = (m * d) / 30;
   const inDispute = outstanding * q;
   const advance = (outstanding - inDispute) * ADVANCE_RATE;
-  // One time, taken off the disbursement. It does not grow with how long the
-  // payor takes, which is the whole point of it.
-  const discountLow = advance * DISCOUNT_LOW;
-  const discountHigh = advance * DISCOUNT_HIGH;
   return {
     outstanding,
     inDispute,
     per30Days: d > 30 ? m : (m * d) / 30,
     earlyPayment: advance,
-    discountLow,
-    discountHigh,
-    netLow: Math.max(0, advance - discountHigh),
-    netHigh: Math.max(0, advance - discountLow),
+    cost: advanceCost(advance, d).total,
   };
 }
 
