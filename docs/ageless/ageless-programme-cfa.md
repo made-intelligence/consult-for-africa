@@ -108,10 +108,11 @@ Also:
 
 | When | What |
 | --- | --- |
-| By 10 October | Speaker bios and photographs, or they miss the printed programme |
-| By 10 October | Capital Club street address and RSVP contact, or invitations cannot print |
-| Week of 13 October | Invitations out. Guest list worked by phone |
-| 16 October | Register interest closes |
+| By 14 October | Speakers confirm their bio, subject and questions, or they miss the printed programme |
+| By 14 October | Capital Club street address and RSVP contact, or invitations cannot print |
+| Now | **Invitation links out.** Nothing has been sent and the room is four applications deep |
+| From now | Guest list worked by phone, not by waiting on the form |
+| 19 October | Register interest closes |
 | 21 October | AGELESS |
 
 ## Still open
