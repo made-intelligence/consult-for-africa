@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import PartnerCTA from "@/components/cfa/PartnerCTA";
 import ReceivablesCheck from "@/components/cfa/claims/ReceivablesCheck";
-import { ADVANCE_HOURS, ADVANCE_LIVE, ADVANCE_RATE, SAMPLE_SIZE } from "@/lib/claims-recovery";
+import { ADVANCE_HOURS, ADVANCE_LIVE, ADVANCE_RATE, CFA_FEE_RATE, DEFAULT_MIN_DAYS, MONTHLY_RATE, SAMPLE_SIZE } from "@/lib/claims-recovery";
 
 // Copy is deliberately short: proof and the calculator do the selling, and the
 // FAQ carries the depth. The early payment line only promises once a funding
@@ -42,8 +42,8 @@ const faqs = [
   {
     q: "Can we be paid before the HMO pays?",
     a: ADVANCE_LIVE
-      ? `Yes. Once a claim has passed vetting, our funding partner disburses ${Math.round(ADVANCE_RATE * 100)}% of its value to you within ${ADVANCE_HOURS} hours, less a one time discount taken at disbursement. You know the number before you accept, you pay it once, and you owe nothing further however long the payor then takes. The remaining balance reaches you when the payor settles.`
-      : "We are setting up early payment against vetted claims for a first group of hospitals. If that interests you, say so in the form and we will tell you when it opens.",
+      ? `Yes, for private HMO claims the HMO has already accepted. Our funding partner disburses ${Math.round(ADVANCE_RATE * 100)}% of the accepted value within ${ADVANCE_HOURS} hours, less a discount: ${(MONTHLY_RATE * 100).toFixed(1)}% a month for the HMO's expected time to pay (${DEFAULT_MIN_DAYS} days at least) and our fee of ${CFA_FEE_RATE * 100}%, once. If the HMO takes longer, the extra days come out of its payment. The balance reaches you within ${ADVANCE_HOURS} hours of the HMO paying, and if an HMO does not pay by the due date, you repay the advance.`
+      : "We are setting up early payment against HMO-accepted claims for a first group of hospitals. If that interests you, say so in the form and we will tell you when it opens.",
   },
 ];
 
@@ -113,7 +113,7 @@ export default async function ClaimsRecoveryPage({ searchParams }: { searchParam
         <div className="max-w-6xl mx-auto">
           <p className="uppercase tracking-[0.2em] text-xs text-[#0B3C5D]/50 mb-3">Check your receivables</p>
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-10">What is sitting outside your hospital?</h2>
-          <ReceivablesCheck refToken={refToken} />
+          <ReceivablesCheck refToken={refToken} advanceLive={ADVANCE_LIVE} />
         </div>
       </section>
 

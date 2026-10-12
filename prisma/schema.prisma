@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -7684,8 +7683,8 @@ model LyfeEnquiry {
   isClinician Boolean?
 
   /// Facility visits only. Who they are and where to go.
-  facilityName String?
-  facilityArea String?
+  facilityName  String?
+  facilityArea  String?
   clinicianRole String?
 
   pathway    LyfePathway   @default(UNSURE)
@@ -7864,23 +7863,147 @@ model SalesCampaignSend {
 // every promise a payer made can be traced.
 
 model RecoveryPayer {
-  id              String   @id @default(cuid())
-  name            String   @unique
-  type            String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | OTHER
+  id                String   @id @default(cuid())
+  name              String   @unique
+  type              String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | MILITARY | OTHER
   /// CFA advises this payer. Claims against it are recovered only
   /// with the hospital told in writing, and are never advanced.
-  conflict        Boolean  @default(false)
-  conflictNote    String?
-  advanceEligible Boolean  @default(true)
-  claimsContact   String?
-  claimsEmail     String?
-  claimsPhone     String?
-  notes           String?  @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  conflict          Boolean  @default(false)
+  conflictNote      String?
+  advanceEligible   Boolean  @default(true)
+  claimsContact     String?
+  claimsEmail       String?
+  claimsPhone       String?
+  /// The payor's usual days from acceptance to payment. The minimum interest
+  /// period taken as a discount at disbursement.
+  expectedDaysToPay Int      @default(60)
+  /// Days from disbursement until the hospital owes the advance back, 120 at most.
+  dueDays           Int      @default(120)
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  claims     RecoveryClaim[]
-  activities RecoveryActivity[]
+  claims          RecoveryClaim[]
+  activities      RecoveryActivity[]
+  acknowledgments RecoveryAcknowledgment[]
+  advances        RecoveryAdvance[]
+  receipts        RecoveryReceipt[]
+}
+
+/// The payor's signed letter for one hospital: it confirms accepted amounts,
+/// pays into the collection account at the funder, and will not set off older
+/// balances against funded claims without notice. No letter, no draws.
+model RecoveryAcknowledgment {
+  id          String          @id @default(cuid())
+  accountId   String
+  account     RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId     String
+  payer       RecoveryPayer   @relation(fields: [payerId], references: [id])
+  signedOn    DateTime
+  documentUrl String?
+  notes       String?         @db.Text
+  createdById String?
+  createdAt   DateTime        @default(now())
+
+  @@unique([accountId, payerId])
+}
+
+/// One advance against one accepted claim. The terms are copied at
+/// disbursement so a later change to the rate or the payor never rewrites a
+/// loan already made.
+model RecoveryAdvance {
+  id                String          @id @default(cuid())
+  claimId           String          @unique
+  claim             RecoveryClaim   @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  accountId         String
+  account           RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId           String
+  payer             RecoveryPayer   @relation(fields: [payerId], references: [id])
+  funder            String          @default("Carbon")
+  principal         Decimal         @db.Decimal(14, 2)
+  monthlyRate       Decimal         @db.Decimal(6, 5)
+  minDays           Int
+  /// Interest for minDays, taken at disbursement.
+  discount          Decimal         @db.Decimal(14, 2)
+  feeRate           Decimal         @db.Decimal(6, 5)
+  /// Our fee, withheld at disbursement, released once the funder is repaid
+  /// and nothing on the hospital's book is overdue.
+  fee               Decimal         @db.Decimal(14, 2)
+  /// principal - discount - fee: what reached the hospital.
+  netDisbursed      Decimal         @db.Decimal(14, 2)
+  disbursedAt       DateTime
+  dueAt             DateTime
+  principalRepaid   Decimal         @default(0) @db.Decimal(14, 2)
+  /// Interest beyond the minimum period, accrued up to interestAccruedTo.
+  extraInterest     Decimal         @default(0) @db.Decimal(14, 2)
+  extraInterestPaid Decimal         @default(0) @db.Decimal(14, 2)
+  interestAccruedTo DateTime
+  /// OPEN | REPAID
+  status            String          @default("OPEN")
+  repaidAt          DateTime?
+  /// WITHHELD | RELEASED
+  feeStatus         String          @default("WITHHELD")
+  feeReleasedAt     DateTime?
+  createdById       String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  allocations RecoveryAllocation[]
+
+  @@index([accountId, status])
+  @@index([dueAt])
+}
+
+/// Money into the hospital's collection account at the funder: an HMO
+/// remittance (usually many claims at once) or a recourse payment from the
+/// hospital. The waterfall is stored on the receipt so the split is never
+/// recomputed after the fact.
+model RecoveryReceipt {
+  id             String          @id @default(cuid())
+  accountId      String
+  account        RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId        String?
+  payer          RecoveryPayer?  @relation(fields: [payerId], references: [id])
+  /// HMO | HOSPITAL
+  source         String          @default("HMO")
+  amount         Decimal         @db.Decimal(14, 2)
+  receivedAt     DateTime
+  reference      String?
+  toFunder       Decimal         @default(0) @db.Decimal(14, 2)
+  /// Our withheld fees released because of this receipt (they come from the
+  /// withheld pool, not from the receipt itself).
+  feesReleased   Decimal         @default(0) @db.Decimal(14, 2)
+  toHospital     Decimal         @default(0) @db.Decimal(14, 2)
+  /// The hospital's share must leave the account within 48 hours.
+  hospitalDueBy  DateTime?
+  hospitalPaidAt DateTime?
+  recordedById   String?
+  createdAt      DateTime        @default(now())
+
+  allocations RecoveryAllocation[]
+
+  @@index([accountId, receivedAt])
+}
+
+/// One line of a receipt: what went to which claim, and how it was applied.
+model RecoveryAllocation {
+  id          String           @id @default(cuid())
+  receiptId   String
+  receipt     RecoveryReceipt  @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  claimId     String?
+  claim       RecoveryClaim?   @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  advanceId   String?
+  advance     RecoveryAdvance? @relation(fields: [advanceId], references: [id])
+  /// CLAIM (payor money against its own claim) | RECOURSE (swept to an overdue advance)
+  kind        String           @default("CLAIM")
+  amount      Decimal          @db.Decimal(14, 2)
+  toInterest  Decimal          @default(0) @db.Decimal(14, 2)
+  toPrincipal Decimal          @default(0) @db.Decimal(14, 2)
+  createdAt   DateTime         @default(now())
+
+  @@index([receiptId])
+  @@index([claimId])
+  @@index([advanceId])
 }
 
 model RecoveryAccount {
@@ -7901,9 +8024,12 @@ model RecoveryAccount {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  batches    RecoveryBatch[]
-  claims     RecoveryClaim[]
-  activities RecoveryActivity[]
+  batches         RecoveryBatch[]
+  claims          RecoveryClaim[]
+  activities      RecoveryActivity[]
+  acknowledgments RecoveryAcknowledgment[]
+  advances        RecoveryAdvance[]
+  receipts        RecoveryReceipt[]
 }
 
 model RecoveryBatch {
@@ -7943,6 +8069,11 @@ model RecoveryClaim {
   tariffAmount   Decimal?        @db.Decimal(14, 2)
   payerResponse  String? // what the payer has said: queried, cut, rejected, silent
 
+  /// The payor has vetted and accepted the claim. Only accepted claims are funded.
+  payerAcceptedAt DateTime?
+  acceptedAmount  Decimal?  @db.Decimal(14, 2)
+  acceptanceRef   String?
+
   /// RECEIVED | VETTED | ADVANCED | IN_RECOVERY | PART_PAID | PAID | WRITTEN_OFF
   status String @default("RECEIVED")
 
@@ -7980,8 +8111,10 @@ model RecoveryClaim {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  activities RecoveryActivity[]
-  payments   RecoveryPayment[]
+  activities  RecoveryActivity[]
+  payments    RecoveryPayment[]
+  advance     RecoveryAdvance?
+  allocations RecoveryAllocation[]
 
   @@unique([accountId, payerId, claimRef])
   @@index([accountId, status])
@@ -8071,31 +8204,31 @@ model StaffMember {
   /// That never reaches a shared surface, so it is not a permission.
   tiers StaffTier[] @default([ALL_STAFF])
 
-  isActive    Boolean   @default(true)
-  lastLoginAt DateTime?
+  isActive           Boolean   @default(true)
+  lastLoginAt        DateTime?
   /// May approve clinical content before it reaches a nurse. A person, never a
   /// tier: Dr Shakirah is a founder and therefore BOARD, which is deliberately
   /// the weakest tier on anything clinical. Her authority here is that she is a
   /// doctor supporting the Chief Medical Director, not that she is an owner.
-  canApproveClinical Boolean @default(false)
+  canApproveClinical Boolean   @default(false)
   /// Annual entitlement in working days. Nigeria's statutory floor is six;
   /// most hospitals here run well above it, so this is set per person.
-  annualLeaveDays Int     @default(20)
+  annualLeaveDays    Int       @default(20)
 
-  loginTokens StaffLoginToken[]
-  leave          StaffLeaveRequest[] @relation("StaffLeave")
-  leaveDecisions StaffLeaveRequest[] @relation("StaffLeaveDecisions")
-  notes          StaffNote[]         @relation("StaffNotes")
-  protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
-  observations     ProtocolProgress[] @relation("ProtocolObservations")
-  protocolApprovals Protocol[]          @relation("ProtocolApprovals")
-  taskCompletions  StaffTaskCompletion[] @relation("TaskCompletions")
-  taskFlags        StaffTaskFlag[]       @relation("TaskFlags")
-  flagResolutions  StaffTaskFlag[]       @relation("FlagResolutions")
-  scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
-  scoreboardAgreed  ScoreboardEntry[] @relation("ScoreboardAgreements")
-  presenting        TrainingSession[]    @relation("TrainingPresenter")
-  trainingAttended  TrainingAttendance[] @relation("TrainingAttendance")
+  loginTokens       StaffLoginToken[]
+  leave             StaffLeaveRequest[]   @relation("StaffLeave")
+  leaveDecisions    StaffLeaveRequest[]   @relation("StaffLeaveDecisions")
+  notes             StaffNote[]           @relation("StaffNotes")
+  protocolProgress  ProtocolProgress[]    @relation("ProtocolProgress")
+  observations      ProtocolProgress[]    @relation("ProtocolObservations")
+  protocolApprovals Protocol[]            @relation("ProtocolApprovals")
+  taskCompletions   StaffTaskCompletion[] @relation("TaskCompletions")
+  taskFlags         StaffTaskFlag[]       @relation("TaskFlags")
+  flagResolutions   StaffTaskFlag[]       @relation("FlagResolutions")
+  scoreboardEntries ScoreboardEntry[]     @relation("ScoreboardEntries")
+  scoreboardAgreed  ScoreboardEntry[]     @relation("ScoreboardAgreements")
+  presenting        TrainingSession[]     @relation("TrainingPresenter")
+  trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8225,7 +8358,7 @@ model StaffNote {
   authorId String
   author   StaffMember @relation("StaffNotes", fields: [authorId], references: [id], onDelete: Cascade)
 
-  scope StaffNoteScope @default(DEPARTMENT)
+  scope      StaffNoteScope @default(DEPARTMENT)
   /// Set when scope is DEPARTMENT. Null for a note to the whole hospital.
   department String?
 
@@ -8272,7 +8405,7 @@ model Protocol {
   domain  String
   title   String
   /// One line, safe to show in a list.
-  summary String @db.Text
+  summary String  @db.Text
   /// The documented procedure itself. Empty until the hospital supplies it.
   body    String? @db.Text
   /// Bumped when the content changes, which re-opens the loop for everybody.
@@ -8314,13 +8447,13 @@ model ProtocolQuestion {
   protocolId String
   protocol   Protocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
 
-  question String   @db.Text
-  options  String[]
+  question  String   @db.Text
+  options   String[]
   /// Index into options.
-  correct  Int
+  correct   Int
   /// Shown after answering, right or wrong. The teaching happens here.
-  because  String?  @db.Text
-  sortOrder Int     @default(0)
+  because   String?  @db.Text
+  sortOrder Int      @default(0)
 
   @@index([protocolId])
 }
@@ -8355,7 +8488,7 @@ model ProtocolProgress {
 
   /// The version this progress was against. If the protocol is reissued this
   /// goes stale and the loop re-opens rather than silently counting.
-  againstVersion Int      @default(1)
+  againstVersion Int       @default(1)
   nextDueAt      DateTime?
 
   createdAt DateTime @default(now())
@@ -8444,7 +8577,7 @@ model TrainingSession {
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   topic       String
-  description String? @db.Text
+  description String?   @db.Text
   /// Where this sits in the library, when the topic is a protocol.
   protocolId  String?
   protocol    Protocol? @relation(fields: [protocolId], references: [id], onDelete: SetNull)
@@ -8460,7 +8593,7 @@ model TrainingSession {
 
   status TrainingStatus @default(SCHEDULED)
   /// What was covered, written after. Becomes the record for anybody absent.
-  notes  String? @db.Text
+  notes  String?        @db.Text
 
   /// Set when the invitation went out, so a reminder job cannot double-send.
   invitedAt  DateTime?
@@ -8510,22 +8643,22 @@ model StaffTask {
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  code  String
-  title String
+  code        String
+  title       String
   /// Matched loosely against position and department. Nineteen people do not
   /// need a role taxonomy.
   roles       String[]
   departments String[]
 
-  cadence StaffTaskCadence
+  cadence  StaffTaskCadence
   /// What is actually captured, so a completion means something.
-  evidence String @db.Text
-  why      String @db.Text
+  evidence String           @db.Text
+  why      String           @db.Text
 
   /// Hours after the day starts before an undone task is chased. A crash
   /// trolley check and a weekly stock count do not deserve the same patience.
-  graceHours Int       @default(24)
-  flagLevel  FlagLevel @default(NUDGE)
+  graceHours  Int       @default(24)
+  flagLevel   FlagLevel @default(NUDGE)
   /// Position or tier the flag escalates to, in words rather than an id,
   /// because the postholder changes and the escalation does not.
   escalatesTo String?

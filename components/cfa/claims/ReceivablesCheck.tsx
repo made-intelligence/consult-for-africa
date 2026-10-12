@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import {
-  ADVANCE_LIVE,
   OLDEST_UNPAID,
   PAYER_COUNTS,
   ROLES,
@@ -30,7 +29,7 @@ function Slider({ label, value, set, min, max, step, show }: { label: string; va
   );
 }
 
-export default function ReceivablesCheck({ refToken }: { refToken: string | null }) {
+export default function ReceivablesCheck({ refToken, advanceLive }: { refToken: string | null; advanceLive: boolean }) {
   const [monthly, setMonthly] = useState(15_000_000);
   const [days, setDays] = useState(120);
   const [queried, setQueried] = useState(20);
@@ -75,10 +74,10 @@ export default function ReceivablesCheck({ refToken }: { refToken: string | null
             { v: naira(r.outstanding), l: "owed to you at any one time" },
             { v: naira(r.inDispute), l: "of that, held up in queries and disputes" },
             { v: naira(r.per30Days), l: "released for good if you are paid 30 days sooner" },
-            ...(ADVANCE_LIVE
+            ...(advanceLive
               ? [
-                  { v: naira(r.earlyPayment), l: "advanced against vetted claims, before the funder's discount" },
-                  { v: `${naira(r.netLow)} to ${naira(r.netHigh)}`, l: "what lands, after the discount is deducted at disbursement" },
+                  { v: naira(r.earlyPayment), l: "advanced against claims your payors have accepted" },
+                  { v: naira(r.cost), l: "interest and fee on that, at your days to pay (60 days minimum)" },
                 ]
               : []),
           ].map((x) => (
@@ -127,7 +126,7 @@ export default function ReceivablesCheck({ refToken }: { refToken: string | null
             <input type="text" name="website" value={f.website} onChange={set("website")} className="hidden" tabIndex={-1} autoComplete="off" />
             <label className="flex items-start gap-2 text-sm text-white/75">
               <input type="checkbox" checked={f.wantsEarlyPayment} onChange={set("wantsEarlyPayment")} className="mt-1" />
-              {ADVANCE_LIVE ? "I would like early payment against vetted claims" : "I am interested in early payment against vetted claims when it opens"}
+              {advanceLive ? "I would like early payment against accepted claims" : "I am interested in early payment against accepted claims when it opens"}
             </label>
             <label className="flex items-start gap-2 text-xs text-white/55">
               <input type="checkbox" checked={f.consent} onChange={set("consent")} className="mt-0.5" required />

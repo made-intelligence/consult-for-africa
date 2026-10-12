@@ -27,7 +27,7 @@ function useAction() {
   return { busy, msg, run };
 }
 
-export function AccountBar({ id, status, signed, advanceRate, fundingLive }: { id: string; status: string; signed: string | null; advanceRate: number; fundingLive: boolean }) {
+export function AccountBar({ id, status, signed, advanceRate, fundingLive, ackCoverage, ackNeeded, overdue }: { id: string; status: string; signed: string | null; advanceRate: number; fundingLive: boolean; ackCoverage: number; ackNeeded: number; overdue: number }) {
   const { busy, msg, run } = useAction();
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   return (
@@ -36,6 +36,8 @@ export function AccountBar({ id, status, signed, advanceRate, fundingLive }: { i
       <span className="text-slate-500">{signed ? `Agreement signed ${signed}` : "No signed agreement"}</span>
       <span className="text-slate-500">Advance rate {Math.round(advanceRate * 100)}%</span>
       <span className={fundingLive ? "text-green-700" : "text-slate-400"}>{fundingLive ? "Funding live" : "Funding not live: decisions will HOLD"}</span>
+      <span className={ackCoverage >= ackNeeded ? "text-green-700" : "text-amber-700"}>HMO letters cover {Math.round(ackCoverage * 100)}% of HMO billing (draws open at {Math.round(ackNeeded * 100)}%)</span>
+      {overdue > 0 && <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-700">{overdue} overdue: no new draws</span>}
       {status !== "ACTIVE" && (
         <span className="ml-auto flex items-center gap-2">
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded border border-slate-300 px-2 py-1 text-xs" />
@@ -105,13 +107,15 @@ export function VetButton({ batchId }: { batchId: string }) {
 
 type PayerProps = {
   accountId: string;
-  payer: { id: string; name: string; type: string; conflict: boolean; conflictNote: string | null; advanceEligible: boolean };
+  payer: { id: string; name: string; type: string; conflict: boolean; conflictNote: string | null; advanceEligible: boolean; expectedDaysToPay: number; dueDays: number };
+  /** Date the acknowledgment letter was signed for this hospital, if it has been. */
+  ack: string | null;
   openCount: number;
   openValue: string;
   draft: { letterSubject: string; letterBody: string; callScript: string; escalateTo: string | null; at: string } | null;
 };
 
-export function PayerPanel({ accountId, payer, openCount, openValue, draft }: PayerProps) {
+export function PayerPanel({ accountId, payer, ack, openCount, openValue, draft }: PayerProps) {
   const { busy, msg, run } = useAction();
   const [mode, setMode] = useState<null | "call" | "draft">(null);
   const [notes, setNotes] = useState("");
@@ -124,6 +128,10 @@ export function PayerPanel({ accountId, payer, openCount, openValue, draft }: Pa
         </p>
         <p className="text-xs text-slate-500">{openCount} open · {openValue}</p>
       </div>
+      <p className="mt-1 text-xs text-slate-500">
+        Pays in {payer.expectedDaysToPay} days (the minimum period) · due at {payer.dueDays} days ·{" "}
+        {ack ? <span className="text-green-700">letter signed {ack}</span> : <span className="text-amber-700">no acknowledgment letter</span>}
+      </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <button className={`${btn} bg-[#0B3C5D] text-white`} disabled={!!busy || !openCount} onClick={() => run("plan", { action: "plan", accountId, payerId: payer.id }, () => "Plan ready: queue ranked, letter and call script drafted")}>
           {busy === "plan" ? "Planning…" : "Plan recovery"}
@@ -142,6 +150,34 @@ export function PayerPanel({ accountId, payer, openCount, openValue, draft }: Pa
         >
           {payer.conflict ? "Clear conflict" : "Mark conflict"}
         </button>
+        <button
+          className={outline}
+          disabled={!!busy}
+          onClick={() => {
+            const type = window.prompt("Payor type: HMO, CORPORATE, NHIA, STATE_SCHEME, MILITARY or OTHER. Only HMO is funded.", payer.type)?.trim().toUpperCase();
+            if (!type) return;
+            const exp = Number(window.prompt("Usual days from acceptance to payment (the minimum interest period)", String(payer.expectedDaysToPay)));
+            const due = Number(window.prompt("Days until the hospital owes the advance back (120 at most)", String(payer.dueDays)));
+            if (!exp || !due) return;
+            run("terms", { action: "payerTerms", payerId: payer.id, type, expectedDaysToPay: exp, dueDays: due });
+          }}
+        >
+          Terms
+        </button>
+        {payer.type === "HMO" && (
+          <button
+            className={outline}
+            disabled={!!busy}
+            onClick={() => {
+              const signedOn = window.prompt("Date the HMO signed the acknowledgment letter (YYYY-MM-DD)", new Date().toISOString().slice(0, 10));
+              if (!signedOn) return;
+              const url = window.prompt("Link to the signed letter (optional)") || null;
+              run("ack", { action: "acknowledge", accountId, payerId: payer.id, signedOn, documentUrl: url, notes: null });
+            }}
+          >
+            {ack ? "Update letter" : "Letter signed"}
+          </button>
+        )}
       </div>
       {payer.conflict && payer.conflictNote && <p className="mt-2 text-xs text-red-700">{payer.conflictNote}. Never advanced; recover only with the hospital told in writing.</p>}
       {mode === "call" && (
@@ -182,7 +218,7 @@ export function PayerPanel({ accountId, payer, openCount, openValue, draft }: Pa
   );
 }
 
-type ClaimProps = { claim: { id: string; accountId: string; status: string; verdict: string | null; confirmed: boolean; decision: string | null; approved: boolean } };
+type ClaimProps = { claim: { id: string; accountId: string; status: string; verdict: string | null; confirmed: boolean; decision: string | null; approved: boolean; accepted: boolean; advanced: boolean; advanceOpen: boolean } };
 
 export function ClaimActions({ claim: c }: ClaimProps) {
   const { busy, msg, run } = useAction();
@@ -190,10 +226,24 @@ export function ClaimActions({ claim: c }: ClaimProps) {
   return (
     <div className="flex max-w-xs flex-col items-end gap-1">
       <div className="flex flex-wrap justify-end gap-1">
+        {open && !c.advanced && (
+          <button
+            className={outline}
+            disabled={!!busy}
+            onClick={() => {
+              const amount = window.prompt("Amount the payor accepted (naira)");
+              if (!amount) return;
+              const ref = window.prompt("Payor's acceptance reference (optional)") || null;
+              run("accept", { action: "accept", claimId: c.id, amount: amount.replace(/[,₦\s]/g, ""), acceptedOn: new Date().toISOString(), ref });
+            }}
+          >
+            {c.accepted ? "Change accepted amount" : "Payor accepted"}
+          </button>
+        )}
         {c.verdict && !c.confirmed && <button className={outline} disabled={!!busy} onClick={() => run("confirm", { action: "confirmVet", claimId: c.id })}>Confirm verification</button>}
         {c.status === "VETTED" && c.confirmed && <button className={outline} disabled={!!busy} onClick={() => run("decide", { action: "decide", claimId: c.id }, (r) => `${r.decision}`)}>Decide advance</button>}
         {c.decision === "ADVANCE" && !c.approved && <button className={`${btn} bg-[#0B3C5D] text-white`} disabled={!!busy} onClick={() => window.confirm("Approve this advance for the funder?") && run("approve", { action: "approve", claimId: c.id })}>Approve advance</button>}
-        {c.decision === "ADVANCE" && c.approved && c.status === "VETTED" && <button className={outline} disabled={!!busy} onClick={() => window.confirm("Has the funder paid this advance to the hospital?") && run("adv", { action: "markAdvanced", claimId: c.id })}>Funder paid</button>}
+        {c.decision === "ADVANCE" && c.approved && c.status === "VETTED" && <button className={outline} disabled={!!busy} onClick={() => window.confirm("Has Carbon paid this advance, less the discount and our fee, to the hospital?") && run("adv", { action: "markAdvanced", claimId: c.id }, (r) => `₦${r.net} to the hospital, due ${r.due}`)}>Carbon paid</button>}
         {open && (
           <button
             className={outline}
@@ -208,7 +258,7 @@ export function ClaimActions({ claim: c }: ClaimProps) {
             Payment received
           </button>
         )}
-        {open && (
+        {open && !c.advanceOpen && (
           <button
             className={`${btn} text-slate-400 hover:text-red-600`}
             disabled={!!busy}
@@ -223,5 +273,68 @@ export function ClaimActions({ claim: c }: ClaimProps) {
       </div>
       {msg && <span className="text-xs text-slate-600">{msg}</span>}
     </div>
+  );
+}
+
+type PayerOption = { id: string; name: string };
+
+/** Money into the hospital's collection account at Carbon, split as it is recorded. */
+export function ReceiptBox({ accountId, payers }: { accountId: string; payers: PayerOption[] }) {
+  const { busy, msg, run } = useAction();
+  const [f, setF] = useState({ source: "HMO", payerId: payers[0]?.id ?? "", amount: "", receivedAt: new Date().toISOString().slice(0, 10), reference: "", lines: "" });
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setF((p) => ({ ...p, [k]: e.target.value }));
+  const field = "rounded border border-slate-300 px-2 py-1 text-xs";
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <h3 className="text-sm font-semibold text-slate-700">Money into the collection account</h3>
+      <p className="mt-1 text-xs text-slate-500">
+        An HMO remittance, or a hospital repaying an advance. List the claims it covers from the remittance advice, one per line: claim ref, amount. Carbon is paid first on any advanced claim, then any overdue advance, then the hospital within 48 hours. Anything not matched to a claim goes to the hospital.
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <select value={f.source} onChange={set("source")} className={field}>
+          <option value="HMO">From an HMO</option>
+          <option value="HOSPITAL">From the hospital (recourse)</option>
+        </select>
+        <select value={f.payerId} onChange={set("payerId")} className={field}>
+          {f.source === "HOSPITAL" && <option value="">Any payor</option>}
+          {payers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <input value={f.amount} onChange={set("amount")} placeholder="Amount" className={`${field} w-28`} />
+        <input type="date" value={f.receivedAt} onChange={set("receivedAt")} className={field} />
+        <input value={f.reference} onChange={set("reference")} placeholder="Bank reference" className={`${field} w-36`} />
+      </div>
+      <textarea value={f.lines} onChange={set("lines")} rows={4} className="mt-2 w-full rounded-lg border border-slate-300 p-2 font-mono text-xs" placeholder={"CLM-0012, 450000\nCLM-0019, 120000"} />
+      <div className="mt-2 flex items-center gap-2">
+        <button
+          className={`${btn} ml-auto bg-[#0B3C5D] text-white`}
+          disabled={!!busy || !f.amount}
+          onClick={() =>
+            run(
+              "receipt",
+              { action: "receipt", accountId, payerId: f.payerId || null, source: f.source, amount: f.amount.replace(/[,₦\s]/g, ""), receivedAt: new Date(f.receivedAt).toISOString(), reference: f.reference || null, lines: f.lines },
+              (r) => {
+                setF((p) => ({ ...p, amount: "", reference: "", lines: "" }));
+                return `₦${r.toFunder} to Carbon, ₦${r.toHospital} to the hospital${Number(r.feesReleased) > 0 ? `, ₦${r.feesReleased} of our fees released` : ""}`;
+              },
+            )
+          }
+        >
+          {busy ? "Splitting…" : "Record and split"}
+        </button>
+      </div>
+      {msg && <p className="mt-2 text-xs text-slate-600">{msg}</p>}
+    </div>
+  );
+}
+
+export function PayoutButton({ receiptId }: { receiptId: string }) {
+  const { busy, msg, run } = useAction();
+  return (
+    <span className="flex items-center gap-2">
+      <button className={outline} disabled={!!busy} onClick={() => window.confirm("Has the hospital's share left the collection account?") && run("paid", { action: "hospitalPaid", receiptId })}>
+        Paid to hospital
+      </button>
+      {msg && <span className="text-xs text-red-600">{msg}</span>}
+    </span>
   );
 }
