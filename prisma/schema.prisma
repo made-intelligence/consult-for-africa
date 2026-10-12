@@ -8048,6 +8048,15 @@ model StaffMember {
   department String
   position   String
 
+  /// What kind of person this row is.
+  ///
+  /// Every surface had been filtering on department, which worked until it did
+  /// not: founders were getting staff onboarding emails twice a week, a CFA
+  /// test account was in the directory a nurse sees, and the sprint denominator
+  /// counted both. Department answers where somebody works. It was never going
+  /// to answer whether they are an employee of this hospital.
+  kind StaffKind @default(EMPLOYEE)
+
   /// What this person holds. A LIST, because at Haven dual roles are the norm
   /// rather than the exception: Dr Odedina is Chief Medical Director and a
   /// founder, Dr Shakirah is associate clinical director and a founder. One
@@ -8093,6 +8102,20 @@ model StaffMember {
 
   @@unique([clientId, email])
   @@index([clientId, isActive])
+}
+
+/// EMPLOYEE is the hospital's own staff: the denominator for everything.
+/// FOUNDER is an owner. Several also work here, and those are EMPLOYEE with a
+/// BOARD tier rather than FOUNDER, because what they need from the system is an
+/// employee's needs plus the board's view.
+/// PARTNER is CFA embedded on site. In the directory because a nurse may need
+/// to call them, out of the denominator because we are not measuring ourselves.
+/// TEST is exactly that, and is excluded from every count and every send.
+enum StaffKind {
+  EMPLOYEE
+  FOUNDER
+  PARTNER
+  TEST
 }
 
 enum StaffTier {

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
 import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
 import { signStaffJWT } from "@/lib/staffAuth";
+import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 
 /**
  * The morning note. One email, one person, only what is waiting on them.
@@ -118,7 +119,7 @@ export async function GET(req: NextRequest) {
   if (!client) return NextResponse.json({ error: "No client" }, { status: 404 });
 
   const staff = await prisma.staffMember.findMany({
-    where: { clientId: client.id, isActive: true, NOT: { email: null } },
+    where: { ...staffWhere(client.id, ONBOARDED), NOT: { email: null } },
     select: { id: true, name: true, email: true, tiers: true, lastLoginAt: true },
   });
 
