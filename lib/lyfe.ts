@@ -163,9 +163,12 @@ export const LYFE_EVENT = {
   venueAddress:
     process.env.NEXT_PUBLIC_LYFE_EVENT_ADDRESS ||
     "6 Elsie Femi Pearse Street, Victoria Island, Lagos",
-  // Moved with the date. Five clear working days before, which is what a
-  // curated 70-person room needs to be chased properly. Confirm it.
-  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Friday, 16 October",
+  // Moved to 19 October on 12 October. The 16th assumed invitations had gone
+  // out a week earlier; on the 12th there were four applications and not one
+  // of the eleven inviter links had been sent, so a Friday deadline was
+  // closing a door nobody had been shown. The 19th gives a week of chasing
+  // and still leaves two clear days to finalise the room.
+  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 19 October",
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
   places: 70,

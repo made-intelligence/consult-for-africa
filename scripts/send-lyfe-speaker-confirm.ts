@@ -20,7 +20,7 @@ const panelSet = () =>
     questions: s.questions,
   }));
 
-const DEADLINE = "4pm tomorrow, Thursday 9 October";
+const DEADLINE = "4pm on Wednesday 14 October";
 const FROM_NAME = process.env.LYFE_SENDER_NAME || "Dr Debo Odulana";
 const TEST_TO = process.env.LYFE_TEST_TO || "dodulana@gmail.com";
 
