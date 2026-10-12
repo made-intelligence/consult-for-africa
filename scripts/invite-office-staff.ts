@@ -55,7 +55,7 @@ async function main() {
   console.log(`Login button target: ${base}/login`);
 
   await sendInvite(user.email, user.name, user.role, tempPassword);
-  console.log("Welcome email sent. She lands on /tasks after her first login.");
+  console.log("Welcome email sent. She lands on /desk after her first login, per middleware.ts.");
 }
 
 main()

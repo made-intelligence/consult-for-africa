@@ -16,6 +16,11 @@ const ALLOWED = [
   // the respondent's name rides inside `responses` (and the optional
   // top-level `respondent`), by design, so the board can compare instincts.
   "haven-leadership-instinct",
+  // The staff page at /HavenStaff. Both are anonymous by default: the name
+  // field is optional and the page says so, because a near-miss report that
+  // costs the reporter anything is a near-miss report you stop receiving.
+  "haven-near-miss",
+  "haven-whats-broken",
 ] as const;
 
 const bodySchema = z.object({
@@ -79,6 +84,31 @@ export async function POST(req: NextRequest) {
         userAgent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
       },
     });
+
+    // A near miss is a safety signal, not a survey response, so it pings the
+    // moment it lands whatever the hour. Never let the notification failing
+    // fail the submission for the person who reported.
+    if (parsed.data.survey === "haven-near-miss") {
+      try {
+        const r = parsed.data.responses as Record<string, unknown>;
+        const esc = (v: unknown) =>
+          String(v ?? "").replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c]!).slice(0, 2000);
+        await notifyInternal(
+          NOTIFY_TO,
+          `Haven near miss reported (reached a patient: ${esc(r.reachedPatient) || "not stated"})`,
+          `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1F2937">
+<p><b>A near miss has been reported at Haven.</b></p>
+<p><b>Reached a patient:</b> ${esc(r.reachedPatient) || "not stated"}</p>
+<p><b>What happened:</b><br>${esc(r.what)}</p>
+<p><b>What made it possible:</b><br>${esc(r.why) || "not stated"}</p>
+<p><b>Reported by:</b> ${esc(r.name) || "anonymous"}</p>
+<p><a href="${ADMIN_URL}" style="color:#0B3C5D">See all responses</a></p>
+</div>`
+        );
+      } catch (err) {
+        console.error("[haven-audit] near-miss notification failed:", err);
+      }
+    }
 
     // The founders' survey is chased by name, so tell us the moment one lands.
     // Never let a notification failure fail the submission for the respondent.

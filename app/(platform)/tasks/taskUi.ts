@@ -82,7 +82,7 @@ export interface TaskRow {
   updatedAt: string;
   assignee: TaskPerson;
   assigner: TaskPerson;
-  _count?: { subtasks: number };
+  _count?: { subtasks: number; attachments?: number };
 }
 
 /**

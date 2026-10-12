@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ClipboardList,
   Loader2,
+  Paperclip,
   Plus,
   X,
 } from "lucide-react";
@@ -137,11 +138,14 @@ export default function TaskBoardClient({ currentUserId, canAssign, canSeeAll }:
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-5">
-        {/* View switch */}
+        {/* View switch. Named for the two sides of the board rather than for
+            ownership: "My desk" was both a tab here and a different page in the
+            sidebar, and a task you raised for yourself sat under both tabs with
+            no way to tell which one it belonged to. */}
         <div className="flex flex-wrap items-center gap-2">
-          <ViewTab label="My desk" active={view === "mine"} onClick={() => setView("mine")} />
+          <ViewTab label="Mine to do" active={view === "mine"} onClick={() => setView("mine")} />
           {canAssign && (
-            <ViewTab label="I assigned" active={view === "assigned"} onClick={() => setView("assigned")} />
+            <ViewTab label="Mine to review" active={view === "assigned"} onClick={() => setView("assigned")} />
           )}
           {canSeeAll && (
             <ViewTab label="Everyone" active={view === "all"} onClick={() => setView("all")} />
@@ -430,6 +434,12 @@ function TaskCard({ task, currentUserId }: { task: TaskRow; currentUserId: strin
         )}
         {task.estimatedMinutes ? <span>est {formatMinutes(task.estimatedMinutes)}</span> : null}
         {task._count && task._count.subtasks > 0 ? <span>{task._count.subtasks} sub-tasks</span> : null}
+        {/* Whether there is anything to review, visible before opening it. */}
+        {task._count?.attachments ? (
+          <span className="flex items-center gap-1"><Paperclip size={11} /> {task._count.attachments}</span>
+        ) : task.status === "SUBMITTED" ? (
+          <span style={{ color: "#B45309" }}>nothing attached</span>
+        ) : null}
       </div>
     </Link>
   );

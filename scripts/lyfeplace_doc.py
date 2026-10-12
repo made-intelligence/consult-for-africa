@@ -124,8 +124,14 @@ def footer_bar(text="Debo Odulana   Consult for Africa   /   +234 913 813 8553  
     return t
 
 
-def make_furniture(left, right):
-    """Page header and footer. left is the brand, right the document name."""
+def make_furniture(left, right,
+                   note="Private and confidential  /  Prepared for Dr Itunu Akinware, Group CEO"):
+    """Page header and footer. left is the brand, right the document name.
+
+    note is the confidentiality line in the footer. It defaults to the Medbury
+    addressee because that is what most of these documents are, but a document
+    written to more than one principal has to say so.
+    """
     def furniture(canv, doc):
         canv.saveState()
         canv.setFillColor(NAVY)
@@ -142,8 +148,7 @@ def make_furniture(left, right):
         canv.line(MARGIN, 14 * mm, MARGIN + 11 * mm, 14 * mm)
         canv.setFillColor(MUTED)
         canv.setFont("Helvetica", 7.2)
-        canv.drawString(MARGIN, 10 * mm,
-                        "Private and confidential  /  Prepared for Dr Itunu Akinware, Group CEO")
+        canv.drawString(MARGIN, 10 * mm, note)
         canv.drawRightString(PW - MARGIN, 10 * mm, "Page %d" % doc.page)
         canv.restoreState()
     return furniture

@@ -29,7 +29,7 @@ const NAME = "CFA - Office of the Founding Partner - Onboarding Pack.pdf";
  * a second copy arriving with a fresh welcome on it reads as a mistake and
  * makes the reader distrust both versions.
  */
-type NoteKey = "welcome" | "startdate" | "scope";
+type NoteKey = "welcome" | "startdate" | "scope" | "people";
 
 const NOTE_ARG = process.argv.find((a) => a.startsWith("--note="));
 const NOTE: NoteKey = (NOTE_ARG?.split("=")[1] as NoteKey) ?? "welcome";
@@ -38,6 +38,7 @@ const SUBJECTS: Record<NoteKey, string> = {
   welcome: "Your onboarding pack, and your platform account",
   startdate: "Your onboarding pack, updated, and you start tomorrow",
   scope: "Arabella scope correction, and a revised pack",
+  people: "A correction to the pack, about Abigail",
 };
 
 const OPENINGS_HTML: Record<NoteKey, string> = {
@@ -65,6 +66,27 @@ const OPENINGS_HTML: Record<NoteKey, string> = {
         four surveys and the report. And the risk, which is not delivery: Dr Chito holds proposals describing
         much more than we are doing, nobody has written down that the scope is narrower, and closing that in
         writing is now the first item on the Arabella list.</p>`,
+  people: `<p>Ezinne,</p>
+     <p>A correction to the pack, and this one is about a person rather than a client, so please read it
+        before you start working with her.</p>
+     <p>The version you have contains a line saying Abigail's first inventory count came back in ten minutes
+        with nothing recorded. <strong>That was not true, and it was not anybody's assessment of her.</strong>
+        The pack was drafted with AI working off platform data, and it read an empty table and asserted the
+        work had not been done. Nobody looked at her work and formed that view. It went out without being
+        checked, which was my failure.</p>
+     <p>Abigail has seen it, and it knocked her. She has had a full apology from me and the corrected pack is
+        attached, so please work from this one and delete the earlier copy.</p>
+     <p>What I want you to know going in. She has held this office on her own since she joined. She built the
+        commitment register from nothing, she runs the follow up sweep and the overdue invoice chase, and when
+        she tested the platform she sent six things that were wrong with it, in writing, and all six were
+        fixed. She is quick and she wants to learn.</p>
+     <p>Two things she needs from you that she has not had. A worked example with anything new, because a
+        definition of done describes a finished thing and she has often never seen one. And a written note
+        back on every piece of work, right or wrong. She submitted five pieces before you arrived and received
+        not one word in return, which is on me and is the single biggest thing that changes now that you are
+        here.</p>
+     <p>She has also not asked a single question in a month. I do not read that as her understanding
+        everything. Please make it easy for her to ask.</p>`,
 };
 
 const OPENINGS_TEXT: Record<NoteKey, string> = {
@@ -83,6 +105,19 @@ A correction on the pack, and it matters today, so please work from the attached
 Debo has confirmed that at Arabella we are doing the diagnostic audit and nothing else. The version you have describes the full two month foundation phase from the proposals, which included marketing, public relations, a records system with staff training, an insurance successor programme, a secondment and a live dashboard. We are not delivering any of that, so none of it is yours to chase.
 
 Part Four has been rewritten accordingly, and the task on your desk about the documents we need from Dr Chito has changed with it. Two things are worth reading properly rather than skimming. The audit itself, which is the information request with its thirteen sections, the uploads against each one, the four surveys and the report. And the risk, which is not delivery: Dr Chito holds proposals describing much more than we are doing, nobody has written down that the scope is narrower, and closing that in writing is now the first item on the Arabella list.`,
+  people: `Ezinne,
+
+A correction to the pack, and this one is about a person rather than a client, so please read it before you start working with her.
+
+The version you have contains a line saying Abigail's first inventory count came back in ten minutes with nothing recorded. That was not true, and it was not anybody's assessment of her. The pack was drafted with AI working off platform data, and it read an empty table and asserted the work had not been done. Nobody looked at her work and formed that view. It went out without being checked, which was my failure.
+
+Abigail has seen it, and it knocked her. She has had a full apology from me and the corrected pack is attached, so please work from this one and delete the earlier copy.
+
+What I want you to know going in. She has held this office on her own since she joined. She built the commitment register from nothing, she runs the follow up sweep and the overdue invoice chase, and when she tested the platform she sent six things that were wrong with it, in writing, and all six were fixed. She is quick and she wants to learn.
+
+Two things she needs from you that she has not had. A worked example with anything new, because a definition of done describes a finished thing and she has often never seen one. And a written note back on every piece of work, right or wrong. She submitted five pieces before you arrived and received not one word in return, which is on me and is the single biggest thing that changes now that you are here.
+
+She has also not asked a single question in a month. I do not read that as her understanding everything. Please make it easy for her to ask.`,
 };
 
 const SUBJECT = SUBJECTS[NOTE];

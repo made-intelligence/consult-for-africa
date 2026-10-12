@@ -35,7 +35,7 @@ const TASK_SELECT = {
   updatedAt: true,
   assignee: { select: { id: true, name: true, email: true, role: true } },
   assigner: { select: { id: true, name: true, email: true, role: true } },
-  _count: { select: { subtasks: true } },
+  _count: { select: { subtasks: true, attachments: true } },
 } satisfies Prisma.TaskSelect;
 
 /**

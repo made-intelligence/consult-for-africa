@@ -26,7 +26,7 @@ const ALLOWED_CONTENT_TYPES: Record<string, string> = {
   "audio/mpeg": "mp3",
 };
 
-const ALLOWED_FOLDERS = ["deliverables", "cvs", "knowledge", "avatars", "documents", "assessments", "founder-docs"] as const;
+const ALLOWED_FOLDERS = ["deliverables", "cvs", "knowledge", "avatars", "documents", "assessments", "founder-docs", "tasks"] as const;
 type Folder = (typeof ALLOWED_FOLDERS)[number];
 
 const MAX_FILE_SIZE_MB = 50;

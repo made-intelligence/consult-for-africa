@@ -26,7 +26,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-bold text-gray-900">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using CadreHealth (&quot;the Platform&quot;), operated by Consult For Africa Limited (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Platform.
+              By accessing or using CadreHealth (&quot;the Platform&quot;), operated by Consult for Africa Management Services Limited (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Platform.
             </p>
           </section>
 
@@ -94,7 +94,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-bold text-gray-900">10. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, Consult For Africa Limited shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform. Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim (if any).
+              To the maximum extent permitted by law, Consult for Africa Management Services Limited shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform. Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim (if any).
             </p>
           </section>
 
