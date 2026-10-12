@@ -1,5 +1,5 @@
 """
-Build the Lyfe Plastics and Dermatology creative set.
+Build the MedLYFE consultation creative set.
 
 Outputs into docs/lyfe-creative/:
 
@@ -78,8 +78,9 @@ SANS = "/System/Library/Fonts/HelveticaNeue.ttc"
 SANS_I = 0
 SANS_B_I = 1
 
-WHATSAPP_NUMBER = "2349138138553"
-PHONE_DISPLAY = "+234 913 813 8553"
+WHATSAPP_NUMBER = "2347030527269"
+PHONE_DISPLAY = "0703 052 7269"
+CENTRE_PHONE_DISPLAY = "+234 913 813 8553"
 # No default. consultforafrica.com/lyfe is where the page happens to sit today,
 # but printing a management consultancy's domain on a plastic surgery practice's
 # card tells a referring doctor something nobody wants to explain. Until the
@@ -93,14 +94,14 @@ WA_MESSAGE = "Hello, I would like to ask about a consultation."
 CONSULT_FEE = None
 
 # The evening. Date and venue move, so they are arguments rather than copy.
-EVENT_NAME = "Medlyfe Wellness and Longevity Centre"
+EVENT_NAME = "MedLYFE Wellness and Longevity Centre"
 EVENT_THEME = "Feel Good, Look Good, Live Better."
 EVENT_DATE = "Wednesday 21 October"
-EVENT_TIME = "Cocktails 6.30pm"
-EVENT_DRESS = "RSVP by 16 October"
+EVENT_TIME = "Arrival 5.30pm"
+EVENT_DRESS = "RSVP by 19 October"
 EVENT_VENUE = "Capital Club, Lagos"
 RSVP_MESSAGE = "Hello, I would like to RSVP to the evening."
-CALL_MESSAGE = "Hello, I would like to book a discovery call."
+CALL_MESSAGE = "Hello, I would like to request a consultation."
 
 
 def wa_link(message: str = WA_MESSAGE) -> str:
@@ -209,8 +210,8 @@ STORIES = [
         "wa": CALL_MESSAGE,
     },
     {
-        "head": "Look rested.\nNot rearranged.",
-        "sub": "Aesthetic care in Lagos, by clinicians who will tell you when the honest answer is no.",
+        "head": "Thirty minutes\nwith a plastic surgeon.",
+        "sub": "A consultation with Dr Chinwe Kpaduwa, in person at MedLYFE or by video.",
         "cta": "Tap to ask a question",
         "theme": "dark",
     },
@@ -278,7 +279,7 @@ def branded_qr(target: str, size: int, fg: str = INK, bg: str = PAPER) -> Image.
     box = Image.new("RGB", (patch, patch), bg)
     d = ImageDraw.Draw(box)
     f = font(DISPLAY, DISPLAY_B_I, int(patch * 0.52))
-    label = "L"
+    label = "M"
     w = text_w(d, label, f)
     bbox = d.textbbox((0, 0), label, font=f)
     d.text(((patch - w) / 2, (patch - (bbox[3] - bbox[1])) / 2 - bbox[1]), label, font=f, fill=BRONZE)
@@ -288,9 +289,9 @@ def branded_qr(target: str, size: int, fg: str = INK, bg: str = PAPER) -> Image.
 
 def wordmark(draw: ImageDraw.ImageDraw, x: int, y: int, scale: float = 1.0, on=INK, sub=BRONZE):
     f1 = font(DISPLAY, DISPLAY_I, int(54 * scale))
-    draw.text((x, y), "Lyfe", font=f1, fill=on)
+    draw.text((x, y), "MedLYFE", font=f1, fill=on)
     f2 = font(SANS, SANS_B_I, int(15 * scale))
-    tracked(draw, (x + 2, y + int(70 * scale)), "PLASTICS AND DERMATOLOGY", f2, sub, track=int(4 * scale))
+    tracked(draw, (x + 2, y + int(70 * scale)), "WELLNESS AND LONGEVITY CENTRE", f2, sub, track=int(4 * scale))
 
 
 # ------------------------------------------------------------- social, feed
@@ -471,10 +472,10 @@ def pdf_para(c, text, x, y, f, size, colour, max_w, leading):
 def pdf_wordmark(c, x, y, scale=1.0, on=HexColor(INK), sub=HexColor(BRONZE)):
     c.setFillColor(on)
     c.setFont("Times-Roman", 26 * scale)
-    c.drawString(x, y, "Lyfe")
+    c.drawString(x, y, "MedLYFE")
     c.setFillColor(sub)
     c.setFont("Helvetica-Bold", 6.6 * scale)
-    t = "PLASTICS AND DERMATOLOGY"
+    t = "WELLNESS AND LONGEVITY CENTRE"
     cx = x + 1
     for ch in t:
         c.drawString(cx, y - 13 * scale, ch)
@@ -493,7 +494,7 @@ def build_flyer_a5(url: str):
     M = 34
     out = OUT / "lyfe-flyer-a5.pdf"
     c = canvaslib.Canvas(str(out), pagesize=A5)
-    c.setTitle("Lyfe Plastics and Dermatology, flyer")
+    c.setTitle("MedLYFE, a consultation with Dr Chinwe Kpaduwa")
 
     c.setFillColor(HexColor(GROUND))
     c.rect(0, 0, PW, PH, fill=1, stroke=0)
@@ -504,14 +505,14 @@ def build_flyer_a5(url: str):
 
     c.setFillColor(white)
     c.setFont("Times-Roman", 25)
-    c.drawString(M, PH - 100, "Look rested. Not rearranged.")
+    c.drawString(M, PH - 100, "Thirty minutes with a plastic surgeon.")
 
     y = PH - 170
     y = pdf_para(
         c,
-        "Aesthetic care in Lagos, delivered by registered clinicians, to a standard set and "
-        "signed off by a board certified plastic surgeon. We will tell you what will work, what "
-        "will not, and when the honest answer is to do nothing.",
+        "A consultation with Dr Chinwe Kpaduwa, in person at MedLYFE or by video. You bring "
+        "what you are thinking about; she tells you what is involved, what she would and would "
+        "not do, and whether you should be doing anything at all.",
         M, y, "Helvetica", 10, HexColor(BODY), PW - 2 * M, 14.5,
     )
 
@@ -552,10 +553,10 @@ def build_flyer_a5(url: str):
     c.rect(M, y - box_h, 3.5, box_h, fill=1, stroke=0)
     c.setFillColor(HexColor(INK))
     c.setFont("Times-Roman", 16)
-    c.drawString(M + 16, y - 26, "Start with a free fifteen minute call")
+    c.drawString(M + 16, y - 26, "A consultation, in person or by video")
     c.setFillColor(HexColor(BODY))
     c.setFont("Helvetica", 9)
-    c.drawString(M + 16, y - 42, "No charge, no obligation, and nothing is booked on it.")
+    c.drawString(M + 16, y - 42, "NGN 150,000. Put towards the cost of a procedure if you require one and decide to proceed.")
     y -= box_h + 24
 
     # the route in
@@ -563,7 +564,7 @@ def build_flyer_a5(url: str):
     c.drawImage(qr_reader(wa_link(CALL_MESSAGE), 600, bg=GROUND), M, y - qr_px, width=qr_px, height=qr_px, mask="auto")
     c.setFillColor(HexColor(INK))
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(M + qr_px + 16, y - 24, "Scan to book your call")
+    c.drawString(M + qr_px + 16, y - 24, "Scan to request a consultation")
     c.setFillColor(HexColor(BODY))
     c.setFont("Helvetica", 9.5)
     c.drawString(M + qr_px + 16, y - 40, "Or send a WhatsApp message to")
@@ -581,7 +582,7 @@ def build_flyer_a5(url: str):
         M, 22,
         "All procedures carry risk. Whether any treatment suits you is a clinical decision taken at a consultation, after an examination.",
     )
-    c.drawString(M, 13, "Treatment is provided by clinicians registered with the Medical and Dental Council of Nigeria.")
+    c.drawString(M, 13, "Not clinical advice or a promise of a result. The clinical decision rests with the registered clinician who sees you.")
 
     c.showPage()
     c.save()
@@ -655,7 +656,7 @@ def build_invitation_a5(url: str):
     c.setFillColor(HexColor("#8B8780"))
     c.setFont("Helvetica", 7.6)
     c.drawString(M, M + 14, "By invitation. Numbers are limited.")
-    c.drawString(M, M + 4, "Introducing Lyfe Plastics and Dermatology, promoted by Dr Chinwe Kpaduwa.")
+    c.drawString(M, M + 4, "MedLYFE Wellness and Longevity Centre.")
     c.showPage()
 
     # ---- back, light. The programme and the single action.
@@ -703,7 +704,7 @@ def build_invitation_a5(url: str):
 
     c.setFillColor(HexColor(MUTED))
     c.setFont("Helvetica", 6.4)
-    c.drawString(M, 22, "Treatment is provided by clinicians registered with the Medical and Dental Council of Nigeria.")
+    c.drawString(M, 22, "Not clinical advice or a promise of a result. The clinical decision rests with the registered clinician who sees you.")
     c.showPage()
     c.save()
     print("  lyfe-invitation-a5.pdf")
@@ -721,7 +722,7 @@ def build_card_a6(url: str):
     M = 24
     out = OUT / "lyfe-card-a6.pdf"
     c = canvaslib.Canvas(str(out), pagesize=A6)
-    c.setTitle("Lyfe Plastics and Dermatology, card")
+    c.setTitle("MedLYFE, card")
 
     # front
     c.setFillColor(HexColor(INK))
@@ -729,8 +730,8 @@ def build_card_a6(url: str):
     pdf_wordmark(c, M, PH - 46, scale=1.15, on=white, sub=HexColor(BRONZE))
     c.setFillColor(white)
     c.setFont("Times-Roman", 21)
-    c.drawString(M, PH - 108, "Look rested.")
-    c.drawString(M, PH - 132, "Not rearranged.")
+    c.drawString(M, PH - 108, "Thirty minutes")
+    c.drawString(M, PH - 132, "with a plastic surgeon.")
     c.setFillColor(HexColor(BRONZE))
     c.rect(M, PH - 152, 40, 2.5, fill=1, stroke=0)
     c.setFillColor(HexColor("#C9C3B9"))
@@ -738,7 +739,7 @@ def build_card_a6(url: str):
     y = PH - 172
     for ln in pdf_wrap(
         c,
-        "Aesthetic care in Lagos, by clinicians who will tell you when the honest answer is no.",
+        "A consultation with Dr Chinwe Kpaduwa, in person at MedLYFE or by video.",
         "Helvetica", 8.4, PW - 2 * M,
     ):
         c.drawString(M, y, ln)
@@ -794,7 +795,7 @@ def build_referrer_a4(url: str):
     M = 52
     out = OUT / "lyfe-referrer-a4.pdf"
     c = canvaslib.Canvas(str(out), pagesize=A4)
-    c.setTitle("Lyfe Plastics and Dermatology, for referring clinicians")
+    c.setTitle("MedLYFE, for referring clinicians")
 
     c.setFillColor(HexColor(INK))
     c.rect(0, PH - 136, PW, 136, fill=1, stroke=0)
@@ -880,7 +881,7 @@ def build_referrer_a4(url: str):
 
     c.setFillColor(HexColor(MUTED))
     c.setFont("Helvetica", 7.2)
-    c.drawString(M, 40, "Treatment is provided by clinicians registered with the Medical and Dental Council of Nigeria.")
+    c.drawString(M, 40, "Not clinical advice or a promise of a result. The clinical decision rests with the registered clinician who sees you.")
     c.drawString(M, 30, "Clinical standards, protocols and sign off are set by Dr Chinwe Kpaduwa, a board certified plastic surgeon.")
     if url:
         c.drawString(M, 20, url.replace("https://", ""))
