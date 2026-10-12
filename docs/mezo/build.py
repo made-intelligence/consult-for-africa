@@ -16,7 +16,11 @@ import markdown
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
-DOCS = ["mezo-surgery-engagement-contract"]
+DOCS = [
+    "mezo-surgery-engagement-contract",
+    "mezo-surgery-facility-agreement",
+    "mezo-facility-assessment-criteria",
+]
 
 CSS = """
 @page { size: A4; margin: 22mm 20mm 20mm; }

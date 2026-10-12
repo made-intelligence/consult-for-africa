@@ -36,7 +36,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 **"Outlier"** means an event that takes a Case outside its Case Bundle under the Bundle's published rules (for example, intensive care beyond the day limit, a device upgrade, or conversion from laparoscopic to open surgery).
 
-**"Partner Facility"** means a facility with which Mezo has an agreement for the use of its theatres and wards.
+**"Partner Facility"** means a facility that has passed the Mezo Network Facility Assessment Criteria and holds a Mezo Surgery Facility Agreement covering the procedure.
 
 **"Privilege"** means the Surgeon's grant, recorded on the Mezo platform, to perform a named procedure, at a named Partner Facility or network-wide, independently or under supervision.
 
@@ -106,7 +106,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 6A.1 **Disclosure.** The Surgeon shall declare every Surgeon-owned Facility in Schedule 1 on signing, and any change within fourteen (14) days. Before a Case is booked at a Surgeon-owned Facility, the patient shall be told in writing that the Surgeon has an interest in it and that the patient may ask for the Case at another Partner Facility.
 
-6A.2 **Separate facility agreement.** A Surgeon-owned Facility is used only under its own Facility Partnership Agreement with Mezo. The facility's share of the All-in Price is set in that agreement and paid to the facility, not to the Surgeon, and never forms part of the Surgeon Fee. The Surgeon Fee under Schedule 2 is unchanged by where the Case takes place.
+6A.2 **Separate facility agreement.** A Surgeon-owned Facility is used only after it has passed the Mezo Network Facility Assessment Criteria, and only under its own Mezo Surgery Facility Agreement. The facility's share of the All-in Price is set in that agreement and paid to the facility, not to the Surgeon, and never forms part of the Surgeon Fee. The Surgeon Fee under Schedule 2 is unchanged by where the Case takes place.
 
 6A.3 **Allocation.** Mezo decides which Partner Facility hosts a Case, on the patient's needs, the patient's choice, safety and value. The Surgeon shall not make a Case conditional on its being done at a Surgeon-owned Facility.
 
@@ -174,7 +174,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 
 ## 15. DISPUTES AND GENERAL
 
-15.1 Disputes shall be resolved by negotiation, then mediation at the Lagos Multi-Door Courthouse, then arbitration under the Lagos Court of Arbitration rules, seated in Lagos, as set out in the Platform Agreement.
+15.1 Disputes shall be resolved by negotiation, then mediation at the Lagos Multi-Door Courthouse, then arbitration by a sole arbitrator under the Lagos Court of Arbitration rules, seated in Lagos, under the Arbitration and Mediation Act 2023.
 
 15.2 This Contract is governed by the laws of the Federal Republic of Nigeria. It may be signed electronically and in counterparts. No variation is effective unless in writing and signed by both Parties.
 
@@ -203,7 +203,7 @@ C. This Contract is separate from, and in addition to, the Independent Practitio
 | Episode of Care | 90 days, unless the fee table sets another period |
 | Minimum indemnity cover | NGN [ ] per claim |
 | Late patient cancellation | [ ] |
-| Surgeon-owned Facility | Facility share set in its own Facility Partnership Agreement; Surgeon Fee unchanged |
+| Surgeon-owned Facility | Facility share set in its own Mezo Surgery Facility Agreement; Surgeon Fee unchanged |
 
 ## EXECUTION
 
