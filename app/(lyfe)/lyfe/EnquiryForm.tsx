@@ -268,7 +268,7 @@ export default function EnquiryForm({
                 key={o.key}
                 checked={service === o.key}
                 onSelect={() => setService(o.key)}
-                label={o.fee ? `${o.name} — ${o.fee}` : o.name}
+                label={o.fee ? `${o.name}, ${o.fee}` : o.name}
               />
             ))}
           </div>
@@ -303,7 +303,7 @@ export default function EnquiryForm({
           <button
             type="button"
             onClick={() => {
-              if (!slotAt) return setError("Please choose a time in her diary.");
+              if (!service) return setError("Please choose which consultation you are asking about.");
               if (!pathway) return setError("Please choose one, even roughly.");
               if (!timing) return setError("Please tell us roughly when you are thinking about this.");
               setError(null);
@@ -492,7 +492,7 @@ export default function EnquiryForm({
               ? "Sending..."
               : rsvp
                 ? "Confirm my place"
-                : `Pay ${LYFE_CONSULT.feeDisplay} and book it`}
+                : "Request the consultation"}
           </button>
           <p className="mt-3 text-center text-[11px] leading-relaxed" style={{ color: C.muted }}>
             We will never sell or share your details, and you can ask us to delete them at any time.
