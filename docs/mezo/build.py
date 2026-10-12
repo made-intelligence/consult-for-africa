@@ -20,6 +20,8 @@ DOCS = [
     "mezo-surgery-engagement-contract",
     "mezo-surgery-facility-agreement",
     "mezo-facility-assessment-criteria",
+    "mezo-facility-reassessment-request",
+    "mezo-facility-assessor-guide",
 ]
 
 CSS = """
