@@ -385,7 +385,7 @@ export default async function ConsultPage({
                 {[
                   "You are looking for a price list. Ask us on WhatsApp and we will send what we can",
                   "You want reassurance rather than an assessment. She will give you the second",
-                  "You need urgent medical attention. Go to a hospital, not a video call",
+                  "You need urgent medical attention. Go to a hospital, not a consultation",
                 ].map((i) => (
                   <li key={i} className="text-[14.5px] leading-relaxed" style={{ color: C.muted }}>
                     {i}

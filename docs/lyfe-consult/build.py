@@ -6,7 +6,8 @@
 Each group gets its own ?src= tag on the QR and the printed link, so the
 requests that come back can be traced to the group that sent them. Add a group
 to GROUPS and rerun. Writes consult-flyer-<slug>.png (1080 x 1350, for
-posting) and consult-flyer-print.pdf (A4).
+posting) and consult-flyer-print.pdf (A4), then the same set again in MedLYFE's
+own livery as consult-flyer-<slug>-medlyfe.png and consult-flyer-print-medlyfe.pdf.
 
 Copy rules: the page is the clinic's, and the flyer says what the page says.
 No superlatives, no comparison with other surgeons, no before and after, no
@@ -19,6 +20,7 @@ import subprocess
 import urllib.parse
 
 import qrcode
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -33,14 +35,18 @@ GROUPS = {
     "print": "Print",
 }
 
-INK = "#15161A"
-BODY = "#4A4D56"
-GROUND = "#FAF7F2"
-WARM = "#F3EDE4"
-BRONZE = "#A87B4F"
+# Each theme is the whole palette. "medlyfe" matches MEDLYFE_BRAND in lib/lyfe.ts.
+THEMES = {
+    "cfa": dict(ink="#15161A", body="#4A4D56", ground="#FAF7F2", warm="#F3EDE4", accent="#A87B4F",
+                fee_bg="#15161A", fee_fg="#FAF7F2", fee_sub="#D9C3A6",
+                foot_bg="#15161A", foot_c="#C9C6BF", foot_r="#8C8A84", mark=False),
+    "medlyfe": dict(ink="#FFFFFF", body="#D8E3D6", ground="#1F3A2E", warm="#15291F", accent="#C4D7A6",
+                    fee_bg="#C4D7A6", fee_fg="#15291F", fee_sub="#1F3A2E",
+                    foot_bg="#0F1E17", foot_c="#D8E3D6", foot_r="#7E9A88", mark=True),
+}
 
 PHONE = "+234 913 813 8553"
-CLINIC = "Medlyfe Wellness and Longevity Centre"
+CLINIC = "MedLYFE Wellness and Longevity Centre"
 
 # Matches LYFE_SURGEON_WORK in lib/lyfe.ts.
 WORK = [
@@ -63,13 +69,29 @@ def qr_uri(url):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-PORTRAIT = data_uri(os.path.join(ROOT, "docs/lyfe-rounds/chinwe-smiling.png"), "image/png")
+MARK = data_uri(os.path.join(ROOT, "public/lyfe-icon.svg"), "image/svg+xml")
+PORTRAIT_PATH = os.path.join(ROOT, "docs/lyfe-rounds/chinwe-smiling.png")
 
 
-def flyer(slug, w, h, scale):
+def portrait_uri(ground):
+    """The portrait carries the cream ground it was cut on. Repaint that ground,
+    filled in from the top corners, so it sits on whatever the theme's ground is."""
+    img = Image.open(PORTRAIT_PATH).convert("RGB")
+    fill = tuple(int(ground[i:i + 2], 16) for i in (1, 3, 5))
+    for corner in ((0, 0), (img.width - 1, 0)):
+        ImageDraw.floodfill(img, corner, fill, thresh=40)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+def flyer(slug, w, h, scale, t):
     url = f"https://www.consultforafrica.com/lyfe/consult?src={slug}"
     shown = f"consultforafrica.com/lyfe/consult?src={slug}"
     s = lambda px: f"{px * scale:.2f}px"
+    INK, BODY, GROUND, WARM, BRONZE = t["ink"], t["body"], t["ground"], t["warm"], t["accent"]
+    eyebrow = (f'<div class="brand"><img src="{MARK}" alt=""><span>MedLYFE</span></div>' if t["mark"]
+               else '<div class="eyebrow">MedLYFE &middot; Lagos</div>')
     work = "".join(f'<div class="w"><div class="w-t">{t}</div><div class="w-b">{b}</div></div>' for t, b in WORK)
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;600&display=block" rel="stylesheet">
@@ -86,9 +108,12 @@ def flyer(slug, w, h, scale):
     line-height: 1.05; letter-spacing: -0.025em; margin-top: {s(24)}; }}
   .lede {{ font-size: {s(24)}; line-height: 1.45; margin-top: {s(24)}; }}
   .lede b {{ color: {INK}; font-weight: 600; }}
-  .fee {{ margin-top: {s(28)}; padding: {s(18)} {s(22)}; background: {INK}; color: {GROUND}; }}
+  .brand {{ display: flex; align-items: center; gap: {s(14)}; }}
+  .brand img {{ width: {s(46)}; height: {s(46)}; }}
+  .brand span {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK}; font-size: {s(30)}; letter-spacing: 0.01em; }}
+  .fee {{ margin-top: {s(28)}; padding: {s(18)} {s(22)}; background: {t["fee_bg"]}; color: {t["fee_fg"]}; }}
   .fee .d {{ font-family: Fraunces, Georgia, serif; font-size: {s(30)}; font-weight: 600; }}
-  .fee .a {{ font-size: {s(17.5)}; margin-top: {s(6)}; color: #D9C3A6; line-height: 1.4; }}
+  .fee .a {{ font-size: {s(17.5)}; margin-top: {s(6)}; color: {t["fee_sub"]}; line-height: 1.4; }}
   .photo {{ width: {s(340)}; flex: none; padding-top: {s(36)}; }}
   .portrait {{ display: block; width: 100%; height: auto; }}
   .cred {{ margin-top: {s(16)}; font-size: {s(16.5)}; line-height: 1.5; }}
@@ -100,27 +125,27 @@ def flyer(slug, w, h, scale):
   .w-t {{ color: {INK}; font-weight: 600; font-size: {s(22)}; }}
   .w-b {{ font-size: {s(19)}; line-height: 1.4; margin-top: {s(4)}; }}
   .ask {{ flex: 1; min-height: 0; display: flex; align-items: center; gap: {s(40)}; padding: {s(26)} {s(72)}; }}
-  .ask img {{ width: {s(190)}; height: {s(190)}; flex: none; }}
+  .ask img {{ width: {s(190)}; height: {s(190)}; flex: none; background: #FFFFFF; padding: {s(8)}; }}
   .ask h2 {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK}; font-size: {s(38)};
     line-height: 1.1; letter-spacing: -0.02em; }}
   .ask p {{ font-size: {s(20)}; line-height: 1.45; margin-top: {s(12)}; }}
   .ask .url {{ color: {INK}; font-weight: 600; margin-top: {s(14)}; font-size: {s(19)}; }}
-  .foot {{ flex: none; background: {INK}; padding: {s(22)} {s(72)}; }}
-  .foot .c {{ color: #C9C6BF; font-size: {s(17)}; }}
-  .foot .r {{ color: #8C8A84; font-size: {s(14)}; margin-top: {s(6)}; line-height: 1.45; }}
+  .foot {{ flex: none; background: {t["foot_bg"]}; padding: {s(22)} {s(72)}; }}
+  .foot .c {{ color: {t["foot_c"]}; font-size: {s(17)}; }}
+  .foot .r {{ color: {t["foot_r"]}; font-size: {s(14)}; margin-top: {s(6)}; line-height: 1.45; }}
 </style></head><body><div class="page">
   <div class="top">
     <div class="copy">
-      <div class="eyebrow">Medlyfe &middot; Lagos</div>
+      {eyebrow}
       <h1>Thirty minutes with a plastic surgeon.</h1>
-      <p class="lede">A consultation with <b>Dr Chinwe Kpaduwa</b>. You bring what you are thinking
-        about; she tells you what is involved, what she would and would not do, and whether you
+      <p class="lede">A consultation with <b>Dr Chinwe Kpaduwa</b>, in person at MedLYFE or by
+        video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you
         should be doing anything at all.</p>
-      <div class="fee"><div class="d">&#8358;150,000, by video</div>
+      <div class="fee"><div class="d">&#8358;150,000, in person or by video</div>
         <div class="a">Put towards the cost of your surgery if you go ahead</div></div>
     </div>
     <div class="photo">
-      <img class="portrait" src="{PORTRAIT}" alt="">
+      <img class="portrait" src="{portrait_uri(GROUND)}" alt="">
       <div class="cred"><b>Dr Chinwe Kpaduwa, MD FACS</b>
         Board certified plastic surgeon (ABPS)<br>Harvard educated, California trained</div>
     </div>
@@ -157,8 +182,10 @@ def render(html, out, w, h, png):
 
 
 if __name__ == "__main__":
-    for slug in GROUPS:
-        if slug == "print":
-            render(flyer(slug, 794, 1123, 794 / 1080), os.path.join(HERE, "consult-flyer-print.pdf"), 794, 1123, False)
-        else:
-            render(flyer(slug, 1080, 1350, 1.0), os.path.join(HERE, f"consult-flyer-{slug}.png"), 1080, 1350, True)
+    for theme, suffix in (("cfa", ""), ("medlyfe", "-medlyfe")):
+        t = THEMES[theme]
+        for slug in GROUPS:
+            if slug == "print":
+                render(flyer(slug, 794, 1123, 794 / 1080, t), os.path.join(HERE, f"consult-flyer-print{suffix}.pdf"), 794, 1123, False)
+            else:
+                render(flyer(slug, 1080, 1350, 1.0, t), os.path.join(HERE, f"consult-flyer-{slug}{suffix}.png"), 1080, 1350, True)
