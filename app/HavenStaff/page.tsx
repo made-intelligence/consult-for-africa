@@ -9,6 +9,7 @@ import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
 import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
 import { periodKey, ON_TODAY, type Cadence } from "@/lib/havenTaskPeriod";
+import { DIRECTORY, staffWhere } from "@/lib/havenAudience";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, atLeast } from "@/lib/staffAuth";
 
@@ -121,7 +122,7 @@ export default async function HavenStaffPage() {
   if (session) {
     const [dir, me, leave] = await Promise.all([
       prisma.staffMember.findMany({
-        where: { clientId: session.clientId, isActive: true },
+        where: staffWhere(session.clientId, DIRECTORY),
         select: { name: true, position: true, department: true, phone: true },
         orderBy: { name: "asc" },
       }),

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TopBar from "@/components/platform/TopBar";
 import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
+import { COUNTED, staffWhere } from "@/lib/havenAudience";
 
 // The chase list.
 //
@@ -45,7 +46,7 @@ export default async function HavenAdoptionPage() {
   if (!client) return <div style={{ padding: 40 }}>No Haven client record.</div>;
 
   const staff = await prisma.staffMember.findMany({
-    where: { clientId: client.id, isActive: true, NOT: { department: "BOARD" } },
+    where: staffWhere(client.id, COUNTED),
     select: { id: true, name: true, position: true, department: true, lastLoginAt: true, email: true },
     orderBy: [{ lastLoginAt: "asc" }, { name: "asc" }],
   });

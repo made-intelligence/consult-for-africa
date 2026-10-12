@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { periodKey } from "@/lib/havenTaskPeriod";
+import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 
 /**
  * Raise flags on tasks that were not recorded in time.
@@ -58,12 +59,7 @@ export async function GET(req: NextRequest) {
       // The consequence is deliberate: until somebody is onboarded, the only
       // thing that reaches them is the invitation. Flags begin the day they
       // first sign in.
-      where: {
-        clientId: client.id,
-        isActive: true,
-        NOT: { department: "BOARD" },
-        lastLoginAt: { not: null },
-      },
+      where: { ...staffWhere(client.id, ONBOARDED), lastLoginAt: { not: null } },
       select: { id: true, position: true, department: true },
     }),
   ]);
