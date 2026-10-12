@@ -635,11 +635,12 @@ export const LYFE_CONSULT = {
   blurb:
     "Half an hour with Dr Kpaduwa herself, by video, from wherever you are. You bring what you are thinking about; she tells you what is actually involved, what she would and would not do, and whether you should be doing anything at all. If the answer is that you should leave it alone, that is the answer you will get. Costings come afterwards, in writing, from the team.",
   /**
-   * Dr Kpaduwa's own wording. Note the narrowing: it goes towards surgery, not
-   * towards any treatment. A non-surgical course does not carry the credit,
-   * and saying "treatment" would quietly promise that it does.
+   * Debo, 12 October 2026: procedure, not surgery. It was narrowed to surgery
+   * on the view that a non-surgical course should not carry the credit. The
+   * wider word is the commercial decision: anyone who books and goes on to
+   * have something done can now set the fee against it.
    */
-  feeNote: "Put towards the total cost of your surgery if you go ahead.",
+  feeNote: "Put towards the total cost of your procedure if you go ahead.",
   note: "Her diary is two hours a week, so the dates below are the ones that are genuinely open.",
 } as const;
 
@@ -702,7 +703,7 @@ export const LYFE_CONSULT_OPTIONS: LyfeConsultOption[] = [
     who: "Board certified by the American Board of Plastic Surgery, FACS",
     body: "Half an hour with her, by video. You bring what you are thinking about; she tells you what is involved, what she would and would not do, and whether you should be doing anything at all.",
     fee: "₦150,000",
-    meta: "Put towards the total cost of your surgery if you go ahead.",
+    meta: "Put towards the total cost of your procedure if you go ahead.",
   },
 ];
 
@@ -856,7 +857,7 @@ export const LYFE_PRICING = [
 ] as const;
 
 export const LYFE_SURGICAL_FEE_NOTE =
-  "The surgical planning review is charged separately and is credited in full against surgery if you go ahead.";
+  "The surgical planning review is charged separately and is credited in full against your procedure if you go ahead.";
 
 /**
  * The reasons people in this market do not book, in the order they come up.
@@ -1137,7 +1138,7 @@ export const LYFE_CONSULT_FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What does the consultation cost, and is it wasted if I do not proceed?",
-    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. If you go on to have surgery, it is put towards the total. If you do not, you have bought half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
+    a: `${LYFE_CONSULT.feeDisplay} for ${LYFE_CONSULT.minutes} minutes with Dr Kpaduwa herself, by video. If you go on to have a procedure, it is put towards the total. If you do not, you have bought half an hour of a board certified plastic surgeon's judgement, including the version where she tells you not to have an operation.`,
   },
   {
     q: "Is she really board certified?",
