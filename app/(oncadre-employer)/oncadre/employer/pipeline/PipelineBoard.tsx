@@ -299,7 +299,7 @@ function EntryRow({
             </p>
           )}
 
-          {entry.matchExplanation && entry.source === "SOURCED" && (
+          {entry.matchExplanation && (
             <p className="mt-2 text-xs text-gray-400">Why: {entry.matchExplanation}</p>
           )}
         </div>

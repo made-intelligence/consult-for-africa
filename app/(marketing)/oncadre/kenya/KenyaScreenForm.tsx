@@ -24,12 +24,14 @@ function Choice({ name, label, options, value, onChange }: { name: string; label
   );
 }
 
-export default function KenyaScreenForm({ defaultRole }: { defaultRole?: string }) {
+export default function KenyaScreenForm({ defaultRole, questionsByRole }: { defaultRole?: string; questionsByRole: Record<string, string[]> }) {
   const [a, setA] = useState<Answers>({ role: KENYA_ROLES.some((r) => r.value === defaultRole) ? defaultRole! : "" });
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [result, setResult] = useState<{ qualified: boolean; isNew: boolean } | null>(null);
   const [error, setError] = useState("");
+  const [answers, setAnswers] = useState<string[]>([]);
   const set = (k: string) => (v: string) => setA((p) => ({ ...p, [k]: v }));
+  const questions = questionsByRole[a.role] ?? [];
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +41,7 @@ export default function KenyaScreenForm({ defaultRole }: { defaultRole?: string 
       const res = await fetch("/api/cadre/kenya-screen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...a, caesarean: a.role === "obgyn" ? a.caesarean === "yes" : undefined }),
+        body: JSON.stringify({ ...a, caesarean: a.role === "obgyn" ? a.caesarean === "yes" : undefined, answers: questions.map((_, i) => answers[i] ?? "") }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
@@ -56,7 +58,7 @@ export default function KenyaScreenForm({ defaultRole }: { defaultRole?: string 
       <div className="text-center py-4">
         <p className="text-lg font-semibold text-gray-900">Thank you</p>
         {result.qualified ? (
-          <p className="mt-2 text-sm text-gray-600">You meet what Zuri Health have asked for. We will be in touch within a week to talk it through, and we will ask for your CV and certificates then.</p>
+          <p className="mt-2 text-sm text-gray-600">Your answers meet the requirements for this role and are now with the team assessing applications. If you are shortlisted we will be in touch within a week and ask for your CV and certificates then.</p>
         ) : (
           <p className="mt-2 text-sm text-gray-600">Your answers fall outside what Zuri Health have asked for on this search, so we will not put you forward this time. We have kept your details and will come back to you when a role fits.</p>
         )}
@@ -78,6 +80,19 @@ export default function KenyaScreenForm({ defaultRole }: { defaultRole?: string 
       {a.role === "obgyn" && (
         <Choice name="caesarean" label={CAESAREAN_QUESTION} options={[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]} value={a.caesarean} onChange={set("caesarean")} />
       )}
+      {questions.map((q, i) => (
+        <label key={q} className="block">
+          <span className="text-sm font-semibold text-gray-900">{q}</span>
+          <textarea
+            required
+            rows={3}
+            className={`${input} mt-2`}
+            style={inputStyle}
+            value={answers[i] ?? ""}
+            onChange={(e) => setAnswers((p) => { const n = [...p]; n[i] = e.target.value; return n; })}
+          />
+        </label>
+      ))}
       <div className="space-y-3">
         <p className="text-sm font-semibold text-gray-900">Your details</p>
         <input required className={input} style={inputStyle} placeholder="Full name" value={a.name ?? ""} onChange={(e) => set("name")(e.target.value)} />

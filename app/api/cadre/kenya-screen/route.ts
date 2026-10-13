@@ -1,9 +1,11 @@
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { contactLimiter } from "@/lib/rate-limit-redis";
 import { notifyInternal } from "@/lib/email";
+import { scoreApplication } from "@/lib/cadreHealth/fitScreen";
+import { candidateQuestions, readFitProfile } from "@/lib/cadreHealth/fitProfile";
 import { KENYA_FACILITY_SLUG, KENYA_QUESTIONS, KENYA_ROLES, answerLines, screenReasons } from "@/lib/cadreHealth/kenyaScreen";
 
 const oneOf = (values: readonly string[]) => z.string().refine((v) => values.includes(v));
@@ -21,6 +23,7 @@ const schema = z.object({
   notice: oneOf(values("notice")),
   caesarean: z.boolean().optional(),
   currentPost: z.string().trim().min(2).max(160),
+  answers: z.array(z.string().trim().max(2000)).max(5).default([]),
 });
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -38,7 +41,7 @@ export const POST = handler(async function POST(req: NextRequest) {
   const role = KENYA_ROLES.find((r) => r.value === a.role)!;
   const mandate = await prisma.cadreMandate.findFirst({
     where: { facility: { slug: KENYA_FACILITY_SLUG }, subSpecialty: role.subSpecialty, status: "OPEN", isPublished: true },
-    select: { id: true, title: true },
+    select: { id: true, title: true, fitProfile: true },
   });
   if (!mandate) return Response.json({ error: "This role is no longer open." }, { status: 404 });
 
@@ -65,30 +68,40 @@ export const POST = handler(async function POST(req: NextRequest) {
   const qualified = reasons.length === 0;
   const notes = [
     `Kenya screening, ${new Date().toISOString().slice(0, 10)}. ${qualified ? "Meets the bar." : `Screened out: ${reasons.join("; ")}.`}`,
-    `Name given: ${a.name}. Phone: ${a.phone}.`,
     ...answerLines(a),
+    // The client's own questions, asked in the order they wrote them.
+    ...candidateQuestions(readFitProfile(mandate.fitProfile)).flatMap((q, i) => [`\nQ: ${q}`, `A: ${a.answers[i] || "(no answer)"}`]),
   ].join("\n");
 
   const key = { mandateId_professionalId: { mandateId: mandate.id, professionalId: professional.id } };
   const existing = await prisma.cadreMandateMatch.findUnique({ where: key });
+  let matchId: string;
   if (existing) {
     // A second submission replaces the first; people correct themselves.
-    await prisma.cadreMandateMatch.update({ where: key, data: { notes, status: qualified ? "NEW" : "REJECTED" } });
+    await prisma.cadreMandateMatch.update({ where: key, data: { notes, status: qualified ? "NEW" : "REJECTED", matchScore: null, matchExplanation: null } });
+    matchId = existing.id;
   } else {
-    await prisma.cadreMandateMatch.create({
+    const row = await prisma.cadreMandateMatch.create({
       data: { mandateId: mandate.id, professionalId: professional.id, source: "APPLIED", status: qualified ? "NEW" : "REJECTED", notes },
     });
+    matchId = row.id;
     await prisma.cadreMandate.update({ where: { id: mandate.id }, data: { applicationCount: { increment: 1 } } });
   }
 
   if (qualified) {
-    const to = process.env.CADRE_ALERT_EMAIL ?? "hello@consultforafrica.com";
-    await notifyInternal(
-      to,
-      `Zuri screening: ${a.name}, ${role.label}`,
-      `<p style="margin:0 0 12px;"><strong>${esc(a.name)}</strong> (${esc(a.email)}) passed the Kenya screening for ${esc(mandate.title)}.</p>
-       <p style="margin:0;white-space:pre-line;">${esc(notes)}</p>`,
-    ).catch((err) => console.error("[kenya-screen] alert failed", err));
+    // Scored after the response, so the applicant is not kept waiting on it.
+    after(async () => {
+      const outcome = await scoreApplication(matchId);
+      if (outcome !== "SHORTLISTED") return;
+      const fresh = await prisma.cadreMandateMatch.findUnique({ where: { id: matchId }, select: { matchScore: true, matchExplanation: true } });
+      await notifyInternal(
+        process.env.CADRE_ALERT_EMAIL ?? "hello@consultforafrica.com",
+        `Zuri shortlist: ${a.name}, ${role.label} (${fresh?.matchScore ?? "?"})`,
+        `<p style="margin:0 0 12px;"><strong>${esc(a.name)}</strong> (${esc(a.email)}, ${esc(a.phone)}) has been shortlisted for ${esc(mandate.title)}.</p>
+         <p style="margin:0 0 12px;white-space:pre-line;">${esc(fresh?.matchExplanation ?? "")}</p>
+         <p style="margin:0;white-space:pre-line;color:#6b7280;">${esc(notes)}</p>`,
+      ).catch((err) => console.error("[kenya-screen] alert failed", err));
+    });
   }
 
   return Response.json({ ok: true, qualified, isNew: !professional.passwordHash });
