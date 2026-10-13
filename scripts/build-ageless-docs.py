@@ -50,6 +50,8 @@ PACK = {
         "MedLYFE  ·  The MedLYFE Experience", f"Medbury Healthcare Group  ·  {TODAY}"),
     "kakulus-brief-lyfeplace": (
         "LyfePlace  ·  The LyfePlace film", f"Medbury Healthcare Group  ·  {TODAY}"),
+    "films-one-pager-itunu-cfa": (
+        "Medbury  ·  Your three films", f"Consult for Africa  ·  {TODAY}"),
     "shoot-replan-session-cfa": (
         "Medlyfe  ·  The content shoot", f"Consult for Africa  ·  {TODAY}"),
 }
