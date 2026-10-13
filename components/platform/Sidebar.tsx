@@ -38,6 +38,7 @@ import {
   X,
   FileText,
   BarChart3,
+  Ticket,
   Stethoscope,
   Banknote,
   MessageSquare,
@@ -222,6 +223,8 @@ const NAV_SECTIONS: NavSection[] = [
     title: "Marketing",
     items: [
       { label: "Campaigns",      href: "/campaigns",      icon: Megaphone },
+      { label: "AGELESS",        href: "/admin/lyfe-enquiries", icon: Ticket, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
+      { label: "Invitations",    href: "/admin/lyfe-enquiries/invitations", icon: FileText, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
     ],
     roles: EM_PLUS_AND_OFFICE,
   },

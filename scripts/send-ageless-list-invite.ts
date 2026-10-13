@@ -45,12 +45,45 @@ const CC = args.find((a) => a.startsWith("--cc="))?.split("=")[1] || null;
 const CSV = "docs/ageless/lists/invite-list.csv";
 const LEDGER = "docs/ageless/lists/sent.csv";
 const LINK = lyfeInviteLink("list");
+/** Whose list this run is from, for the invitations page. */
+const SOURCE = args.find((a) => a.startsWith("--source="))?.split("=")[1] || "main";
 
 /** "Dr. Orode Doherty" greets as Orode. Titles are not first names. */
 function firstNameOf(full: string): string {
+  if (!full.trim()) return "colleagues";
   const drop = /^(dr|prof|professor|mrs|mr|ms|miss|chief|barr|hajia|dame|engr|alhaji|sir|princess|olorogun|erelu)\.?$/i;
   const parts = full.trim().split(/\s+/).filter((w) => !drop.test(w));
   return (parts[0] || full).replace(/[“”"']/g, "");
+}
+
+/**
+ * Split one CSV line, keeping empty fields.
+ *
+ * The regex this replaces skipped empty tokens, so a row whose first column was
+ * blank had every later column shifted left by one and was then thrown away for
+ * having an invalid email. That silently dropped 22 people.
+ */
+function splitCsv(line: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (quoted) {
+      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+      else if (ch === '"') quoted = false;
+      else cur += ch;
+    } else if (ch === '"') {
+      quoted = true;
+    } else if (ch === ",") {
+      out.push(cur.trim());
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur.trim());
+  return out;
 }
 
 function rows(): { name: string; email: string; onBehalfOf: string }[] {
@@ -62,11 +95,16 @@ function rows(): { name: string; email: string; onBehalfOf: string }[] {
   const iFor = cols.indexOf("onbehalfof");
   const out: { name: string; email: string; onBehalfOf: string }[] = [];
   for (const line of lines) {
-    const cells = line.match(/("[^"]*"|[^,]+)/g)?.map((c) => c.replace(/^"|"$/g, "").trim()) ?? [];
+    const cells = splitCsv(line);
     const name = cells[iName] ?? "";
     const email = (cells[iMail] ?? "").toLowerCase();
     const onBehalfOf = iFor >= 0 ? (cells[iFor] ?? "") : "";
-    if (name && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) out.push({ name, email, onBehalfOf });
+    // A row may carry no contact name when the address is a company inbox and
+    // we only know who we are trying to reach through it. Those are still
+    // sendable; they are simply greeted as the office rather than as a person.
+    if ((name || onBehalfOf) && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      out.push({ name, email, onBehalfOf });
+    }
   }
   return out;
 }
@@ -147,6 +185,13 @@ async function main() {
       ok++;
       if (!existsSync(LEDGER)) appendFileSync(LEDGER, "email,name,sentAt\n");
       appendFileSync(LEDGER, `${r.email},"${r.name.replace(/"/g, "")}",${new Date().toISOString()}\n`);
+      // The platform's copy, so /admin/lyfe-enquiries/invitations shows it.
+      // The CSV stays the guard against a double send; this is only the view.
+      await prisma.lyfeInvitation.upsert({
+        where: { email: r.email },
+        create: { email: r.email, name: r.name || r.onBehalfOf, onBehalfOf: r.onBehalfOf || null, source: SOURCE, sentAt: new Date() },
+        update: { sentAt: new Date() },
+      }).catch((e) => console.error(`  (not recorded on the platform: ${e instanceof Error ? e.message : e})`));
       console.log(`  SENT    ${r.name.padEnd(30)} ${r.email}`);
     } catch (err) {
       console.error(`  FAILED  ${r.name.padEnd(30)} ${r.email}  ${err instanceof Error ? err.message : err}`);

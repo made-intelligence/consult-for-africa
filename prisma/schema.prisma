@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -7684,8 +7683,8 @@ model LyfeEnquiry {
   isClinician Boolean?
 
   /// Facility visits only. Who they are and where to go.
-  facilityName String?
-  facilityArea String?
+  facilityName  String?
+  facilityArea  String?
   clinicianRole String?
 
   pathway    LyfePathway   @default(UNSURE)
@@ -7767,6 +7766,25 @@ model LyfeEnquiry {
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+/// Who the AGELESS invitation was emailed to. The list itself is gathered by
+/// hand from several people's contacts and kept off git; this table is the
+/// copy the platform can show, so the queue can say who was written to, who
+/// bounced and who came back. One row per address.
+model LyfeInvitation {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String
+  /// Set when the address is an office inbox written to for a named person.
+  onBehalfOf String?
+  /// Whose list the name came from: main, office, sally, and so on.
+  source     String
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([sentAt])
 }
 
 // ─── Hospital sales: one directory, every product ───────────────────────────
@@ -8071,31 +8089,31 @@ model StaffMember {
   /// That never reaches a shared surface, so it is not a permission.
   tiers StaffTier[] @default([ALL_STAFF])
 
-  isActive    Boolean   @default(true)
-  lastLoginAt DateTime?
+  isActive           Boolean   @default(true)
+  lastLoginAt        DateTime?
   /// May approve clinical content before it reaches a nurse. A person, never a
   /// tier: Dr Shakirah is a founder and therefore BOARD, which is deliberately
   /// the weakest tier on anything clinical. Her authority here is that she is a
   /// doctor supporting the Chief Medical Director, not that she is an owner.
-  canApproveClinical Boolean @default(false)
+  canApproveClinical Boolean   @default(false)
   /// Annual entitlement in working days. Nigeria's statutory floor is six;
   /// most hospitals here run well above it, so this is set per person.
-  annualLeaveDays Int     @default(20)
+  annualLeaveDays    Int       @default(20)
 
-  loginTokens StaffLoginToken[]
-  leave          StaffLeaveRequest[] @relation("StaffLeave")
-  leaveDecisions StaffLeaveRequest[] @relation("StaffLeaveDecisions")
-  notes          StaffNote[]         @relation("StaffNotes")
-  protocolProgress ProtocolProgress[] @relation("ProtocolProgress")
-  observations     ProtocolProgress[] @relation("ProtocolObservations")
-  protocolApprovals Protocol[]          @relation("ProtocolApprovals")
-  taskCompletions  StaffTaskCompletion[] @relation("TaskCompletions")
-  taskFlags        StaffTaskFlag[]       @relation("TaskFlags")
-  flagResolutions  StaffTaskFlag[]       @relation("FlagResolutions")
-  scoreboardEntries ScoreboardEntry[] @relation("ScoreboardEntries")
-  scoreboardAgreed  ScoreboardEntry[] @relation("ScoreboardAgreements")
-  presenting        TrainingSession[]    @relation("TrainingPresenter")
-  trainingAttended  TrainingAttendance[] @relation("TrainingAttendance")
+  loginTokens       StaffLoginToken[]
+  leave             StaffLeaveRequest[]   @relation("StaffLeave")
+  leaveDecisions    StaffLeaveRequest[]   @relation("StaffLeaveDecisions")
+  notes             StaffNote[]           @relation("StaffNotes")
+  protocolProgress  ProtocolProgress[]    @relation("ProtocolProgress")
+  observations      ProtocolProgress[]    @relation("ProtocolObservations")
+  protocolApprovals Protocol[]            @relation("ProtocolApprovals")
+  taskCompletions   StaffTaskCompletion[] @relation("TaskCompletions")
+  taskFlags         StaffTaskFlag[]       @relation("TaskFlags")
+  flagResolutions   StaffTaskFlag[]       @relation("FlagResolutions")
+  scoreboardEntries ScoreboardEntry[]     @relation("ScoreboardEntries")
+  scoreboardAgreed  ScoreboardEntry[]     @relation("ScoreboardAgreements")
+  presenting        TrainingSession[]     @relation("TrainingPresenter")
+  trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8225,7 +8243,7 @@ model StaffNote {
   authorId String
   author   StaffMember @relation("StaffNotes", fields: [authorId], references: [id], onDelete: Cascade)
 
-  scope StaffNoteScope @default(DEPARTMENT)
+  scope      StaffNoteScope @default(DEPARTMENT)
   /// Set when scope is DEPARTMENT. Null for a note to the whole hospital.
   department String?
 
@@ -8272,7 +8290,7 @@ model Protocol {
   domain  String
   title   String
   /// One line, safe to show in a list.
-  summary String @db.Text
+  summary String  @db.Text
   /// The documented procedure itself. Empty until the hospital supplies it.
   body    String? @db.Text
   /// Bumped when the content changes, which re-opens the loop for everybody.
@@ -8314,13 +8332,13 @@ model ProtocolQuestion {
   protocolId String
   protocol   Protocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
 
-  question String   @db.Text
-  options  String[]
+  question  String   @db.Text
+  options   String[]
   /// Index into options.
-  correct  Int
+  correct   Int
   /// Shown after answering, right or wrong. The teaching happens here.
-  because  String?  @db.Text
-  sortOrder Int     @default(0)
+  because   String?  @db.Text
+  sortOrder Int      @default(0)
 
   @@index([protocolId])
 }
@@ -8355,7 +8373,7 @@ model ProtocolProgress {
 
   /// The version this progress was against. If the protocol is reissued this
   /// goes stale and the loop re-opens rather than silently counting.
-  againstVersion Int      @default(1)
+  againstVersion Int       @default(1)
   nextDueAt      DateTime?
 
   createdAt DateTime @default(now())
@@ -8444,7 +8462,7 @@ model TrainingSession {
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   topic       String
-  description String? @db.Text
+  description String?   @db.Text
   /// Where this sits in the library, when the topic is a protocol.
   protocolId  String?
   protocol    Protocol? @relation(fields: [protocolId], references: [id], onDelete: SetNull)
@@ -8460,7 +8478,7 @@ model TrainingSession {
 
   status TrainingStatus @default(SCHEDULED)
   /// What was covered, written after. Becomes the record for anybody absent.
-  notes  String? @db.Text
+  notes  String?        @db.Text
 
   /// Set when the invitation went out, so a reminder job cannot double-send.
   invitedAt  DateTime?
@@ -8510,22 +8528,22 @@ model StaffTask {
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  code  String
-  title String
+  code        String
+  title       String
   /// Matched loosely against position and department. Nineteen people do not
   /// need a role taxonomy.
   roles       String[]
   departments String[]
 
-  cadence StaffTaskCadence
+  cadence  StaffTaskCadence
   /// What is actually captured, so a completion means something.
-  evidence String @db.Text
-  why      String @db.Text
+  evidence String           @db.Text
+  why      String           @db.Text
 
   /// Hours after the day starts before an undone task is chased. A crash
   /// trolley check and a weekly stock count do not deserve the same patience.
-  graceHours Int       @default(24)
-  flagLevel  FlagLevel @default(NUDGE)
+  graceHours  Int       @default(24)
+  flagLevel   FlagLevel @default(NUDGE)
   /// Position or tier the flag escalates to, in words rather than an id,
   /// because the postholder changes and the escalation does not.
   escalatesTo String?
