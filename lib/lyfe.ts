@@ -544,9 +544,8 @@ export const LYFE_SURGEON = {
   shortName: "Dr Chinwe Kpaduwa",
   /** How she is introduced in one line. Dr Akinware's flyer, 12 October. */
   strap: "Plastic surgeon and aesthetics specialist",
-  // Cropped so she sits in the middle of the frame. The original has her right
-  // of centre; the crop also stops above the KD mark on her scrubs, which would
-  // otherwise be cut in half at the left edge.
+  // The studio portrait she asked us to use everywhere (13 October), cropped
+  // so she sits in the middle of the frame; the original has her left of centre.
   portrait: "/lyfe/chinwe-portrait-centred.jpg",
   portraitWidth: 532,
   portraitHeight: 810,

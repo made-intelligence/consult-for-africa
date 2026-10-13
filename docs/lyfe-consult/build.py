@@ -74,7 +74,7 @@ def qr_uri(url):
 
 
 MARK = data_uri(os.path.join(ROOT, "public/lyfe-icon.svg"), "image/svg+xml")
-PORTRAIT_PATH = os.path.join(ROOT, "docs/lyfe-rounds/chinwe-smiling.png")
+PORTRAIT_PATH = os.path.join(ROOT, "docs/lyfe-rounds/chinwe-tile.png")
 
 
 def portrait_uri(ground):

@@ -55,7 +55,7 @@ def qr_uri(url):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-PORTRAIT = data_uri(os.path.join(HERE, "chinwe-smiling.png"), "image/png")
+PORTRAIT = data_uri(os.path.join(HERE, "chinwe-tile.png"), "image/png")
 QR = qr_uri(URL)
 
 POINTS = [
