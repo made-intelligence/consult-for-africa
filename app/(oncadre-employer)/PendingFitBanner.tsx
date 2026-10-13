@@ -18,13 +18,14 @@ export default function PendingFitBanner({ pending }: { pending: PendingFit }) {
           {count === 1 ? "Your role is" : `Your ${count} roles are`} live and doctors are applying
         </h2>
         <p className="mt-2 text-sm text-white/80">
-          {applied} {applied === 1 ? "doctor has" : "doctors have"} applied and {shortlisted} {shortlisted === 1 ? "is" : "are"} already shortlisted. Tell us what fit looks like and accept our terms, and your candidates appear here.
+          {applied} {applied === 1 ? "doctor has" : "doctors have"} applied and {shortlisted} {shortlisted === 1 ? "is" : "are"} already shortlisted. Tell us what fit looks like and accept our terms, and you will see who they are.
         </p>
       </div>
 
       <ul className="divide-y" style={{ borderColor: "#F0F1F4" }}>
         {pending.roles.map((r) => (
-          <li key={r.id} className="flex items-center justify-between gap-4 px-6 py-4 sm:px-8">
+          <li key={r.id} className="px-6 py-4 sm:px-8">
+            <div className="flex items-center justify-between gap-4">
             <p className="min-w-0 text-sm font-medium text-gray-900">{r.title}</p>
             <div className="flex shrink-0 gap-4 text-right">
               <div>
@@ -36,6 +37,28 @@ export default function PendingFitBanner({ pending }: { pending: PendingFit }) {
                 <p className="text-[11px] text-gray-400">shortlisted</p>
               </div>
             </div>
+            </div>
+            {r.candidates.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {r.candidates.map((c, i) => (
+                  <li key={i} className="flex items-start gap-3 rounded-xl px-3 py-2.5" style={{ background: "#F8F9FB" }}>
+                    <span
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                      style={{ background: c.shortlisted ? "#059669" : "#0B3C5D", }}
+                    >
+                      {c.initials}
+                    </span>
+                    <div className="min-w-0 flex-1 text-xs text-gray-600">
+                      <p className="font-semibold text-gray-900">
+                        {c.shortlisted ? "Shortlisted" : "Under review"}
+                        {c.score != null && <span className="ml-2 font-normal text-gray-500">score {c.score}</span>}
+                      </p>
+                      <p className="mt-0.5">{[c.years && `${c.years} as a specialist`, c.qualification, c.relocate && `Relocation: ${c.relocate.toLowerCase()}`].filter(Boolean).join(" · ")}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
