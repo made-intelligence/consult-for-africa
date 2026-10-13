@@ -1,150 +1,110 @@
 #!/usr/bin/env python3
-"""One card per speaker, for them to post themselves.
+"""One card per speaker, cut from the invitation itself.
 
-    npx tsx scripts/dump-ageless-speakers.ts > /tmp/speakers.json
-    python3 docs/ageless/speakers/build.py /tmp/speakers.json
+    python3 docs/ageless/speakers/build.py
 
 A speaker given a card with their own face on it posts it. A speaker given
-the event poster does not, because it is somebody else's. That is the whole
-reason these exist.
+the event poster does not, because it is somebody else's. With the room still
+mostly empty, six people with their own audiences is the cheapest reach there
+is.
 
-The design is the consultation flyer's, unchanged: MedLYFE livery, the mark
-and wordmark at the top, copy left and portrait right, a band for the one
-thing that matters, a dark footer. Only the content differs, so the set reads
-as one campaign rather than six.
+The design is not reinterpreted. The invitation is the artwork, so each card
+keeps its border, its logos, its wordmark, its standfirst and its footer, and
+only the six-tile grid is replaced by that speaker's own tile, enlarged. The
+set cannot drift from the invitation, and nothing is redrawn in a font we do
+not have.
 
-Each card carries the one subject that person is there for, so six cards
-cover the evening between them rather than six copies of the same claim.
-Written in the third person, because they are sharing it, not saying it.
-
-Writes speaker-<slug>.png at 1080x1350 for the feed, and -story at 1080x1920.
-
-No clinical claim and no procedure is named. These go out on personal
-accounts, where ARCON still applies and the practitioner carries the MDCN
-exposure rather than the centre.
+Writes speaker-<slug>.png at 1080x1350.
 """
-import base64
-import io
-import json
 import os
-import subprocess
-import sys
-import urllib.parse
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+SOURCE = os.path.join(HERE, "invitation-source.png")
 
-# The same palette as THEMES["medlyfe"] in docs/lyfe-consult/build.py.
-INK, BODY = "#FFFFFF", "#D8E3D6"
-GROUND, WARM = "#1F3A2E", "#15291F"
-ACCENT = "#C4D7A6"
-FOOT_BG, FOOT_C, FOOT_R = "#0F1E17", "#D8E3D6", "#7E9A88"
+GREEN = (122, 143, 90)
 
+# Where the six tiles sit on the invitation, found by looking rather than
+# guessed: three columns of 220, two rows of about 257.
+COLS = [(193, 413), (424, 644), (656, 876)]
+ROWS = [(552, 810), (849, 1105)]
 
-def data_uri(path, mime):
-    with open(path, "rb") as fh:
-        return f"data:{mime};base64," + base64.b64encode(fh.read()).decode()
+# Reading order on the invitation, left to right and top to bottom.
+GRID = [["awosika", "giwa", "adenuga"], ["kpaduwa", "ajelabi", "odulana"]]
 
+# The one line each of them is there for, from the running order, so a card
+# and the stage cannot disagree.
+SUBJECT = {
+    "awosika": "Speaking to stress management, self care and longevity",
+    "giwa": "Speaking to lifestyle and behaviour change for longevity",
+    "adenuga": "Speaking to weight, metabolism and longevity",
+    "kpaduwa": "Speaking to maintaining beauty, aesthetics and skin as we age",
+    "ajelabi": "Opening the evening: can we live to 100 and still live well?",
+    "odulana": "Chairing the panel",
+}
 
-def portrait_uri(rel):
-    img = Image.open(os.path.join(ROOT, "public", rel.lstrip("/"))).convert("RGB")
-    buf = io.BytesIO()
-    img.save(buf, format="JPEG", quality=92)
-    return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
-
-
-MARK = data_uri(os.path.join(ROOT, "public/lyfe-icon.svg"), "image/svg+xml")
-
-
-def card(p, ev, w, h, scale):
-    s = lambda px: f"{px * scale:.2f}px"
-    return f"""<!doctype html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;600&display=block" rel="stylesheet">
-<style>
-  @page {{ size: {w}px {h}px; margin: 0; }}
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  html, body {{ width: {w}px; height: {h}px; background: {GROUND}; color: {BODY};
-    font-family: Inter, system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
-  .page {{ width: {w}px; height: {h}px; display: flex; flex-direction: column; overflow: hidden; }}
-
-  .top {{ flex: 1; min-height: 0; display: flex; gap: {s(44)};
-    padding: {s(60)} {s(72)} {s(34)}; align-items: stretch; }}
-  .copy {{ flex: 1; min-width: 0; }}
-  .brand {{ display: flex; align-items: center; gap: {s(14)}; }}
-  .brand img {{ width: {s(46)}; height: {s(46)}; }}
-  .brand span {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK};
-    font-size: {s(30)}; letter-spacing: 0.01em; }}
-  .eyebrow {{ font-size: {s(17)}; font-weight: 600; letter-spacing: 0.2em;
-    text-transform: uppercase; color: {ACCENT}; margin-top: {s(30)}; }}
-  h1 {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK}; font-size: {s(58)};
-    line-height: 1.04; letter-spacing: -0.025em; margin-top: {s(20)}; }}
-  .lede {{ font-size: {s(23)}; line-height: 1.45; margin-top: {s(18)}; }}
-
-  .photo {{ width: {s(400)}; flex: none; padding-top: {s(40)}; padding-bottom: {s(10)}; }}
-  .portrait {{ display: block; width: 100%; height: 100%; object-fit: cover;
-    object-position: center 18%; border-radius: {s(14)}; }}
-
-  .subj {{ background: {WARM}; padding: {s(30)} {s(72)}; }}
-  .subj h2 {{ font-size: {s(16)}; font-weight: 600; letter-spacing: 0.18em;
-    text-transform: uppercase; color: {ACCENT}; }}
-  .subj .t {{ border-top: {s(2)} solid {ACCENT}; margin-top: {s(16)}; padding-top: {s(14)};
-    color: {INK}; font-size: {s(27)}; line-height: 1.35; }}
-
-  .when {{ flex: none; padding: {s(34)} {s(72)} {s(30)}; }}
-  .when h2 {{ font-family: Fraunces, Georgia, serif; font-weight: 600; color: {INK};
-    font-size: {s(38)}; line-height: 1.1; letter-spacing: -0.02em; }}
-  .when p {{ font-size: {s(21)}; line-height: 1.45; margin-top: {s(12)}; }}
-  .when .url {{ color: {ACCENT}; font-weight: 600; margin-top: {s(14)}; font-size: {s(20)}; }}
-
-  .foot {{ flex: none; background: {FOOT_BG}; padding: {s(22)} {s(72)}; }}
-  .foot .c {{ color: {FOOT_C}; font-size: {s(17)}; }}
-  .foot .r {{ color: {FOOT_R}; font-size: {s(14)}; margin-top: {s(6)}; line-height: 1.45; }}
-</style></head><body><div class="page">
-  <div class="top">
-    <div class="copy">
-      <div class="brand"><img src="{MARK}" alt=""><span>MedLYFE</span></div>
-      <div class="eyebrow">{p['role']} &middot; {ev['theme'].upper()}</div>
-      <h1>{p['name']}</h1>
-      <p class="lede">{p['org']}</p>
-    </div>
-    <div class="photo">
-      <img class="portrait" src="{portrait_uri(p['portrait'])}" alt="">
-    </div>
-  </div>
-  <div class="subj"><h2>Speaking to</h2><div class="t">{p['subject']}</div></div>
-  <div class="when">
-    <h2>{ev['theme'].upper()}: {ev['proposition']}</h2>
-    <p>{ev['date']} &middot; {ev['venue']} &middot; by invitation</p>
-    <div class="url">{ev['shown']}</div>
-  </div>
-  <div class="foot">
-    <div class="c">{ev['host']}</div>
-    <div class="r">An evening of conversation. Nothing here is clinical advice or a promise of a result.</div>
-  </div>
-</div></body></html>"""
+# The clear area between the standfirst and the footer. Outside it the border,
+# the logos and the type are left exactly as drawn.
+BOX = (178, 512, 900, 1122)
 
 
-def render(html, out, w, h):
-    html_path = out + ".html"
-    with open(html_path, "w", encoding="utf-8") as fh:
-        fh.write(html)
-    url = "file://" + urllib.parse.quote(html_path)
-    subprocess.run(
-        [CHROME, "--headless", "--disable-gpu", "--hide-scrollbars",
-         "--virtual-time-budget=8000", f"--window-size={w},{h}",
-         "--force-device-scale-factor=1", f"--screenshot={out}", url],
-        check=True, capture_output=True,
-    )
-    os.remove(html_path)
-    print("  wrote", os.path.relpath(out, ROOT))
+def font(size):
+    for n in ("Montserrat-Regular.ttf", "Arial.ttf", "Helvetica.ttc"):
+        for base in ("/System/Library/Fonts/Supplemental/", "/System/Library/Fonts/", "/Library/Fonts/"):
+            p = os.path.join(base, n)
+            if os.path.exists(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except OSError:
+                    pass
+    return ImageFont.load_default()
+
+
+def tiles(src):
+    out = {}
+    for r, (y0, y1) in enumerate(ROWS):
+        for c, (x0, x1) in enumerate(COLS):
+            out[GRID[r][c]] = src.crop((x0, y0, x1, y1))
+    return out
+
+
+def card(src, tile, subject):
+    im = src.copy()
+    d = ImageDraw.Draw(im)
+    d.rectangle(BOX, fill=(255, 255, 255))
+
+    scale = 1.92
+    big = tile.resize((int(tile.width * scale), int(tile.height * scale)), Image.LANCZOS)
+    bx = (im.width - big.width) // 2
+    by = BOX[1] + 12
+    im.paste(big, (bx, by))
+
+    f = font(23)
+    words, line, lines = subject.split(), "", []
+    while words:
+        trial = (line + " " + words[0]).strip()
+        if d.textlength(trial, font=f) <= 700:
+            line = trial
+            words.pop(0)
+        else:
+            lines.append(line)
+            line = ""
+    if line:
+        lines.append(line)
+
+    y = by + big.height + 22
+    for ln in lines:
+        w = d.textlength(ln, font=f)
+        d.text(((im.width - w) / 2, y), ln, font=f, fill=GREEN)
+        y += 30
+    return im
 
 
 if __name__ == "__main__":
-    data = json.load(open(sys.argv[1]))
-    ev = data["event"]
-    for p in data["speakers"]:
-        render(card(p, ev, 1080, 1350, 1.0), os.path.join(HERE, f"speaker-{p['slug']}.png"), 1080, 1350)
-        render(card(p, ev, 1080, 1920, 1.0), os.path.join(HERE, f"speaker-{p['slug']}-story.png"), 1080, 1920)
+    src = Image.open(SOURCE).convert("RGB")
+    for slug, tile in tiles(src).items():
+        out = os.path.join(HERE, f"speaker-{slug}.png")
+        card(src, tile, SUBJECT[slug]).save(out)
+        print("  wrote", os.path.relpath(out, ROOT))
