@@ -22,14 +22,16 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-SOURCE = os.path.join(HERE, "invitation-source.png")
+# The artwork the invitation emails serve, so a card and an email cannot
+# differ. Taken from public/lyfe/ageless-invitation.jpg on main.
+SOURCE = os.path.join(HERE, "invitation-source.jpg")
 
 GREEN = (122, 143, 90)
 
 # Where the six tiles sit on the invitation, found by looking rather than
 # guessed: three columns of 220, two rows of about 257.
 COLS = [(193, 413), (424, 644), (656, 876)]
-ROWS = [(552, 810), (849, 1105)]
+ROWS = [(551, 810), (849, 1105)]
 
 # Reading order on the invitation, left to right and top to bottom.
 GRID = [["awosika", "giwa", "adenuga"], ["kpaduwa", "ajelabi", "odulana"]]
