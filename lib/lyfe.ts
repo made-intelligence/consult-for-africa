@@ -310,6 +310,17 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     places: 10,
     note: "The general link, and the one to use when nobody specific sent them.",
   },
+  {
+    // The emailed invitation carries ?i=list. Without this entry the key was
+    // dropped on arrival and every registration from the email read as
+    // unattributed.
+    key: "list",
+    name: "The invitation email",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 0,
+    note: "The email sent to the invitation list, and anybody it was forwarded to.",
+  },
 ];
 
 export function lyfeInviter(key: string | null | undefined): LyfeInviter | null {
