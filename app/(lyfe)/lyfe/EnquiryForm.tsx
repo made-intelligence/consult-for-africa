@@ -80,7 +80,9 @@ export default function EnquiryForm({
 }) {
   const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
   const [step, setStep] = useState(initialIntent === "CONSULTATION" ? 1 : 2);
-  const [slotAt, setSlotAt] = useState<string>("");
+  // Kept so a coordinator-sent link carrying a slot still works; the page
+  // itself no longer offers one.
+  const [slotAt] = useState<string>("");
   // Which of the four they are asking for. The page takes a request rather
   // than a payment now, so the coordinator picks the time and, where there is
   // a fee, takes it on the call.
@@ -303,7 +305,12 @@ export default function EnquiryForm({
           <button
             type="button"
             onClick={() => {
-              if (!slotAt) return setError("Please choose a time in her diary.");
+              // Was `!slotAt`, which outlived the slot picker it belonged to.
+              // The page takes a request now and the coordinator books the
+              // time, so step one asks which consultation instead, and the
+              // old check was blocking every submission on a control that is
+              // no longer on the screen.
+              if (!service) return setError("Please tell us which consultation you are asking about.");
               if (!pathway) return setError("Please choose one, even roughly.");
               if (!timing) return setError("Please tell us roughly when you are thinking about this.");
               setError(null);
