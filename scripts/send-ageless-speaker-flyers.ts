@@ -18,6 +18,8 @@ import { lyfeInviteLink } from "@/lib/lyfe";
 const args = process.argv.slice(2);
 const send = args.includes("--send");
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1];
+/** The follow-up: the version with the caption and their link printed on it. */
+const captioned = args.includes("--captioned");
 
 const SPEAKERS = [
   { slug: "odulana", key: "cfa", to: "dodulana@gmail.com", first: "Debo", role: "chairing the panel" },
@@ -30,6 +32,18 @@ const SPEAKERS = [
 function parseFrom(raw: string) {
   const m = raw.match(/^\s*"?([^"<]*)"?\s*<([^>]+)>\s*$/);
   return m ? { name: m[1].trim(), address: m[2].trim() } : { name: "Consult for Africa", address: raw.trim() };
+}
+
+function captionedBody(first: string, link: string) {
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1d1a22;max-width:560px">
+<p>Dear ${first},</p>
+<p>A second version of your AGELESS flyer is attached, with the caption on the flyer itself and your own link printed in the footer, so it works as a post on its own.</p>
+<p>Your link, for anywhere you can paste one: <a href="${link}">${link}</a></p>
+<p>Use whichever version suits.</p>
+<p>Warm regards,<br>Debo</p>
+</div>`;
+  const text = `Dear ${first},\n\nA second version of your AGELESS flyer is attached, with the caption on the flyer itself and your own link printed in the footer, so it works as a post on its own.\n\nYour link, for anywhere you can paste one: ${link}\n\nUse whichever version suits.\n\nWarm regards,\nDebo`;
+  return { html, text };
 }
 
 function body(first: string, role: string, link: string) {
@@ -61,9 +75,9 @@ async function main() {
 
   for (const s of list) {
     const link = lyfeInviteLink(s.key);
-    const file = `docs/ageless/speakers/flyer-${s.slug}.png`;
+    const file = `docs/ageless/speakers/flyer-${s.slug}${captioned ? "-captioned" : ""}.png`;
     const png = readFileSync(file).toString("base64");
-    const { html, text } = body(s.first, s.role, link);
+    const { html, text } = captioned ? captionedBody(s.first, link) : body(s.first, s.role, link);
     const line = `  ${s.first.padEnd(12)} ${s.to.padEnd(40)} ${link}`;
     if (!send) {
       console.log(`${line}  (${file})`);
@@ -79,10 +93,10 @@ async function main() {
       body: JSON.stringify({
         from,
         to: [{ email_address: { address: s.to } }],
-        subject: "Your AGELESS speaker flyer",
+        subject: captioned ? "Your AGELESS flyer, with the caption on it" : "Your AGELESS speaker flyer",
         htmlbody: html,
         textbody: text,
-        attachments: [{ content: png, mime_type: "image/png", name: `AGELESS-${s.slug}.png` }],
+        attachments: [{ content: png, mime_type: "image/png", name: `AGELESS-${s.slug}${captioned ? "-captioned" : ""}.png` }],
       }),
     });
     const data = (await res.json().catch(() => null)) as { message?: string; error?: { message?: string } } | null;
