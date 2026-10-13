@@ -9,7 +9,7 @@ FROM
 MedLYFE Wellness and Longevity Centre, with Consult for Africa
 
 DATE
-Tuesday 13 October 2026
+Friday 9 October 2026
 
 ---
 
@@ -23,7 +23,7 @@ Tuesday 13 October 2026
 - **It carries the discovery deck's spine**, not a new story. Same argument, same words, so the film and the call agree.
 - **It ends on an instruction with a price on it.** Start with a Longevity Day, from ₦50,000, Lekki.
 - **Half a day at the centre.** One location, three setups, one person to camera.
-- **Shoot Thursday 15 or Friday 16 October.** Final files for both films by Monday 19 October.
+- **Shoot Tuesday 13 or Wednesday 14 October.** Final file by Monday 19 October.
 - No patients. No before and after. No drug brand names. The section on what must not be in it is not negotiable.
 
 ## The opening film: the reference
@@ -49,17 +49,17 @@ The film is cued in a room on a fixed date. There is no version of this where it
 
 | | |
 | --- | --- |
-| Brief issued | Tuesday 13 October |
-| Confirm you can crew it, with your quote | **Wednesday 14 October** |
-| Recce, in person or by video | Thursday 15 October |
-| Shoot | **Thursday 15 or Friday 16 October** |
-| First cut of both films | Saturday 17 October |
-| Notes back to you | Sunday 18 October |
-| Final files delivered | **Monday 19 October** |
+| Brief issued | Friday 9 October |
+| Confirm you can crew it | **Saturday 10 October** |
+| Recce, in person or by video | Monday 12 October |
+| Shoot | **Tuesday 13 or Wednesday 14 October** |
+| First cut | Friday 16 October |
+| Notes back to you | Saturday 17 October |
+| Final file delivered | **Monday 19 October** |
 | Technical check at Capital Club | Tuesday 20 October |
 | Event | Wednesday 21 October |
 
-If you cannot hold Monday 19 October, say so on Wednesday. That is as useful to us as a yes.
+If you cannot hold Monday 19 October, say so on Saturday. That is as useful to us as a yes.
 
 ## What the film has to do
 
@@ -191,7 +191,7 @@ One further point, for the website version only. A film shown to an invited room
 
 ## What we provide
 
-- Access to the centre for the shoot day, and for the recce on Thursday 15 October.
+- Access to the centre for the shoot day, and for the recce on Monday 12 October.
 - Dr Ajelabi, for a maximum of two hours inside the shoot day.
 - Two staff for the clinical inserts.
 - The MedLYFE mark, brand colours and the end card specification, including the current entry price.
@@ -219,17 +219,15 @@ Itemised, so pre-production, the day and post can be weighed separately.
 
 Quote the half day as a half day. If you can only crew a full day, quote that as well and we will decide.
 
-Quote the ten minute opening film separately, against the same lines where they apply, and tell us how you would make it: what you would shoot, what you would license, and whether any of it can come out of the introduction film's day.
-
 ## Rights
 
 Full, perpetual, worldwide, across every medium, to MedLYFE Wellness and Longevity Centre. Music cleared on the same basis, with the licence supplied.
 
 You are welcome to use the finished film in your own portfolio and showreel, and we will credit you where there is a credit to give.
 
-## What we would like back on Wednesday 14 October
+## What we would like back on Saturday
 
-1. Whether you can crew Thursday 15 or Friday 16 October.
-2. Whether you can deliver both films by Monday 19 October.
-3. The quotation, for each film separately.
+1. Whether you can crew Tuesday 13 or Wednesday 14 October.
+2. Whether you can deliver the event master by Monday 19 October.
+3. The quotation.
 4. Anything in this brief you would do differently. We would rather hear it now than see it in the cut.
