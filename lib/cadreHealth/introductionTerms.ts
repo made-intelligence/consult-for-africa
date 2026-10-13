@@ -17,7 +17,7 @@ export const INTRO_TERMS_VERSION = "2026-10-13";
 
 export const STANDARD_FEE_PERCENT = 15;
 export const NETWORK_FEE_PERCENT = 8;
-export const MINIMUM_FEE = "USD 3,500";
+export const MINIMUM_FEE = "USD 2,000";
 export const FEE_SUMMARY = `${NETWORK_FEE_PERCENT}% of first-year gross, minimum ${MINIMUM_FEE} per hire`;
 
 export const INTRO_TERMS: string[] = [
