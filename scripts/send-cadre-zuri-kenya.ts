@@ -3,9 +3,11 @@
  * specialties. Each person is offered the role in their own specialty and
  * asked to pass the other two on.
  *
- * Claimed accounts only, at Debo's instruction (13 Oct 2026): these are the
- * members who have answered us before. The unclaimed register still carries
- * the bounce rate that got ZeptoMail nervous, so it waits.
+ * Claimed accounts went first, at Debo's instruction (13 Oct 2026): 402 sent.
+ * --unclaimed then reaches the rest of the register in the three specialties,
+ * which still carries the bounce rate that got ZeptoMail nervous. It goes in
+ * batches of 200 and stops when a batch bounces above 5%, read off the
+ * suppressions the ZeptoMail webhook writes.
  *
  * Every link goes to the screening form at /oncadre/kenya, which asks about
  * relocation first. Sends are logged to scripts/out/zuri-kenya-sent.json and
@@ -13,7 +15,8 @@
  *
  *   npx tsx --env-file=.env.local scripts/send-cadre-zuri-kenya.ts                 # dry run + preview
  *   npx tsx --env-file=.env.local scripts/send-cadre-zuri-kenya.ts --to=me@x       # one test of each version
- *   npx tsx --env-file=.env.local scripts/send-cadre-zuri-kenya.ts --send          # everyone
+ *   npx tsx --env-file=.env.local scripts/send-cadre-zuri-kenya.ts --send          # claimed accounts
+ *   npx tsx --env-file=.env.local scripts/send-cadre-zuri-kenya.ts --unclaimed --send   # the rest, in batches
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,6 +25,9 @@ import { sendViaZeptoMail } from "@/lib/zeptomail";
 import { salutationFor } from "@/lib/cadreSalutation";
 
 const SEND = process.argv.includes("--send");
+const UNCLAIMED = process.argv.includes("--unclaimed");
+const BATCH = 200;
+const MAX_BOUNCE = 0.05;
 const TO = process.argv.find((a) => a.startsWith("--to="))?.slice(5);
 const SITE = "https://www.consultforafrica.com";
 const FROM = process.env.SMTP_FROM ?? "Consult For Africa <hello@consultforafrica.com>";
@@ -55,13 +61,14 @@ const roleFor = (sub: string | null): Role | null => (sub ? ((Object.keys(ROLES)
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const link = (role: Role) => `${SITE}/oncadre/kenya?role=${role}&utm_source=cadre&utm_campaign=zuri-kenya-2026-10`;
 
-function render(p: { id: string; firstName: string; lastName: string }, role: Role) {
+function render(p: { id: string; firstName: string; lastName: string }, role: Role, member = true) {
   const r = ROLES[role];
   const others = (Object.keys(ROLES) as Role[]).filter((x) => x !== role).map((x) => ROLES[x].short);
   const url = link(role);
   const unsub = `${SITE}/oncadre/unsubscribe/${p.id}`;
   const subject = `A consultant ${r.short} role in Nairobi`;
   const hello = salutationFor(p, { assumeDoctor: true });
+  const why = member ? "You are receiving this as a CadreHealth member." : "You are receiving this because you are listed as a specialist on the CadreHealth register.";
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:24px 16px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1f2937;">
@@ -76,7 +83,7 @@ function render(p: { id: string; firstName: string; lastName: string }, role: Ro
 <p style="margin:0 0 4px;">With kind regards,</p>
 <p style="margin:0;font-weight:600;">Dr Debo Odulana</p>
 <p style="margin:2px 0 24px;font-size:13px;color:#6b7280;">Founding Partner, Consult for Africa</p>
-<p style="margin:0;font-size:12px;color:#9ca3af;">You are receiving this as a CadreHealth member. <a href="${esc(unsub)}" style="color:#6b7280;">Unsubscribe</a>.</p>
+<p style="margin:0;font-size:12px;color:#9ca3af;">${why} <a href="${esc(unsub)}" style="color:#6b7280;">Unsubscribe</a>.</p>
 </div></body></html>`;
 
   const text = `${hello}
@@ -96,7 +103,7 @@ With kind regards,
 Dr Debo Odulana
 Founding Partner, Consult for Africa
 
-Unsubscribe: ${unsub}`;
+${why} Unsubscribe: ${unsub}`;
   return { subject, html, text };
 }
 
@@ -125,7 +132,14 @@ async function main() {
   }
 
   const members = await prisma.cadreProfessional.findMany({
-    where: { cadre: "MEDICINE", outreachRecord: { profileClaimedAt: { not: null } }, email: { not: { contains: "@cadrehealth.system" } } },
+    where: UNCLAIMED
+      ? {
+          cadre: "MEDICINE",
+          email: { not: { contains: "@cadrehealth.system" } },
+          // Prisma's `not` drops NULLs, so "no outreach record" is spelled out.
+          OR: [{ outreachRecord: null }, { outreachRecord: { profileClaimedAt: null, status: { notIn: ["UNREACHABLE", "NOT_INTERESTED"] } } }],
+        }
+      : { cadre: "MEDICINE", outreachRecord: { profileClaimedAt: { not: null } }, email: { not: { contains: "@cadrehealth.system" } } },
     select: { id: true, email: true, firstName: true, lastName: true, subSpecialty: true },
   });
   const suppressed = new Set((await prisma.communicationSuppression.findMany({ select: { email: true } })).map((s) => s.email?.toLowerCase()));
@@ -137,7 +151,7 @@ async function main() {
     .filter((m): m is typeof m & { role: Role } => !!m.role && !suppressed.has(m.email.toLowerCase()) && !done.has(m.email.toLowerCase()));
 
   const byRole = Object.fromEntries((Object.keys(ROLES) as Role[]).map((r) => [r, queue.filter((q) => q.role === r).length]));
-  console.log({ claimedDoctors: members.length, alreadySent: done.size, toSend: queue.length, byRole });
+  console.log({ pool: UNCLAIMED ? "unclaimed" : "claimed", doctors: members.length, alreadySent: done.size, toSend: queue.length, byRole });
 
   if (!SEND) {
     console.log("DRY RUN. Previews in scripts/out/zuri-kenya-preview-*.html. Pass --send to send.");
@@ -146,13 +160,28 @@ async function main() {
 
   let ok = 0;
   const failed: string[] = [];
+  let batch: string[] = [];
+  let batchStart = new Date();
   for (const m of queue) {
-    const { subject, html, text } = render(m, m.role);
+    if (UNCLAIMED && batch.length === BATCH) {
+      // Hard bounces reach the webhook within a minute or two.
+      await new Promise((res) => setTimeout(res, 180_000));
+      const bounced = await prisma.communicationSuppression.count({ where: { reason: "BOUNCED", createdAt: { gte: batchStart }, email: { in: batch } } });
+      console.log(`batch of ${batch.length}: ${bounced} bounced (${((bounced / batch.length) * 100).toFixed(1)}%). ${ok} sent so far.`);
+      if (bounced / batch.length > MAX_BOUNCE) {
+        console.log(`STOPPED: bounce rate above ${MAX_BOUNCE * 100}%. Re-running resumes from here.`);
+        break;
+      }
+      batch = [];
+      batchStart = new Date();
+    }
+    const { subject, html, text } = render(m, m.role, !UNCLAIMED);
     const r = await sendViaZeptoMail({ from: parse(FROM), to: [{ email: m.email }], replyTo: parse(FROM), subject, htmlbody: html, textbody: text, trackingTag: "zuri-kenya" });
     if (r.ok) {
       ok++;
       sent.push({ email: m.email.toLowerCase(), role: m.role, at: new Date().toISOString(), id: r.messageId });
       fs.writeFileSync(LOG, JSON.stringify(sent, null, 1));
+      batch.push(m.email.toLowerCase());
     } else failed.push(`${m.email}: ${r.error}`);
     await new Promise((res) => setTimeout(res, 300));
   }

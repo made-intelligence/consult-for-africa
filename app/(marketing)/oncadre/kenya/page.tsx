@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { KENYA_FACILITY_SLUG, KENYA_ROLES } from "@/lib/cadreHealth/kenyaScreen";
+import { candidateQuestions, readFitProfile } from "@/lib/cadreHealth/fitProfile";
 import KenyaScreenForm from "./KenyaScreenForm";
 
 export const dynamic = "force-dynamic";
@@ -16,8 +17,12 @@ export default async function KenyaPage({ searchParams }: { searchParams: Promis
   const { role } = await searchParams;
   const jobs = await prisma.cadreMandate.findMany({
     where: { facility: { slug: KENYA_FACILITY_SLUG }, status: "OPEN", isPublished: true },
-    select: { slug: true, id: true, title: true, subSpecialty: true },
+    select: { slug: true, id: true, title: true, subSpecialty: true, fitProfile: true },
   });
+  // The client's own questions, once they have answered the fit request.
+  const questionsByRole = Object.fromEntries(
+    KENYA_ROLES.map((r) => [r.value, candidateQuestions(readFitProfile(jobs.find((j) => j.subSpecialty === r.subSpecialty)?.fitProfile))]),
+  );
   const linkFor = (sub: string) => {
     const j = jobs.find((x) => x.subSpecialty === sub);
     return j ? `/oncadre/jobs/${j.slug ?? j.id}` : null;
@@ -53,7 +58,7 @@ export default async function KenyaPage({ searchParams }: { searchParams: Promis
         <div className="mt-8 rounded-2xl bg-white p-6 sm:p-8" style={{ border: "1px solid #E8EBF0", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)" }}>
           <p className="text-base font-semibold text-gray-900">A few questions, two minutes</p>
           <p className="mt-1 mb-6 text-sm text-gray-500">This tells us whether to put you forward. We ask for your CV afterwards.</p>
-          <KenyaScreenForm defaultRole={role} />
+          <KenyaScreenForm defaultRole={role} questionsByRole={questionsByRole} />
         </div>
       </div>
     </main>
