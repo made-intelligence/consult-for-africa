@@ -32,6 +32,7 @@ export type RequestSection = {
 export const RECEIVED: { what: string; section: string }[] = [
   { section: "B", what: "Board pack of 19 May 2026: 2025 and 2024 year end, Q1 2026 and Q1 2025, by department" },
   { section: "G", what: "Visit log, March 2025 to October 2026: virtual consultations and endoscopy" },
+  { section: "G", what: "Monthly activity for 2026: GP, endoscopy and pharmacy visits by type and funder" },
 ];
 
 /** What we need next, ordered by what unlocks the most. */
@@ -44,7 +45,7 @@ export const PRIORITY: { n: number; what: string; why: string; section: string }
   { n: 6, section: "F", what: "Corporate clients, current and past, including Stanbic: lives covered, scope, annual value, and when and why any ended", why: "What replaced the largest endoscopy client, and what can be won back" },
   { n: 7, section: "K", what: "Ambulance work in 2025: each job, the client, what was charged, what the provider was paid, and the provider contract", why: "The largest line in 2025 and nil in Q1 2026; we need to know why" },
   { n: 8, section: "L", what: "Staff list with role, start date, pay and days worked, plus payroll by month since January 2024", why: "Salaries roughly doubled in clinic and pharmacy in 2025" },
-  { n: 9, section: "G", what: "All consultations by month since January 2024, in person and virtual, new and returning, by doctor", why: "The visit log covers virtual and endoscopy only" },
+  { n: 9, section: "G", what: "The same monthly activity summary for 2024 and 2025", why: "One year of activity cannot show a trend, and 2025 is the year the accounts cover" },
 ];
 
 export const REQUEST_SECTIONS: RequestSection[] = [
