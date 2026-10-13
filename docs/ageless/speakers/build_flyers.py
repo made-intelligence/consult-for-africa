@@ -45,30 +45,30 @@ HEAD_ROOM = 42
 
 SPEAKERS = [
     # slug, photo, mask, ground, band, name, role lines, subject
-    dict(slug="awosika", photo="public/lyfe/joycee-portrait.jpg", mask="joycee",
+    dict(slug="awosika", key="joycee", join=["Join me at AGELESS, where I'll be speaking on", 'stress management, self care and longevity.'], photo="public/lyfe/joycee-portrait.jpg", mask="joycee",
          ground=GREEN, band=YELLOW, name="Mrs. Joycee Awosika",
          role=["Founder & CEO,", "ORIKI Group"],
          subject="Speaking to stress management, self care and longevity", frame=0.60),
-    dict(slug="giwa", photo="public/lyfe/gbemi-portrait.jpg", mask="gbemi",
+    dict(slug="giwa", key="gbemi", join=["Join me at AGELESS, where I'll be speaking on", 'lifestyle and behaviour change for longevity.'], photo="public/lyfe/gbemi-portrait.jpg", mask="gbemi",
          ground=YELLOW, band=OLIVE, name="Ms. Gbemi Giwa",
          role=["Founder, African", "Fat Loss Method"],
          subject="Speaking to lifestyle and behaviour change for longevity", frame=0.62,
          # Her photograph crops the hair flat at the top, so that edge sits on
          # the tile's top edge instead of rising above it.
          room=0),
-    dict(slug="adenuga", photo="public/lyfe/adenuga-portrait.jpg", mask="adenuga",
+    dict(slug="adenuga", key="adenuga", join=["Join me at AGELESS, where I'll be speaking on", 'weight, metabolism and longevity.'], photo="public/lyfe/adenuga-portrait.jpg", mask="adenuga",
          ground=GREEN, band=NAVY, name="Dr. Timi Adenuga",
          role=["Lead Bariatric &", "Laparoscopic Surgeon"],
          subject="Speaking to weight, metabolism and longevity", frame=0.62),
-    dict(slug="kpaduwa", photo="docs/lyfe-rounds/chinwe-smiling.png", mask="chinwe-smiling",
+    dict(slug="kpaduwa", key="kpaduwa", join=["Join me at AGELESS, where I'll be speaking on", 'beauty, aesthetics and skin as we age.'], photo="docs/lyfe-rounds/chinwe-smiling.png", mask="chinwe-smiling",
          ground=YELLOW, band=NAVY, name="Dr. Chinwe, MD, FACS",
          role=["Founder,", "KP Plastic Surgery"],
          subject="Speaking to maintaining beauty, aesthetics and skin as we age", frame=1.0),
-    dict(slug="ajelabi", photo="public/lyfe/adedotun-portrait.jpg", mask="adedotun",
+    dict(slug="ajelabi", key="ajelabi", join=["Join me at AGELESS, where I'll open the evening:", 'can we live to 100 and still live well?'], photo="public/lyfe/adedotun-portrait.jpg", mask="adedotun",
          ground=GREEN, band=YELLOW, name="Dr. Adedotun Ajelabi",
          role=["Head of Medical", "Services, MedLYFE"],
          subject="Opening the evening: can we live to 100 and still live well?", frame=0.62),
-    dict(slug="odulana", photo="public/lyfe/debo-portrait.jpg", mask="debo",
+    dict(slug="odulana", key="cfa", join=['Join me at AGELESS,', "where I'll be chairing the panel."], photo="public/lyfe/debo-portrait.jpg", mask="debo",
          ground=YELLOW, band=OLIVE, name="Dr. Debo Odulana",
          role=["Founding Partner,", "Consult for Africa"],
          subject="Chairing the panel", frame=0.82),
@@ -114,7 +114,7 @@ def centred(d, text, f, cy, fill):
     d.text((540 - (r - l) // 2 - l, cy - (b - t) // 2 - t), text, font=f, fill=fill)
 
 
-def flyer(src, sp):
+def flyer(src, sp, subject=True):
     im = src.copy().convert("RGB")
     d = ImageDraw.Draw(im)
     d.rectangle(BOX, fill=WHITE)
@@ -147,7 +147,43 @@ def flyer(src, sp):
     for i, line in enumerate(sp["role"]):
         centred(d, line, font("Regular", 23), band_mid + 14 + i * 28, WHITE)
 
-    centred(d, sp["subject"], font("Medium", 22), TILE_Y + TILE_H + 38, TEXT_GREEN)
+    if subject:
+        centred(d, sp["subject"], font("Medium", 22), TILE_Y + TILE_H + 38, TEXT_GREEN)
+    return im
+
+
+# The register line in the footer, measured on the invitation.
+REGISTER_BOX = (190, 1136, 672, 1172)
+SITE = "consultforafrica.com/ageless"
+
+
+def captioned(src, sp):
+    """Version two: the caption is on the flyer, in the speaker's own voice,
+    and the footer carries their own link so registrations are credited."""
+    global TILE_H
+    keep = TILE_H
+    TILE_H = 470
+    try:
+        im = flyer(src, sp, subject=False)
+    finally:
+        TILE_H = keep
+    d = ImageDraw.Draw(im)
+    f = font("Medium", 23)
+    y = 560 + 470 + 30
+    for line in sp["join"]:
+        centred(d, line, f, y, TEXT_GREEN)
+        y += 32
+    # Their own link in place of the general one.
+    d.rectangle(REGISTER_BOX, fill=WHITE)
+    label, url = "Register: ", f"{SITE}?i={sp['key']}"
+    for size in range(24, 14, -1):
+        fl, fu = font("Regular", size), font("ExtraBold", size)
+        w = d.textlength(label, font=fl) + d.textlength(url, font=fu)
+        if 198 + w <= 668:
+            break
+    base = 1165
+    d.text((198, base), label, font=fl, fill=(40, 40, 40), anchor="ls")
+    d.text((198 + d.textlength(label, font=fl), base), url, font=fu, fill=TEXT_GREEN, anchor="ls")
     return im
 
 
@@ -156,7 +192,9 @@ def main():
     for sp in SPEAKERS:
         out = os.path.join(HERE, f"flyer-{sp['slug']}.png")
         flyer(src, sp).save(out, optimize=True)
-        print("wrote", os.path.relpath(out, ROOT))
+        out2 = os.path.join(HERE, f"flyer-{sp['slug']}-captioned.png")
+        captioned(src, sp).save(out2, optimize=True)
+        print("wrote", os.path.relpath(out, ROOT), "and -captioned")
 
 
 if __name__ == "__main__":
