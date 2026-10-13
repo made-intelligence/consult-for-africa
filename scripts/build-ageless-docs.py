@@ -44,6 +44,12 @@ PACK = {
         "AGELESS  ·  Plan summary", "Consult for Africa  ·  Confidential"),
     "ageless-note-to-chinwe-cfa": (
         "AGELESS  ·  For Dr Kpaduwa", f"Consult for Africa  ·  {EVENING}"),
+    "kakulus-brief-opening-film": (
+        "Medbury  ·  The opening film", f"Medbury Healthcare Group  ·  {TODAY}"),
+    "kakulus-brief-medlyfe-experience": (
+        "MedLYFE  ·  The MedLYFE Experience", f"Medbury Healthcare Group  ·  {TODAY}"),
+    "kakulus-brief-lyfeplace": (
+        "LyfePlace  ·  The LyfePlace film", f"Medbury Healthcare Group  ·  {TODAY}"),
     "shoot-replan-session-cfa": (
         "Medlyfe  ·  The content shoot", f"Consult for Africa  ·  {TODAY}"),
 }
