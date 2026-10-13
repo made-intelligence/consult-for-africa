@@ -98,7 +98,11 @@ export default function KenyaScreenForm({ defaultRole, questionsByRole }: { defa
         <input required className={input} style={inputStyle} placeholder="Full name" value={a.name ?? ""} onChange={(e) => set("name")(e.target.value)} />
         <input required type="email" className={input} style={inputStyle} placeholder="Email address" value={a.email ?? ""} onChange={(e) => set("email")(e.target.value)} />
         <input required type="tel" className={input} style={inputStyle} placeholder="Phone or WhatsApp (+234...)" value={a.phone ?? ""} onChange={(e) => set("phone")(e.target.value)} />
-        <input required className={input} style={inputStyle} placeholder="Current post and hospital" value={a.currentPost ?? ""} onChange={(e) => set("currentPost")(e.target.value)} />
+        {/* A placeholder alone vanished on typing, and doctors put their name here. */}
+        <label className="block">
+          <span className="text-xs font-medium text-gray-600">Your current post and hospital</span>
+          <input required className={`${input} mt-1`} style={inputStyle} placeholder="e.g. Consultant Obstetrician, LUTH" value={a.currentPost ?? ""} onChange={(e) => set("currentPost")(e.target.value)} />
+        </label>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button type="submit" disabled={status === "loading"} className="w-full rounded-xl py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50" style={{ background: "#0B3C5D" }}>
