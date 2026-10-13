@@ -26,9 +26,7 @@ export default function FitForm(props: {
   roles: Role[];
   shared: { relocation: string; process: string };
   name: string;
-  feeOption?: "fixed" | "percent";
   terms: string[];
-  feeOptions: { value: string; label: string }[];
 }) {
   const [shared, setShared] = useState(props.shared);
   const [roles, setRoles] = useState<Record<string, RoleAnswers>>(() =>
@@ -40,7 +38,6 @@ export default function FitForm(props: {
     ),
   );
   const [name, setName] = useState(props.name);
-  const [fee, setFee] = useState<string>(props.feeOption ?? "");
   const [accept, setAccept] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = useState("");
@@ -55,7 +52,7 @@ export default function FitForm(props: {
       const res = await fetch(`/api/cadre/fit/${props.token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, shared, roles, feeOption: fee, acceptTerms: accept }),
+        body: JSON.stringify({ name, shared, roles, acceptTerms: accept }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
@@ -116,17 +113,6 @@ export default function FitForm(props: {
             <li key={t}>{t}</li>
           ))}
         </ol>
-        <fieldset>
-          <legend className="text-sm font-semibold text-gray-900 mb-2">Fee basis</legend>
-          <div className="space-y-1.5">
-            {props.feeOptions.map((o) => (
-              <label key={o.value} className="flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer" style={{ border: `1px solid ${fee === o.value ? "#0B3C5D" : "#E8EBF0"}` }}>
-                <input type="radio" required name="fee" value={o.value} checked={fee === o.value} onChange={() => setFee(o.value)} className="mt-0.5 accent-[#0B3C5D]" />
-                {o.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
         <input required className={box} style={boxStyle} placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} />
         <label className="flex items-start gap-2.5 text-sm text-gray-700">
           <input type="checkbox" required checked={accept} onChange={(e) => setAccept(e.target.checked)} className="mt-0.5 accent-[#0B3C5D]" />

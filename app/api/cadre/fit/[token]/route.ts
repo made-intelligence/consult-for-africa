@@ -6,7 +6,7 @@ import { contactLimiter } from "@/lib/rate-limit-redis";
 import { notifyInternal } from "@/lib/email";
 import { orgFromFitToken, fitProfileSchema } from "@/lib/cadreHealth/fitProfile";
 import { rescoreMandate } from "@/lib/cadreHealth/fitScreen";
-import { FEE_OPTIONS, INTRO_TERMS, INTRO_TERMS_VERSION } from "@/lib/cadreHealth/introductionTerms";
+import { FEE_SUMMARY, INTRO_TERMS, INTRO_TERMS_VERSION } from "@/lib/cadreHealth/introductionTerms";
 
 const text = (max: number) => z.string().trim().max(max).default("");
 
@@ -17,7 +17,6 @@ const schema = z.object({
     z.string(),
     z.object({ mustHave: text(3000), dealBreakers: text(3000), standOut: text(3000), pay: text(1000), questions: text(2000), payShareable: z.boolean().default(false) }),
   ),
-  feeOption: z.enum(["fixed", "percent"]),
   acceptTerms: z.literal(true),
 });
 
@@ -39,7 +38,7 @@ export const POST = handler(async function POST(req: NextRequest, { params }: { 
   if (!(await contactLimiter.limit(`fit:${ip}`)).success) return Response.json({ error: "Too many submissions. Please try again later." }, { status: 429 });
 
   const parsed = schema.safeParse(await req.json());
-  if (!parsed.success) return Response.json({ error: "Please add your name, choose a fee basis and accept the terms." }, { status: 400 });
+  if (!parsed.success) return Response.json({ error: "Please add your name and accept the terms." }, { status: 400 });
   const b = parsed.data;
 
   const org = await prisma.cadreEmployerOrg.findUnique({ where: { id: orgId }, select: { id: true, name: true, facilityId: true } });
@@ -59,28 +58,26 @@ export const POST = handler(async function POST(req: NextRequest, { params }: { 
       termsAcceptedBy: b.name,
       termsAcceptedAt: now.toISOString(),
       termsVersion: INTRO_TERMS_VERSION,
-      feeOption: b.feeOption,
+      feeOption: "percent",
     });
     await prisma.cadreMandate.update({ where: { id: m.id }, data: { fitProfile: fit, fitProfileAt: now, employerOrgId: org.id } });
   }
 
-  const fee = FEE_OPTIONS.find((f) => f.value === b.feeOption)!;
   await prisma.cadreEmployerOrg.update({
     where: { id: org.id },
     data: {
       isVerified: true,
       verifiedAt: now,
-      verifiedNote: `Introduction terms v${INTRO_TERMS_VERSION} accepted by ${b.name} on ${now.toISOString()} from ${ip} via the fit request. Fee basis: ${fee.short}.`,
+      verifiedNote: `Introduction terms v${INTRO_TERMS_VERSION} accepted by ${b.name} on ${now.toISOString()} from ${ip} via the fit request. Fee: ${FEE_SUMMARY}.`,
     },
   });
   await prisma.cadreEmployerAccount.updateMany({ where: { orgId: org.id }, data: { isVerified: true } });
 
   await notifyInternal(
     process.env.CADRE_ALERT_EMAIL ?? "hello@consultforafrica.com",
-    `${org.name}: fit answers in, terms accepted (${fee.short})`,
+    `${org.name}: fit answers in, terms accepted (${FEE_SUMMARY})`,
     `<p style="margin:0 0 12px;"><strong>${esc(b.name)}</strong> answered the fit request for ${esc(org.name)} and accepted the introduction terms (version ${INTRO_TERMS_VERSION}) at ${now.toISOString()} from ${esc(ip)}.</p>
-     <p style="margin:0 0 12px;"><strong>Fee basis chosen:</strong> ${esc(fee.label)}</p>
-     <p style="margin:0 0 6px;"><strong>Terms as accepted</strong></p>
+          <p style="margin:0 0 6px;"><strong>Terms as accepted</strong></p>
      <ol style="margin:0 0 16px;padding-left:20px;">${INTRO_TERMS.map((t) => `<li style="margin:0 0 6px;">${esc(t)}</li>`).join("")}</ol>
      <p style="margin:0 0 6px;"><strong>Relocation offer:</strong> ${esc(b.shared.relocation || "(blank)")}</p>
      <p style="margin:0 0 12px;"><strong>Their process:</strong> ${esc(b.shared.process || "(blank)")}</p>

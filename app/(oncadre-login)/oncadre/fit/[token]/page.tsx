@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { orgFromFitToken, readFitProfile } from "@/lib/cadreHealth/fitProfile";
-import { FEE_OPTIONS, INTRO_TERMS } from "@/lib/cadreHealth/introductionTerms";
+import { INTRO_TERMS } from "@/lib/cadreHealth/introductionTerms";
 import FitForm from "./FitForm";
 
 export const dynamic = "force-dynamic";
@@ -41,9 +41,7 @@ export default async function FitPage({ params }: { params: Promise<{ token: str
         roles={roles.map((r) => ({ id: r.id, title: r.title, applied: r.applied, fit: r.fit }))}
         shared={{ relocation: first?.relocation ?? "", process: first?.process ?? "" }}
         name={first?.answeredBy ?? ""}
-        feeOption={first?.feeOption}
         terms={INTRO_TERMS}
-        feeOptions={FEE_OPTIONS.map((f) => ({ value: f.value, label: f.label }))}
       />
     </main>
   );
