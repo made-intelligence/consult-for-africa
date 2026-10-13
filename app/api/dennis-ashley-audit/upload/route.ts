@@ -61,8 +61,8 @@ const EXT_TO_MIME: Record<string, string> = {
   zip: "application/zip",
 };
 
-/** Letters of the information request (A..N), plus a catch-all. */
-const SECTIONS = /^([A-N]|priority|other)$/;
+/** Letters of the information request (A..P), plus a catch-all. */
+const SECTIONS = /^([A-P]|priority|other)$/;
 
 // Per-IP limiter, same shape as the generic public uploader.
 const hits = new Map<string, { n: number; resetAt: number }>();

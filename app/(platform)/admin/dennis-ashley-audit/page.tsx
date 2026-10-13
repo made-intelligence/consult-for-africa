@@ -10,7 +10,7 @@ import {
 } from "@/lib/dennis-ashley-survey";
 import {
   DA_ENGAGEMENT,
-  PRIORITY_NINE,
+  PRIORITY,
   REQUEST_SECTIONS,
   sectionLabel,
 } from "@/lib/dennis-ashley-audit";
@@ -364,11 +364,11 @@ function UploadsSection({ rows }: { rows: UploadRow[] }) {
     list.push(r);
     bySection.set(r.section, list);
   }
-  // Which lettered sections have produced nothing at all. The nine priority
+  // Which lettered sections have produced nothing at all. The priority
   // items map onto sections too, so a silent section is a chase list entry.
   const silent = REQUEST_SECTIONS.filter((s) => !bySection.has(s.key));
-  const prioritySections = [...new Set(PRIORITY_NINE.map((p) => p.section))];
-  const prioritySilent = prioritySections.filter((k) => !bySection.has(k) && !bySection.has("priority"));
+  const prioritySections = [...new Set(PRIORITY.map((p) => p.section))];
+  const prioritySilent = prioritySections.filter((k) => !bySection.has(k));
 
   return (
     <section style={{ ...CARD, padding: 22 }} className="space-y-5">
@@ -394,7 +394,7 @@ function UploadsSection({ rows }: { rows: UploadRow[] }) {
           className="text-sm"
           style={{ background: "#FDF3E3", borderLeft: "3px solid #D4AF37", padding: "10px 14px", color: "#7a5b1f" }}
         >
-          <b>Still nothing against the priority nine</b> for section
+          <b>Still nothing against the priority items</b> for section
           {prioritySilent.length === 1 ? " " : "s "}
           {prioritySilent.join(", ")}. Those are the ones that turn a tour into an audit.
         </div>
