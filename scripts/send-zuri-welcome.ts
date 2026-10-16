@@ -15,7 +15,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendViaZeptoMail } from "@/lib/zeptomail";
 import { fitToken } from "@/lib/cadreHealth/fitProfile";
-import { MINIMUM_FEE, NETWORK_FEE_PERCENT, STANDARD_FEE_PERCENT } from "@/lib/cadreHealth/introductionTerms";
+import { NETWORK_FEE_PERCENT, STANDARD_FEE_PERCENT } from "@/lib/cadreHealth/introductionTerms";
 
 const SEND = process.argv.includes("--send");
 const TO = process.argv.find((a) => a.startsWith("--to="))?.slice(5);
@@ -97,7 +97,7 @@ ${h("What we have done")}
 ${h("The one thing we need from you")}
 ${p("Ten minutes on what fit looks like for each role: what someone must have, what rules them out, the questions you would ask every candidate, and what you offer a doctor relocating from Nigeria. Everyone who has applied is re-assessed the moment you save.")}
 ${button(fitUrl, "Tell us what fit looks like")}
-${p(`The same page sets out our terms. This is a paid search, charged once for each person you engage: ${NETWORK_FEE_PERCENT} per cent of their first-year gross, our digital health network rate (our standard is ${STANDARD_FEE_PERCENT} per cent), with a minimum of ${MINIMUM_FEE} per person. There is no fee unless you engage someone. Once you have accepted, we send the roles to the wider register, ${UNCLAIMED_POOL} more specialists.`)}
+${p(`The same page sets out our terms. This is a paid search, charged once for each person you engage: ${NETWORK_FEE_PERCENT} per cent of their first-year gross, our digital health network rate (our standard is ${STANDARD_FEE_PERCENT} per cent). There is no fee unless you engage someone. Once you have accepted, we send the roles to the wider register, ${UNCLAIMED_POOL} more specialists.`)}
 ${h("Your dashboard")}
 ${p("Set your password below. Once the terms are accepted your dashboard shows each role, every shortlisted candidate with the reasons, and lets you move them to interview and offer. When you want to speak to someone, ask through the dashboard and we put you in touch as soon as they agree.")}
 ${button(resetUrl, "Set your password")}
@@ -122,7 +122,7 @@ THE ONE THING WE NEED FROM YOU
 Ten minutes on what fit looks like for each role: what someone must have, what rules them out, the questions you would ask every candidate, and what you offer a doctor relocating from Nigeria. Everyone who has applied is re-assessed the moment you save.
 ${fitUrl}
 
-The same page sets out our terms. This is a paid search, charged once for each person you engage: ${NETWORK_FEE_PERCENT} per cent of their first-year gross, our digital health network rate (our standard is ${STANDARD_FEE_PERCENT} per cent), with a minimum of ${MINIMUM_FEE} per person. There is no fee unless you engage someone. Once you have accepted, we send the roles to the wider register, ${UNCLAIMED_POOL} more specialists.
+The same page sets out our terms. This is a paid search, charged once for each person you engage: ${NETWORK_FEE_PERCENT} per cent of their first-year gross, our digital health network rate (our standard is ${STANDARD_FEE_PERCENT} per cent). There is no fee unless you engage someone. Once you have accepted, we send the roles to the wider register, ${UNCLAIMED_POOL} more specialists.
 
 YOUR DASHBOARD
 Set your password: ${resetUrl}
