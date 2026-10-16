@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
-import { newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
+import { greetingName, newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
 import { sendSMS } from "@/lib/cadreHealth/sms";
 
 // Public endpoint. A staff member gives their email and gets a six-digit code.
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     });
 
     const { code, hash } = newLoginCode(staff.id);
-    const via = await deliver(email, staff.phone, staff.name.split(" ")[0], code);
+    const via = await deliver(email, staff.phone, greetingName(staff.name), code);
 
     await prisma.staffLoginToken.create({
       data: {
