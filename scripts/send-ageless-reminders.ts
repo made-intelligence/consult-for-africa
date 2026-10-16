@@ -21,6 +21,10 @@ import {
   emailLyfeInvitationReminder,
 } from "@/lib/lyfeEmail";
 
+// Guests click these links, so they point at production whatever .env.local
+// says. lyfeConfirmUrl reads NEXTAUTH_URL, which is localhost in development.
+process.env.NEXTAUTH_URL = "https://www.consultforafrica.com";
+
 const prisma = new PrismaClient();
 const FROM_NAME = process.env.LYFE_SENDER_NAME || "Dr Debo Odulana";
 const TEST_TO = process.env.LYFE_TEST_TO || "dodulana@gmail.com";
