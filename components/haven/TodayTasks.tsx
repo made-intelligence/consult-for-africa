@@ -13,6 +13,7 @@ export interface TodayTask {
   id: string;
   title: string;
   why: string;
+  cadence: "EVERY_SHIFT" | "DAILY" | "WEEKLY" | "MONTHLY";
   done: boolean;
   flagged: boolean;
 }
@@ -26,6 +27,16 @@ export interface TodayTask {
  * waits on the network looks broken, and the second time it looks broken the
  * person stops ticking.
  */
+// Said on every row because a weekly task ticked on Tuesday is still ticked on
+// Friday, and under a heading that only said "Today" that read as a page that
+// had not noticed three days had passed.
+const WHEN: Record<TodayTask["cadence"], string> = {
+  EVERY_SHIFT: "Every shift",
+  DAILY: "Today",
+  WEEKLY: "This week, resets Monday",
+  MONTHLY: "This month",
+};
+
 export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
   const router = useRouter();
   const [local, setLocal] = useState<Record<string, boolean>>({});
@@ -95,6 +106,9 @@ export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
                   textDecoration: done ? "line-through" : "none",
                 }}>
                   {t.title}
+                </div>
+                <div style={{ color: done ? MUTED : TEAL, fontSize: 11.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", marginTop: 4 }}>
+                  {WHEN[t.cadence]}
                 </div>
                 {!done && <div style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.5, marginTop: 3 }}>{t.why}</div>}
                 {t.flagged && !done && (

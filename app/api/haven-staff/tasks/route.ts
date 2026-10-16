@@ -63,6 +63,14 @@ export async function POST(req: NextRequest) {
     where: { taskId: task.id, staffId: session.sub, forDate, resolvedAt: null },
     data: { resolvedAt: new Date(), resolution: "Completed" },
   });
+  // And an older period's chase on the same task. There is nowhere on the page
+  // to record last week, so without this a flag from a missed week sat beside
+  // a ticked box saying "Not recorded yet" for ever, and the person was left
+  // believing the tick had not saved.
+  await prisma.staffTaskFlag.updateMany({
+    where: { taskId: task.id, staffId: session.sub, forDate: { lt: forDate }, resolvedAt: null },
+    data: { resolvedAt: new Date(), resolution: "Completed in a later period" },
+  });
 
   return NextResponse.json({ ok: true, done: true });
 }

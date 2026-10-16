@@ -190,3 +190,16 @@ export function atLeast(session: StaffSession | null, tier: Tier) {
   if (tier === "BOARD") return session.tiers.includes("BOARD");
   return session.tiers.some((t) => RANK[t] >= RANK[tier]);
 }
+
+const TITLES = new Set(["dr", "dr.", "mr", "mr.", "mrs", "mrs.", "ms", "ms.", "miss", "prof", "prof.", "pharm", "pharm.", "nurse"]);
+
+/**
+ * The name to greet somebody by. "Dr Omotanwa Gbadebo" is "Dr Omotanwa", not
+ * "Dr", which is what splitting on the first space gave her: a page that
+ * cannot say your name does not read as yours.
+ */
+export function greetingName(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length > 1 && TITLES.has(parts[0].toLowerCase())) return `${parts[0]} ${parts[1]}`;
+  return parts[0];
+}

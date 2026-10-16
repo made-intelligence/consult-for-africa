@@ -64,6 +64,18 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
+  // lastLoginAt is the latest sign-in, not the first, so it cannot answer "was
+  // this person here for that period". The first used code can. Without it the
+  // job flagged Dr Tanwa at 20:00 on the Monday she first signed in, for all
+  // four weekly tasks of the week before, which she had never seen.
+  const firstIn = new Map<string, Date>();
+  const used = await prisma.staffLoginToken.groupBy({
+    by: ["staffId"],
+    where: { staffId: { in: staff.map((s: { id: string }) => s.id) }, usedAt: { not: null } },
+    _min: { usedAt: true },
+  });
+  for (const u of used) if (u._min.usedAt) firstIn.set(u.staffId, u._min.usedAt);
+
   const now = new Date();
   // Yesterday, not today. A task with a two hour grace is still inside it for
   // most of the morning, and flagging a nurse at 08:00 for a shift that ends at
@@ -81,9 +93,11 @@ export async function GET(req: NextRequest) {
     const hoursSince = (now.getTime() - period.getTime()) / 3600000;
     if (hoursSince < t.graceHours) continue;
 
-    const owed = staff.filter((s: { position: string; department: string }) =>
-      appliesTo(t.roles, s.position, s.department)
-    );
+    // Only people who were signed up before the period began owe it.
+    const owed = staff.filter((s: { id: string; position: string; department: string }) => {
+      const first = firstIn.get(s.id);
+      return first !== undefined && first <= period && appliesTo(t.roles, s.position, s.department);
+    });
     if (owed.length === 0) continue;
 
     const done = await prisma.staffTaskCompletion.findMany({

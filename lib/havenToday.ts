@@ -73,7 +73,7 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
       }),
       prisma.staffTaskFlag.findMany({
         where: { staffId: me.id, resolvedAt: null },
-        select: { level: true, task: { select: { title: true } } },
+        select: { level: true, forDate: true, task: { select: { title: true, cadence: true } } },
         orderBy: { createdAt: "desc" },
         take: 5,
       }),
@@ -109,7 +109,11 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     items.push({
       kind: "FLAG",
       title: f.task.title,
-      detail: f.level === "ESCALATE" ? "Escalated" : "Not recorded yet",
+      // Name the period. "Not recorded yet" under a task ticked for this week
+      // reads as a tick that did not save, when the flag is about last week.
+      detail: `${f.level === "ESCALATE" ? "Escalated" : "Not recorded"} for ${
+        f.task.cadence === "WEEKLY" ? "the week of " : ""
+      }${f.forDate.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" })}. Ticking it now clears this.`,
       urgency: "NOW",
       href: "/HavenStaff#today",
     });
