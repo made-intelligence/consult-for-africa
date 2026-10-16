@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { sendTransactionalEmail } from "@/lib/zeptomail";
+import { sendTransactionalEmail, type ZeptoMailSendInput } from "@/lib/zeptomail";
 
 /** Escape HTML entities in user-supplied values to prevent XSS in emails */
 function esc(str: string): string {
@@ -57,7 +57,10 @@ async function sendWithRetry(
 
 // ─── Send helper ──────────────────────────────────────────────────────────────
 
-async function send(to: string, subject: string, html: string) {
+/** Files carried with a mail. ZeptoMail only; the SMTP fallback drops them. */
+export type MailFiles = Pick<ZeptoMailSendInput, "attachments" | "inlineImages">;
+
+async function send(to: string, subject: string, html: string, files?: MailFiles) {
   // Preferred path: ZeptoMail HTTP API. Used whenever ZEPTOMAIL_API_KEY is
   // set in the environment. Better deliverability + higher rate limits +
   // tracking/webhook support compared to relaying through Zoho regular SMTP.
@@ -69,6 +72,7 @@ async function send(to: string, subject: string, html: string) {
       to,
       subject,
       html,
+      ...files,
     });
     if (!result.ok) {
       console.error(`[email] ZeptoMail send error to ${to}:`, result.error);
@@ -104,11 +108,12 @@ async function send(to: string, subject: string, html: string) {
 export async function notifyInternal(
   to: string | string[],
   subject: string,
-  html: string
+  html: string,
+  files?: MailFiles,
 ): Promise<void> {
   const recipients = Array.isArray(to) ? to : [to];
   for (const address of recipients) {
-    await send(address, subject, html);
+    await send(address, subject, html, files);
   }
 }
 

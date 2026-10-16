@@ -23,6 +23,17 @@ export interface ZeptoMailSendInput {
   replyTo?: ZeptoMailRecipient;
   /** Optional inline tracking tags - shows up in ZeptoMail logs */
   trackingTag?: string;
+  /** Files to attach, base64 content. */
+  attachments?: ZeptoMailFile[];
+  /** Images referenced from the HTML as src="cid:<cid>". */
+  inlineImages?: (ZeptoMailFile & { cid: string })[];
+}
+
+export interface ZeptoMailFile {
+  name: string;
+  mimeType: string;
+  /** Base64, no data: prefix. */
+  content: string;
 }
 
 export interface ZeptoMailSendResult {
@@ -64,6 +75,12 @@ export async function sendViaZeptoMail(input: ZeptoMailSendInput): Promise<Zepto
       reply_to: [{ address: input.replyTo.email, name: input.replyTo.name }],
     }),
     ...(input.trackingTag && { track_clicks: true, track_opens: true }),
+    ...(input.attachments?.length && {
+      attachments: input.attachments.map((a) => ({ name: a.name, mime_type: a.mimeType, content: a.content })),
+    }),
+    ...(input.inlineImages?.length && {
+      inline_images: input.inlineImages.map((a) => ({ cid: a.cid, mime_type: a.mimeType, content: a.content })),
+    }),
   };
 
   try {
@@ -117,6 +134,8 @@ export async function sendTransactionalEmail({
   subject,
   html,
   text,
+  attachments,
+  inlineImages,
 }: {
   from: string;
   replyTo?: string;
@@ -124,6 +143,8 @@ export async function sendTransactionalEmail({
   subject: string;
   html: string;
   text?: string;
+  attachments?: ZeptoMailSendInput["attachments"];
+  inlineImages?: ZeptoMailSendInput["inlineImages"];
 }): Promise<ZeptoMailSendResult> {
   return sendViaZeptoMail({
     from: parseAddress(from),
@@ -132,5 +153,7 @@ export async function sendTransactionalEmail({
     htmlbody: html,
     textbody: text,
     replyTo: replyTo ? parseAddress(replyTo) : undefined,
+    attachments,
+    inlineImages,
   });
 }

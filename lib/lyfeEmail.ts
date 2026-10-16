@@ -49,6 +49,15 @@ type Letterhead = "lyfe" | "medlyfe";
 /** Why an Ageless mail arrived. The clinic default is wrong for both. */
 const INVITED_FOOTER =
   "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
+/**
+ * The printed invitation, six speakers and all, served from the live site. It
+ * goes at the head of every guest mail so the email looks like the evening
+ * people were shown, not a form letter about it.
+ */
+const AGELESS_FLYER_URL = "https://www.consultforafrica.com/lyfe/ageless-invitation.jpg";
+const flyer = () =>
+  `<p style="margin:0 0 20px;"><img src="${AGELESS_FLYER_URL}" width="496" alt="${esc(LYFE_EVENT_THEME)}, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;"></p>`;
+
 const SPEAKER_FOOTER =
   "You are receiving this because you are speaking at Ageless, hosted by Medlyfe.";
 
@@ -398,7 +407,8 @@ export async function emailLyfeInvitation({
   const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
 
   const html = layout(
-    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+    `${flyer()}
+     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
      <p style="margin:0 0 14px;">We would like you to join us for ${esc(LYFE_EVENT_THEME)}, an evening hosted by ${esc(LYFE_EVENT.host)}.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -428,23 +438,86 @@ export async function emailLyfeInvitation({
   await notifyInternal(to, `An invitation to ${LYFE_EVENT_THEME}`, html);
 }
 
+/**
+ * For somebody invited who has not yet confirmed. Same link as the invitation,
+ * so whichever email they act on, the place is the same one.
+ */
+export async function emailLyfeInvitationReminder({
+  to,
+  firstName,
+  token,
+  from,
+}: {
+  to: string;
+  firstName: string;
+  token: string;
+  from?: string | null;
+}): Promise<void> {
+  const url = lyfeConfirmUrl(token);
+  const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
+
+  const html = layout(
+    `${flyer()}
+     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">A short note in case our invitation to ${esc(LYFE_EVENT_THEME)} was missed. We are finalising the room on ${esc(LYFE_EVENT.rsvpBy)} and would like to keep a place for you.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
+         <strong style="font-size:17px;">${esc(LYFE_EVENT.date)}</strong><br>
+         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
+         ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
+       </td></tr>
+     </table>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};">
+         <a href="${url}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Confirm your place</a>
+       </td></tr>
+     </table>
+     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${url}" style="color:${MEDLYFE_BRAND.green};">${esc(url)}</a></p>
+     <p style="margin:0 0 14px;">If you cannot make it, the same link lets you say so, and we will offer the place to somebody else.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
+    `Please confirm your place at ${LYFE_EVENT_THEME} by ${LYFE_EVENT.rsvpBy}.`,
+    "medlyfe",
+    INVITED_FOOTER,
+  );
+
+  await notifyInternal(to, `A reminder: ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}`, html);
+}
+
 /** Sent the moment somebody confirms, so they have the details in writing. */
 export async function emailLyfeAttendanceConfirmed({
   to,
   firstName,
   guestCount,
+  pass,
 }: {
   to: string;
   firstName: string;
   guestCount: number | null;
+  /**
+   * Their access pass, a PNG built by scripts/build-ageless-passes.py. When it
+   * is given it leads the mail in place of the flyer, which it already
+   * carries the top of, and goes as an attachment they can save.
+   */
+  pass?: { code: string; png: string } | null;
 }): Promise<void> {
   const plusOne = guestCount && guestCount > 0
     ? `<p style="margin:0 0 14px;">We have you down for ${guestCount === 1 ? "one guest" : `${guestCount} guests`} as well. If that changes, reply and tell us.</p>`
     : "";
 
+  const passCid = "ageless-pass";
+  const head = pass
+    ? `<p style="margin:0 0 20px;"><img src="cid:${passCid}" width="496" alt="Your access pass to ${esc(LYFE_EVENT_THEME)}, code ${esc(pass.code)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;"></p>`
+    : flyer();
+  const passNote = pass
+    ? `<p style="margin:0 0 14px;">Your access pass is above and attached. Please show it at the door, on your phone or printed. Your pass code is <strong>${esc(pass.code)}</strong>.</p>`
+    : "";
+
   const html = layout(
-    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+    `${head}
+     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
      <p style="margin:0 0 14px;">Your place is held. Thank you, and we look forward to seeing you.</p>
+     ${passNote}
      ${plusOne}
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -466,7 +539,15 @@ export async function emailLyfeAttendanceConfirmed({
     INVITED_FOOTER,
   );
 
-  await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
+  const file = pass
+    ? { name: `Ageless access pass ${pass.code}.png`, mimeType: "image/png", content: pass.png }
+    : null;
+  await notifyInternal(
+    to,
+    `Your place is held, ${firstName}`,
+    html,
+    file ? { attachments: [file], inlineImages: [{ ...file, cid: passCid }] } : undefined,
+  );
 }
 
 /**
