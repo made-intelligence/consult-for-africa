@@ -174,6 +174,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Projects",       href: "/projects",       icon: Briefcase },
       { label: "Deliverables",   href: "/deliverables",   icon: FileCheck },
       { label: "Meetings",       href: "/meetings",       icon: Video },
+      { label: "Haven adoption", href: "/admin/haven-adoption", icon: HeartPulse, roles: STAFF_ROLES },
     ],
     roles: STAFF_AND_OFFICE,
   },
