@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { auth } from "@/auth";
 import { getCadreEmployerContext } from "@/lib/cadreEmployerAuth";
+import { mandateScope } from "@/lib/cadreHealth/mandateAccess";
 
-const STAFF_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
 
 /**
  * Who may run the matcher against a role.
@@ -13,12 +13,18 @@ const STAFF_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
  * mandate id could write fifty match rows against it and flip the role's status,
  * unauthenticated, from anywhere.
  *
- * Staff can run it for any mandate, including the ones we run ourselves out of
- * admin. An employer can run it only against a role their own organisation owns.
+ * Staff can run it for the mandates mandateScope lets them see: Partner and
+ * Admin for any, anyone else for the roles they own. An employer can run it only against a role their own organisation owns.
  */
 async function authoriseMatch(mandateId: string): Promise<boolean> {
   const staff = await auth();
-  if (staff && STAFF_ROLES.includes(staff.user.role)) return true;
+  if (staff?.user) {
+    const visible = await prisma.cadreMandate.findFirst({
+      where: { id: mandateId, ...mandateScope(staff.user) },
+      select: { id: true },
+    });
+    if (visible) return true;
+  }
 
   const ctx = await getCadreEmployerContext();
   if (!ctx) return false;

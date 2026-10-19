@@ -12,12 +12,14 @@ import {
   XCircle,
   ArrowLeft,
 } from "lucide-react";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 export default async function OutreachDashboard({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; tier?: string; page?: string }>;
 }) {
+  await requireCadreAdmin();
   const params = await searchParams;
   const statusFilter = params.status;
   const tierFilter = params.tier;

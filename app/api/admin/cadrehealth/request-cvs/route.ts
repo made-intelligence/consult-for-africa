@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { handler } from "@/lib/api-handler";
 import { sendCvRequests } from "@/lib/cadreHealth/cvRequest";
 
-const ALLOWED_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
+import { CADRE_ADMIN_ROLES as ALLOWED_ROLES } from "@/lib/cadreHealth/mandateAccess";
 
 // One email every 250ms; a few hundred applicants needs the headroom.
 export const maxDuration = 300;

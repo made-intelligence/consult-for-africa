@@ -9,8 +9,10 @@ import {
   Building2,
   CheckCircle2,
 } from "lucide-react";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 export default async function CadreHealthReferralsAdmin() {
+  await requireCadreAdmin();
   const professionalsWithReferrals = await prisma.cadreProfessional.findMany({
     where: {
       referrals: { some: {} },

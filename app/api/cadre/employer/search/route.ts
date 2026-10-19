@@ -10,6 +10,7 @@ import {
   toCandidateCard,
   type CandidateCardRow,
 } from "@/lib/cadreHealth/candidateVisibility";
+import { ownStaffIds } from "@/lib/cadreHealth/ownStaff";
 
 /**
  * Employer candidate search.
@@ -100,6 +101,11 @@ export const GET = handler(async function GET(req: NextRequest) {
       { currentFacility: { contains: q, mode: "insensitive" } },
     ];
   }
+
+  // A hospital's own staff are not in its search at all, so neither the cards,
+  // the ranking nor the facet counts can say which of them are looking.
+  const ownStaff = await ownStaffIds(ctx.org);
+  if (ownStaff.length) where.id = { notIn: ownStaff };
 
   const [rows, total, facets] = await Promise.all([
     prisma.cadreProfessional.findMany({

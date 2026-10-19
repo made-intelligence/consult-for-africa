@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCadreEmployerContext, canWrite } from "@/lib/cadreEmployerAuth";
 import { handler } from "@/lib/api-handler";
 import { createContactRequest } from "@/lib/cadreHealth/contactRequest";
+import { hiddenAsOwnStaff } from "@/lib/cadreHealth/ownStaff";
 
 /**
  * Asking a professional whether a hospital may approach them.
@@ -30,10 +31,14 @@ export const POST = handler(async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}));
+  const professionalId = typeof body.professionalId === "string" ? body.professionalId : "";
+  if (professionalId && (await hiddenAsOwnStaff(ctx.org, professionalId))) {
+    return NextResponse.json({ error: "Professional not found" }, { status: 404 });
+  }
 
   const result = await createContactRequest({
     orgId: ctx.org.id,
-    professionalId: typeof body.professionalId === "string" ? body.professionalId : "",
+    professionalId,
     mandateId: typeof body.mandateId === "string" && body.mandateId ? body.mandateId : null,
     message: typeof body.message === "string" ? body.message : "",
     requestedById: ctx.accountId,

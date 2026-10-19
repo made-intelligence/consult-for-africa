@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCadreEmployerContext, canWrite } from "@/lib/cadreEmployerAuth";
 import { handler } from "@/lib/api-handler";
+import { hiddenAsOwnStaff } from "@/lib/cadreHealth/ownStaff";
 
 /** Adding and removing people from a shortlist. */
 
@@ -42,7 +43,7 @@ export const POST = handler(async function POST(
     where: { id: professionalId, accountStatus: { not: "SUSPENDED" } },
     select: { id: true, availability: true },
   });
-  if (!professional) {
+  if (!professional || (await hiddenAsOwnStaff(ctx.org, professionalId))) {
     return NextResponse.json({ error: "Professional not found" }, { status: 404 });
   }
   // Someone who has opted out of being approached is not shown in search and is

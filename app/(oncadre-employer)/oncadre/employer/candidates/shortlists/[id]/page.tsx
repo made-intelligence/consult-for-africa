@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { displayNameFor } from "@/lib/cadreSalutation";
 import { tierFor, specialtyProvenance } from "@/lib/cadreHealth/candidateVisibility";
+import { ownStaffIds } from "@/lib/cadreHealth/ownStaff";
 
 /** One list, side by side, so a hospital can actually compare. */
 export const dynamic = "force-dynamic";
@@ -57,6 +58,9 @@ export default async function ShortlistDetailPage({
     },
   });
   if (!shortlist) notFound();
+  // Entries added before own staff were hidden would still show their availability.
+  const ownStaff = new Set(await ownStaffIds(ctx.org));
+  shortlist.entries = shortlist.entries.filter((e) => !ownStaff.has(e.professional.id));
 
   return (
     <div className="space-y-6">
