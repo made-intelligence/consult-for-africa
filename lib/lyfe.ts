@@ -168,7 +168,9 @@ export const LYFE_EVENT = {
   // of the eleven inviter links had been sent, so a Friday deadline was
   // closing a door nobody had been shown. The 19th gives a week of chasing
   // and still leaves two clear days to finalise the room.
-  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 19 October",
+  // Extended to the 20th on the 19th: places were still open and the
+  // two-days-to-go post went out that evening.
+  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Tuesday, 20 October",
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
   places: 70,
