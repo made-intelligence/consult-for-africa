@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import ClickableRow from "./ClickableRow";
 import { RequestCvsButton } from "@/components/cadrehealth/RequestCvsButton";
 import { applicantsWithoutCv } from "@/lib/cadreHealth/cvRequest";
+import { mandateScope, requireMandateViewer } from "@/lib/cadreHealth/mandateAccess";
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-emerald-50 text-emerald-700",
@@ -18,7 +19,9 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default async function MandatesPage() {
+  const session = await requireMandateViewer();
   const mandates = await prisma.cadreMandate.findMany({
+    where: mandateScope(session.user),
     orderBy: { createdAt: "desc" },
     include: {
       _count: { select: { matches: true } },

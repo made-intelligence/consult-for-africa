@@ -7,6 +7,7 @@ import {
   Users,
   CheckCircle2,
 } from "lucide-react";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 const PARTNER_ORG_LABELS: Record<string, string> = {
   MANSAG: "MANSAG",
@@ -17,6 +18,7 @@ const PARTNER_ORG_LABELS: Record<string, string> = {
 };
 
 export default async function AdminMentorshipPage() {
+  await requireCadreAdmin();
   const [
     totalMentorsActive,
     totalMentorsPending,

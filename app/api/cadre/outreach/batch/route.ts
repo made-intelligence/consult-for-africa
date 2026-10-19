@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendReactivationEmail } from "@/lib/cadreHealth/outreachEmail";
 import { handler } from "@/lib/api-handler";
+import { isCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 // Assume this exists and will be implemented with WhatsApp Business API
 // import { sendInitialWhatsApp } from "@/lib/cadreHealth/outreachSender";
@@ -9,6 +10,9 @@ import { handler } from "@/lib/api-handler";
 const DEFAULT_BATCH_SIZE = 50;
 
 export const POST = handler(async function POST(req: NextRequest) {
+  if (!(await isCadreAdmin())) {
+    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+  }
   try {
     const body = await req.json().catch(() => ({}));
     const batchSize = Math.min(body.batchSize ?? DEFAULT_BATCH_SIZE, 200);
