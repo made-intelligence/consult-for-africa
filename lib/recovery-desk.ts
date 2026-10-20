@@ -2,7 +2,8 @@ import * as XLSX from "xlsx";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { newToken } from "@/lib/hospital-sales";
-import { ADVANCE_LIVE } from "@/lib/claims-recovery";
+import { ADVANCE_LIVE, FUNDABLE_PAYER_TYPES, MAX_DUE_DAYS } from "@/lib/claims-recovery";
+import { recordReceipt } from "@/lib/recovery-ledger";
 import { digestCall, planRecovery, vetClaims, type ClaimForVetting } from "@/lib/recovery-ai";
 import { ageDays, decide } from "@/lib/recovery-rules";
 
@@ -40,6 +41,9 @@ const COLS: Record<string, string[]> = {
   billed: ["billed", "amount", "amount billed", "claim amount", "billed amount"],
   tariff: ["tariff", "tariff amount", "agreed tariff"],
   payerResponse: ["payer response", "status", "hmo response", "remark", "remarks"],
+  accepted: ["accepted amount", "approved amount", "amount approved", "amount accepted", "vetted amount"],
+  acceptedAt: ["date accepted", "accepted on", "approval date", "date approved"],
+  acceptanceRef: ["acceptance ref", "approval ref", "batch approval", "remittance advice"],
 };
 
 function parseDate(v: string | null): Date | null {
@@ -97,6 +101,9 @@ export function parseClaimsSheet(text: string) {
       billedAmount: billed,
       tariffAmount: parseMoney(get(r, "tariff")),
       payerResponse: get(r, "payerResponse"),
+      acceptedAmount: parseMoney(get(r, "accepted")),
+      payerAcceptedAt: parseDate(get(r, "acceptedAt")),
+      acceptanceRef: get(r, "acceptanceRef"),
     });
   }
   return { rows, skipped };
@@ -130,6 +137,8 @@ export async function importBatch(accountId: string, kind: "SAMPLE" | "LIVE", te
           claimRef: r.claimRef, enrolleeRef: r.enrolleeRef, serviceDate: r.serviceDate, submittedAt: r.submittedAt,
           serviceSummary: r.serviceSummary, authCode: r.authCode, documentsHeld: r.documentsHeld,
           billedAmount: r.billedAmount, tariffAmount: r.tariffAmount, payerResponse: r.payerResponse,
+          // The sheet's acceptance is the hospital's word; a person checks it before approving.
+          ...(r.acceptedAmount ? { acceptedAmount: r.acceptedAmount, payerAcceptedAt: r.payerAcceptedAt ?? new Date(), acceptanceRef: r.acceptanceRef } : {}),
         },
       });
       created++;
@@ -217,11 +226,16 @@ export async function vetBatch(batchId: string, userId: string) {
 
 export async function decideClaim(claimId: string, userId: string) {
   const c = await prisma.recoveryClaim.findUniqueOrThrow({ where: { id: claimId }, include: { payer: true, account: true } });
-  const advanced = { status: { in: ["ADVANCED", "IN_RECOVERY", "PART_PAID"] }, advanceAmount: { not: null } };
-  const [tot, pay] = await Promise.all([
-    prisma.recoveryClaim.aggregate({ where: { accountId: c.accountId, ...advanced }, _sum: { advanceAmount: true } }),
-    prisma.recoveryClaim.aggregate({ where: { accountId: c.accountId, payerId: c.payerId, ...advanced }, _sum: { advanceAmount: true } }),
+  const [open, ack, overdueCount, billing] = await Promise.all([
+    prisma.recoveryAdvance.findMany({ where: { accountId: c.accountId, status: "OPEN" }, select: { payerId: true, principal: true, principalRepaid: true } }),
+    prisma.recoveryAcknowledgment.findMany({ where: { accountId: c.accountId }, select: { payerId: true } }),
+    prisma.recoveryAdvance.count({ where: { accountId: c.accountId, status: "OPEN", dueAt: { lt: new Date() } } }),
+    prisma.recoveryClaim.groupBy({ by: ["payerId"], where: { accountId: c.accountId, payer: { type: { in: FUNDABLE_PAYER_TYPES } } }, _sum: { billedAmount: true } }),
   ]);
+  const out = (xs: typeof open) => xs.reduce((s, a) => s.add(a.principal.sub(a.principalRepaid)), D(0));
+  const signed = new Set(ack.map((a) => a.payerId));
+  const allBilled = billing.reduce((s, b) => s.add(b._sum.billedAmount ?? 0), D(0));
+  const signedBilled = billing.filter((b) => signed.has(b.payerId)).reduce((s, b) => s.add(b._sum.billedAmount ?? 0), D(0));
   const d = decide({
     status: c.status,
     vetVerdict: c.vetVerdict,
@@ -231,10 +245,13 @@ export async function decideClaim(claimId: string, userId: string) {
     billedAmount: c.billedAmount,
     tariffAmount: c.tariffAmount,
     ageDays: ageDays(c.serviceDate, c.submittedAt),
-    payer: { advanceEligible: c.payer.advanceEligible, conflict: c.payer.conflict },
+    acceptedAmount: c.payerAcceptedAt ? c.acceptedAmount : null,
+    payer: { advanceEligible: c.payer.advanceEligible, conflict: c.payer.conflict, type: c.payer.type, acknowledged: signed.has(c.payerId) },
+    ackCoverage: allBilled.gt(0) ? signedBilled.div(allBilled).toNumber() : 0,
+    overdueCount,
     account: { status: c.account.status, advanceRate: c.account.advanceRate, maxClaimAgeDays: c.account.maxClaimAgeDays, payerCap: c.account.payerCap, facilityLimit: c.account.facilityLimit, agreementSigned: !!c.account.agreementSignedAt },
-    outstandingTotal: tot._sum.advanceAmount ?? D(0),
-    outstandingPayer: pay._sum.advanceAmount ?? D(0),
+    outstandingTotal: out(open),
+    outstandingPayer: out(open.filter((a) => a.payerId === c.payerId)),
     fundingLive: ADVANCE_LIVE,
   });
   await prisma.$transaction([
@@ -317,17 +334,41 @@ export async function logCall(accountId: string, payerId: string, notes: string,
 
 // ── Money ────────────────────────────────────────────────────────────────
 
+/** One payment against one claim: a receipt with a single line, through the same waterfall. */
 export async function recordPayment(claimId: string, amount: string, receivedAt: Date, reference: string | null, userId: string) {
+  const c = await prisma.recoveryClaim.findUniqueOrThrow({ where: { id: claimId }, select: { accountId: true, payerId: true, claimRef: true } });
+  return recordReceipt({ accountId: c.accountId, payerId: c.payerId, source: "HMO", amount, receivedAt, reference, lines: [{ claimRef: c.claimRef, amount }], userId });
+}
+
+// ── Acceptance, letters and payor terms ──────────────────────────────────
+
+export async function markAccepted(claimId: string, amount: string, acceptedOn: Date, ref: string | null, userId: string) {
   const amt = D(amount);
   if (amt.lte(0)) throw new Error("Amount must be positive");
-  return prisma.$transaction(async (tx) => {
-    const c = await tx.recoveryClaim.findUniqueOrThrow({ where: { id: claimId } });
-    const recovered = c.recoveredAmount.add(amt);
-    const target = c.vetPayable ?? c.tariffAmount ?? c.billedAmount;
-    const status = recovered.gte(target) ? "PAID" : "PART_PAID";
-    await tx.recoveryPayment.create({ data: { claimId, amount: amt, receivedAt, reference, recordedById: userId } });
-    await tx.recoveryClaim.update({ where: { id: claimId }, data: { recoveredAmount: recovered, status, closedAt: status === "PAID" ? new Date() : null, nextAction: status === "PAID" ? null : c.nextAction } });
-    await tx.recoveryActivity.create({ data: { accountId: c.accountId, claimId, payerId: c.payerId, kind: "PAYMENT", summary: `₦${amt.toFixed(2)} received${reference ? ` (${reference})` : ""}. ${status === "PAID" ? "Claim paid in full." : `₦${recovered.toFixed(2)} of ₦${target.toFixed(2)} so far.`}`, amount: amt, createdById: userId } });
-    return { status, recovered: recovered.toFixed(2) };
-  });
+  const c = await prisma.recoveryClaim.findUniqueOrThrow({ where: { id: claimId }, include: { advance: { select: { id: true } } } });
+  if (c.advance) throw new Error("Already advanced: the accepted amount is fixed");
+  if (amt.gt(c.billedAmount)) throw new Error("Accepted amount is more than was billed");
+  await prisma.$transaction([
+    prisma.recoveryClaim.update({ where: { id: claimId }, data: { acceptedAmount: amt, payerAcceptedAt: acceptedOn, acceptanceRef: ref, decision: null, decisionAmount: null, approvedAt: null, approvedById: null } }),
+    prisma.recoveryActivity.create({ data: { accountId: c.accountId, claimId, payerId: c.payerId, kind: "STATUS", amount: amt, createdById: userId, summary: `Payor accepted ₦${amt.toFixed(2)} of ₦${c.billedAmount.toFixed(2)}${ref ? ` (${ref})` : ""}` } }),
+  ]);
+}
+
+export async function recordAcknowledgment(accountId: string, payerId: string, signedOn: Date, documentUrl: string | null, notes: string | null, userId: string) {
+  const payer = await prisma.recoveryPayer.findUniqueOrThrow({ where: { id: payerId } });
+  if (!FUNDABLE_PAYER_TYPES.includes(payer.type)) throw new Error(`Private HMOs only: ${payer.name} is ${payer.type}`);
+  await prisma.$transaction([
+    prisma.recoveryAcknowledgment.upsert({
+      where: { accountId_payerId: { accountId, payerId } },
+      create: { accountId, payerId, signedOn, documentUrl, notes, createdById: userId },
+      update: { signedOn, documentUrl, notes },
+    }),
+    prisma.recoveryActivity.create({ data: { accountId, payerId, kind: "LETTER", createdById: userId, summary: `${payer.name} signed the acknowledgment letter on ${signedOn.toISOString().slice(0, 10)}` } }),
+  ]);
+}
+
+export async function setPayerTerms(payerId: string, type: string, expectedDaysToPay: number, dueDays: number) {
+  if (dueDays > MAX_DUE_DAYS) throw new Error(`Due days cannot exceed ${MAX_DUE_DAYS}`);
+  if (expectedDaysToPay > dueDays) throw new Error("Expected days to pay cannot be longer than the due days");
+  return prisma.recoveryPayer.update({ where: { id: payerId }, data: { type, expectedDaysToPay, dueDays } });
 }
