@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
   LayoutDashboard,
+  Gauge,
   Briefcase,
   Megaphone,
   Building2,
@@ -183,6 +184,10 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: "Pipeline",       href: "/pipeline",       icon: TrendingUp },
       { label: "Clients",        href: "/clients",        icon: Building2, roles: EM_PLUS },
+      // Gated exactly as /admin/client-dashboards is, so the link never shows
+      // somebody a page that will bounce them.
+      { label: "Client dashboards", href: "/admin/client-dashboards", icon: Gauge,
+        roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
     ],
     roles: EM_PLUS_AND_OFFICE,
   },
