@@ -173,7 +173,12 @@ export const LYFE_EVENT = {
   rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Tuesday, 20 October",
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
-  places: 70,
+  /// Raised to 75 on 20 October, the eve of the evening.
+  places: 75,
+  /// From 20 October every new registration joins the waiting list rather
+  /// than the queue for an invitation. The team offers a place from it by
+  /// hand if one opens.
+  waitlistOnly: true,
 } as const;
 
 /**
