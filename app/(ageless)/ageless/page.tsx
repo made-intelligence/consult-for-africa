@@ -191,7 +191,9 @@ function Rule({ color = MB.lime, width = 56 }: { color?: string; width?: number 
   return <div className="h-px" style={{ width, background: color, opacity: 0.75 }} />;
 }
 
-function RsvpButton({ children = "Register your interest" }: { children?: React.ReactNode }) {
+function RsvpButton({
+  children = LYFE_EVENT.waitlistOnly ? "Join the waiting list" : "Register your interest",
+}: { children?: React.ReactNode }) {
   return (
     <a
       href="?go=rsvp#enquire"
@@ -387,8 +389,14 @@ function Hero() {
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
               <RsvpButton />
               <span className="text-[14px]" style={{ color: MB.greenSoft }}>
-                An intimate evening for {LYFE_EVENT.places}. Register your interest by{" "}
-                {LYFE_EVENT.rsvpBy} and we will come back to you.
+                {LYFE_EVENT.waitlistOnly ? (
+                  <>The room of {LYFE_EVENT.places} is full. Join the waiting list and we will write if a place opens.</>
+                ) : (
+                  <>
+                    An intimate evening for {LYFE_EVENT.places}. Register your interest by{" "}
+                    {LYFE_EVENT.rsvpBy} and we will come back to you.
+                  </>
+                )}
               </span>
             </div>
 
@@ -663,7 +671,7 @@ function Rsvp({
     <Section bg={MB.green} id="enquire">
       <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
-          <Eyebrow>Register your interest</Eyebrow>
+          <Eyebrow>{LYFE_EVENT.waitlistOnly ? "The waiting list" : "Register your interest"}</Eyebrow>
           <h2
             className="mt-5 text-[30px] leading-[1.14] md:text-[42px]"
             style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
@@ -671,9 +679,9 @@ function Rsvp({
             We would like you there.
           </h2>
           <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-            It is a small room, {LYFE_EVENT.places} places, so names are confirmed in advance
-            rather than taken at the door. Tell us you would like to come and we will write
-            back with a link of your own. Your place is held the moment you use it.
+            {LYFE_EVENT.waitlistOnly
+              ? `The room of ${LYFE_EVENT.places} is full. Leave your details and you join the waiting list. If a place opens we will write with a link of your own, and your place is held the moment you use it.`
+              : `It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. Tell us you would like to come and we will write back with a link of your own. Your place is held the moment you use it.`}
           </p>
 
           <div className="mt-9">

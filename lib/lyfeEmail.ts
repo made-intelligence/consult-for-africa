@@ -122,6 +122,8 @@ export interface LyfeConfirmationInput {
   surgical: boolean;
   guestCount: number | null;
   slotAt?: Date | null;
+  /** Event registrations once the room is closed: they join the waiting list. */
+  waitlisted?: boolean;
 }
 
 /** "Tuesday 13 October, 11:00 WAT", from an instant, in Lagos time. */
@@ -148,6 +150,7 @@ export async function emailLyfeConfirmation({
   surgical,
   guestCount,
   slotAt,
+  waitlisted = false,
 }: LyfeConfirmationInput): Promise<void> {
   // A request, not a booking. The page stopped taking money at the door, so
   // saying "booked" or "paid" here would both be wrong. What is true is that
@@ -202,15 +205,23 @@ export async function emailLyfeConfirmation({
            ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>
+       ${waitlisted
+         ? `<p style="margin:0 0 14px;">The room is full, so we have put you on the waiting list. If a place opens we will write to you straight away with a link of your own, and your place is held the moment you use it. Please do not come to the door without one.</p>`
+         : `<p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>`}
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
        <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
-      `Your interest in ${LYFE_EVENT_THEME} is registered.`,
+      waitlisted
+        ? `You are on the waiting list for ${LYFE_EVENT_THEME}.`
+        : `Your interest in ${LYFE_EVENT_THEME} is registered.`,
       "medlyfe",
       INVITED_FOOTER,
     );
-    await notifyInternal(to, `Thank you for your interest, ${esc(firstName)}`, html);
+    await notifyInternal(
+      to,
+      waitlisted ? `You are on the waiting list, ${esc(firstName)}` : `Thank you for your interest, ${esc(firstName)}`,
+      html,
+    );
     return;
   }
 
@@ -245,6 +256,8 @@ export interface LyfeInternalInput {
   email: string;
   phone: string;
   intent: Intent;
+  /** An event registration that went straight to the waiting list. */
+  waitlisted?: boolean;
   guestCount: number | null;
   isClinician: boolean | null;
   pathway: PathwayKey;
@@ -328,12 +341,16 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
      <p style="margin:24px 0 0;padding-top:16px;border-top:1px solid ${LYFE_BRAND.line};font-size:12px;color:${LYFE_BRAND.muted};">
        Reference ${esc(input.id)}. Mark her contacted in the queue the moment you speak to her, because the clock on this row is running until you do.
      </p>`,
-    rsvp ? `${input.fullName} is coming to the evening` : `${input.fullName}, ${PATHWAY_LABELS[input.pathway]}`,
+    rsvp
+      ? input.waitlisted
+        ? `${input.fullName} joined the waiting list`
+        : `${input.fullName} is coming to the evening`
+      : `${input.fullName}, ${PATHWAY_LABELS[input.pathway]}`,
   );
 
   await notifyInternal(
     input.to,
-    `${rsvp ? "RSVP: " : input.intent === "CONSULTATION" ? "CONSULTATION: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
+    `${rsvp ? (input.waitlisted ? "WAITLIST: " : "RSVP: ") : input.intent === "CONSULTATION" ? "CONSULTATION: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
     html,
   );
 }
