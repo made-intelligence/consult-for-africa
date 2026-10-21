@@ -8623,3 +8623,24 @@ model StaffTaskFlag {
   @@index([staffId, resolvedAt])
   @@index([resolvedAt])
 }
+
+/// A question from the room at an AGELESS evening, posted from a guest's phone
+/// at /ageless/live. Votes are a plain counter: the room is seventy-odd people
+/// and the stakes are which question the chair reads next, so a browser-side
+/// guard against double votes is enough. The chair hides anything unsuitable.
+model AgelessQuestion {
+  id        String   @id @default(cuid())
+  /// The edition, so the series can reuse the table. "2026-10" for the first.
+  edition   String
+  text      String   @db.Text
+  askerName String?
+  /// Who it is for, if the guest chose a speaker.
+  forWhom   String?
+  votes     Int      @default(0)
+  hidden    Boolean  @default(false)
+  answered  Boolean  @default(false)
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([edition, hidden, votes])
+}

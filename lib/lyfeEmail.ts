@@ -703,3 +703,31 @@ export async function emailLyfeSpeakerConfirm({
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: please confirm your details`, html);
 }
+
+/**
+ * The day-of note to every confirmed AGELESS guest: questions for the panel
+ * go in from their phone at /live, and the pass is scanned at the door.
+ */
+export async function emailAgelessLiveQuestions({
+  to,
+  firstName,
+  passCode,
+}: {
+  to: string;
+  firstName: string;
+  passCode: string;
+}): Promise<void> {
+  const link = "https://www.consultforafrica.com/live";
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">We look forward to seeing you at ${esc(LYFE_EVENT_THEME)} this evening.</p>
+     <p style="margin:0 0 14px;">The speakers want your questions. From ${esc(LYFE_EVENT.arrival)}, open <a href="${link}" style="color:${MEDLYFE_BRAND.green};font-weight:600;">consultforafrica.com/live</a> on your phone, post a question, and vote for the ones you want answered. The chair takes the most popular first. You can leave your name off if you prefer.</p>
+     <p style="margin:0 0 14px;">Please have your access pass ready on your phone. The door scans it. Your pass code is <strong>${esc(passCode)}</strong>.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
+    `Tonight at ${LYFE_EVENT_THEME}: your questions, from your phone.`,
+    "medlyfe",
+    INVITED_FOOTER,
+  );
+  await notifyInternal(to, `Tonight at ${LYFE_EVENT_THEME}: your questions, from your phone`, html);
+}
