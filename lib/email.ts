@@ -1087,10 +1087,12 @@ export async function emailSecondmentRecall({
 
 export async function sendMeetingInvite({
   to, participantName, meetingTitle, meetLink, scheduledAt, scheduledEndAt,
-  organizerName, nuruEnabled,
+  organizerName, nuruEnabled, transcribed = false,
 }: {
   to: string; participantName: string; meetingTitle: string; meetLink: string;
   scheduledAt: Date; scheduledEndAt: Date; organizerName: string; nuruEnabled: boolean;
+  /** Held in a Daily room, which transcribes the call. The link is personal. */
+  transcribed?: boolean;
 }) {
   const dateStr = scheduledAt.toLocaleDateString("en-NG", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -1103,7 +1105,13 @@ export async function sendMeetingInvite({
     hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos",
   });
 
-  const nuruLine = nuruEnabled
+  // Telling people before the call that it is transcribed is the notice the
+  // NDPA asks for. Daily also shows it in the call while it runs.
+  const nuruLine = transcribed
+    ? `<p style="margin:12px 0;padding:12px;background:#F0F7FF;border-radius:8px;font-size:13px;color:#374151;">
+        This meeting is transcribed so that notes and agreed actions can be sent round afterwards. You will see a notice in the call while transcription is running.
+      </p>`
+    : nuruEnabled
     ? `<p style="margin:12px 0;padding:12px;background:#F0F7FF;border-radius:8px;font-size:13px;color:#374151;">
         <strong>Nuru</strong>, our meeting assistant, will join to take notes and capture action items automatically.
       </p>`
@@ -1120,8 +1128,8 @@ export async function sendMeetingInvite({
         ["Organized by", organizerName],
       ])}
       ${nuruLine}
-      ${btn("Join Google Meet", meetLink, "#1a73e8")}
-      ${p("You can also join using this link:")}
+      ${btn(transcribed ? "Join the meeting" : "Join Google Meet", meetLink, transcribed ? "#0F2744" : "#1a73e8")}
+      ${p(transcribed ? "This link is yours. Please do not forward it; ask us to add anyone else who should come." : "You can also join using this link:")}
       <p style="margin:0 0 16px;font-size:13px;word-break:break-all;">
         <a href="${esc(meetLink)}" style="color:#1a73e8;">${esc(meetLink)}</a>
       </p>

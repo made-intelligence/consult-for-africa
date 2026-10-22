@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { canUseOfficeDesk, nextOccurrenceAfter } from "@/lib/office";
 import { canAssignToOthers } from "@/lib/tasks";
-import { FINANCE_READ_ROLES, PIPELINE_ROLES } from "@/lib/constants";
+import { FINANCE_READ_ROLES, OFFICE_ROLES, PIPELINE_ROLES } from "@/lib/constants";
+import { Prisma } from "@prisma/client";
 
 /**
  * GET /api/desk?forUserId=...
@@ -90,7 +91,7 @@ export const GET = handler(async function GET(req: NextRequest) {
 
   const [
     myTasks, toReview, myDecisions, myCommitments, raisedDecisions, assignedOut,
-    meetings, rhythms, nextActions, overdueInvoices, silentProposals, lowStock,
+    meetings, rhythms, nextActions, overdueInvoices, silentProposals, lowStock, notesToConfirm,
   ] = await Promise.all([
     prisma.task.findMany({
       where: { assigneeId: me, status: { in: ["ASSIGNED", "IN_PROGRESS", "CHANGES_REQUESTED", "BLOCKED"] } },
@@ -162,6 +163,19 @@ export const GET = handler(async function GET(req: NextRequest) {
       FROM "StockItem" WHERE "quantityOnHand" <= "reorderLevel"
       ORDER BY "quantityOnHand" ASC LIMIT 15
     `,
+    // Nuru's drafts wait on whoever runs the follow-through: the office for
+    // every meeting, anyone else for the meetings they organised.
+    prisma.meeting.findMany({
+      where: {
+        dailyRoomName: { not: null },
+        aiCommitments: { not: Prisma.DbNull },
+        commitmentsReviewedAt: null,
+        ...(OFFICE_ROLES.includes(subject.role as typeof OFFICE_ROLES[number]) ? {} : { organizerId: me }),
+      },
+      orderBy: { endedAt: "asc" },
+      select: { id: true, title: true, endedAt: true, aiCommitments: true },
+      take: 15,
+    }),
   ]);
 
   const yoursNow: Row[] = [];
@@ -280,6 +294,20 @@ export const GET = handler(async function GET(req: NextRequest) {
       href: `/tasks/${t.id}`, date: t.dueDate?.toISOString() ?? null,
       urgency: t.status === "BLOCKED" ? "TODAY" : urgencyOf(t.dueDate, now),
       action: t.status === "BLOCKED" ? "Unblock them" : "Waiting",
+    });
+  }
+
+  for (const m of notesToConfirm) {
+    const n = Array.isArray(m.aiCommitments) ? m.aiCommitments.length : 0;
+    const ended = m.endedAt ?? now;
+    yoursNow.push({
+      kind: "MEETING_NOTES", id: m.id, title: `Confirm the notes: ${m.title}`,
+      detail: n
+        ? `Nuru heard ${n} commitment${n === 1 ? "" : "s"}. Nobody has the notes until you confirm.`
+        : "Nuru heard no commitments. Confirm that, and the notes go out.",
+      href: `/meetings/${m.id}`, date: ended.toISOString(),
+      urgency: now.getTime() - ended.getTime() > 86400000 ? "OVERDUE" : "TODAY",
+      action: "Confirm",
     });
   }
 

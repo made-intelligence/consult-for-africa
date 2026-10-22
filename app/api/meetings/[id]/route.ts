@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { updateGoogleMeetMeeting, cancelGoogleMeetMeeting } from "@/lib/google";
 import { sendMeetingInvite } from "@/lib/email";
+import { deleteMeetingRoom, joinLinkFor, rescheduleMeetingRoom } from "@/lib/daily";
 import { NextRequest } from "next/server";
 import { handler } from "@/lib/api-handler";
 import { MEETING_ORGANIZER_ROLES } from "@/lib/constants";
@@ -157,9 +158,35 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: Ctx) {
     );
   }
 
+  // A Daily room only opens inside its window, so moving the meeting moves the
+  // window. The links people already hold keep working.
+  if (existing.dailyRoomName && scheduledAt) {
+    rescheduleMeetingRoom(existing.dailyRoomName, meeting.scheduledAt, meeting.scheduledEndAt).catch((err) =>
+      console.error("[meetings] Daily reschedule failed:", err),
+    );
+  }
+
   // Somebody added late still needs telling. Only the new people, so nobody
   // already going gets a duplicate.
-  if (added.length > 0 && meeting.meetLink) {
+  if (added.length > 0 && existing.dailyRoomName) {
+    for (const p of added as { name: string; email: string; userId?: string | null }[]) {
+      joinLinkFor({ roomName: existing.dailyRoomName, userName: p.name, isOwner: !!p.userId })
+        .then((link) =>
+          sendMeetingInvite({
+            to: p.email,
+            participantName: p.name,
+            meetingTitle: meeting.title,
+            meetLink: link,
+            scheduledAt: meeting.scheduledAt,
+            scheduledEndAt: meeting.scheduledEndAt,
+            organizerName: meeting.organizer?.name ?? "C4A",
+            nuruEnabled: meeting.nuruEnabled,
+            transcribed: true,
+          }),
+        )
+        .catch((err) => console.error(`[meetings] invite to ${p.email} failed:`, err));
+    }
+  } else if (added.length > 0 && meeting.meetLink) {
     for (const p of added) {
       sendMeetingInvite({
         to: p.email,
@@ -203,6 +230,13 @@ export const DELETE = handler(async function DELETE(_req: NextRequest, ctx: Ctx)
   if (existing.calendarEventId) {
     cancelGoogleMeetMeeting(existing.calendarEventId).catch((err) =>
       console.error("[meetings] Google Calendar cancel failed:", err)
+    );
+  }
+
+  // Delete the room so the links already sent stop working.
+  if (existing.dailyRoomName) {
+    deleteMeetingRoom(existing.dailyRoomName).catch((err) =>
+      console.error("[meetings] Daily room delete failed:", err),
     );
   }
 

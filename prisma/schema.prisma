@@ -2819,6 +2819,18 @@ model Meeting {
   nuruEnabled Boolean @default(true)
   nuruJoined  Boolean @default(false)
 
+  /// The Daily room this meeting is held in. Rooms sit on the Daily domain
+  /// Mezo already pays for, named cfa-<id> so the two never collide. Daily
+  /// transcribes the call itself, so nothing has to join it to take notes.
+  dailyRoomName String? @unique
+
+  /// What Nuru heard promised, drafted from the transcript and waiting for
+  /// the office to confirm. Nothing here is in the register until somebody
+  /// has said yes to it, because a misheard owner becomes a wrong chase.
+  aiCommitments           Json?
+  commitmentsReviewedAt   DateTime?
+  commitmentsReviewedById String?
+
   // Transcript & Notes
   transcript     String?  @db.Text
   aiSummary      String?  @db.Text
