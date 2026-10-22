@@ -73,7 +73,7 @@ export default function After({ token, firstName }: { token: string | null; firs
               Your voucher
             </p>
             <h2 className="mt-4 text-[32px] leading-tight md:text-[40px]" style={{ fontFamily: display, fontWeight: 500 }}>
-              {AGELESS_VOUCHER.offer ? `Your gift pack includes ${AGELESS_VOUCHER.offer}.` : "Your gift pack includes a MedLYFE voucher."}
+              {AGELESS_VOUCHER.offer ? `Your souvenir pack includes ${AGELESS_VOUCHER.offer}.` : "Your souvenir pack includes a MedLYFE voucher."}
             </h2>
             <p className="mt-4 text-[16.5px] leading-relaxed" style={{ color: "#3A4A40" }}>
               To use it, book a consultation online or call {F.phoneDisplay}, and mention the

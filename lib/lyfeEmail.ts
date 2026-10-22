@@ -819,7 +819,7 @@ export async function emailAgelessThankYou({
      <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px 22px;color:#FFFFFF;">
          <div style="font-size:17px;font-weight:700;margin:0 0 8px;">Your AGELESS voucher</div>
-         <div style="font-size:14px;line-height:1.65;color:${MEDLYFE_BRAND.mist};margin:0 0 16px;">Your gift pack includes a MedLYFE voucher. To use it, book a consultation online or call ${esc(FIND_US.phone)}, and mention the voucher when you book.</div>
+         <div style="font-size:14px;line-height:1.65;color:${MEDLYFE_BRAND.mist};margin:0 0 16px;">Your souvenir pack includes a MedLYFE voucher. To use it, book a consultation online or call ${esc(FIND_US.phone)}, and mention the voucher when you book.</div>
          <a href="${bookLink}" style="display:inline-block;padding:14px 24px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;background:${MEDLYFE_BRAND.lime};color:${MEDLYFE_BRAND.greenDeep};">Book a consultation</a>
        </td></tr>
      </table>

@@ -37,7 +37,7 @@ export const AGELESS_VOUCHER = {
   /** Set these once MedLYFE confirms them; the page and mail pick them up. */
   offer: null as string | null, // e.g. "a complimentary longevity assessment"
   validUntil: null as string | null, // e.g. "30 November 2026"
-  line: "Your AGELESS pack holds a MedLYFE voucher. Book through the link below and mention it, and the team will apply it.",
+  line: "Your AGELESS souvenir pack holds a MedLYFE voucher. Book through the link below and mention it, and the team will apply it.",
 };
 
 /** Where to find MedLYFE. Taken from its own brochure and site. */

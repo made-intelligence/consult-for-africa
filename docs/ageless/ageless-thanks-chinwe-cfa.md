@@ -20,7 +20,7 @@ Thank you for speaking at AGELESS on Wednesday 21 October on maintaining skin an
 ## What happens next
 
 - **Consultations:** the MedLYFE consultation page now lists plastic surgery consultations with you, at consultforafrica.com/lyfe/consult.
-- **Guests:** every guest has received a thank-you email directing them to book, and AGELESS guests can use the voucher from their gift pack.
+- **Guests:** every guest has received a thank-you email directing them to book, and AGELESS guests can use the voucher from their souvenir pack.
 - **Requests:** MedLYFE will share any surgical consultation requests from AGELESS guests with you.
 - **Event page:** the event films and highlights are at consultforafrica.com/ageless.
 
