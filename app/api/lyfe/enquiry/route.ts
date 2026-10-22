@@ -49,6 +49,8 @@ const schema = z.object({
     .enum(["LONGEVITY", "METABOLIC", "SKIN", "SURGERY"])
     .optional()
     .nullable(),
+  /// An AGELESS guest's voucher, as they typed it. Read by the coordinator.
+  voucher: z.string().trim().max(60).optional().nullable(),
   guestCount: z.number().int().min(0).max(4).optional().nullable(),
   isClinician: z.boolean().optional().nullable(),
   pathway: z.enum(["AESTHETIC", "SURGICAL", "UNSURE"]),
@@ -232,6 +234,7 @@ export const POST = handler(async function POST(req: NextRequest) {
         data.requestedService
           ? `Asked about: ${SERVICE_LABEL[data.requestedService]}`
           : null,
+        data.voucher ? `AGELESS voucher: ${data.voucher}` : null,
         data.notes || null,
       ]
         .filter(Boolean)

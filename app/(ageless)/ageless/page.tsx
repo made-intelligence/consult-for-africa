@@ -18,6 +18,11 @@ import EnquiryForm from "@/app/(lyfe)/lyfe/EnquiryForm";
 import LyfeNav from "@/app/(lyfe)/lyfe/LyfeNav";
 import AboutGroup from "@/app/(lyfe)/lyfe/AboutGroup";
 import StickyRsvp from "@/app/(lyfe)/lyfe/StickyRsvp";
+import { prisma } from "@/lib/prisma";
+import After from "./After";
+
+/** From the morning after, the page thanks the room instead of filling it. */
+const EVENING_OVER = new Date("2026-10-22T00:00:00+01:00");
 
 const DESCRIPTION = `MedLYFE and The Lyfe Place present Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ${LYFE_EVENT.standfirst}`;
 
@@ -92,9 +97,26 @@ export default async function LyfePage({
     utm_campaign?: string;
     i?: string;
     go?: string;
+    g?: string;
   }>;
 }) {
   const sp = await searchParams;
+  if (Date.now() >= EVENING_OVER.getTime()) {
+    // A personal link carries the guest's own invitation token, so the page
+    // can greet them and the forms need not ask who they are.
+    const token = sp.g?.trim().slice(0, 200) || null;
+    const guest = token
+      ? await prisma.lyfeEnquiry
+          .findUnique({ where: { inviteToken: token }, select: { fullName: true } })
+          .catch(() => null)
+      : null;
+    return (
+      <div style={{ fontFamily: sans }}>
+        <LyfeNav on="after" />
+        <After token={guest ? token : null} firstName={guest ? firstNameOf(guest.fullName) : null} />
+      </div>
+    );
+  }
   // Every inviter sends their own link, so the key on the URL is worth more
   // than a utm_source somebody pasted. It wins when both are present.
   const inviter = lyfeInviter(sp.i);
@@ -121,6 +143,13 @@ export default async function LyfePage({
       <StickyRsvp />
     </div>
   );
+}
+
+function firstNameOf(full: string): string {
+  const drop = /^(dr|prof|professor|mrs|mr|ms|miss|chief|barr|engr|sir)\.?$/i;
+  const parts = full.trim().split(/\s+/).filter((w) => !drop.test(w));
+  const f = parts[0] || full.trim();
+  return f === f.toUpperCase() ? f[0] + f.slice(1).toLowerCase() : f;
 }
 
 /* ─── brand furniture ──────────────────────────────────────────────────────── */

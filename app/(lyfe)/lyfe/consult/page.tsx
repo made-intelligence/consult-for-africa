@@ -3,14 +3,18 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import {
   LYFE_BRAND as C,
+  LYFE_BOOKING_DISPLAY,
+  LYFE_BOOKING_WHATSAPP,
   LYFE_CONSULT,
   LYFE_CONSULT_OPTIONS,
+  LYFE_PROCEDURES,
   LYFE_CONSULT_FAQ,
-  LYFE_CONSULT_PROOF,
   LYFE_CONSULT_SCHEDULE,
   LYFE_NAME,
   LYFE_PHONE_DISPLAY,
   LYFE_SOCIAL,
+  MEDLYFE_BRAND as MB,
+  MEDLYFE_NAME,
   LYFE_SURGEON,
   consultSlots,
   whatsappLink,
@@ -18,11 +22,20 @@ import {
 import EnquiryForm from "../EnquiryForm";
 import LyfeNav from "../LyfeNav";
 import AboutGroup from "../AboutGroup";
+import { AGELESS_FILMS } from "@/lib/ageless-followup";
+
+/** What anybody weighs before booking a clinic they have not used. */
+const PROOF = [
+  { stat: "Licensed centre", line: "MedLYFE Wellness and Longevity Centre, 25 Admiralty Way, Lekki Phase 1" },
+  { stat: "Physician led", line: "Clinical work led by Dr Adedotun Ajelabi, Consultant Family Physician, FWACP" },
+  { stat: "ABPS, FACS", line: "Plastic surgery with Dr Chinwe Kpaduwa, board certified in the United States" },
+  { stat: "Medbury Healthcare Group", line: "Part of a Lagos healthcare group, not a standalone clinic" },
+];
 
 const SITE = "https://www.consultforafrica.com";
 const URL = `${SITE}/lyfe/consult`;
 
-const TITLE = "Consultations at Medlyfe, Lagos";
+const TITLE = "Consultations at MedLYFE, Lekki, Lagos";
 const DESCRIPTION =
   "Longevity and preventive health, metabolism and hormones, skin and aesthetic medicine, and plastic surgery with Dr Chinwe Kpaduwa, MD FACS, board certified by the American Board of Plastic Surgery. Lagos.";
 
@@ -137,104 +150,87 @@ export default async function ConsultPage({
     ],
   };
 
+  const fromAgeless = utm.source === "ageless";
+
   return (
     <div style={{ background: C.ground, color: C.body, fontFamily: sans }}>
       <LyfeNav on="consult" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* ── the offer ─────────────────────────────────────────────────── */}
-      <section className="px-6 pb-16 pt-14 md:px-10 md:pb-24 md:pt-20">
-        <div className="mx-auto grid w-full max-w-5xl gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
+      {fromAgeless && (
+        <div style={{ background: MB.lime }}>
+          <p className="mx-auto w-full max-w-5xl px-6 py-3 text-[14px] md:px-10" style={{ color: MB.greenDeep }}>
+            <strong>AGELESS guests:</strong> enter your voucher details when you book.
+          </p>
+        </div>
+      )}
+
+      {/* ── MedLYFE first ─────────────────────────────────────────────── */}
+      <section className="px-6 pb-16 pt-14 md:px-10 md:pb-24 md:pt-20" style={{ background: MB.green }}>
+        <div className="mx-auto grid w-full max-w-5xl items-center gap-12 md:grid-cols-[1.05fr_0.95fr] md:gap-16">
           <div>
-            <p
-              className="text-[10.5px] font-semibold uppercase"
-              style={{ color: C.bronze, letterSpacing: "0.2em" }}
-            >
-              {LYFE_NAME}
+            <p className="text-[10.5px] font-semibold uppercase" style={{ color: MB.lime, letterSpacing: "0.2em" }}>
+              {MEDLYFE_NAME}
             </p>
-
             <h1
-              className="mt-6 text-[38px] leading-[1.04] md:text-[56px]"
-              style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.025em" }}
+              className="mt-6 text-[40px] leading-[1.04] md:text-[58px]"
+              style={{ fontFamily: display, fontWeight: 500, color: MB.white, letterSpacing: "-0.02em" }}
             >
-              Start with the right appointment.
+              Book a consultation at MedLYFE.
             </h1>
-
-            <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: C.body }}>
-              Medlyfe covers longevity and preventive health, metabolism, weight
-              and hormones, skin and aesthetic medicine, and surgery. Four
-              different conversations, and the one you need is often not the one
-              you came for. Tell us what you are thinking about and we will say
-              which it is.
+            <p className="mt-6 max-w-xl text-[17px] leading-relaxed" style={{ color: MB.mist }}>
+              Longevity and preventive health, metabolism and hormones, skin and aesthetics, and
+              plastic surgery with Dr Chinwe Kpaduwa, at our licensed centre in Lekki. Tell us what
+              you need and a coordinator will arrange the right appointment.
             </p>
-
             <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <a
-                href="#options"
-                className="px-8 py-4 text-[15px] font-semibold"
-                style={{ background: C.ink, color: C.ground }}
-              >
-                See the four
-              </a>
-              <a
-                href="#book"
-                className="text-[15px] font-semibold underline underline-offset-4"
-                style={{ color: C.bronzeDeep }}
-              >
+              <a href="#book" className="rounded-xl px-8 py-4 text-[15px] font-semibold" style={{ background: MB.lime, color: MB.greenDeep }}>
                 Request a consultation
               </a>
+              <a href="#options" className="text-[15px] font-semibold underline underline-offset-4" style={{ color: MB.lime }}>
+                See our consultations
+              </a>
             </div>
-
-            <p className="mt-6 text-[14.5px]" style={{ color: C.bronzeDeep }}>
-              {open > 0
-                ? `${open} appointment${open === 1 ? "" : "s"} open between now and the end of her diary. ${LYFE_CONSULT_SCHEDULE}.`
-                : `Her diary is full. Ask to be told when a half hour is released.`}
+            <p className="mt-6 text-[14.5px] leading-snug" style={{ color: MB.greenSoft }}>
+              Or call or WhatsApp{" "}
+              <a href={`https://wa.me/${LYFE_BOOKING_WHATSAPP}`} className="font-semibold underline underline-offset-4" style={{ color: MB.white }}>
+                {LYFE_BOOKING_DISPLAY}
+              </a>
+              . Nothing is taken on this page.
             </p>
           </div>
-
-          <div>
-            <div
-              className="overflow-hidden"
-              style={{ borderTopLeftRadius: 9999, borderTopRightRadius: 9999, background: C.groundDeep }}
+          <figure className="m-0">
+            <video
+              controls
+              playsInline
+              preload="none"
+              poster={AGELESS_FILMS.medlyfe.poster}
+              className="w-full rounded-2xl"
+              style={{ aspectRatio: "16 / 9", background: "#000" }}
             >
-              <Image
-                src={LYFE_SURGEON.portrait}
-                alt={`${LYFE_SURGEON.name}, board certified plastic surgeon`}
-                width={LYFE_SURGEON.portraitWidth}
-                height={LYFE_SURGEON.portraitHeight}
-                priority
-                sizes="(max-width: 768px) 70vw, 340px"
-                style={{ width: "100%", height: "auto", objectFit: "cover" }}
-              />
-            </div>
-            <p className="mt-5 text-[15px] font-semibold" style={{ color: C.ink }}>
-              {LYFE_SURGEON.name}
-            </p>
-            <ul className="mt-2 space-y-1">
-              {LYFE_SURGEON.credentials.map((c) => (
-                <li key={c} className="text-[13.5px] leading-snug" style={{ color: C.body }}>
-                  {c}
-                </li>
-              ))}
-            </ul>
-            {LYFE_SOCIAL.length > 0 && (
-              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
-                {LYFE_SOCIAL.map((s) => (
-                  <a
-                    key={s.url}
-                    href={s.url}
-                    rel="me noopener"
-                    target="_blank"
-                    className="text-[13px] font-semibold underline underline-offset-4"
-                    style={{ color: C.bronzeDeep }}
-                  >
-                    {s.label} {s.handle}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
+              <source src={AGELESS_FILMS.medlyfe.src} type="video/mp4" />
+            </video>
+            <figcaption className="mt-3 text-[13.5px]" style={{ color: MB.greenSoft }}>
+              {AGELESS_FILMS.medlyfe.line}
+            </figcaption>
+          </figure>
         </div>
+      </section>
+
+      {/* ── what anybody weighs ───────────────────────────────────────── */}
+      <section style={{ background: MB.greenDeep }} className="px-6 py-12 md:px-10">
+        <dl className="mx-auto grid w-full max-w-5xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {PROOF.map((p) => (
+            <div key={p.stat}>
+              <dt className="text-[19px]" style={{ fontFamily: display, fontWeight: 600, color: MB.white }}>
+                {p.stat}
+              </dt>
+              <dd className="mt-1.5 text-[13.5px] leading-snug" style={{ color: MB.greenSoft }}>
+                {p.line}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* ── what you can actually book ───────────────────────────────── */}
@@ -244,12 +240,12 @@ export default async function ConsultPage({
             className="text-[27px] leading-tight md:text-[34px]"
             style={{ fontFamily: display, fontWeight: 600, color: C.ink }}
           >
-            Four consultations.
+            Our consultations.
           </h2>
           <p className="mt-3 max-w-2xl text-[16px] leading-relaxed" style={{ color: C.body }}>
-            Most people need the first or the third. Say what you are thinking
-            about and we will tell you which, including when the answer is that
-            you do not need an appointment at all.
+            Most people start with a longevity and preventive health
+            consultation. If you are unsure which to choose, tell us what you
+            need and we will advise.
           </p>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -296,57 +292,35 @@ export default async function ConsultPage({
         </div>
       </section>
 
-      {/* ── the four things a buyer weighs ────────────────────────────── */}
-      <section style={{ background: C.ink }} className="px-6 py-12 md:px-10">
-        <dl className="mx-auto grid w-full max-w-5xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {LYFE_CONSULT_PROOF.map((p) => (
-            <div key={p.stat}>
-              <dt
-                className="text-[20px]"
-                style={{ fontFamily: display, fontWeight: 600, color: C.ground }}
-              >
-                {p.stat}
-              </dt>
-              <dd className="mt-1.5 text-[13.5px] leading-snug" style={{ color: "#A8A69F" }}>
-                {p.line}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      {/* ── what the half hour actually is ───────────────────────────── */}
+      {/* ── what a first appointment is ──────────────────────────────── */}
       <section className="px-6 py-16 md:px-10 md:py-20">
         <div className="mx-auto w-full max-w-5xl">
           <h2
             className="text-[28px] leading-tight md:text-[38px]"
             style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.02em" }}
           >
-            What happens in the thirty minutes.
+            Your first appointment.
           </h2>
           <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-3">
             {[
               {
                 n: "01",
-                t: "You talk first",
-                b: "What you have been thinking about, how long for, and what you would want to be different. You do not need photographs, the right words, or a decision.",
+                t: "Your history",
+                b: "The clinician discusses your health, your concerns and your goals. Bring any recent test results if you have them.",
               },
               {
                 n: "02",
-                t: "She tells you what is actually involved",
-                b: "What the procedure is, what recovery really looks like in Lagos, and what she would and would not do in your case. She does not discuss fees on the call; that comes from the team afterwards, in writing.",
+                t: "Assessment",
+                b: "Where needed, we carry out tests such as blood work, body composition, blood pressure or a skin assessment. Nothing is done without your agreement.",
               },
               {
                 n: "03",
-                t: "You leave knowing where you stand",
-                b: "Either a plan, or the reason not to. If the honest answer is to leave it alone, that is the answer you get, and the half hour has still bought you it. A written costing follows from the team if you want one.",
+                t: "Your plan",
+                b: "You receive a written plan with recommended treatment, timing and costs. If no treatment is needed, we will tell you.",
               },
             ].map((x) => (
               <div key={x.n}>
-                <p
-                  className="text-[13px] font-semibold"
-                  style={{ color: C.bronze, letterSpacing: "0.1em" }}
-                >
+                <p className="text-[13px] font-semibold" style={{ color: MB.greenSoft, letterSpacing: "0.1em" }}>
                   {x.n}
                 </p>
                 <h3 className="mt-3 text-[17.5px] font-semibold" style={{ color: C.ink }}>
@@ -357,42 +331,6 @@ export default async function ConsultPage({
                 </p>
               </div>
             ))}
-          </div>
-
-          <div className="mt-12 grid gap-8 border-t pt-10 md:grid-cols-2" style={{ borderColor: C.line }}>
-            <div>
-              <h3 className="text-[16px] font-semibold" style={{ color: C.ink }}>
-                Book this if
-              </h3>
-              <ul className="mt-3 space-y-2">
-                {[
-                  "You are seriously considering a procedure and want a straight answer before you commit",
-                  "You have been quoted elsewhere and want a second, qualified opinion",
-                  "You are weighing travelling abroad against being treated here",
-                  "You have had surgery before and are living with the result",
-                ].map((i) => (
-                  <li key={i} className="text-[14.5px] leading-relaxed" style={{ color: C.body }}>
-                    {i}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-[16px] font-semibold" style={{ color: C.ink }}>
-                Do not book this if
-              </h3>
-              <ul className="mt-3 space-y-2">
-                {[
-                  "You are looking for a price list. Ask us on WhatsApp and we will send what we can",
-                  "You want reassurance rather than an assessment. She will give you the second",
-                  "You need urgent medical attention. Go to a hospital, not a video call",
-                ].map((i) => (
-                  <li key={i} className="text-[14.5px] leading-relaxed" style={{ color: C.muted }}>
-                    {i}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
       </section>
@@ -410,21 +348,81 @@ export default async function ConsultPage({
             Tell us which of the four and what you are thinking about. A
             coordinator calls you, arranges the time and tells you what it
             costs before anything is booked. Nothing is taken here.
+            {fromAgeless ? " If you were at AGELESS, add your voucher below." : ""}
           </p>
           <div className="mt-10">
-            <EnquiryForm utm={utm} initialIntent="CONSULTATION" slots={slots} />
+            <EnquiryForm utm={utm} initialIntent="CONSULTATION" slots={slots} voucher={fromAgeless} />
           </div>
         </div>
       </section>
 
-      {/* ── the questions that decide it ──────────────────────────────── */}
+      {/* ── plastic surgery, one route among four ─────────────────────── */}
+      <section id="surgery" className="px-6 py-16 md:px-10 md:py-24" style={{ background: C.ink }}>
+        <div className="mx-auto grid w-full max-w-5xl gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+          <div>
+            <div className="overflow-hidden" style={{ borderTopLeftRadius: 9999, borderTopRightRadius: 9999, background: C.inkSoft }}>
+              <Image
+                src={LYFE_SURGEON.portrait}
+                alt={`${LYFE_SURGEON.name}, board certified plastic surgeon`}
+                width={LYFE_SURGEON.portraitWidth}
+                height={LYFE_SURGEON.portraitHeight}
+                sizes="(max-width: 768px) 70vw, 340px"
+                style={{ width: "100%", height: "auto", objectFit: "cover" }}
+              />
+            </div>
+            <p className="mt-5 text-[15px] font-semibold" style={{ color: C.ground }}>
+              {LYFE_SURGEON.name}
+            </p>
+            <ul className="mt-2.5 space-y-1">
+              {LYFE_SURGEON.credentials.map((c) => (
+                <li key={c} className="text-[13.5px] leading-snug" style={{ color: "#B6B8C0" }}>
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-[10.5px] font-semibold uppercase" style={{ color: C.bronze, letterSpacing: "0.2em" }}>
+              Plastic surgery at MedLYFE
+            </p>
+            <h2 className="mt-5 text-[30px] leading-tight md:text-[40px]" style={{ fontFamily: display, fontWeight: 600, color: C.ground }}>
+              Thirty minutes with a plastic surgeon.
+            </h2>
+            <p className="mt-5 text-[16px] leading-relaxed" style={{ color: "#C9CBD2" }}>
+              {LYFE_CONSULT.blurb}
+            </p>
+            <p className="mt-5 text-[15px]" style={{ color: C.bronze }}>
+              {LYFE_CONSULT.feeDisplay}, in person or by video. {LYFE_CONSULT.feeNote}{" "}
+              {open > 0
+                ? `${open} appointment${open === 1 ? "" : "s"} open. ${LYFE_CONSULT_SCHEDULE}.`
+                : "Her diary is full. Ask to be told when a half hour is released."}
+            </p>
+            <div className="mt-9 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              {LYFE_PROCEDURES.map((p) => (
+                <div key={p.group} className="border-t pt-4" style={{ borderColor: "#3A3C44" }}>
+                  <h3 className="text-[16px] font-semibold" style={{ color: C.ground }}>
+                    {p.group}
+                  </h3>
+                  <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#B6B8C0" }}>
+                    {p.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <a href="#book" className="mt-10 inline-block px-8 py-4 text-[15px] font-semibold" style={{ background: C.bronze, color: C.ink }}>
+              Book with Dr Kpaduwa
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="px-6 py-16 md:px-10 md:py-24">
         <div className="mx-auto w-full max-w-3xl">
           <h2
             className="text-[28px] leading-tight md:text-[38px]"
             style={{ fontFamily: display, fontWeight: 600, color: C.ink, letterSpacing: "-0.02em" }}
           >
-            The questions people ask last.
+            Questions about surgery
           </h2>
           <div className="mt-10 divide-y" style={{ borderColor: C.line }}>
             {LYFE_CONSULT_FAQ.map((f) => (
@@ -438,21 +436,14 @@ export default async function ConsultPage({
               </div>
             ))}
           </div>
-
           <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <a
-              href="#book"
-              className="px-8 py-4 text-[15px] font-semibold"
-              style={{ background: C.ink, color: C.ground }}
-            >
-              Book for {LYFE_CONSULT.feeDisplay}
+            <a href="#book" className="rounded-xl px-8 py-4 text-[15px] font-semibold" style={{ background: MB.greenDeep, color: "#fff" }}>
+              Request a consultation
             </a>
             <a
-              href={whatsappLink(
-                `Hello, I would like to book a consultation with ${LYFE_SURGEON.shortName}.`,
-              )}
+              href={whatsappLink("Hello MedLYFE, I would like to book a consultation.")}
               className="text-[15px] font-semibold underline underline-offset-4"
-              style={{ color: C.bronzeDeep }}
+              style={{ color: MB.greenDeep }}
             >
               Or message us on WhatsApp
             </a>
@@ -465,7 +456,7 @@ export default async function ConsultPage({
       <footer className="px-6 py-10 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto w-full max-w-5xl">
           <p className="text-[13px]" style={{ color: "#8C8A84" }}>
-            {LYFE_NAME} &middot; {LYFE_PHONE_DISPLAY}
+            {MEDLYFE_NAME} &middot; {LYFE_PHONE_DISPLAY}
           </p>
           <p className="mt-3 max-w-2xl text-[12px] leading-relaxed" style={{ color: "#6F6D68" }}>
             Nothing on this page is clinical advice, a diagnosis, or a promise of a result. No

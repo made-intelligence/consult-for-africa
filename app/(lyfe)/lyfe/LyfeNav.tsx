@@ -12,8 +12,10 @@ import { LYFE_EVENT_THEME, LYFE_SHORT, MEDLYFE_BRAND as MB } from "@/lib/lyfe";
  * and somebody weighing a consultation can see there is an evening. Two items,
  * no dropdowns, nothing else competing with the page's own call to action.
  */
-export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
-  const event = on === "event";
+export default function LyfeNav({ on }: { on: "event" | "after" | "consult" | "visit" }) {
+  // "after" is the evening's page once it has happened: same livery, and the
+  // one action is booking rather than registering.
+  const event = on === "event" || on === "after";
   return (
     <nav
       className="sticky top-0 z-40 w-full backdrop-blur"
@@ -34,7 +36,15 @@ export default function LyfeNav({ on }: { on: "event" | "consult" | "visit" }) {
           {event ? LYFE_EVENT_THEME : LYFE_SHORT}
         </Link>
 
-        {event ? (
+        {on === "after" ? (
+          <a
+            href="/lyfe/consult?src=ageless#book"
+            className="px-5 py-2.5 text-[13.5px] font-semibold"
+            style={{ background: MB.lime, color: MB.greenDeep }}
+          >
+            Book your consultation
+          </a>
+        ) : event ? (
           <a
             href="?go=rsvp#enquire"
             className="px-5 py-2.5 text-[13.5px] font-semibold"
