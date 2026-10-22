@@ -24,6 +24,9 @@ Run:
 from __future__ import annotations
 
 from pathlib import Path
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cfa_company import LEGAL_LINE, RC, TIN  # noqa: E402
 
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import A4
@@ -194,7 +197,8 @@ def build():
     for i, line in enumerate(["2 Tom Ogboi Avenue, Lekki Phase 1",
                               "Lagos, Nigeria",
                               "hello@consultforafrica.com",
-                              "+234 913 813 8553"]):
+                              "+234 913 813 8553",
+                              f"RC {RC}  ·  TIN {TIN}"]):
         c.drawString(MX, y - 27 - i * 13, line)
     bx = PAGE_W / 2 + 6
     c.setFont("Helvetica-Bold", 10)
@@ -205,7 +209,7 @@ def build():
     for i, line in enumerate(BILL_TO[1:]):
         c.drawString(bx, y - 14 - i * 13, line)
 
-    y -= 27 + 4 * 13 + 14
+    y -= 27 + 5 * 13 + 14
 
     # ---- engagement description ----
     c.setFillColor(NAVY)
