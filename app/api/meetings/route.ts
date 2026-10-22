@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { createGoogleMeetMeeting } from "@/lib/google";
 import { sendMeetingInvite } from "@/lib/email";
 import { dispatchScheduleJob } from "@/lib/nuru-bot/dispatch";
+import { createMeetingRoom, isDailyConfigured, joinLinkFor } from "@/lib/daily";
 import { NextRequest } from "next/server";
 import { handler } from "@/lib/api-handler";
 import { MEETING_VIEW_ALL_ROLES } from "@/lib/constants";
@@ -65,7 +66,8 @@ export const GET = handler(async function GET(req: NextRequest) {
 
 /**
  * POST /api/meetings
- * Create a new meeting with auto-generated Google Meet link.
+ * Create a new meeting in its own Daily room. Falls back to Google Meet only
+ * where Daily is not configured.
  */
 export const POST = handler(async function POST(req: NextRequest) {
   const session = await auth();
@@ -108,7 +110,9 @@ export const POST = handler(async function POST(req: NextRequest) {
     .map((p: { email?: string }) => p.email)
     .filter(Boolean);
 
-  // Create Google Meet.
+  const useDaily = isDailyConfigured();
+
+  // Create Google Meet, where Daily is not set up.
   //
   // A failure here used to be swallowed with a console line and the meeting was
   // saved anyway. That produced a meeting with no join link, no calendar entry,
@@ -119,7 +123,7 @@ export const POST = handler(async function POST(req: NextRequest) {
   let meetLink = "";
   let calendarEventId = "";
   let googleWarning: string | null = null;
-  try {
+  if (!useDaily) try {
     const googleResult = await createGoogleMeetMeeting({
       title: title.trim(),
       description: description?.trim(),
@@ -173,6 +177,45 @@ export const POST = handler(async function POST(req: NextRequest) {
       where: { id: discoveryCallId },
       data: { meetingId: meeting.id },
     });
+  }
+
+  // The Daily room needs the meeting's id for its name, so it comes after the
+  // record. Each person gets their own link: C4A people as owners, which is
+  // what starts the transcription, clients as guests.
+  let dailyWarning: string | null = null;
+  if (useDaily) {
+    try {
+      const room = await createMeetingRoom({ meetingId: meeting.id, startsAt: startTime, endsAt: endTime });
+      await prisma.meeting.update({
+        where: { id: meeting.id },
+        data: { dailyRoomName: room.roomName, meetLink: room.roomUrl },
+      });
+      meeting.meetLink = room.roomUrl;
+      for (const participant of meeting.participants) {
+        joinLinkFor({ roomName: room.roomName, userName: participant.name, isOwner: !!participant.userId })
+          .then((link) =>
+            sendMeetingInvite({
+              to: participant.email,
+              participantName: participant.name,
+              meetingTitle: meeting.title,
+              meetLink: link,
+              scheduledAt: startTime,
+              scheduledEndAt: endTime,
+              organizerName: meeting.organizer?.name ?? "C4A",
+              nuruEnabled: meeting.nuruEnabled,
+              transcribed: true,
+            }),
+          )
+          .catch((err) => console.error(`[meetings] Failed to invite ${participant.email}:`, err));
+      }
+    } catch (err) {
+      console.error("[meetings] Daily room creation failed:", err);
+      dailyWarning = "The meeting room could not be created, so no invitations were sent. The meeting has been saved.";
+    }
+    return Response.json(
+      { meeting, ...(dailyWarning ? { warning: dailyWarning } : {}), invitesSent: !dailyWarning },
+      { status: 201 },
+    );
   }
 
   // Send email invites (non-blocking)

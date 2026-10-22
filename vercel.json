@@ -59,6 +59,10 @@
     {
       "path": "/api/cron/haven-flags",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/meeting-transcripts",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

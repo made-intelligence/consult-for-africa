@@ -6,12 +6,14 @@ import {
   Video, Calendar, Clock, Users, ExternalLink, Copy, Check, X, Plus, Pencil,
   FileText, ListChecks, AlertCircle, Sparkles,
 } from "lucide-react";
+import CommitmentReview, { type CommitmentDraft } from "./CommitmentReview";
 
 interface Participant {
   id: string;
   name: string;
   email: string;
   role: string | null;
+  userId: string | null;
   attended: boolean;
   joinedAt: string | null;
   leftAt: string | null;
@@ -30,6 +32,9 @@ interface Meeting {
   duration: number | null;
   meetLink: string | null;
   calendarEventId: string | null;
+  dailyRoomName: string | null;
+  aiCommitments: CommitmentDraft[] | null;
+  commitmentsReviewedAt: string | null;
   nuruEnabled: boolean;
   nuruJoined: boolean;
   transcript: string | null;
@@ -79,12 +84,16 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
   const [addingPerson, setAddingPerson] = useState(false);
   const [newPerson, setNewPerson] = useState({ name: "", email: "", role: "" });
 
-  useEffect(() => {
+  const reload = () =>
     fetch(`/api/meetings/${id}`)
       .then((r) => r.json())
       .then((data) => setMeeting(data.meeting ?? null))
       .catch(() => {})
       .finally(() => setLoading(false));
+
+  useEffect(() => {
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   function copyLink() {
@@ -212,7 +221,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
           <div className="flex items-center gap-2">
             {isActive && meeting.meetLink && (
               <a
-                href={meeting.meetLink}
+                href={meeting.dailyRoomName ? `/api/meetings/${meeting.id}/join` : meeting.meetLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white"
@@ -325,8 +334,9 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
-            {/* Meet Link */}
-            {meeting.meetLink && (
+            {/* Meet Link. A Daily room is private, so its bare URL is no use to
+                anyone; people join through their own link or the button above. */}
+            {meeting.meetLink && !meeting.dailyRoomName && (
               <div className="bg-white rounded-xl border p-4" style={{ borderColor: "#e5eaf0" }}>
                 <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">
                   Google Meet Link
@@ -434,6 +444,21 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                   )}
                 </div>
               </div>
+            )}
+
+            {/* What Nuru heard promised, until the office has confirmed it. */}
+            {meeting.dailyRoomName && meeting.aiCommitments && !meeting.commitmentsReviewedAt && (
+              <CommitmentReview
+                meetingId={meeting.id}
+                drafts={meeting.aiCommitments}
+                people={[
+                  ...(meeting.participants.some((p) => p.userId === meeting.organizer?.id)
+                    ? []
+                    : [{ name: meeting.organizer.name, email: meeting.organizer.email, userId: meeting.organizer.id }]),
+                  ...meeting.participants.map((p) => ({ name: p.name, email: p.email, userId: p.userId })),
+                ]}
+                onDone={reload}
+              />
             )}
 
             {/* Transcript */}
@@ -601,15 +626,27 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                   <div className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${meeting.nuruJoined ? "bg-green-500" : "bg-amber-400"}`} />
                     <p className="text-sm text-gray-700">
-                      {meeting.nuruJoined
-                        ? "Nuru is in the meeting"
-                        : meeting.status === "COMPLETED"
-                          ? "Nuru attended this meeting"
-                          : "Nuru will join when the meeting starts"}
+                      {meeting.dailyRoomName
+                        ? meeting.transcript === ""
+                          ? "Nothing was transcribed"
+                          : meeting.transcript !== null
+                          ? meeting.commitmentsReviewedAt
+                            ? "Notes confirmed and sent"
+                            : "Notes drafted, waiting for confirmation"
+                          : meeting.status === "IN_PROGRESS"
+                            ? "Transcribing"
+                            : "Transcription starts when a C4A host joins"
+                        : meeting.nuruJoined
+                          ? "Nuru is in the meeting"
+                          : meeting.status === "COMPLETED"
+                            ? "Nuru attended this meeting"
+                            : "Nuru will join when the meeting starts"}
                     </p>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Real-time transcription and note-taking
+                    {meeting.dailyRoomName
+                      ? "Daily transcribes the call. Nuru writes it up and drafts the commitments within about fifteen minutes of everyone leaving."
+                      : "Real-time transcription and note-taking"}
                   </p>
                 </div>
               ) : (
