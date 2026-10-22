@@ -18,7 +18,7 @@ import {
   emailAgelessSpeakerThanks,
   emailAgelessThankYou,
 } from "@/lib/lyfeEmail";
-import { agelessBookLink, agelessLink } from "@/lib/ageless-followup";
+import { AGELESS_MEDBURY_CC, agelessBookLink, agelessLink } from "@/lib/ageless-followup";
 
 const prisma = new PrismaClient();
 const args = process.argv.slice(2);
@@ -118,6 +118,17 @@ async function main() {
     console.log(`SPEAKER ${s.first} <${s.to ?? "NO ADDRESS, skipped"}>`);
     if (send && s.to) {
       await emailAgelessSpeakerThanks({ to: s.to, firstName: s.first, part: s.part, pageLink: page, fromName: FROM_NAME });
+    }
+  }
+
+  // Medbury sees one example of each mail rather than a cc on every guest's.
+  for (const cc of AGELESS_MEDBURY_CC) {
+    console.log(`COPY    one of each to ${cc}`);
+    if (send) {
+      const page = agelessLink("");
+      await emailAgelessThankYou({ to: cc, firstName: "Opeoluwa", pageLink: page, bookLink: agelessBookLink(), broughtGuests: 1, shareLink: share });
+      await emailAgelessMissedYou({ to: cc, firstName: "Opeoluwa", pageLink: page, bookLink: agelessBookLink() });
+      await emailAgelessSpeakerThanks({ to: cc, firstName: "Opeoluwa", part: SPEAKERS[1].part, pageLink: page, fromName: FROM_NAME });
     }
   }
 

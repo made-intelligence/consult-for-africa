@@ -9,6 +9,7 @@ import {
   AGELESS_CARE_AREAS,
   AGELESS_CONSENT_TEXT,
   AGELESS_CONTACT_PREF,
+  AGELESS_MEDBURY_CC,
   AGELESS_SURVEYS,
 } from "@/lib/ageless-followup";
 
@@ -48,7 +49,7 @@ function coordinators(): string[] {
     .split(",")
     .map((a) => a.trim())
     .filter(Boolean);
-  return list.length ? list : [LYFE_CONTACT_EMAIL];
+  return [...(list.length ? list : [LYFE_CONTACT_EMAIL]), ...AGELESS_MEDBURY_CC];
 }
 
 const esc = (s: string) =>

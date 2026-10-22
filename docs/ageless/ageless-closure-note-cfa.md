@@ -3,7 +3,7 @@
 ## Closure note
 
 FOR
-Dr Adedotun Ajelabi and Dorcas Akinjole, MedLYFE
+Dr Adedotun Ajelabi and Dorcas Akinjole, MedLYFE; Opeoluwa Duntoye, Medbury Healthcare Group
 
 FROM
 Dr Debo Odulana, Consult for Africa
@@ -52,7 +52,7 @@ DATE
 
 - **AGELESS page:** consultforafrica.com/ageless. Event films, voucher details, The Lyfe Place waiting list, feedback form and MedLYFE contact details. Each guest receives a personal link.
 - **Consultation page:** consultforafrica.com/lyfe/consult. Now led by MedLYFE, with four consultation types: longevity and preventive health; metabolism, weight and hormones; skin and aesthetics; plastic surgery with Dr Kpaduwa. AGELESS guests can enter their voucher when they book.
-- **Booking requests:** any guest who asks to book, through the feedback form or the waiting list, goes into the coordinator queue and triggers an email to the coordinators.
+- **Booking requests:** any guest who asks to book, through the feedback form or the waiting list, goes into the coordinator queue and triggers an email to the coordinators and to Medbury Healthcare Group.
 - **Films:** Inside MedLYFE (1 minute) and The Lyfe Place (under 2 minutes), on both pages.
 - **Print files:** event backdrop with all Medbury company logos, and four options for the 10 x 7 ft MedLYFE banner.
 

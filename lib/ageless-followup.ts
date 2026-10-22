@@ -111,6 +111,9 @@ export const AGELESS_CONTACT_PREF = ["WhatsApp", "A phone call", "Email"] as con
 export const AGELESS_CONSENT_TEXT =
   "I agree that MedLYFE Wellness and Longevity Centre, with Consult for Africa, may hold what I have shared to improve future events and, where I have asked, to contact me. I can ask for my details to be removed at any time.";
 
+/** Medbury copies on every booking alert and on one example of each guest mail. */
+export const AGELESS_MEDBURY_CC = ["opeoluwa.duntoye@medburyhealthcare.com"];
+
 export const AGELESS_SURVEYS = ["ageless-feedback", "lyfeplace-waitlist"] as const;
 export type AgelessSurvey = (typeof AGELESS_SURVEYS)[number];
 
