@@ -67,6 +67,7 @@ export default function EnquiryForm({
   initialIntent,
   slots,
   lock = false,
+  voucher = false,
 }: {
   utm: { source: string | null; medium: string | null; campaign: string | null };
   initialIntent: Intent | null;
@@ -77,6 +78,8 @@ export default function EnquiryForm({
    * other one. Two calls to action on a page halve both of them.
    */
   lock?: boolean;
+  /** Arrived from AGELESS: ask for the voucher in their pack. */
+  voucher?: boolean;
 }) {
   const [intent, setIntent] = useState<Intent>(initialIntent ?? "EVENT_RSVP");
   const [step, setStep] = useState(initialIntent === "CONSULTATION" ? 1 : 2);
@@ -104,8 +107,9 @@ export default function EnquiryForm({
   const [weightTrend, setWeightTrend] = useState<WeightTrend | "">("");
   const [priorSurgery, setPriorSurgery] = useState<boolean | null>(null);
   const [goal, setGoal] = useState("");
-  const [source, setSource] = useState<Source | "">("");
-  const [sourceDetail, setSourceDetail] = useState("");
+  const [source, setSource] = useState<Source | "">(voucher ? "AN_EVENT" : "");
+  const [sourceDetail, setSourceDetail] = useState(voucher ? "AGELESS" : "");
+  const [voucherCode, setVoucherCode] = useState("");
   const [consent, setConsent] = useState(false);
   const [company, setCompany] = useState(""); // honeypot
 
@@ -114,6 +118,10 @@ export default function EnquiryForm({
   const [done, setDone] = useState<Intent | null>(null);
 
   const surgical = pathway === "SURGICAL";
+  // The aesthetic questions only make sense for skin and surgery. Somebody
+  // asking about their bloods or their weight is not asked what they would
+  // like to change about their face.
+  const aesthetic = service === "SKIN" || service === "SURGERY";
   const rsvp = intent === "EVENT_RSVP";
 
   // The hero buttons set ?go=rsvp or ?go=call and scroll here, so the form has
@@ -154,8 +162,9 @@ export default function EnquiryForm({
           requestedService: rsvp ? null : service || null,
           guestCount: rsvp ? guestCount : null,
           isClinician: rsvp ? isClinician : null,
-          pathway: rsvp ? "UNSURE" : pathway || "UNSURE",
-          concerns: rsvp ? [] : concerns,
+          pathway: rsvp || !aesthetic ? "UNSURE" : pathway || "UNSURE",
+          concerns: rsvp ? [] : aesthetic ? concerns : service === "METABOLIC" ? ["WELLNESS_AND_WEIGHT"] : [],
+          voucher: voucher ? voucherCode.trim() || "AGELESS guest" : null,
           timing: rsvp ? null : timing,
           based,
           travelFrom: based === "LAGOS" ? null : travelFrom.trim() || null,
@@ -283,6 +292,7 @@ export default function EnquiryForm({
               : "Nothing is taken here. A coordinator calls you to arrange the time and tell you what it costs before anything is booked."}
           </p>
 
+          {aesthetic && (<>
           <Legend className="mt-7">What are you thinking about?</Legend>
           <div className="grid gap-2.5">
             {(["AESTHETIC", "SURGICAL", "UNSURE"] as Pathway[]).map((pv) => (
@@ -296,6 +306,7 @@ export default function EnquiryForm({
               <Choice key={c} multi checked={concerns.includes(c)} onSelect={() => toggleConcern(c)} label={CONCERN_LABELS[c]} />
             ))}
           </div>
+          </>)}
 
           <Legend className="mt-7">When are you thinking about this?</Legend>
           <div className="grid gap-2.5 sm:grid-cols-2">
@@ -313,7 +324,7 @@ export default function EnquiryForm({
               // old check was blocking every submission on a control that is
               // no longer on the screen.
               if (!service) return setError("Please tell us which consultation you are asking about.");
-              if (!pathway) return setError("Please choose one, even roughly.");
+              if (aesthetic && !pathway) return setError("Please choose one, even roughly.");
               if (!timing) return setError("Please tell us roughly when you are thinking about this.");
               setError(null);
               setStep(2);
@@ -349,6 +360,11 @@ export default function EnquiryForm({
                 <Input value={email} onChange={setEmail} type="email" autoComplete="email" />
               </Field>
             </div>
+            {voucher && !rsvp && (
+              <Field label="Your AGELESS voucher number, if it has one">
+                <Input value={voucherCode} onChange={setVoucherCode} placeholder="Leave blank if there is no number" />
+              </Field>
+            )}
           </div>
 
           {rsvp && (

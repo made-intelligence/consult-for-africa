@@ -748,3 +748,161 @@ export async function emailAgelessLiveQuestions({
   );
   await notifyInternal(to, `Tonight at ${LYFE_EVENT_THEME}: your questions, from your phone`, html);
 }
+
+/* ─── after AGELESS ─────────────────────────────────────────────────────── */
+
+const AFTER_FOOTER =
+  "You are receiving this because you were invited to Ageless, hosted by MedLYFE and The Lyfe Place. Reply at any time and we will remove your details.";
+const THUMBS = "https://pub-8a22dea573ee4a5dae362925fc14c5f1.r2.dev/marketing/ageless";
+const FIND_US = {
+  address: "25 Admiralty Way, Lekki Phase 1, Lagos",
+  phone: "+234 911 981 9727",
+  whatsapp: "2349119819727",
+  instagram: "@medlyfe_wellness",
+  instagramUrl: "https://www.instagram.com/medlyfe_wellness/",
+  website: "medlyfewellness.com",
+};
+
+function button(href: string, label: string, solid = true): string {
+  return `<a href="${href}" style="display:inline-block;padding:15px 26px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;${
+    solid
+      ? `background:${MEDLYFE_BRAND.green};color:#FFFFFF;`
+      : `background:#FFFFFF;color:${MEDLYFE_BRAND.green};border:1.5px solid ${MEDLYFE_BRAND.green};`
+  }">${esc(label)}</a>`;
+}
+
+function filmCard(href: string, img: string, title: string, line: string): string {
+  return `<a href="${href}" style="text-decoration:none;color:${LYFE_BRAND.ink};display:block;margin:0 0 6px;">
+      <img src="${img}" width="496" alt="${esc(title)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;border-radius:10px;">
+    </a>
+    <p style="margin:0 0 22px;font-size:14px;line-height:1.55;"><strong>${esc(title)}.</strong> ${esc(line)}</p>`;
+}
+
+function findUs(): string {
+  return `<table cellpadding="0" cellspacing="0" style="width:100%;margin:8px 0 22px;border-top:1px solid ${LYFE_BRAND.line};">
+      <tr><td style="padding:16px 0 0;font-size:13.5px;line-height:1.8;color:${LYFE_BRAND.body};">
+        <strong style="color:${LYFE_BRAND.ink};">Find MedLYFE</strong><br>
+        ${esc(FIND_US.address)}<br>
+        Call or WhatsApp <a href="https://wa.me/${FIND_US.whatsapp}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.phone)}</a><br>
+        Instagram <a href="${FIND_US.instagramUrl}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.instagram)}</a> &middot;
+        <a href="https://${FIND_US.website}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.website)}</a>
+      </td></tr>
+    </table>`;
+}
+
+/** To everyone who held a place. Worded to be true whether or not they came. */
+export async function emailAgelessThankYou({
+  to,
+  firstName,
+  pageLink,
+  bookLink,
+  broughtGuests = 0,
+  shareLink,
+}: {
+  to: string;
+  firstName: string;
+  pageLink: string;
+  bookLink: string;
+  /** Guests they brought whose names never reached us. */
+  broughtGuests?: number;
+  shareLink: string;
+}): Promise<void> {
+  const forward = encodeURIComponent(
+    `Thank you for attending AGELESS with me. MedLYFE has shared the event films, the waiting list for The Lyfe Place and details of the voucher here: ${shareLink}`,
+  );
+  const plusOnes = broughtGuests
+    ? `<p style="margin:0 0 20px;">We did not receive your guest's contact details. Please forward this email to them, or <a href="https://wa.me/?text=${forward}" style="color:${MEDLYFE_BRAND.green};font-weight:700;">share it on WhatsApp</a>.</p>`
+    : "";
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 20px;">Thank you for attending ${esc(LYFE_EVENT_THEME)} on Wednesday, 21 October. We hope you found the evening useful.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px 22px;color:#FFFFFF;">
+         <div style="font-size:17px;font-weight:700;margin:0 0 8px;">Your AGELESS voucher</div>
+         <div style="font-size:14px;line-height:1.65;color:${MEDLYFE_BRAND.mist};margin:0 0 16px;">Your gift pack includes a MedLYFE voucher. To use it, book a consultation online or call ${esc(FIND_US.phone)}, and mention the voucher when you book.</div>
+         <a href="${bookLink}" style="display:inline-block;padding:14px 24px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;background:${MEDLYFE_BRAND.lime};color:${MEDLYFE_BRAND.greenDeep};">Book a consultation</a>
+       </td></tr>
+     </table>
+     ${plusOnes}
+     <p style="margin:0 0 14px;font-weight:700;">Event films</p>
+     ${filmCard(pageLink, `${THUMBS}/medlyfe-email.jpg`, "Inside MedLYFE", "A short tour of the centre in Lekki.")}
+     ${filmCard(`${pageLink}#lyfeplace`, `${THUMBS}/lyfeplace-email.jpg`, "The Lyfe Place", "Medbury Healthcare Group's planned wellness park in Lagos.")}
+     <p style="margin:0 0 6px;font-weight:700;">The Lyfe Place waiting list</p>
+     <p style="margin:0 0 14px;">Join the waiting list to receive updates on membership and the opening date.</p>
+     <p style="margin:0 0 24px;">${button(`${pageLink}#lyfeplace`, "Join the waiting list", false)}</p>
+     <p style="margin:0 0 6px;font-weight:700;">Your feedback</p>
+     <p style="margin:0 0 22px;">Please tell us what worked and what we should improve. The form takes about two minutes. <a href="${pageLink}#feedback" style="color:${MEDLYFE_BRAND.green};font-weight:700;">Give feedback</a></p>
+     ${findUs()}
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(MEDLYFE_NAME)}</p>`,
+    "Your voucher, the event films and The Lyfe Place waiting list.",
+    "medlyfe",
+    AFTER_FOOTER,
+  );
+  await notifyInternal(to, `Thank you for attending AGELESS`, html);
+}
+
+/** To the people we could not seat. No voucher: they never had a pack. */
+export async function emailAgelessMissedYou({
+  to,
+  firstName,
+  pageLink,
+  bookLink,
+}: {
+  to: string;
+  firstName: string;
+  pageLink: string;
+  bookLink: string;
+}): Promise<void> {
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}. The event was fully booked and we were unable to offer you a place. We apologise for this.</p>
+     <p style="margin:0 0 22px;">You will be among the first invited to the next edition. In the meantime, the event films are below.</p>
+     ${filmCard(pageLink, `${THUMBS}/medlyfe-email.jpg`, "Inside MedLYFE", "A short tour of the centre in Lekki.")}
+     ${filmCard(`${pageLink}#lyfeplace`, `${THUMBS}/lyfeplace-email.jpg`, "The Lyfe Place", "Medbury Healthcare Group's planned wellness park in Lagos. Join the waiting list for updates on membership and the opening date.")}
+     <p style="margin:0 0 26px;">${button(bookLink, "Book a consultation")}&nbsp;&nbsp;${button(`${pageLink}#lyfeplace`, "Join the waiting list", false)}</p>
+     ${findUs()}
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(MEDLYFE_NAME)}</p>`,
+    "The event films, and an invitation to the next edition.",
+    "medlyfe",
+    AFTER_FOOTER,
+  );
+  await notifyInternal(to, `AGELESS: sorry we could not offer you a place`, html);
+}
+
+/** To each speaker and the host, from Debo. */
+export async function emailAgelessSpeakerThanks({
+  to,
+  firstName,
+  part,
+  pageLink,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  /** What they did, in a phrase: "opening the evening". */
+  part: string;
+  pageLink: string;
+  fromName: string;
+}): Promise<void> {
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for ${esc(part)} at ${esc(LYFE_EVENT_THEME)} on Wednesday. Your contribution was well received by the guests.</p>
+     <p style="margin:0 0 14px;">The event highlights and two short films are on <a href="${pageLink}" style="color:${MEDLYFE_BRAND.green};font-weight:700;">the AGELESS page</a>.</p>
+     <p style="margin:0 0 10px;">We would be grateful if you could:</p>
+     <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+       <li style="margin:0 0 6px;">Share the page with your network and tag ${esc(FIND_US.instagram)}</li>
+       <li style="margin:0 0 6px;">Send us a short comment on the evening for our recap</li>
+       <li style="margin:0 0 6px;">Let us know anything we should improve for the next edition</li>
+     </ul>
+     <p style="margin:0 0 14px;">We look forward to working with you again.</p>
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">On behalf of MedLYFE and The Lyfe Place</p>`,
+    `Thank you for ${part} at ${LYFE_EVENT_THEME}.`,
+    "medlyfe",
+    SPEAKER_FOOTER,
+  );
+  await notifyInternal(to, `AGELESS: thank you`, html);
+}

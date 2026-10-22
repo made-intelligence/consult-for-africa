@@ -42,6 +42,12 @@ PACK = {
         "MedLYFE  ·  The introduction film", f"Consult for Africa  ·  {TODAY}"),
     "ageless-plan-summary-cfa": (
         "AGELESS  ·  Plan summary", "Consult for Africa  ·  Confidential"),
+    "ageless-mc-pack-cfa": (
+        "AGELESS  ·  MC pack", f"MedLYFE  ·  {EVENING}"),
+    "ageless-closure-note-cfa": (
+        "AGELESS  ·  Closure note", "Consult for Africa  ·  For MedLYFE"),
+    "ageless-thanks-chinwe-cfa": (
+        "AGELESS  ·  Thank you", f"MedLYFE and The Lyfe Place  ·  {TODAY}"),
     "ageless-note-to-chinwe-cfa": (
         "AGELESS  ·  For Dr Kpaduwa", f"Consult for Africa  ·  {EVENING}"),
 }

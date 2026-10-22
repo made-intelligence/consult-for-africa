@@ -552,6 +552,7 @@ export const LYFE_EVENT_TAKEAWAY = "A thoughtfully designed Ageless takeaway";
 export const LYFE_SURGEON = {
   name: "Dr Chinwe Kpaduwa, MD FACS",
   shortName: "Dr Chinwe Kpaduwa",
+  strap: "Plastic surgeon and aesthetics specialist",
   // Cropped so she sits in the middle of the frame. The original has her right
   // of centre; the crop also stops above the KD mark on her scrubs, which would
   // otherwise be cut in half at the left edge.
@@ -1276,3 +1277,30 @@ export const LYFE_VISIT = {
     },
   ],
 } as const;
+
+/** Bookings line, carried from the Lyfe site branch for the consultation page. */
+export const LYFE_BOOKING_DISPLAY = "0703 052 7269";
+export const LYFE_BOOKING_WHATSAPP = "2347030527269";
+
+export const LYFE_PROCEDURES: { group: string; body: string }[] = [
+  {
+    group: "Face",
+    body: "Eyelids, face lift, neck lift and facial rejuvenation.",
+  },
+  {
+    group: "Breast",
+    body: "Reduction, lift, enlargement, breast reconstruction, and correcting earlier surgery.",
+  },
+  {
+    group: "Body",
+    body: "Tummy tuck, liposuction, body contouring and mommy makeover.",
+  },
+  {
+    group: "Skin and aesthetics",
+    body: "Injectables, scar revision, skin rejuvenation, peels and regenerative aesthetics.",
+  },
+  {
+    group: "Reconstruction",
+    body: "Scars, wound revision, deformities, breast reconstruction, and living with the result of an earlier operation.",
+  },
+];
