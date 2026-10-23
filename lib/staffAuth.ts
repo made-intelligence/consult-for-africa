@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Sign-in for a client's own staff. No passwords.
@@ -202,4 +203,45 @@ export function greetingName(name: string) {
   const parts = name.trim().split(/\s+/);
   if (parts.length > 1 && TITLES.has(parts[0].toLowerCase())) return `${parts[0]} ${parts[1]}`;
   return parts[0];
+}
+
+/** The last ten digits, so 0803..., 234803... and +234 803 ... all compare equal. */
+function phoneKey(s: string) {
+  const d = s.replace(/\D/g, "");
+  return d.length >= 10 ? d.slice(-10) : null;
+}
+
+/**
+ * Find an active staff member by what they typed: an email address or a
+ * mobile number. The phone route exists because seven people who were on the
+ * list never produced a single code in a fortnight. Whatever address they were
+ * typing was not the one the hospital gave us, and a nurse knows her own number
+ * far more reliably than which of her email accounts HR has.
+ */
+export async function findStaffByIdentifier(clientId: string, input: string) {
+  const select = { id: true, clientId: true, name: true, email: true, phone: true, tiers: true } as const;
+  const raw = input.trim();
+  if (raw.includes("@")) {
+    return prisma.staffMember.findFirst({
+      where: { clientId, isActive: true, email: { equals: raw, mode: "insensitive" } },
+      select,
+    });
+  }
+  const key = phoneKey(raw);
+  if (!key) return null;
+  const all = await prisma.staffMember.findMany({
+    where: { clientId, isActive: true, phone: { not: null } },
+    select,
+  });
+  const hits = all.filter((s) => s.phone && phoneKey(s.phone) === key);
+  // Two people on one number is a data problem, not a sign-in. Refuse rather
+  // than pick one.
+  return hits.length === 1 ? hits[0] : null;
+}
+
+/** b•••@gmail.com, so the person can see which inbox to open without the page reading the address out. */
+export function maskEmail(email: string) {
+  const [user, domain] = email.split("@");
+  if (!domain) return email;
+  return `${user.slice(0, 1)}${"•".repeat(Math.max(2, Math.min(user.length - 1, 5)))}@${domain}`;
 }

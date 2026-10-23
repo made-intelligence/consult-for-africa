@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { hashLoginCode, signStaffJWT, STAFF_COOKIE, MAX_ATTEMPTS } from "@/lib/staffAuth";
+import { findStaffByIdentifier, hashLoginCode, signStaffJWT, STAFF_COOKIE, MAX_ATTEMPTS } from "@/lib/staffAuth";
 
 // Takes the email and the six-digit code and, if they match, sets the session.
 //
@@ -13,7 +13,8 @@ import { hashLoginCode, signStaffJWT, STAFF_COOKIE, MAX_ATTEMPTS } from "@/lib/s
 export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
-  email: z.string().email().max(200),
+  // An email address or a mobile number, whichever they asked for the code with.
+  email: z.string().trim().min(3).max(200),
   code: z.string().regex(/^\d{6}$/),
 });
 
@@ -24,15 +25,10 @@ export async function POST(req: NextRequest) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return no();
 
-  const email = parsed.data.email.trim().toLowerCase();
-
   const client = await prisma.client.findFirst({ where: { name: CLIENT_NAME }, select: { id: true } });
   if (!client) return no();
 
-  const staff = await prisma.staffMember.findFirst({
-    where: { clientId: client.id, email, isActive: true },
-    select: { id: true, clientId: true, name: true, tiers: true },
-  });
+  const staff = await findStaffByIdentifier(client.id, parsed.data.email);
   if (!staff) return no();
 
   const token = await prisma.staffLoginToken.findFirst({
