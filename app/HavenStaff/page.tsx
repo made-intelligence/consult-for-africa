@@ -149,7 +149,7 @@ export default async function HavenStaffPage() {
     });
     const allTasks = await prisma.staffTask.findMany({
       where: { clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
-      select: { id: true, title: true, why: true, roles: true, cadence: true },
+      select: { id: true, code: true, title: true, why: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     });
     // Daily and weekly completions key to different dates, so both periods are
@@ -179,7 +179,7 @@ export default async function HavenStaffPage() {
         const n = r.toLowerCase().replace(/^every /, "").replace(/s$/, "");
         return hay.includes(n) || n.includes("everybody") || n.includes("all ");
       }))
-      .map((x) => ({ id: x.id, title: x.title, why: x.why, cadence: x.cadence as Cadence, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
+      .map((x) => ({ id: x.id, code: x.code, title: x.title, why: x.why, cadence: x.cadence as Cadence, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
     entitlement = me?.annualLeaveDays ?? 20;
     myDepartment = me?.department ?? "";
 
