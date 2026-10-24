@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TASK_PROMPTS, NOTHING_THIS_WEEK } from "@/lib/havenTaskPrompts";
 
 const NAVY = "#0B3C5D";
 const GOLD = "#D4AF37";
@@ -11,6 +12,7 @@ const MUTED = "#64748b";
 
 export interface TodayTask {
   id: string;
+  code: string;
   title: string;
   why: string;
   cadence: "EVERY_SHIFT" | "DAILY" | "WEEKLY" | "MONTHLY";
@@ -40,28 +42,43 @@ const WHEN: Record<TodayTask["cadence"], string> = {
 export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
   const router = useRouter();
   const [local, setLocal] = useState<Record<string, boolean>>({});
-  const [failed, setFailed] = useState<Record<string, boolean>>({});
+  const [failed, setFailed] = useState<Record<string, string | false>>({});
+  // Which answer box is open, and what is in it. Only tasks in TASK_PROMPTS
+  // open one; every other task stays a single tap.
+  const [open, setOpen] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Record<string, string>>({});
 
   const isDone = (t: TodayTask) => local[t.id] ?? t.done;
   const doneCount = tasks.filter(isDone).length;
 
-  async function toggle(t: TodayTask) {
-    const next = !isDone(t);
+  function tap(t: TodayTask) {
+    if (!isDone(t) && TASK_PROMPTS[t.code]) {
+      setOpen(open === t.id ? null : t.id);
+      return;
+    }
+    void save(t, !isDone(t));
+  }
+
+  async function save(t: TodayTask, next: boolean, note?: string) {
     setLocal((s) => ({ ...s, [t.id]: next }));
     setFailed((s) => ({ ...s, [t.id]: false }));
     try {
       const res = await fetch("/api/haven-staff/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskId: t.id, done: next }),
+        body: JSON.stringify({ taskId: t.id, done: next, note }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(res.status === 422 ? body?.error : undefined);
+      }
+      setOpen(null);
       router.refresh();
-    } catch {
+    } catch (e) {
       // Put it back and say so. Silently reverting is how somebody believes
       // they recorded a crash trolley check that was never recorded.
       setLocal((s) => ({ ...s, [t.id]: !next }));
-      setFailed((s) => ({ ...s, [t.id]: true }));
+      setFailed((s) => ({ ...s, [t.id]: (e instanceof Error && e.message) || "That did not save. Check your signal and tap again." }));
     }
   }
 
@@ -89,7 +106,7 @@ export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
               borderRadius: 12, padding: 14,
             }}>
               <button
-                onClick={() => toggle(t)}
+                onClick={() => tap(t)}
                 aria-label={done ? `Mark ${t.title} not done` : `Mark ${t.title} done`}
                 style={{
                   flexShrink: 0, width: 26, height: 26, borderRadius: 7, cursor: "pointer",
@@ -116,9 +133,43 @@ export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
                     Not recorded yet
                   </div>
                 )}
+                {open === t.id && !done && TASK_PROMPTS[t.code] && (
+                  <div style={{ marginTop: 10 }}>
+                    <label style={{ display: "block", color: NAVY, fontSize: 13.5, fontWeight: 650, marginBottom: 6 }}>
+                      {TASK_PROMPTS[t.code].question}
+                    </label>
+                    <textarea
+                      value={draft[t.id] ?? ""}
+                      onChange={(e) => setDraft((s) => ({ ...s, [t.id]: e.target.value }))}
+                      placeholder={TASK_PROMPTS[t.code].placeholder}
+                      maxLength={500}
+                      rows={3}
+                      style={{ width: "100%", boxSizing: "border-box", border: `1px solid ${LINE}`, borderRadius: 8, padding: 10, fontSize: 15, fontFamily: "inherit" }}
+                    />
+                    <div style={{ color: MUTED, fontSize: 12.5, marginTop: 4 }}>
+                      We share what changed because of it. We never share your name without asking you.
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                      <button
+                        onClick={() => save(t, true, draft[t.id])}
+                        style={{ background: TEAL, color: "#fff", border: 0, borderRadius: 8, padding: "9px 16px", fontSize: 14, fontWeight: 650, cursor: "pointer" }}
+                      >
+                        Send and tick
+                      </button>
+                      {TASK_PROMPTS[t.code].allowNothing && (
+                        <button
+                          onClick={() => save(t, true, NOTHING_THIS_WEEK)}
+                          style={{ background: "#fff", color: NAVY, border: `1px solid ${LINE}`, borderRadius: 8, padding: "9px 16px", fontSize: 14, cursor: "pointer" }}
+                        >
+                          Nothing this week
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {failed[t.id] && (
                   <div style={{ color: "#B0392B", fontSize: 13, marginTop: 4 }}>
-                    That did not save. Check your signal and tap again.
+                    {failed[t.id]}
                   </div>
                 )}
               </div>
