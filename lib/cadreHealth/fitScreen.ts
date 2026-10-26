@@ -17,6 +17,7 @@ import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { prisma } from "@/lib/prisma";
 import { readFitProfile } from "@/lib/cadreHealth/fitProfile";
+import { withoutRelocationBlock } from "@/lib/cadreHealth/zuriRelocationFit";
 
 const client = new Anthropic();
 
@@ -99,8 +100,10 @@ export async function scoreApplication(matchId: string): Promise<Outcome | null>
     : `The organisation has not yet said what fit looks like beyond the job description. Use the requirements below. Do not decline anyone on this basis alone: use hold for the weak.\n\nRequired:\n- ${m.requiredQualifications.join("\n- ")}\n\nPreferred:\n- ${m.preferredQualifications.join("\n- ")}`;
 
   const p = match.professional;
+  // Relocation fit is its own answer, shown to the client beside this one; it
+  // must not lower a clinical score or turn a flag into a decline.
   const applicant = [
-    match.notes,
+    withoutRelocationBlock(match.notes),
     p.subSpecialty && `Specialty on record: ${p.subSpecialty}`,
     p.yearsOfExperience != null && `Years of experience on record: ${p.yearsOfExperience}`,
     p.currentRole && `Current role on record: ${p.currentRole}`,
