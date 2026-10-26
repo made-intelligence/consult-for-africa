@@ -546,6 +546,7 @@ model Client {
   ndas               Nda[]
   creditNotes        CreditNote[]
   agentOpportunities AgentOpportunity[]
+  marketWatches      MarketWatch[]
 
   // Communications CRM back-relations
   communications   Communication[]
@@ -660,6 +661,7 @@ model Engagement {
   ndas               Nda[]
   impactMetrics      EngagementImpactMetric[]
   dashboards         EngagementDashboard[]
+  marketWatches      MarketWatch[]
   knowledgeAssets    KnowledgeAsset[]
   frameworks         EngagementFramework[]
   staffingRequests   StaffingRequest[]
@@ -8655,4 +8657,253 @@ model AgelessQuestion {
   createdAt DateTime @default(now())
 
   @@index([edition, hidden, votes])
+}
+
+// ─── Market Watch ─────────────────────────────────────────────────────────
+// Social listening and market intelligence for a client's brand and its
+// competitors. A watch names who we follow; crons pull what the public says
+// about them from each source into WatchMention, read it, raise alerts, and
+// each week compose an EngagementDashboard draft for a partner to publish.
+// Only aggregates reach the client portal; the raw feed stays with CFA.
+
+model MarketWatch {
+  id           String            @id @default(cuid())
+  name         String
+  /// Optional: Mezo and other in-house brands have no client record.
+  clientId     String?
+  client       Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  /// Where the weekly dashboard draft lands. Without one, the watch is internal only.
+  engagementId String?
+  engagement   Engagement?       @relation(fields: [engagementId], references: [id], onDelete: SetNull)
+  status       MarketWatchStatus @default(ACTIVE)
+  /// healthcare, aesthetics, nutrition: picks the aspect taxonomy the reader tags with.
+  sector       String            @default("healthcare")
+  /// What the business does, in a sentence. The reader uses it to judge relevance.
+  context      String?           @db.Text
+  /// Who gets same-day alerts and the weekly brief. CFA staff by default.
+  alertEmails  String[]
+  lastRunAt    DateTime?
+  createdById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  entities WatchEntity[]
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  alerts   WatchAlert[]
+  runs     WatchRun[]
+
+  @@index([status])
+}
+
+enum MarketWatchStatus {
+  ACTIVE
+  PAUSED
+}
+
+/// One brand we follow: the client's own, or a competitor.
+model WatchEntity {
+  id              String          @id @default(cuid())
+  watchId         String
+  watch           MarketWatch     @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  name            String
+  role            WatchEntityRole @default(COMPETITOR)
+  /// Search terms. Any one matching counts, e.g. ["Medlyfe", "Lyfe Plastics"].
+  keywords        String[]
+  /// Words that make a match a false positive, e.g. a namesake in another trade.
+  excludes        String[]
+  /// Google Maps place, for reviews and rating.
+  googlePlaceId   String?
+  googleCid       String?
+  instagramHandle String?
+  tiktokHandle    String?
+  xHandle         String?
+  facebookPage    String?
+  youtubeChannel  String?
+  website         String?
+  /// The Awario alert that tracks this brand, when Awario is the web feed.
+  awarioAlertId   String?
+  /// Pages watched for changes: price lists, services, team.
+  trackedUrls     String[]
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  pages    WatchPageSnapshot[]
+
+  @@index([watchId])
+}
+
+enum WatchEntityRole {
+  OWN
+  COMPETITOR
+}
+
+enum WatchSource {
+  GOOGLE_REVIEW
+  NEWS
+  X
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+  YOUTUBE
+  REDDIT
+  NAIRALAND
+  WEB
+  WEBSITE_CHANGE
+  SEARCH_INTEREST
+}
+
+enum WatchSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  MIXED
+}
+
+model WatchMention {
+  id              String       @id @default(cuid())
+  watchId         String
+  watch           MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId        String?
+  entity          WatchEntity? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+  source          WatchSource
+  /// The source's own id, so a re-fetch updates rather than duplicates.
+  externalId      String
+  url             String?
+  authorName      String?
+  authorHandle    String?
+  /// Followers of the author where the source gives it; drives reach.
+  authorFollowers Int?
+  title           String?
+  text            String       @db.Text
+  publishedAt     DateTime
+  /// Star rating for reviews, 1 to 5.
+  rating          Int?
+  likes           Int?
+  comments        Int?
+  shares          Int?
+  views           Int?
+  /// The business's own reply, for reviews.
+  ownerReply      String?      @db.Text
+  ownerRepliedAt  DateTime?
+  raw             Json?
+
+  // Filled by the reader (lib/market-watch/classify.ts)
+  classifiedAt   DateTime?
+  relevant       Boolean?
+  sentiment      WatchSentiment?
+  /// -1 to 1.
+  sentimentScore Float?
+  /// Healthcare aspects, e.g. ["wait_time", "billing"].
+  aspects        String[]
+  /// Someone asking where to get what the client sells.
+  isLead         Boolean         @default(false)
+  isComplaint    Boolean         @default(false)
+  /// A claim or post that could become a regulatory or reputational problem.
+  isRisk         Boolean         @default(false)
+  language       String?
+  summary        String?
+  /// A suggested public reply for a review. Never confirms the reviewer is a patient.
+  replyDraft     String?         @db.Text
+  /// Set when staff corrected the reader, so a re-read does not undo them.
+  correctedBy    String?
+
+  /// CFA staff working the feed.
+  starred   Boolean   @default(false)
+  handledAt DateTime?
+  handledBy String?
+
+  fetchedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alerts WatchAlert[]
+
+  @@unique([watchId, source, externalId])
+  @@index([watchId, publishedAt])
+  @@index([watchId, classifiedAt])
+  @@index([entityId, publishedAt])
+}
+
+/// A number about an entity on a day: followers, rating, review count, search interest.
+model WatchMetric {
+  id       String       @id @default(cuid())
+  watchId  String
+  watch    MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId String
+  entity   WatchEntity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  metric   String
+  date     DateTime     @db.Date
+  value    Float
+  source   WatchSource?
+
+  @@unique([entityId, metric, date])
+  @@index([watchId, metric, date])
+}
+
+/// The last seen text of a tracked page, so a change can be spotted and described.
+model WatchPageSnapshot {
+  id        String      @id @default(cuid())
+  entityId  String
+  entity    WatchEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  url       String
+  hash      String
+  text      String      @db.Text
+  fetchedAt DateTime    @default(now())
+
+  @@index([entityId, url, fetchedAt])
+}
+
+enum WatchAlertKind {
+  NEGATIVE_REVIEW
+  NEGATIVE_MENTION
+  SPIKE
+  RISK
+  LEAD
+  COMPETITOR_MOVE
+}
+
+model WatchAlert {
+  id             String         @id @default(cuid())
+  watchId        String
+  watch          MarketWatch    @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  mentionId      String?
+  mention        WatchMention?  @relation(fields: [mentionId], references: [id], onDelete: SetNull)
+  kind           WatchAlertKind
+  title          String
+  detail         String         @db.Text
+  /// Stops the same thing alerting twice, e.g. "spike:<entity>:<date>".
+  dedupeKey      String
+  emailedAt      DateTime?
+  acknowledgedAt DateTime?
+  acknowledgedBy String?
+  createdAt      DateTime       @default(now())
+
+  @@unique([watchId, dedupeKey])
+  @@index([watchId, createdAt])
+}
+
+/// One pull from one source, so a silent source is visible rather than mistaken for a quiet week.
+model WatchRun {
+  id              String      @id @default(cuid())
+  watchId         String
+  watch           MarketWatch @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  /// The source's key in lib/market-watch/sources, e.g. "instagram-profiles".
+  source          String
+  startedAt       DateTime    @default(now())
+  finishedAt      DateTime?
+  fetched         Int         @default(0)
+  inserted        Int         @default(0)
+  skipped         String?
+  error           String?     @db.Text
+  /// Slow sources (Apify runs, DataForSEO review tasks) start a job in one run
+  /// and collect it in a later one. The job's id waits here until collected.
+  pendingRef      String?
+  pendingEntityId String?
+  collectedAt     DateTime?
+
+  @@index([watchId, startedAt])
+  @@index([pendingRef, collectedAt])
 }
