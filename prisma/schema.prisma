@@ -4599,27 +4599,28 @@ model CadreProfessional {
   profileCompleteness Int @default(0) // 0-100
 
   // Relations
-  credentials          CadreCredential[]
-  qualifications       CadreQualification[]
-  cpdEntries           CadreCPDEntry[]
-  workHistory          CadreWorkHistory[]
-  facilityReviews      CadreFacilityReview[]
-  salaryReports        CadreSalaryReport[]
-  mandateMatches       CadreMandateMatch[]
-  readinessAssessments CadreReadinessAssessment[]
-  outreachRecord       CadreOutreachRecord?
-  whatsAppMessages     CadreWhatsAppMessage[]
-  facilityReferrals    CadreFacilityReferral[]    @relation("FacilityReferrals")
-  careerReports        CadreCareerReport[]
-  advisorMessages      CadreAdvisorMessage[]
-  mentorProfile        CadreMentorProfile?
-  menteeMentorships    CadreMentorship[]          @relation("MenteeMentorships")
-  notifications        CadreNotification[]
-  subscription         CadreSubscription?
-  coachingSessions     CadreCoachingSession[]
-  mezoInterest         CadreMezoInterest?
-  shortlistEntries     CadreShortlistEntry[]
-  contactRequests      CadreContactRequest[]
+  credentials            CadreCredential[]
+  qualifications         CadreQualification[]
+  cpdEntries             CadreCPDEntry[]
+  workHistory            CadreWorkHistory[]
+  facilityReviews        CadreFacilityReview[]
+  salaryReports          CadreSalaryReport[]
+  mandateMatches         CadreMandateMatch[]
+  readinessAssessments   CadreReadinessAssessment[]
+  outreachRecord         CadreOutreachRecord?
+  whatsAppMessages       CadreWhatsAppMessage[]
+  facilityReferrals      CadreFacilityReferral[]      @relation("FacilityReferrals")
+  careerReports          CadreCareerReport[]
+  advisorMessages        CadreAdvisorMessage[]
+  mentorProfile          CadreMentorProfile?
+  menteeMentorships      CadreMentorship[]            @relation("MenteeMentorships")
+  notifications          CadreNotification[]
+  subscription           CadreSubscription?
+  coachingSessions       CadreCoachingSession[]
+  mezoInterest           CadreMezoInterest?
+  shortlistEntries       CadreShortlistEntry[]
+  contactRequests        CadreContactRequest[]
+  internshipApplications CadreInternshipApplication[]
 
   // Profile analytics
   profileViews Int       @default(0)
@@ -4862,10 +4863,11 @@ model CadreEmployerOrg {
   /// first message. Null means the client is named openly.
   publicName String?
 
-  members         CadreEmployerAccount[]
-  mandates        CadreMandate[]
-  shortlists      CadreShortlist[]
-  contactRequests CadreContactRequest[]
+  members          CadreEmployerAccount[]
+  mandates         CadreMandate[]
+  shortlists       CadreShortlist[]
+  contactRequests  CadreContactRequest[]
+  internshipCentre CadreInternshipCentre?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8655,4 +8657,145 @@ model AgelessQuestion {
   createdAt DateTime @default(now())
 
   @@index([edition, hidden, votes])
+}
+
+// ─── CadreHealth: Nurse internship placement ───
+//
+// Newly qualified nurses compete for a small number of internship places at
+// NMCN-approved centres, and each centre runs its own written exam before it
+// interviews. CadreHealth runs one assessment, and each centre gets a ranked
+// list of the people who chose it. The centre keeps the interview and the
+// decision; we take the exam and the admin off its hands.
+
+enum CadreInternshipCentreStage {
+  PROSPECT // on the approved list, not yet approached
+  CONTACTED // first approach made
+  MEETING // in conversation
+  COMMITTED // agreed slots and a minimum score; candidates flow to it
+  DECLINED
+}
+
+/// An approved internship centre, and the record of our engagement with it.
+/// The BD fields live here because the people working the list are the same
+/// people the centre will deal with once it says yes.
+model CadreInternshipCentre {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  area      String? // Lagos district, e.g. "Lekki", "Ikeja"
+  ownership String? // PRIVATE, STATE, FEDERAL, MILITARY, MISSION
+
+  stage         CadreInternshipCentreStage @default(PROSPECT)
+  /// Platform user (staff) who owns the relationship. Plain id, resolved on read.
+  ownerUserId   String?
+  contactName   String?
+  contactRole   String?
+  contactEmail  String?
+  contactPhone  String?
+  nextAction    String?
+  nextActionDue DateTime?
+  notes         String?                    @db.Text
+
+  /// What the centre has agreed, once it commits.
+  slotsOffered Int?
+  /// Minimum assessment score (percent) a candidate needs to reach this centre's list.
+  minScore     Int?
+  intakeNote   String? // e.g. "January and July intakes"
+  committedAt  DateTime?
+
+  /// The employer login that sees this centre's candidates.
+  employerOrgId String?           @unique
+  employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: SetNull)
+
+  preferences CadreInternshipPreference[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stage])
+}
+
+enum CadreInternshipStatus {
+  APPLIED // form in, assessment not finished
+  ASSESSED // assessment submitted and scored
+  PLACED // accepted an offer
+  WITHDRAWN
+}
+
+model CadreInternshipApplication {
+  id             String            @id @default(cuid())
+  professionalId String
+  professional   CadreProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  /// Intake label, e.g. "2027-H1". One application per person per intake.
+  intake         String
+
+  qualification  String // BNSC, RN, RM, RN_RM
+  school         String
+  graduationYear Int
+  /// NMCN registration (licence) number, if issued yet.
+  nmcnNumber     String?
+  phone          String
+
+  /// The link the applicant uses to sit and see the assessment. No password:
+  /// most applicants are new graduates with no account, and the link is emailed.
+  accessToken String @unique
+
+  /// The applicant agreed that the centres they chose may see their score and details.
+  consentAt DateTime
+  status    CadreInternshipStatus @default(APPLIED)
+
+  preferences CadreInternshipPreference[]
+  attempt     CadreInternshipAttempt?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([professionalId, intake])
+  @@index([intake, status])
+}
+
+enum CadreInternshipMatchStatus {
+  PENDING // on the centre's list, no decision yet
+  INVITED // invited to interview
+  OFFERED
+  ACCEPTED // the nurse took the place
+  DECLINED // the centre passed
+  WITHDRAWN // the nurse withdrew, or took a place elsewhere
+}
+
+/// One ranked choice of centre by one applicant. This is the row a centre acts on.
+model CadreInternshipPreference {
+  id            String                     @id @default(cuid())
+  applicationId String
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  centreId      String
+  centre        CadreInternshipCentre      @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  rank          Int
+  status        CadreInternshipMatchStatus @default(PENDING)
+  decidedAt     DateTime?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+
+  @@unique([applicationId, centreId])
+  @@index([centreId, status])
+}
+
+/// The one sitting of the assessment. The question set is drawn and fixed at
+/// start, scoring happens on the server, and the clock is the server's.
+model CadreInternshipAttempt {
+  id            String                     @id @default(cuid())
+  applicationId String                     @unique
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  bankVersion   String
+  /// [{ id, order: number[] }]: the questions drawn and the option order shown.
+  paper         Json
+  /// { [questionId]: optionIndex as shown }
+  answers       Json                       @default("{}")
+  startedAt     DateTime                   @default(now())
+  deadlineAt    DateTime
+  submittedAt   DateTime?
+  /// Percent correct, 0-100.
+  score         Int?
+  /// { [sectionKey]: { correct, total } }
+  sectionScores Json?
 }
