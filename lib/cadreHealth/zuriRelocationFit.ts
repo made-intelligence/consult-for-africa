@@ -51,6 +51,7 @@ export const RELOCATION_QUESTIONS: Question[] = [
       { value: "yes", label: "Yes", points: 0 },
       { value: "possibly", label: "Possibly, depending on the package", points: 1 },
       { value: "no", label: "No, we would move together", points: 2 },
+      { value: "alone", label: "Not applicable, I would move alone", points: 0 },
     ],
   },
   {
@@ -75,8 +76,8 @@ export const RELOCATION_QUESTIONS: Question[] = [
     key: "abroad",
     label: "Have you lived and worked outside Nigeria before?",
     options: [
-      { value: "worked", label: "Yes, I worked abroad for a year or more", points: 0 },
-      { value: "training", label: "A training post, fellowship or study abroad", points: 1 },
+      { value: "worked", label: "Yes, for a year or more in total, in any post or training", points: 0 },
+      { value: "training", label: "Yes, but for less than a year in total", points: 1 },
       { value: "first", label: "No, this would be my first move", points: 2 },
     ],
   },
@@ -86,7 +87,7 @@ export const RELOCATION_QUESTIONS: Question[] = [
     options: [
       { value: "permit", label: "Work permit and KMPDC registration only", points: 0 },
       { value: "housing-help", label: "Those, plus help finding housing", points: 1 },
-      { value: "full", label: "Those, plus paid housing, flights and school fees", points: 2 },
+      { value: "full", label: "Those, plus paid housing or relocation costs such as flights or school fees", points: 2 },
     ],
   },
 ];
@@ -114,9 +115,9 @@ export const HOUSEHOLD_QUESTION: PlainQuestion = {
   hint: "Helps Zuri plan permits and housing. It does not count toward your result.",
   options: [
     { value: "alone", label: "Just me" },
-    { value: "partner", label: "A spouse or partner" },
-    { value: "family", label: "A spouse or partner and children" },
-    { value: "dependants", label: "Other dependants as well" },
+    { value: "partner", label: "A spouse or partner, no children" },
+    { value: "family", label: "Children, with or without a spouse or partner" },
+    { value: "dependants", label: "Other dependants, such as a parent, with or without the above" },
   ],
 };
 
