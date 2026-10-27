@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { nextStages, stageFor } from "@/lib/cadreHealth/matchStages";
+import type { Band, RelocationSummary } from "@/lib/cadreHealth/zuriRelocationFit";
 
 /**
  * Everyone in play, split by how they arrived.
@@ -26,6 +27,9 @@ export interface PipelineEntry {
   matchScore: number | null;
   matchExplanation: string | null;
   notes: string | null;
+  /** Set only where the applicant has answered the relocation questions. */
+  relocation: RelocationSummary | null;
+  relocationAnswers: string[];
   createdAt: string;
   overdue: boolean;
   mandate: { id: string; title: string; cadreLabel: string };
@@ -61,6 +65,17 @@ const TABS = [
   },
 ];
 
+const BAND: Record<Band, { label: string; bg: string; color: string }> = {
+  low: { label: "Low relocation baggage", bg: "rgba(16,185,129,0.08)", color: "#047857" },
+  medium: { label: "Medium relocation baggage", bg: "rgba(212,175,55,0.1)", color: "#8A6D1A" },
+  high: { label: "High relocation baggage", bg: "rgba(220,38,38,0.07)", color: "#B91C1C" },
+};
+
+function relocationRank(e: PipelineEntry): number {
+  if (!e.relocation) return 1000;
+  return e.relocation.score;
+}
+
 export default function PipelineBoard({
   entries,
   showRole,
@@ -84,7 +99,13 @@ export default function PipelineBoard({
     SOURCED: entries.filter((e) => e.source === "SOURCED").length,
   };
   const overdue = entries.filter((e) => e.overdue).length;
-  const shown = entries.filter((e) => e.source === tab);
+  // Where applicants have answered the relocation questions, the least tied
+  // come first. Unanswered keep their place at the end; nobody is hidden.
+  const shown = entries
+    .filter((e) => e.source === tab)
+    .map((e, i) => ({ e, i }))
+    .sort((a, b) => relocationRank(a.e) - relocationRank(b.e) || a.i - b.i)
+    .map(({ e }) => e);
 
   async function move(matchId: string, status: string) {
     setBusy(matchId);
@@ -301,6 +322,35 @@ function EntryRow({
 
           {entry.matchExplanation && (
             <p className="mt-2 text-xs text-gray-400">Why: {entry.matchExplanation}</p>
+          )}
+
+          {entry.relocation && (
+            <div className="mt-2 space-y-1 text-xs">
+              <span
+                className="inline-block rounded-md px-2 py-0.5 font-semibold"
+                style={{ background: BAND[entry.relocation.band].bg, color: BAND[entry.relocation.band].color }}
+                title="Seven questions on what the move depends on. Household is not scored."
+              >
+                {BAND[entry.relocation.band].label} {entry.relocation.score}/{entry.relocation.max}
+              </span>
+              {entry.relocation.plus.map((p) => (
+                <p key={p} style={{ color: "#047857" }}>+ {p}</p>
+              ))}
+              {entry.relocation.flags.map((f) => (
+                <p key={f} style={{ color: "#8A6D1A" }}>Flag: {f}. For you to judge; it has not declined them.</p>
+              ))}
+              {entry.relocation.household && <p className="text-gray-500">Moving with them: {entry.relocation.household}</p>}
+              {entry.relocationAnswers.length > 0 && (
+                <details className="text-gray-500">
+                  <summary className="cursor-pointer text-[#0B3C5D]">Their relocation answers</summary>
+                  <ul className="mt-1 space-y-0.5">
+                    {entry.relocationAnswers.map((l) => (
+                      <li key={l}>{l}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
           )}
         </div>
 
