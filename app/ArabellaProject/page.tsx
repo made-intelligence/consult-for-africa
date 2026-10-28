@@ -173,7 +173,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Updated 28 October"
             title="What we need now"
-            lead="We went back through every file you sent and rebuilt each figure from the line items. These records settle the questions the files could not. Items marked first matter most. Where something does not exist, a one-line note saying so is just as useful."
+            lead="We have now reviewed all the additional information you sent. These records settle the questions the files cannot answer on their own. Items marked first matter most. Where something does not exist, a one-line note saying so is just as useful."
           />
           <div style={{ display: "grid", gap: 14 }}>
             {ADDITIONAL_REQUEST.map((g) => (

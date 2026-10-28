@@ -18,7 +18,7 @@ const TO = [
 
 const text = `Dear Dr Chito and Tolu,
 
-Thank you for your response to the report. We have gone back through every file you sent and rebuilt each figure from the line items, and several of our earlier readings have changed as a result. I will take you through what changed when we meet.
+Thank you for your response to the report. The interim report was prepared from the sales record and the expense summaries; the additional information you sent, including the bank statements and the expense line items, was not reviewed in that report. We have now reviewed all of it, and I will take you through the updated picture when we meet.
 
 To settle the questions the files cannot answer on their own, the project page now lists what we need next: 21 items in five groups, with six marked first. Most are exports and documents that already exist, such as the billing export, the Access Bank statement, the full expense ledger, payroll schedules and the antenatal booking register.
 
