@@ -322,7 +322,6 @@ export default async function DocumentsPage({
                             href={d.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
                             className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90"
                             style={{
                               background: "#0F2744",

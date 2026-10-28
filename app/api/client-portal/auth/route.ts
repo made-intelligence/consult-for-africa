@@ -11,7 +11,7 @@ export const POST = handler(async function POST(req: NextRequest) {
     return Response.json({ error: "Email and password required" }, { status: 400 });
 
   const contact = await prisma.clientContact.findUnique({
-    where: { email: (email as string).toLowerCase() },
+    where: { email: (email as string).trim().toLowerCase() },
     select: {
       id: true,
       clientId: true,
@@ -26,7 +26,11 @@ export const POST = handler(async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid credentials or portal not enabled" }, { status: 401 });
   }
 
-  const valid = await bcrypt.compare(password as string, contact.passwordHash);
+  // Phones paste passwords out of WhatsApp with a trailing space.
+  const valid =
+    (await bcrypt.compare(password as string, contact.passwordHash)) ||
+    (password !== (password as string).trim() &&
+      (await bcrypt.compare((password as string).trim(), contact.passwordHash)));
   if (!valid) return Response.json({ error: "Invalid credentials" }, { status: 401 });
 
   const token = signClientPortalJWT({
