@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import DocumentUploader from "@/components/arabella/DocumentUploader";
-import { DOCUMENTS, PRIORITY_EIGHT, RECEIVED, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
+import { ADDITIONAL_REQUEST, DOCUMENTS, RECEIVED, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
 
 // One link for Dr Chito and the Arabella team: the request document, the four
 // surveys, and somewhere to put the answers. Deliberately not indexed.
@@ -143,7 +143,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Thank you"
             title="What has come in"
-            lead="All of this arrived within a day of asking. Where something is only partly in, the note says what is still missing."
+            lead="Twenty four files so far. Where something is only partly in, the note says what is still missing."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {RECEIVED.map((r, i) => (
@@ -161,41 +161,51 @@ export default function ArabellaProjectPage() {
                 </span>
                 <span style={{ flex: 1 }}>
                   <span style={{ display: "block", fontSize: 15, color: "#1F2937" }}>{r.what}</span>
-                  <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2 }}>{r.note}</span>
+                  {r.note && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2 }}>{r.note}</span>}
                 </span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* 3. The eight */}
+        {/* 3. The October request */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
-            eyebrow="Next"
-            title="The eight we need next"
-            lead="Reading what came in showed us exactly what we still cannot see. These eight close the biggest gaps, so if time is short, send these first."
+            eyebrow="Updated 28 October"
+            title="What we need now"
+            lead="We went back through every file you sent and rebuilt each figure from the line items. These records settle the questions the files could not. Items marked first matter most. Where something does not exist, a one-line note saying so is just as useful."
           />
-          <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-            {PRIORITY_EIGHT.map((p, i) => (
-              <div
-                key={p.n}
-                style={{
-                  display: "flex", gap: 14, padding: "14px 18px",
-                  borderTop: i === 0 ? "none" : `1px solid #F1F5F9`,
-                  background: i % 2 ? "#FBFDFE" : "#fff",
-                }}
-              >
-                <span style={{ color: GOLD, fontWeight: 800, fontSize: 15, minWidth: 18 }}>{p.n}</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 15, color: "#1F2937", lineHeight: 1.5 }}>{p.what}</span>
-                  <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 3 }}>{p.why}</span>
-                </span>
-                <span style={{ color: TEAL, fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap" }}>
-                  section {p.section}
-                </span>
+          <div style={{ display: "grid", gap: 14 }}>
+            {ADDITIONAL_REQUEST.map((g) => (
+              <div key={g.group} style={{ ...card, padding: 0, overflow: "hidden" }}>
+                <div style={{ padding: "11px 18px", background: "#F8FAFC", borderBottom: `1px solid ${LINE}`, color: NAVY, fontWeight: 700, fontSize: 14 }}>
+                  {g.group}
+                </div>
+                {g.items.map((p, i) => (
+                  <div
+                    key={p.n}
+                    style={{ display: "flex", gap: 14, padding: "13px 18px", borderTop: i === 0 ? "none" : `1px solid #F1F5F9` }}
+                  >
+                    <span style={{ color: GOLD, fontWeight: 800, fontSize: 15, minWidth: 22 }}>{p.n}</span>
+                    <span style={{ flex: 1, fontSize: 14.5, color: "#1F2937", lineHeight: 1.55 }}>{p.what}</span>
+                    {p.first && (
+                      <span
+                        style={{
+                          alignSelf: "flex-start", background: "#FEF3C7", color: "#92400E", borderRadius: 20,
+                          padding: "3px 9px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
+                        }}
+                      >
+                        First
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
+          <p style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.6, margin: "12px 2px 0" }}>
+            When you upload, choose the item number so each file lands against the question it answers.
+          </p>
         </section>
 
         {/* 3. Uploads */}
@@ -212,8 +222,8 @@ export default function ArabellaProjectPage() {
         <section style={{ marginTop: 40 }}>
           <SectionHeading
             eyebrow="For reference"
-            title="Everything we have asked for"
-            lead="The full list, in ten sections with each question asked once, is in the request above."
+            title="The original request"
+            lead="The ten sections of the first request, for reference. The list above is what we need now."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {REQUEST_SECTIONS.map((s, i) => (
