@@ -21,6 +21,9 @@ Run:
 from __future__ import annotations
 
 from pathlib import Path
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cfa_company import LEGAL_LINE, RC, TIN  # noqa: E402
 
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import A4
@@ -309,7 +312,7 @@ def build():
     c.rect(0, 26, PAGE_W, 2, fill=1, stroke=0)
     c.setFillColor(white)
     c.setFont("Helvetica-Bold", 8)
-    c.drawString(MX, 10, "Consult for Africa Management Services Limited")
+    c.drawString(MX, 10, LEGAL_LINE)
     c.setFillColor(LIGHT)
     c.setFont("Helvetica", 8)
     c.drawRightString(PAGE_W - MX, 10, "hello@consultforafrica.com   /   consultforafrica.com")
