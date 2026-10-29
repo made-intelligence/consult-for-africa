@@ -46,6 +46,17 @@ export const DFC_CATALYST_EVENTS: DfcCatalystEvent[] = [
     venue: "Zoom",
     registerUrl: "https://www.dfcare.org/events/dfc-catalyst-series-featuring-dr-tare-biu",
   },
+  {
+    startsAt: new Date("2026-10-31T10:00:00+01:00"),
+    speaker: "Dr. Richardson Ajayi",
+    speakerBio:
+      "Obstetrician and gynaecologist, healthcare entrepreneur and director. He graduated with distinction from King's College London in 1988, holds fellowships from leading medical institutions in the UK and West Africa, and founded Bridge Clinic in 1999, growing it into a leading fertility centre in West Africa.",
+    topic:
+      "Management of Infertility: The African Perspective. Building IVF in Nigeria: From First Cycle to Ecosystem",
+    when: "Saturday 31 October 2026, 10:00 AM WAT",
+    venue: "Zoom",
+    registerUrl: "https://www.dfcare.org/events/dfc-october-physical-edition",
+  },
 ];
 
 /**
