@@ -15,6 +15,7 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [resent, setResent] = useState(false);
   const [error, setError] = useState("");
+  const [q, setQ] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((p) => ({ ...p, [k]: e.target.value }));
 
   const toggle = (id: string) =>
@@ -85,7 +86,7 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
             <span className="text-xs font-medium text-gray-600">Year you graduated</span>
-            <input required type="number" min={2020} max={2030} className={`${input} mt-1`} style={inputStyle} value={f.graduationYear} onChange={set("graduationYear")} />
+            <input required type="number" min={new Date().getFullYear() - 5} max={new Date().getFullYear() + 1} className={`${input} mt-1`} style={inputStyle} value={f.graduationYear} onChange={set("graduationYear")} />
           </label>
           <label className="block">
             <span className="text-xs font-medium text-gray-600">Intern licence number, if issued</span>
@@ -96,6 +97,7 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
 
       <div>
         <p className="text-sm font-semibold text-gray-900">Choose up to {MAX_PREFERENCES} centres, in order of preference</p>
+        <p className="mt-0.5 text-xs text-gray-500">Tap a centre to add it. Your first choice is number 1; use the arrows to reorder.</p>
         {chosen.length > 0 && (
           <ol className="mt-3 space-y-1.5">
             {chosen.map((id, i) => (
@@ -109,9 +111,19 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
             ))}
           </ol>
         )}
-        <div className="mt-3 max-h-72 overflow-y-auto rounded-lg" style={{ border: "1px solid #E8EBF0" }}>
+        {chosen.length < MAX_PREFERENCES && (
+          <input
+            className={`${input} mt-3`}
+            style={inputStyle}
+            placeholder="Search by name or area, e.g. Lekki"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        )}
+        <div className="mt-2 max-h-72 overflow-y-auto rounded-lg" style={{ border: "1px solid #E8EBF0" }}>
           {centres
             .filter((c) => !chosen.includes(c.id))
+            .filter((c) => !q.trim() || `${c.name} ${c.area ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()))
             .map((c) => (
               <button
                 type="button"
