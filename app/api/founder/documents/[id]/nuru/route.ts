@@ -16,7 +16,7 @@ export const POST = handler(async function POST(req: Request, { params }: { para
   const docContent = doc.content || doc.description || doc.title;
 
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 800,
     messages: [{
       role: "user",
@@ -40,18 +40,18 @@ Be specific to C4A. Never use em dashes. Be concise.`,
     }],
   });
 
-  const nuruNotes = message.content[0].type === "text" ? message.content[0].text : "";
+  const nuruNotes = message.content.find((b) => b.type === "text")?.text ?? "";
 
   // Also generate a short summary
   const summaryMsg = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 100,
     messages: [{
       role: "user",
       content: `Summarise this in exactly one sentence (max 20 words): ${doc.title}. ${doc.description || docContent?.slice(0, 500) || ""}`,
     }],
   });
-  const nuruSummary = summaryMsg.content[0].type === "text" ? summaryMsg.content[0].text : "";
+  const nuruSummary = summaryMsg.content.find((b) => b.type === "text")?.text ?? "";
 
   await prisma.founderDocument.update({
     where: { id },

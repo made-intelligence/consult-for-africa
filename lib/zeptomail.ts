@@ -25,6 +25,8 @@ export interface ZeptoMailSendInput {
   trackingTag?: string;
   /** Base64 content. ZeptoMail caps a message at 15MB including these. */
   attachments?: { name: string; content: string; mimeType: string }[];
+  /** Images referenced from the HTML as src="cid:<cid>". */
+  inlineImages?: { cid: string; content: string; mimeType: string }[];
 }
 
 export interface ZeptoMailSendResult {
@@ -72,6 +74,9 @@ export async function sendViaZeptoMail(input: ZeptoMailSendInput): Promise<Zepto
         content: a.content,
         mime_type: a.mimeType,
       })),
+    }),
+    ...(input.inlineImages?.length && {
+      inline_images: input.inlineImages.map((a) => ({ cid: a.cid, mime_type: a.mimeType, content: a.content })),
     }),
   };
 
@@ -127,6 +132,7 @@ export async function sendTransactionalEmail({
   html,
   text,
   attachments,
+  inlineImages,
 }: {
   from: string;
   replyTo?: string;
@@ -135,6 +141,7 @@ export async function sendTransactionalEmail({
   html: string;
   text?: string;
   attachments?: { name: string; content: string; mimeType: string }[];
+  inlineImages?: ZeptoMailSendInput["inlineImages"];
 }): Promise<ZeptoMailSendResult> {
   return sendViaZeptoMail({
     from: parseAddress(from),
@@ -144,5 +151,6 @@ export async function sendTransactionalEmail({
     textbody: text,
     replyTo: replyTo ? parseAddress(replyTo) : undefined,
     attachments,
+    inlineImages,
   });
 }

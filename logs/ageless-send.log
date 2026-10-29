@@ -1,0 +1,38 @@
+
+===== [2026-10-12 12:00:01 WAT] batch starting =====
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/debo/consult-for-africa/scripts/send-ageless-list-invite.ts' imported from /Users/debo/consult-for-africa/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/debo/consult-for-africa/node_modules/tsx/dist/register-nyXW-TH3.mjs:2:10494)
+    at async resolveDirectory (file:///Users/debo/consult-for-africa/node_modules/tsx/dist/register-nyXW-TH3.mjs:2:11575) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/debo/consult-for-africa/scripts/send-ageless-list-invite.ts'
+}
+
+Node.js v22.20.0
+----- exit 1, 0 written to in total -----
+
+===== [2026-10-12 14:00:00 WAT] batch starting =====
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/debo/consult-for-africa/scripts/send-ageless-list-invite.ts' imported from /Users/debo/consult-for-africa/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/debo/consult-for-africa/node_modules/tsx/dist/register-nyXW-TH3.mjs:2:10494)
+    at async resolveDirectory (file:///Users/debo/consult-for-africa/node_modules/tsx/dist/register-nyXW-TH3.mjs:2:11575) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/debo/consult-for-africa/scripts/send-ageless-list-invite.ts'
+}
+
+Node.js v22.20.0
+----- exit 1, 0 written to in total -----

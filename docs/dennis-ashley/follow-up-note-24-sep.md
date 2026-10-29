@@ -49,6 +49,22 @@ debo.odulana@consultforafrica.com  ·  +234 913 813 8553  ·  mezohealth.com
 
 ---
 
+## Alternative opening, if the 22 September letter never actually went out
+
+Nothing in either repo records the letter being sent, and there is no address on file for him. If
+it was only ever built and not delivered, swap the first paragraph for this one, which carries the
+request and the link together and does not refer back to something he never received.
+
+> Dear Dr Oti, following our conversations about bringing Dennis Ashley into the network, I have put
+> everything for the diagnostic audit in one place rather than sending you a list to work through.
+> The page below is private to the clinic and is not listed anywhere.
+
+The rest of the note stands unchanged, except the closing line about the NDA, which should read
+"the mutual NDA is yours whenever you want it, and I would rather it did not become the reason
+nothing moves."
+
+---
+
 ## WhatsApp version, if that reaches him faster
 
 Good morning Dr Oti. Following my note of the 22nd, I have put everything for the diagnostic audit

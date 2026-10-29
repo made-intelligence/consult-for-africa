@@ -5,11 +5,14 @@ import { handler } from "@/lib/api-handler";
 import { logAudit } from "@/lib/audit";
 import {
   emailTaskApproved,
+  emailTaskAssigned,
   emailTaskBlocked,
+  emailTaskCancelled,
   emailTaskChangesRequested,
   emailTaskSubmitted,
 } from "@/lib/email";
 import {
+  NEXT_MOVE,
   TASK_STATUSES,
   allowedTransitions,
   canAssignToOthers,
@@ -17,6 +20,7 @@ import {
   canUseTaskBoard,
   partyFor,
   validateTransition,
+  whoseMove,
 } from "@/lib/tasks";
 import { evidenceFor } from "@/lib/taskEvidence";
 import type { Prisma, TaskStatus } from "@prisma/client";
@@ -36,6 +40,7 @@ const TASK_SELECT = {
   actualMinutes: true,
   blockedReason: true,
   reviewNote: true,
+  handoverNote: true,
   linkedEntityType: true,
   linkedEntityId: true,
   parentTaskId: true,
@@ -62,6 +67,20 @@ const TASK_SELECT = {
       checkInAt: true,
       assignee: PERSON,
       assigner: PERSON,
+    },
+    orderBy: { createdAt: "asc" },
+  },
+  attachments: {
+    select: {
+      id: true, label: true, fileKey: true, url: true, contentType: true,
+      sizeBytes: true, createdAt: true, uploadedBy: PERSON,
+    },
+    orderBy: { createdAt: "asc" },
+  },
+  events: {
+    select: {
+      id: true, kind: true, fromStatus: true, toStatus: true, note: true,
+      createdAt: true, actor: PERSON,
     },
     orderBy: { createdAt: "asc" },
   },
@@ -96,10 +115,21 @@ function shape(task: LoadedTask, userId: string, role: string) {
     ...task,
     subtasks: visibleSubtasks,
     subtaskRollup: rollup(task.subtasks),
+    // The storage key never leaves the server. Every object in the bucket is
+    // readable by anyone holding its key, so the key is the only control there
+    // is, and a page the whole office can open is not where it belongs.
+    attachments: task.attachments.map(({ fileKey, ...a }) => ({ ...a, isFile: !!fileKey })),
+    nextMove: NEXT_MOVE[task.status],
+    whoseMove: whoseMove(
+      { assigneeId: task.assignee.id, assignerId: task.assigner.id, status: task.status },
+      userId,
+    ),
     viewer: {
       party,
       canTransitionTo: allowedTransitions(task.status, party),
       canEditFields: party === "ASSIGNER" || party === "BOTH",
+      canReassign: (party === "ASSIGNER" || party === "BOTH") && !["DONE", "CANCELLED"].includes(task.status),
+      canAttach: party !== "NONE" && task.status !== "CANCELLED",
       canBreakDown: canAssignToOthers(role) && !task.parentTaskId && (party !== "NONE" || seesEverything),
     },
   };
@@ -162,11 +192,34 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
   }
 
   const body = await req.json();
-  const { status, blockedReason, reviewNote, actualMinutes } = body;
+  const { status, blockedReason, reviewNote, cancelReason, handoverNote, actualMinutes } = body;
   const isAssigner = party === "ASSIGNER" || party === "BOTH";
   const isAssignee = party === "ASSIGNEE" || party === "BOTH";
 
   const data: Prisma.TaskUpdateInput = {};
+
+  // Changing hands. The one move the board did not have: when somebody goes on
+  // leave their work used to die on their desk, because every field of a task
+  // was editable except the name against it.
+  let handedTo: { id: string; name: string; email: string } | null = null;
+  if (typeof body.assigneeId === "string" && body.assigneeId && body.assigneeId !== existing.assignee.id) {
+    if (!isAssigner) {
+      return Response.json({ error: "Only the person who assigned this can move it to somebody else." }, { status: 403 });
+    }
+    if (["DONE", "CANCELLED"].includes(existing.status)) {
+      return Response.json({ error: "This task is closed. Raise a new one rather than moving this." }, { status: 400 });
+    }
+    const next = await prisma.user.findUnique({
+      where: { id: body.assigneeId },
+      select: { id: true, name: true, email: true, role: true },
+    });
+    if (!next) return Response.json({ error: "That person was not found." }, { status: 404 });
+    if (!canUseTaskBoard(next.role)) {
+      return Response.json({ error: "That person does not have a task board." }, { status: 400 });
+    }
+    data.assignee = { connect: { id: next.id } };
+    handedTo = { id: next.id, name: next.name, email: next.email };
+  }
 
   // The terms of the task belong to the person who set them.
   if (isAssigner) {
@@ -217,6 +270,11 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
       // the reason resent.
       blockedReason: blockedReason ?? existing.blockedReason,
       reviewNote: reviewNote ?? existing.reviewNote,
+      cancelReason,
+      handover: {
+        attachmentCount: existing.attachments.length,
+        note: handoverNote ?? existing.handoverNote,
+      },
     });
     if (!check.ok) return Response.json({ error: check.error }, { status: 400 });
 
@@ -226,10 +284,17 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
     if (next === "BLOCKED") data.blockedReason = blockedReason?.trim() ?? existing.blockedReason;
     if (next === "IN_PROGRESS" || next === "ASSIGNED") data.blockedReason = null;
     if (next === "CHANGES_REQUESTED") data.reviewNote = reviewNote?.trim() ?? existing.reviewNote;
-    if (next === "SUBMITTED") data.submittedAt = new Date();
+    if (next === "SUBMITTED") {
+      data.submittedAt = new Date();
+      if (typeof handoverNote === "string") data.handoverNote = handoverNote.trim() || null;
+    }
     if (next === "DONE") {
       data.completedAt = new Date();
-      if (typeof reviewNote === "string" && reviewNote.trim()) data.reviewNote = reviewNote.trim();
+      // The sign-off note goes on the trail, not into reviewNote. That column
+      // means one thing now, "what needs to change", and the correction it
+      // held has just been satisfied. Carrying it forward meant a reopened
+      // task showed last month's praise as this month's correction.
+      data.reviewNote = null;
     }
     if (next !== "DONE" && next !== "CHANGES_REQUESTED" && next !== "SUBMITTED") data.completedAt = null;
   } else {
@@ -248,6 +313,39 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
 
   const task = await prisma.task.update({ where: { id }, data, select: TASK_SELECT });
 
+  // One row per move, carrying the one note that move required. The columns say
+  // where the task is; only the trail can say how it got there.
+  const moveNote =
+    moved === "BLOCKED" ? task.blockedReason
+    : moved === "CHANGES_REQUESTED" ? task.reviewNote
+    : moved === "CANCELLED" ? (typeof cancelReason === "string" ? cancelReason.trim() : null)
+    : moved === "SUBMITTED" ? task.handoverNote
+    : moved === "DONE" ? (typeof reviewNote === "string" ? reviewNote.trim() || null : null)
+    : null;
+
+  if (moved) {
+    await prisma.taskEvent.create({
+      data: {
+        taskId: task.id,
+        kind: "STATUS",
+        fromStatus: existing.status,
+        toStatus: moved,
+        note: moveNote,
+        actorId: session.user.id,
+      },
+    });
+  }
+  if (handedTo) {
+    await prisma.taskEvent.create({
+      data: {
+        taskId: task.id,
+        kind: "REASSIGNED",
+        note: `From ${existing.assignee.name} to ${handedTo.name}.`,
+        actorId: session.user.id,
+      },
+    });
+  }
+
   await logAudit({
     userId: session.user.id,
     action: moved ? "STATUS_CHANGE" : "UPDATE",
@@ -256,6 +354,29 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
     entityName: task.title,
     details: moved ? { from: existing.status, to: moved } : { fields: Object.keys(data) },
   });
+
+  if (handedTo) {
+    await logAudit({
+      userId: session.user.id,
+      action: "UPDATE",
+      entityType: "Task",
+      entityId: task.id,
+      entityName: task.title,
+      details: { reassignedFrom: existing.assignee.id, reassignedTo: handedTo.id },
+    });
+    emailTaskAssigned({
+      assigneeEmail: handedTo.email,
+      assigneeName: handedTo.name,
+      assignerName: session.user.name ?? "Consult For Africa",
+      title: task.title,
+      brief: task.brief,
+      definitionOfDone: task.definitionOfDone,
+      dueDate: task.dueDate,
+      checkInAt: task.checkInAt,
+      estimatedMinutes: task.estimatedMinutes,
+      taskId: task.id,
+    }).catch((err) => console.error(`[tasks] handover email failed for ${task.id}:`, err));
+  }
 
   // Notifications follow the chain. A block raises it to whoever assigned the
   // work, which is what keeps the Founding Partner out of the EA's review loop.
@@ -281,6 +402,8 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
       assignerName: task.assigner.name,
       assigneeName: task.assignee.name,
       title: task.title,
+      handoverNote: task.handoverNote,
+      attachments: task.attachments.map((a) => a.label),
       taskId: task.id,
     }).catch(fail);
   } else if (moved === "CHANGES_REQUESTED") {
@@ -298,7 +421,18 @@ export const PATCH = handler(async function PATCH(req: NextRequest, ctx: { param
       assigneeName: task.assignee.name,
       assignerName: actorName,
       title: task.title,
-      reviewNote: task.reviewNote,
+      reviewNote: moveNote,
+      taskId: task.id,
+    }).catch(fail);
+  } else if (moved === "CANCELLED") {
+    // Work that disappears without a word reads as a judgement on the person
+    // who was carrying it, which is why the reason is not optional.
+    emailTaskCancelled({
+      assigneeEmail: task.assignee.email,
+      assigneeName: task.assignee.name,
+      assignerName: actorName,
+      title: task.title,
+      reason: moveNote ?? "No reason given.",
       taskId: task.id,
     }).catch(fail);
   }

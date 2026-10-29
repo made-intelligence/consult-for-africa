@@ -36,7 +36,7 @@ def build(d: dict) -> str:
     w("- Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.")
     w("- Speaker focus is what to prepare to open with, two to three minutes.")
     w(f"- {ev['places']} guests. {d['room']}")
-    w("- No slides, no lectern. Cocktail dress.\n")
+    w("- No slides, no lectern. Smart casual.\n")
 
     w("## What we need from you\n")
     w("| What | Detail |")

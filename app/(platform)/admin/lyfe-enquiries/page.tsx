@@ -104,6 +104,18 @@ export default async function LyfeEnquiriesPage() {
   const KEYS = new Set(LYFE_INVITERS.map((i) => i.key));
   const unattributed = rsvps.filter((e) => !e.utmSource || !KEYS.has(e.utmSource));
 
+  // The consultation flyers carry a ?src= per group, and MedLYFE's own copy
+  // carries src=medlyfe. Count requests by that tag so whoever sent a flyer
+  // can be shown what it brought.
+  const consults = entries.filter((e) => e.intent !== "EVENT_RSVP");
+  const byTag = Object.entries(
+    consults.reduce<Record<string, number>>((acc, e) => {
+      const tag = e.utmSource || "No link tag";
+      acc[tag] = (acc[tag] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).sort((a, b) => b[1] - a[1]);
+
   const rows: Row[] = [...entries]
     .sort((a, b) => {
       // Untouched first, longest wait at the top. Then everything else by how
@@ -136,6 +148,7 @@ export default async function LyfeEnquiriesPage() {
       notes: e.notes,
       source: e.source,
       sourceDetail: e.sourceDetail,
+      tag: e.utmSource,
       status: e.status,
       eventStage: e.eventStage,
       invitedAtLabel: e.invitedAt
@@ -229,6 +242,26 @@ export default async function LyfeEnquiriesPage() {
       </div>
 
       <InviterTable rows={byInviter} unattributed={unattributed.length} />
+
+      <section className="mt-10">
+        <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-gray-500">
+          Consultation requests by link
+        </h2>
+        <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-gray-500">
+          The tag on the flyer or link they came through. Open a row below for who they are.
+        </p>
+        {byTag.length ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {byTag.map(([tag, n]) => (
+              <span key={tag} className="rounded-md border border-gray-200 px-3 py-1.5 text-[13px] text-gray-700">
+                {tag} <span className="font-semibold text-gray-900">{n}</span>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-[13px] text-gray-500">No consultation requests yet.</p>
+        )}
+      </section>
 
       <div className="mt-10">
         <Queue rows={rows} />

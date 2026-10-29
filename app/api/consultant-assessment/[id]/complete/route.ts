@@ -134,13 +134,13 @@ Return your evaluation as a JSON object with this exact structure:
 Return ONLY the JSON object, no additional text.`;
 
   const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 2000,
     messages: [{ role: "user", content: prompt }],
   });
 
-  const content = message.content[0];
-  if (content.type !== "text") {
+  const content = message.content.find((b) => b.type === "text");
+  if (!content) {
     throw new Error("Unexpected response format from AI scoring");
   }
 

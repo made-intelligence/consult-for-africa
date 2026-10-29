@@ -4,3 +4,6 @@
 *.csv
 !.gitignore
 !README.md
+*.xlsx
+*.json
+*.pdf

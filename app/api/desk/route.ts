@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { canUseOfficeDesk, nextOccurrenceAfter } from "@/lib/office";
-import { canAssignToOthers } from "@/lib/tasks";
+import { NEXT_MOVE, OPEN_STATUSES, canAssignToOthers, whoseMove } from "@/lib/tasks";
 import { FINANCE_READ_ROLES, OFFICE_ROLES, PIPELINE_ROLES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 
@@ -15,18 +15,23 @@ import { Prisma } from "@prisma/client";
  * At any moment a thing is waiting on you, waiting on somebody else, waiting on
  * a date, or waiting on nobody. That is exhaustive and it does not overlap.
  *
- * This replaced a second screen, the principal's brief, which answered "what is
- * the state of the firm" and duplicated five of its nine categories here. The
- * two differences it had are kept as features rather than as a separate page:
- * you can open somebody else's desk, and firm-level facts appear alongside
- * personal ones. An ageing invoice nobody has chased is the office's move, and
- * saying so is more useful than listing it on a status board.
+ * The route said so from the start and then broke it in six places. Blocked
+ * work sat under "yours" with the action "waiting on an answer". Work you had
+ * submitted appeared under nothing at all, because the status list here and the
+ * one in lib/tasks disagreed about whether submitted work was still open. A
+ * check-in emitted a second row for a task already listed. Commitments you
+ * personally owed were filtered out by name. And the fourth bucket, the things
+ * nobody holds, was never built, so overdue invoices were filed as yours and
+ * duplicated onto every desk that could see finance.
  *
- * The rule that keeps the buckets exclusive: work somebody submitted to you is
- * YOUR move, even though they own the task. Ownership is not the axis.
+ * Now every row declares whose move it is, one function decides, and the
+ * buckets are the partition rather than four lists written by hand.
  */
 
 type Urgency = "OVERDUE" | "TODAY" | "SOON" | "NONE";
+
+/** The four answers. Every row carries exactly one. */
+type Move = "YOU" | "SOMEONE" | "A_DATE" | "NOBODY";
 
 interface Row {
   kind: string;
@@ -37,6 +42,7 @@ interface Row {
   date: string | null;
   urgency: Urgency;
   action: string;
+  move: Move;
 }
 
 function urgencyOf(date: Date | null, now: Date): Urgency {
@@ -56,6 +62,11 @@ function sortRows(rows: Row[]): Row[] {
     if (a.date && b.date) return a.date.localeCompare(b.date);
     return a.date ? -1 : b.date ? 1 : 0;
   });
+}
+
+function daysSince(date: Date | null, now: Date): number {
+  if (!date) return 0;
+  return Math.floor((now.getTime() - date.getTime()) / 86400000);
 }
 
 export const GET = handler(async function GET(req: NextRequest) {
@@ -90,20 +101,59 @@ export const GET = handler(async function GET(req: NextRequest) {
   const seesPipeline = PIPELINE_ROLES.includes(session.user.role as typeof PIPELINE_ROLES[number]);
 
   const [
-    myTasks, toReview, myDecisions, myCommitments, raisedDecisions, assignedOut,
+    tasks, questions, myDecisions, raisedDecisions, deferredDecisions, owedByMe, owedToMe,
     meetings, rhythms, nextActions, overdueInvoices, silentProposals, lowStock, notesToConfirm,
   ] = await Promise.all([
+    // One query for every open task I touch, from either side of the desk, so
+    // no task can be counted twice and none can fall between two filters.
     prisma.task.findMany({
-      where: { assigneeId: me, status: { in: ["ASSIGNED", "IN_PROGRESS", "CHANGES_REQUESTED", "BLOCKED"] } },
-      select: { id: true, title: true, status: true, dueDate: true, checkInAt: true, assigner: { select: { name: true } } },
+      where: { status: { in: OPEN_STATUSES }, OR: [{ assigneeId: me }, { assignerId: me }] },
+      select: {
+        id: true, title: true, status: true, dueDate: true, checkInAt: true,
+        submittedAt: true, blockedReason: true,
+        assigneeId: true, assignerId: true,
+        assignee: { select: { name: true } },
+        assigner: { select: { name: true } },
+        _count: { select: { attachments: true } },
+      },
     }),
-    prisma.task.findMany({
-      where: { assignerId: me, status: "SUBMITTED" },
-      select: { id: true, title: true, submittedAt: true, assignee: { select: { name: true } } },
+    // A question is the quiet half of being stuck. Blocking escalates the same
+    // day and an unanswered question escalated nowhere at all, so the two
+    // channels for "I need something from you" had completely different odds of
+    // being heard.
+    prisma.taskQuestion.findMany({
+      where: { answeredAt: null, task: { OR: [{ assigneeId: me }, { assignerId: me }] } },
+      select: {
+        id: true, question: true, createdAt: true, askedById: true,
+        askedBy: { select: { name: true } },
+        task: { select: { id: true, title: true, assigneeId: true, assignee: { select: { name: true } }, assigner: { select: { name: true } } } },
+      },
+      take: 25,
     }),
     prisma.decision.findMany({
       where: { forUserId: me, status: "PENDING" },
       select: { id: true, title: true, dueBy: true, raisedBy: { select: { name: true } } },
+    }),
+    prisma.decision.findMany({
+      where: { raisedById: me, status: "PENDING", NOT: { forUserId: me } },
+      select: { id: true, title: true, dueBy: true, forUser: { select: { name: true } } },
+    }),
+    // Deferring without a date is a slower no. These used to drop off every
+    // list the moment they were deferred, which is how a decision gets made by
+    // running out of time.
+    prisma.decision.findMany({
+      where: { forUserId: me, status: "DEFERRED" },
+      select: { id: true, title: true, dueBy: true, updatedAt: true },
+      take: 15,
+    }),
+    // What I owe. Excluded from this desk by name until now, so the office
+    // tracked every promise made to it and none of the ones it made.
+    prisma.commitment.findMany({
+      where: { status: { in: ["OPEN", "CHASED"] }, owedByUserId: me },
+      select: {
+        id: true, what: true, dueDate: true, chaseCount: true,
+        owedToUser: { select: { name: true } },
+      },
     }),
     prisma.commitment.findMany({
       where: {
@@ -116,14 +166,6 @@ export const GET = handler(async function GET(req: NextRequest) {
         owedByName: true, owedByUser: { select: { name: true } },
       },
     }),
-    prisma.decision.findMany({
-      where: { raisedById: me, status: "PENDING", NOT: { forUserId: me } },
-      select: { id: true, title: true, dueBy: true, forUser: { select: { name: true } } },
-    }),
-    prisma.task.findMany({
-      where: { assignerId: me, status: { in: ["ASSIGNED", "IN_PROGRESS", "CHANGES_REQUESTED", "BLOCKED"] }, NOT: { assigneeId: me } },
-      select: { id: true, title: true, status: true, dueDate: true, assignee: { select: { name: true } } },
-    }),
     prisma.meeting.findMany({
       where: {
         scheduledAt: { gte: now, lte: weekOut },
@@ -134,7 +176,10 @@ export const GET = handler(async function GET(req: NextRequest) {
     }),
     prisma.recurringTask.findMany({
       where: { active: true, assigneeId: me },
-      select: { id: true, title: true, cadence: true, dayOfWeek: true, dayOfMonth: true, monthOfYear: true, leadTimeDays: true },
+      select: {
+        id: true, title: true, cadence: true, dayOfWeek: true, dayOfMonth: true,
+        monthOfYear: true, leadTimeDays: true, lastGeneratedFor: true,
+      },
     }),
     prisma.communication.findMany({
       where: { nextActionAssignedToId: me, nextActionDate: { lte: weekOut } },
@@ -178,173 +223,248 @@ export const GET = handler(async function GET(req: NextRequest) {
     }),
   ]);
 
-  const yoursNow: Row[] = [];
-  const waitingOnOthers: Row[] = [];
-  const scheduled: Row[] = [];
+  const rows: Row[] = [];
 
-  for (const t of myTasks) {
-    const isBlocked = t.status === "BLOCKED";
-    yoursNow.push({
-      kind: "TASK", id: t.id, title: t.title,
-      detail: isBlocked
-        ? `Marked blocked. ${t.assigner.name} has been told.`
-        : t.status === "CHANGES_REQUESTED"
-          ? `${t.assigner.name} sent this back with a note.`
-          : `From ${t.assigner.name}.`,
-      href: `/tasks/${t.id}`,
-      date: t.dueDate?.toISOString() ?? null,
-      urgency: isBlocked ? "NONE" : urgencyOf(t.dueDate, now),
-      action: t.status === "CHANGES_REQUESTED" ? "Pick it back up" : isBlocked ? "Waiting on an answer" : "Do it",
-    });
-    if (t.checkInAt && t.checkInAt <= now && !isBlocked) {
-      yoursNow.push({
-        kind: "CHECK_IN", id: `${t.id}-checkin`, title: `Check in on: ${t.title}`,
-        detail: `The mid-point conversation with ${t.assigner.name} was set for today or earlier.`,
-        href: `/tasks/${t.id}`, date: t.checkInAt.toISOString(),
-        urgency: urgencyOf(t.checkInAt, now), action: "Have the conversation",
-      });
-    }
-  }
+  // ── Tasks ────────────────────────────────────────────────────────────────
+  // One row per task. The status decides whose move it is; being the assignee
+  // does not. Work you handed in is not yours even though you own it, and work
+  // you are blocked on is not yours even though it is on your list.
+  for (const t of tasks) {
+    const mine = whoseMove(t, me) === "MINE";
+    const iAmDoer = t.assigneeId === me;
+    const waited = daysSince(t.submittedAt, now);
+    // A check-in that has come due belongs on the task's own row. It used to be
+    // a second row for the same task sitting directly beneath it.
+    const checkInDue = !!t.checkInAt && t.checkInAt <= now && t.status !== "SUBMITTED" && t.status !== "BLOCKED";
 
-  for (const t of toReview) {
-    // Work that has been sitting should look worse the longer it sits. Blocking
-    // raises itself to the assigner the same day; waiting used to raise nothing
-    // at all, so submitted work sat for days while the assignee read the silence
-    // as approval.
-    const waited = t.submittedAt ? Math.floor((now.getTime() - t.submittedAt.getTime()) / 86400000) : 0;
-    yoursNow.push({
-      kind: "REVIEW", id: t.id, title: t.title,
-      detail:
-        waited >= 2
+    let detail: string;
+    let action: string;
+    let date: Date | null = t.dueDate;
+    let urgency: Urgency;
+
+    if (t.status === "SUBMITTED") {
+      date = t.submittedAt;
+      if (mine) {
+        detail = waited >= 2
           ? `${t.assignee.name} submitted this ${waited} days ago and has heard nothing.`
-          : `${t.assignee.name} submitted this and it is waiting.`,
-      href: `/tasks/${t.id}`, date: t.submittedAt?.toISOString() ?? null,
-      urgency: waited >= 2 ? "OVERDUE" : waited >= 1 ? "SOON" : "TODAY",
-      action: "Review it",
+          : `${t.assignee.name} submitted this${t._count.attachments ? ` with ${t._count.attachments} attached` : ", with nothing attached"}.`;
+        action = "Review it";
+        urgency = waited >= 2 ? "OVERDUE" : waited >= 1 ? "SOON" : "TODAY";
+      } else {
+        // No date on this row. The only date it has is the day it was handed
+        // in, and showing that in a column headed by how late things are reads
+        // as an accusation against the person who finished on time.
+        date = null;
+        detail = `Handed to ${t.assigner.name}${waited >= 1 ? ` ${waited} day${waited === 1 ? "" : "s"} ago` : ""}. Nothing further is needed from you.`;
+        action = "Waiting on review";
+        urgency = "NONE";
+      }
+    } else if (t.status === "BLOCKED") {
+      if (mine) {
+        detail = `${t.assignee.name} is stuck. ${t.blockedReason ?? "No reason given."}`;
+        action = "Unblock them";
+        urgency = "TODAY";
+      } else {
+        detail = `${t.assigner.name} has been told what is in the way.`;
+        action = "Waiting on an answer";
+        urgency = "NONE";
+      }
+    } else if (iAmDoer && mine) {
+      detail =
+        t.status === "CHANGES_REQUESTED" ? `${t.assigner.name} sent this back with a note.`
+        : checkInDue ? `The mid-point conversation with ${t.assigner.name} was set for today or earlier.`
+        : `From ${t.assigner.name}.`;
+      action =
+        t.status === "CHANGES_REQUESTED" ? "Pick it back up"
+        : checkInDue ? "Check in, then carry on"
+        : "Do it";
+      urgency = checkInDue && urgencyOf(t.dueDate, now) === "NONE" ? "TODAY" : urgencyOf(t.dueDate, now);
+    } else {
+      detail = `With ${t.assignee.name}.`;
+      action = "Waiting";
+      urgency = urgencyOf(t.dueDate, now);
+    }
+
+    rows.push({
+      kind: !mine ? "TASK_OUT" : NEXT_MOVE[t.status] === "REVIEWER" ? "REVIEW" : "TASK",
+      id: t.id, title: t.title, detail, href: `/tasks/${t.id}`,
+      date: date?.toISOString() ?? null,
+      urgency,
+      action,
+      move: mine ? "YOU" : "SOMEONE",
     });
   }
 
+  // ── Questions on a task ──────────────────────────────────────────────────
+  // Not the task itself, which is somewhere else on this desk and still moving.
+  // The question is its own open loop, owed by whichever party did not ask it.
+  for (const q of questions) {
+    const iAsked = q.askedById === me;
+    const answerer = q.task.assigneeId === q.askedById ? q.task.assigner.name : q.task.assignee.name;
+    const age = daysSince(q.createdAt, now);
+    rows.push({
+      kind: iAsked ? "QUESTION_OUT" : "QUESTION",
+      id: q.id,
+      title: q.question.length > 90 ? `${q.question.slice(0, 90)}...` : q.question,
+      detail: iAsked
+        ? `You asked ${answerer} on ${q.task.title}. ${age >= 2 ? `${age} days ago.` : ""}`.trim()
+        : `${q.askedBy.name} asked this on ${q.task.title}. They are still working while they wait.`,
+      href: `/tasks/${q.task.id}`,
+      date: q.createdAt.toISOString(),
+      urgency: iAsked ? "NONE" : age >= 2 ? "OVERDUE" : age >= 1 ? "SOON" : "TODAY",
+      action: iAsked ? "Waiting on an answer" : "Answer it",
+      move: iAsked ? "SOMEONE" : "YOU",
+    });
+  }
+
+  // ── Decisions ────────────────────────────────────────────────────────────
   for (const d of myDecisions) {
-    yoursNow.push({
+    rows.push({
       kind: "DECISION", id: d.id, title: d.title,
       detail: `${d.raisedBy.name} needs a decision.`,
       href: `/decisions#${d.id}`, date: d.dueBy?.toISOString() ?? null,
-      urgency: urgencyOf(d.dueBy, now), action: "Decide",
+      urgency: urgencyOf(d.dueBy, now), action: "Decide", move: "YOU",
+    });
+  }
+  for (const d of raisedDecisions) {
+    rows.push({
+      kind: "DECISION_OUT", id: d.id, title: d.title, detail: `With ${d.forUser.name}.`,
+      href: `/decisions#${d.id}`, date: d.dueBy?.toISOString() ?? null,
+      urgency: urgencyOf(d.dueBy, now), action: "Waiting", move: "SOMEONE",
+    });
+  }
+  for (const d of deferredDecisions) {
+    rows.push({
+      kind: "DECISION_DEFERRED", id: d.id, title: d.title,
+      detail: `Deferred ${daysSince(d.updatedAt, now)} days ago with no date to come back on.`,
+      href: `/decisions#${d.id}`, date: null,
+      urgency: "NONE", action: "Give it a date or decide it", move: "NOBODY",
     });
   }
 
-  for (const c of nextActions) {
-    const due = c.nextActionDate && c.nextActionDate <= now;
-    const row: Row = {
-      kind: "FOLLOW_UP", id: c.id, title: c.nextAction ?? c.subject ?? "Follow up",
-      detail: "A follow-up set on a logged conversation.",
-      href: "/communications", date: c.nextActionDate?.toISOString() ?? null,
-      urgency: urgencyOf(c.nextActionDate, now), action: due ? "Follow up" : "Coming up",
-    };
-    (due ? yoursNow : scheduled).push(row);
-  }
-
-  // Firm-level, and all of it is somebody's move rather than a status line.
-  for (const i of overdueInvoices) {
-    yoursNow.push({
-      kind: "INVOICE", id: i.id, title: `${i.invoiceNumber}, ${i.client.name}`,
-      detail: `${i.currency} ${Number(i.balanceDue).toLocaleString()} outstanding, past its due date.`,
-      href: `/finance/invoices/${i.id}`, date: i.dueDate?.toISOString() ?? null,
-      urgency: "OVERDUE", action: "Chase it",
+  // ── Commitments ──────────────────────────────────────────────────────────
+  for (const c of owedByMe) {
+    rows.push({
+      kind: "COMMITMENT_MINE", id: c.id, title: c.what,
+      detail: c.owedToUser ? `You promised this to ${c.owedToUser.name}.` : "You promised this.",
+      href: "/commitments", date: c.dueDate?.toISOString() ?? null,
+      urgency: urgencyOf(c.dueDate, now), action: "Honour it", move: "YOU",
     });
   }
-  for (const p of silentProposals) {
-    yoursNow.push({
-      kind: "PROPOSAL", id: p.id, title: `${p.title}, ${p.clientName}`,
-      detail: "Sent over a week ago and nobody has replied.",
-      href: "/proposals", date: p.sentAt?.toISOString() ?? null,
-      urgency: "SOON", action: "Follow up",
-    });
-  }
-  for (const s of lowStock) {
-    yoursNow.push({
-      kind: "STOCK", id: s.id, title: s.name,
-      detail: `${s.quantityOnHand} ${s.unit}${s.quantityOnHand === 1 ? "" : "s"} left, reorder at ${s.reorderLevel}.`,
-      href: "/inventory", date: null, urgency: "SOON", action: "Reorder",
-    });
-  }
-
-  for (const c of myCommitments) {
+  for (const c of owedToMe) {
     const who = c.owedByUser?.name ?? c.owedByName ?? "someone";
     const dueChase = !!c.nextChaseAt && c.nextChaseAt <= now;
-    waitingOnOthers.push({
+    rows.push({
       kind: "COMMITMENT", id: c.id, title: c.what,
       detail: `${who}. ${c.chaseCount ? `Chased ${c.chaseCount} time${c.chaseCount === 1 ? "" : "s"}.` : "Never chased."}`,
       href: "/commitments", date: c.dueDate?.toISOString() ?? null,
       urgency: dueChase ? "TODAY" : urgencyOf(c.dueDate, now),
-      action: dueChase ? "Chase it" : "Watching",
+      action: dueChase ? "Chase it" : "Watching", move: "SOMEONE",
     });
   }
-  for (const d of raisedDecisions) {
-    waitingOnOthers.push({
-      kind: "DECISION_OUT", id: d.id, title: d.title, detail: `With ${d.forUser.name}.`,
-      href: `/decisions#${d.id}`, date: d.dueBy?.toISOString() ?? null,
-      urgency: urgencyOf(d.dueBy, now), action: "Waiting",
-    });
-  }
-  for (const t of assignedOut) {
-    waitingOnOthers.push({
-      kind: "TASK_OUT", id: t.id, title: t.title,
-      detail: t.status === "BLOCKED" ? `${t.assignee.name} is blocked and needs an answer.` : `With ${t.assignee.name}.`,
-      href: `/tasks/${t.id}`, date: t.dueDate?.toISOString() ?? null,
-      urgency: t.status === "BLOCKED" ? "TODAY" : urgencyOf(t.dueDate, now),
-      action: t.status === "BLOCKED" ? "Unblock them" : "Waiting",
+
+  // ── Follow-ups, meetings, the rhythm ─────────────────────────────────────
+  for (const c of nextActions) {
+    const due = !!c.nextActionDate && c.nextActionDate <= now;
+    rows.push({
+      kind: "FOLLOW_UP", id: c.id, title: c.nextAction ?? c.subject ?? "Follow up",
+      detail: "A follow-up set on a logged conversation.",
+      href: "/communications", date: c.nextActionDate?.toISOString() ?? null,
+      urgency: urgencyOf(c.nextActionDate, now), action: due ? "Follow up" : "Coming up",
+      move: due ? "YOU" : "A_DATE",
     });
   }
 
   for (const m of notesToConfirm) {
     const n = Array.isArray(m.aiCommitments) ? m.aiCommitments.length : 0;
     const ended = m.endedAt ?? now;
-    yoursNow.push({
+    rows.push({
       kind: "MEETING_NOTES", id: m.id, title: `Confirm the notes: ${m.title}`,
       detail: n
         ? `Nuru heard ${n} commitment${n === 1 ? "" : "s"}. Nobody has the notes until you confirm.`
         : "Nuru heard no commitments. Confirm that, and the notes go out.",
       href: `/meetings/${m.id}`, date: ended.toISOString(),
       urgency: now.getTime() - ended.getTime() > 86400000 ? "OVERDUE" : "TODAY",
-      action: "Confirm",
+      action: "Confirm", move: "YOU",
     });
   }
 
   for (const m of meetings) {
-    scheduled.push({
+    rows.push({
       kind: "MEETING", id: m.id, title: m.title,
       detail: `${m._count.participants} attending.${m.meetLink ? "" : " No join link, so nobody was invited."}`,
       href: `/meetings/${m.id}`, date: m.scheduledAt.toISOString(),
       urgency: urgencyOf(m.scheduledAt, now), action: m.meetLink ? "Prepare" : "Fix the link",
+      move: "A_DATE",
     });
   }
   for (const r of rhythms) {
     const next = nextOccurrenceAfter(r, now);
     if (!next) continue;
+    // Once the lead time has passed, this occurrence exists as a real task and
+    // is already on this desk. Listing the cadence as well put a board pack
+    // under "coming up" on the same screen as the board pack under "yours now".
+    if (r.lastGeneratedFor && r.lastGeneratedFor >= next) continue;
     if (new Date(next.getTime() - r.leadTimeDays * 86400000) > weekOut) continue;
-    scheduled.push({
+    rows.push({
       kind: "RHYTHM", id: r.id, title: r.title,
       detail: "Recurring. It appears on the desk automatically.",
       href: "/rhythm", date: next.toISOString(), urgency: "NONE", action: "Coming up",
+      move: "A_DATE",
     });
   }
 
-  const sortedNow = sortRows(yoursNow);
+  // ── The firm's own loose ends ────────────────────────────────────────────
+  // Nobody holds these. Filing them as yours put the same overdue invoice on
+  // four desks and made it nobody's job on all four.
+  for (const i of overdueInvoices) {
+    rows.push({
+      kind: "INVOICE", id: i.id, title: `${i.invoiceNumber}, ${i.client.name}`,
+      detail: `${i.currency} ${Number(i.balanceDue).toLocaleString()} outstanding, past its due date.`,
+      href: `/finance/invoices/${i.id}`, date: i.dueDate?.toISOString() ?? null,
+      urgency: "OVERDUE", action: "Chase it", move: "NOBODY",
+    });
+  }
+  for (const p of silentProposals) {
+    rows.push({
+      kind: "PROPOSAL", id: p.id, title: `${p.title}, ${p.clientName}`,
+      detail: "Sent over a week ago and nobody has replied.",
+      href: "/proposals", date: p.sentAt?.toISOString() ?? null,
+      urgency: "SOON", action: "Follow up", move: "NOBODY",
+    });
+  }
+  for (const s of lowStock) {
+    rows.push({
+      kind: "STOCK", id: s.id, title: s.name,
+      detail: `${s.quantityOnHand} ${s.unit}${s.quantityOnHand === 1 ? "" : "s"} left, reorder at ${s.reorderLevel}.`,
+      href: "/inventory", date: null, urgency: "SOON", action: "Reorder", move: "NOBODY",
+    });
+  }
+
+  // The partition. Four buckets, one pass, nothing in two places and nothing
+  // left over.
+  const by = (move: Move) => sortRows(rows.filter((r) => r.move === move));
+  const yoursNow = by("YOU");
+  const waitingOnOthers = by("SOMEONE");
+  const scheduled = by("A_DATE");
+  const nobodyHolds = by("NOBODY");
+
   return Response.json({
     generatedAt: now.toISOString(),
     subject: { ...subject, viewingSelf },
     canViewOthers: canAssignToOthers(session.user.role),
-    yoursNow: sortedNow,
-    waitingOnOthers: sortRows(waitingOnOthers),
-    scheduled: sortRows(scheduled),
+    yoursNow,
+    waitingOnOthers,
+    scheduled,
+    nobodyHolds,
     headline: {
-      yoursNow: sortedNow.length,
-      late: sortedNow.filter((r) => r.urgency === "OVERDUE").length,
+      yoursNow: yoursNow.length,
+      late: yoursNow.filter((r) => r.urgency === "OVERDUE").length,
       waiting: waitingOnOthers.length,
-      blocked: waitingOnOthers.filter((r) => r.action === "Unblock them").length,
+      blocked: yoursNow.filter((r) => r.action === "Unblock them").length,
       toChase: waitingOnOthers.filter((r) => r.action === "Chase it").length,
       scheduled: scheduled.length,
+      nobodyHolds: nobodyHolds.length,
     },
   });
 });

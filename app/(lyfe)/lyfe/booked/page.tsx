@@ -85,14 +85,14 @@ export default async function BookedPage({
                 {when}
               </p>
               <p className="mt-1 text-[14px]" style={{ color: MB.limeSoft }}>
-                {LYFE_CONSULT.minutes} minutes with {LYFE_SURGEON.name}, by video.
+                {LYFE_CONSULT.minutes} minutes with {LYFE_SURGEON.name}, in person at Medlyfe or by video.
               </p>
             </div>
           )}
 
           <p className="mt-6 text-[15px] leading-relaxed" style={{ color: "#AFC2B4" }}>
             {confirmed
-              ? "We send the video link the day before. Come with one thing in mind: what you would like to be different. You do not need photographs and you will not be sold to."
+              ? "We confirm the day before, with the address if you are coming in or the video link if you are not. Come with one thing in mind: what you would like to be different. You do not need photographs and you will not be sold to."
               : entry
                 ? "Your bank has it and we are waiting on the confirmation, which usually takes a few seconds. You will get an email the moment it lands. Nothing more is needed from you."
                 : "If you have just paid, the confirmation is on its way to your email. If you are not sure the payment went through, message us and we will check it rather than charge you twice."}

@@ -7,15 +7,21 @@ import {
   CalendarClock,
   CheckCircle2,
   ChevronRight,
+  Download,
   HelpCircle,
+  Link2,
   Loader2,
   OctagonX,
+  Paperclip,
   Pencil,
   Plus,
   Send,
+  Trash2,
   Undo2,
+  UserCog,
 } from "lucide-react";
 import { parseApiError } from "@/lib/parse-api-error";
+import { NOTE_PROMPT } from "@/lib/tasks";
 import {
   STATUS_LABELS,
   STATUS_STYLES,
@@ -48,17 +54,47 @@ interface Question {
   answeredBy: TaskPerson | null;
 }
 
+/** A file the firm holds, or a link to where the work actually lives. */
+interface Attachment {
+  id: string;
+  label: string;
+  url: string | null;
+  isFile: boolean;
+  contentType: string | null;
+  sizeBytes: number | null;
+  createdAt: string;
+  uploadedBy: TaskPerson;
+}
+
+/** One move, with the one note it carried. */
+interface TaskEvent {
+  id: string;
+  kind: "RAISED" | "STATUS" | "REASSIGNED";
+  fromStatus: string | null;
+  toStatus: string | null;
+  note: string | null;
+  createdAt: string;
+  actor: TaskPerson;
+}
+
 interface TaskDetail extends TaskRow {
   workedExample: string | null;
+  handoverNote: string | null;
   questions: Question[];
+  attachments: Attachment[];
+  events: TaskEvent[];
   evidence: { summary: string; empty: boolean } | null;
   parentTask: { id: string; title: string; assignee: TaskPerson; assigner: TaskPerson } | null;
   subtasks: Subtask[];
   subtaskRollup: { total: number; done: number; blocked: number; byStatus: Record<string, number> };
+  nextMove: "DOER" | "REVIEWER" | "NOBODY";
+  whoseMove: "MINE" | "THEIRS" | "NOBODY";
   viewer: {
     party: "ASSIGNEE" | "ASSIGNER" | "BOTH" | "NONE";
     canTransitionTo: string[];
     canEditFields: boolean;
+    canReassign: boolean;
+    canAttach: boolean;
     canBreakDown: boolean;
   };
 }
@@ -66,6 +102,12 @@ interface TaskDetail extends TaskRow {
 const inputClass =
   "w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0F2744]";
 const inputStyle = { borderColor: "#e5eaf0" };
+
+/**
+ * The moves that ask for something before they land. Five of the seven, because
+ * only starting work and picking it back up need nothing said about them.
+ */
+const GATED_MOVES = ["BLOCKED", "CHANGES_REQUESTED", "DONE", "CANCELLED", "SUBMITTED"];
 
 /** What each move is called from the desk it is made on. */
 const ACTION_LABELS: Record<string, string> = {
@@ -117,17 +159,24 @@ export default function TaskDetailClient({
 
   async function move(to: string) {
     if (!task) return;
-    // Blocking and sending back both depend on a written note, so ask for it
-    // before the move rather than letting the status land bare.
+    // Every move that changes who holds the task asks for the one thing that
+    // move depends on, before it lands rather than after. Blocking needs to say
+    // what is in the way, sending back needs to say what to change, cancelling
+    // needs to say why, and submitting needs something to actually hand over.
     //
     // Signing off asks too, though it does not insist. Five tasks were signed
     // off in the first week with not one note written, which is the loop
     // running hollow: the assignee learns that the work was acceptable and
     // nothing about why. Forcing a note would only produce "ok", so the field
     // is offered, pre-focused, and skippable.
-    if ((to === "BLOCKED" || to === "CHANGES_REQUESTED" || to === "DONE") && pending !== to) {
+    if (GATED_MOVES.includes(to) && pending !== to) {
       setPending(to);
-      setNote(to === "BLOCKED" ? task.blockedReason ?? "" : to === "DONE" ? "" : task.reviewNote ?? "");
+      setNote(
+        to === "BLOCKED" ? task.blockedReason ?? ""
+        : to === "CHANGES_REQUESTED" ? task.reviewNote ?? ""
+        : to === "SUBMITTED" ? task.handoverNote ?? ""
+        : "",
+      );
       return;
     }
     setSaving(true);
@@ -136,6 +185,8 @@ export default function TaskDetailClient({
       const body: Record<string, unknown> = { status: to };
       if (to === "BLOCKED") body.blockedReason = note;
       if (to === "CHANGES_REQUESTED") body.reviewNote = note;
+      if (to === "CANCELLED") body.cancelReason = note;
+      if (to === "SUBMITTED") body.handoverNote = note;
       if (to === "DONE" && note.trim()) body.reviewNote = note;
       const res = await fetch(`/api/tasks/${taskId}`, {
         method: "PATCH",
@@ -217,6 +268,17 @@ export default function TaskDetailClient({
     task.estimatedMinutes && task.actualMinutes
       ? task.actualMinutes / task.estimatedMinutes
       : null;
+  // Whether the gated move in front of us has what it needs. Submitting wants
+  // something handed over, which a line of text counts as; the rest want the
+  // note that gives the move its meaning.
+  // The sign-off note lives on the trail, so that reopening a task cannot turn
+  // last month's praise into this month's correction.
+  const signOffNote = [...task.events].reverse().find((e) => e.toStatus === "DONE" && e.note)?.note ?? null;
+  const canCommit =
+    !pending ? true
+    : pending === "DONE" ? true
+    : pending === "SUBMITTED" ? task.attachments.length > 0 || !!note.trim()
+    : !!note.trim();
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -302,6 +364,26 @@ export default function TaskDetailClient({
             accent={task.status === "DONE" ? "#10B981" : "#F97316"}
           />
         )}
+        {task.status === "DONE" && signOffNote && (
+          <Panel title="Sign-off note" body={signOffNote} accent="#10B981" />
+        )}
+
+        {/* What is being handed over. The reviewer's two moves, sign it off or
+            send it back, both need something to judge, and for most of this
+            office's work that something is a document rather than a row in a
+            section of the platform. */}
+        {task.viewer.party !== "NONE" && (
+          <Handover
+            taskId={taskId}
+            attachments={task.attachments}
+            handoverNote={task.handoverNote}
+            canAttach={task.viewer.canAttach}
+            currentUserId={currentUserId}
+            status={task.status}
+            assigneeName={task.assignee.name}
+            onChange={load}
+          />
+        )}
 
         {task.evidence && (
           <div
@@ -332,15 +414,11 @@ export default function TaskDetailClient({
           </p>
         )}
 
-        {/* Note first, then the move */}
+        {/* What the move depends on, then the move */}
         {pending && (
           <div className="rounded-xl border bg-white p-4 space-y-3" style={{ borderColor: "#e5eaf0" }}>
             <label className="block text-xs font-semibold text-gray-600">
-              {pending === "BLOCKED"
-                ? "What is in the way? This goes to your assigner, not to the whole firm."
-                : pending === "DONE"
-                  ? "What did they get right, or what would you do differently next time? One line they can carry into the next one."
-                  : "What needs to change? Write it so the correction is reusable."}
+              {NOTE_PROMPT[pending as keyof typeof NOTE_PROMPT]}
             </label>
             <textarea
               className={inputClass}
@@ -350,12 +428,26 @@ export default function TaskDetailClient({
               onChange={(e) => setNote(e.target.value)}
               autoFocus
             />
+            {pending === "SUBMITTED" && (
+              <p className="text-xs" style={{ color: task.attachments.length ? "#64748B" : "#B45309" }}>
+                {task.attachments.length
+                  ? `${task.attachments.length} ${task.attachments.length === 1 ? "thing" : "things"} attached above. ${task.assigner.name} will see ${task.attachments.length === 1 ? "it" : "them"}.`
+                  : "Nothing is attached. Attach the work above, or say in the line here where it lives, so your reviewer is not signing off something they cannot open."}
+              </p>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={() => move(pending)}
-                disabled={saving || (pending !== "DONE" && !note.trim())}
+                disabled={saving || !canCommit}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50"
-                style={{ background: pending === "BLOCKED" ? "#EF4444" : pending === "DONE" ? "#10B981" : "#F97316" }}
+                style={{
+                  background:
+                    pending === "BLOCKED" ? "#EF4444"
+                    : pending === "DONE" ? "#10B981"
+                    : pending === "CANCELLED" ? "#64748B"
+                    : pending === "SUBMITTED" ? "#0F2744"
+                    : "#F97316",
+                }}
               >
                 {saving ? "Saving" : pending === "DONE" && !note.trim() ? "Sign it off without a note" : ACTION_LABELS[pending]}
               </button>
@@ -582,6 +674,20 @@ export default function TaskDetailClient({
               </div>
             )}
           </div>
+        )}
+
+        {/* How it got here */}
+        {task.events.length > 0 && <Trail events={task.events} />}
+
+        {/* Changing hands. Not a status, which is why it never existed: every
+            field of a task was editable except the name against it, so work
+            died on the desk of whoever went on leave. */}
+        {task.viewer.canReassign && (
+          <Reassign
+            currentAssignee={task.assignee}
+            saving={saving}
+            onReassign={(assigneeId) => patch({ assigneeId })}
+          />
         )}
 
         {/* Edit the terms */}
@@ -991,6 +1097,392 @@ function EditForm({
           {saving ? "Saving" : "Save"}
         </button>
         <button onClick={onCancel} className="px-4 py-2 rounded-lg text-sm font-medium border" style={{ borderColor: "#e5eaf0", color: "#64748B" }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function fileSize(bytes: number | null): string {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * What is actually being handed over.
+ *
+ * Submitting used to record a timestamp. The reviewer opened the task, saw
+ * "Abigail Oladejo submitted this", and had nowhere to go: the work was in a
+ * shared folder, or an email, or nowhere. Sign-off became a courtesy extended
+ * to someone whose work nobody had seen.
+ *
+ * A link counts. Most of this office's output lands in a shared drive and
+ * insisting on an upload would only mean nothing gets recorded at all.
+ */
+function Handover({
+  taskId,
+  attachments,
+  handoverNote,
+  canAttach,
+  currentUserId,
+  status,
+  assigneeName,
+  onChange,
+}: {
+  taskId: string;
+  attachments: Attachment[];
+  handoverNote: string | null;
+  canAttach: boolean;
+  currentUserId: string;
+  status: string;
+  assigneeName: string;
+  onChange: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [linking, setLinking] = useState(false);
+  const [link, setLink] = useState("");
+  const [linkLabel, setLinkLabel] = useState("");
+
+  async function record(body: Record<string, unknown>) {
+    setBusy(true);
+    setErr("");
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/attachments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) { setErr(await parseApiError(res, "Could not attach that.")); return false; }
+      onChange();
+      return true;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function uploadFile(file: File) {
+    setBusy(true);
+    setErr("");
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type || "application/octet-stream",
+          folder: "tasks",
+          fileSize: file.size,
+        }),
+      });
+      if (!res.ok) { setErr(await parseApiError(res, "Could not start the upload.")); return; }
+      const { uploadUrl, key } = await res.json();
+
+      const put = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
+      if (!put.ok) { setErr("The file did not reach storage. Try it again."); return; }
+
+      await record({ fileKey: key, label: file.name, contentType: file.type, sizeBytes: file.size });
+    } catch {
+      setErr("The upload did not finish. Check your connection and try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function openAttachment(a: Attachment) {
+    if (a.url) { window.open(a.url, "_blank", "noopener"); return; }
+    const res = await fetch(`/api/tasks/${taskId}/attachments/${a.id}`);
+    if (!res.ok) { setErr(await parseApiError(res, "Could not open that.")); return; }
+    const { downloadUrl } = await res.json();
+    window.open(downloadUrl, "_blank", "noopener");
+  }
+
+  async function remove(a: Attachment) {
+    setBusy(true);
+    setErr("");
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/attachments/${a.id}`, { method: "DELETE" });
+      if (!res.ok) { setErr(await parseApiError(res, "Could not take that down.")); return; }
+      onChange();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const handedIn = ["SUBMITTED", "CHANGES_REQUESTED", "DONE"].includes(status);
+  if (!canAttach && attachments.length === 0 && !handoverNote) return null;
+
+  return (
+    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#e5eaf0" }}>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Paperclip size={14} style={{ color: "#64748B" }} /> What is being handed over
+        </p>
+        {attachments.length > 0 && (
+          <span className="text-xs" style={{ color: "#94A3B8" }}>{attachments.length}</span>
+        )}
+      </div>
+      <p className="text-xs mb-3" style={{ color: "#94A3B8" }}>
+        The file itself, or a link to where it lives. A shared folder is a fine answer; nothing at all is not.
+      </p>
+
+      {handoverNote && (
+        <p className="text-sm text-gray-700 whitespace-pre-wrap rounded-lg px-3 py-2 mb-3" style={{ background: "#F8FAFC" }}>
+          {handoverNote}
+        </p>
+      )}
+
+      {attachments.length === 0 ? (
+        <p
+          className="text-sm rounded-lg px-3 py-3"
+          style={handedIn
+            ? { background: "#FFFBEB", color: "#92400E", border: "1px solid #FDE68A" }
+            : { background: "#F8FAFC", color: "#94A3B8" }}
+        >
+          {handedIn
+            ? `Nothing was attached. Whatever ${assigneeName} did is somewhere other than here, so there is no record of what was signed off.`
+            : "Nothing attached yet."}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {attachments.map((a) => (
+            <div
+              key={a.id}
+              className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
+              style={{ borderColor: "#e5eaf0" }}
+            >
+              {a.isFile
+                ? <Paperclip size={14} className="shrink-0" style={{ color: "#64748B" }} />
+                : <Link2 size={14} className="shrink-0" style={{ color: "#64748B" }} />}
+              <button
+                onClick={() => openAttachment(a)}
+                className="min-w-0 flex-1 text-left"
+              >
+                <span className="block text-sm font-medium text-gray-900 truncate hover:underline">{a.label}</span>
+                <span className="block text-[11px]" style={{ color: "#94A3B8" }}>
+                  {a.uploadedBy.name}
+                  {a.sizeBytes ? ` · ${fileSize(a.sizeBytes)}` : ""}
+                  {` · ${formatDate(a.createdAt)}`}
+                </span>
+              </button>
+              <button onClick={() => openAttachment(a)} className="shrink-0 p-1" title="Open it">
+                <Download size={14} style={{ color: "#64748B" }} />
+              </button>
+              {canAttach && a.uploadedBy.id === currentUserId && status !== "DONE" && (
+                <button onClick={() => remove(a)} disabled={busy} className="shrink-0 p-1" title="Take it down">
+                  <Trash2 size={14} style={{ color: "#CBD5E1" }} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {err && <p className="text-xs mt-3" style={{ color: "#DC2626" }}>{err}</p>}
+
+      {canAttach && (
+        <div className="mt-4 pt-4 space-y-3" style={{ borderTop: "1px solid #f1f5f9" }}>
+          {linking ? (
+            <div className="space-y-2">
+              <input
+                className={inputClass}
+                style={inputStyle}
+                placeholder="https://..."
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                autoFocus
+              />
+              <input
+                className={inputClass}
+                style={inputStyle}
+                placeholder="What it is, in a few words"
+                value={linkLabel}
+                onChange={(e) => setLinkLabel(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <button
+                  disabled={busy || !link.trim()}
+                  onClick={async () => {
+                    if (await record({ url: link, label: linkLabel })) {
+                      setLink(""); setLinkLabel(""); setLinking(false);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white disabled:opacity-50"
+                  style={{ background: "#0F2744" }}
+                >
+                  {busy ? "Saving" : "Add the link"}
+                </button>
+                <button
+                  onClick={() => { setLinking(false); setLink(""); setLinkLabel(""); }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border"
+                  style={{ borderColor: "#e5eaf0", color: "#64748B" }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-4">
+              <label
+                className="flex items-center gap-2 text-sm font-medium cursor-pointer"
+                style={{ color: busy ? "#94A3B8" : "#0F2744" }}
+              >
+                <Paperclip size={14} />
+                {busy ? "Uploading" : "Attach a file"}
+                <input
+                  type="file"
+                  className="hidden"
+                  disabled={busy}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = "";
+                    if (f) void uploadFile(f);
+                  }}
+                />
+              </label>
+              <button
+                onClick={() => setLinking(true)}
+                disabled={busy}
+                className="flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+                style={{ color: "#0F2744" }}
+              >
+                <Link2 size={14} /> Paste a link
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * How it got here.
+ *
+ * A task that bounced three times and one that landed first time read
+ * identically on the board. The status says where the work is; only this can
+ * say what happened to it, which is the part worth knowing about how a working
+ * relationship is actually going.
+ */
+function Trail({ events }: { events: TaskEvent[] }) {
+  const [open, setOpen] = useState(false);
+  const shown = open ? events : events.slice(-3);
+
+  return (
+    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#e5eaf0" }}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-gray-900">How it got here</p>
+        {events.length > 3 && (
+          <button onClick={() => setOpen(!open)} className="text-xs font-medium" style={{ color: "#64748B" }}>
+            {open ? "Show less" : `All ${events.length}`}
+          </button>
+        )}
+      </div>
+      <div className="space-y-3">
+        {shown.map((e) => (
+          <div key={e.id} className="flex gap-3">
+            <span
+              className="shrink-0 w-1.5 h-1.5 rounded-full mt-1.5"
+              style={{ background: STATUS_STYLES[e.toStatus ?? "ASSIGNED"]?.dot ?? "#CBD5E1" }}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-gray-800">
+                <span className="font-medium">{e.actor.name}</span>{" "}
+                {e.kind === "RAISED" ? "raised it"
+                  : e.kind === "REASSIGNED" ? "moved it to someone else"
+                  : `moved it to ${(STATUS_LABELS[e.toStatus ?? ""] ?? "").toLowerCase()}`}
+              </p>
+              {e.note && (
+                <p className="text-sm text-gray-600 whitespace-pre-wrap mt-0.5">{e.note}</p>
+              )}
+              <p className="text-[11px] mt-0.5" style={{ color: "#94A3B8" }}>
+                {new Date(e.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Moving the work to somebody else. The one move the board never had: when
+ * Abigail is away, her tasks used to sit on her desk until she came back.
+ */
+function Reassign({
+  currentAssignee,
+  saving,
+  onReassign,
+}: {
+  currentAssignee: TaskPerson;
+  saving: boolean;
+  onReassign: (assigneeId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [people, setPeople] = useState<TaskPerson[]>([]);
+  const [picked, setPicked] = useState("");
+
+  useEffect(() => {
+    if (!open || people.length) return;
+    fetch("/api/tasks/people")
+      .then((r) => r.json())
+      .then((d) => setPeople(d.people ?? []))
+      .catch(() => setPeople([]));
+  }, [open, people.length]);
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-2 text-sm font-medium"
+        style={{ color: "#64748B" }}
+      >
+        <UserCog size={13} /> Move this to somebody else
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border bg-white p-4 space-y-3" style={{ borderColor: "#e5eaf0" }}>
+      <p className="text-xs font-semibold text-gray-600">
+        {currentAssignee.name} is carrying this. Who takes it on?
+      </p>
+      <select
+        className={inputClass}
+        style={inputStyle}
+        value={picked}
+        onChange={(e) => setPicked(e.target.value)}
+      >
+        <option value="">Choose somebody</option>
+        {people.filter((p) => p.id !== currentAssignee.id).map((p) => (
+          <option key={p.id} value={p.id}>{p.name}</option>
+        ))}
+      </select>
+      <p className="text-xs" style={{ color: "#94A3B8" }}>
+        They get the brief, the definition of done and anything already attached. The trail keeps both names.
+      </p>
+      <div className="flex gap-2">
+        <button
+          disabled={saving || !picked}
+          onClick={() => { onReassign(picked); setOpen(false); setPicked(""); }}
+          className="px-4 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50"
+          style={{ background: "#0F2744" }}
+        >
+          {saving ? "Saving" : "Hand it over"}
+        </button>
+        <button
+          onClick={() => { setOpen(false); setPicked(""); }}
+          className="px-4 py-2 rounded-lg text-sm font-medium border"
+          style={{ borderColor: "#e5eaf0", color: "#64748B" }}
+        >
           Cancel
         </button>
       </div>

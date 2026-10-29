@@ -58,7 +58,7 @@ export const POST = handler(async function POST() {
   ).join("\n\n");
 
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 400,
     messages: [{
       role: "user",
@@ -108,7 +108,7 @@ Generate as JSON:
     }],
   });
 
-  const responseText = message.content[0].type === "text" ? message.content[0].text : "";
+  const responseText = message.content.find((b) => b.type === "text")?.text ?? "";
 
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

@@ -26,6 +26,7 @@ from reportlab.platypus import (
     NextPageTemplate,
     PageBreak,
     PageTemplate,
+    Image,
     Paragraph,
     Spacer,
     Table,
@@ -229,7 +230,113 @@ def render_table(rows):
     return t
 
 
-def build_doc(src: Path, out: Path, header_label: str, footer_label: str):
+# Markdown images, "![caption](path)" on a line of their own, path relative to
+# the source file. Scaled to the text width and kept with their caption.
+_IMG_BASE = ROOT
+_IMG_RE = re.compile(r"^!\[(.*)\]\((.+)\)$")
+
+
+def render_image(caption: str, path: str):
+    p = Path(path)
+    if not p.is_absolute():
+        p = _IMG_BASE / p
+    iw, ih = ImageReader(str(p)).getSize()
+    w = AVAIL
+    parts = [Spacer(1, 4), Image(str(p), width=w, height=w * ih / iw)]
+    if caption:
+        parts += [Spacer(1, 2), Paragraph(inline(caption), SMALL)]
+    parts.append(Spacer(1, 8))
+    return KeepTogether(parts)
+
+
+def _body_only(doc, el, body):
+        n = len(body)
+        k = 0
+        while k < n:
+            s = body[k].strip()
+
+            if s in ("---", ""):
+                k += 1
+                continue
+
+            mimg = _IMG_RE.match(s)
+            if mimg:
+                el.append(render_image(mimg.group(1), mimg.group(2)))
+                k += 1
+                continue
+
+            if s.startswith("|"):
+                tbl = []
+                while k < n and body[k].strip().startswith("|"):
+                    cells = [c.strip() for c in body[k].strip().strip("|").split("|")]
+                    if not re.match(r"^[\s:\-]+$", "".join(cells)):
+                        tbl.append(cells)
+                    k += 1
+                if tbl:
+                    el += [Spacer(1, 2), render_table(tbl), Spacer(1, 6)]
+                continue
+
+            if s.startswith(">"):
+                q = []
+                while k < n and body[k].strip().startswith(">"):
+                    q.append(body[k].strip()[1:].strip())
+                    k += 1
+                while q and not q[0]:
+                    q.pop(0)
+                while q and not q[-1]:
+                    q.pop()
+                el.append(quote_card(q))
+                continue
+
+            if s.startswith("#### "):
+                el.append(Paragraph(inline(s[5:]), H3))
+                k += 1
+                continue
+            if s.startswith("### "):
+                el.append(Paragraph(inline(s[4:]), H3 if s[4:].endswith(".") else H2))
+                k += 1
+                continue
+            if s.startswith("## "):
+                # a heading with nothing under it yet needs room to start
+                el.append(KeepTogether([Paragraph(inline(s[3:]), H1)]))
+                k += 1
+                continue
+            if s.startswith("# "):
+                el.append(Paragraph(inline(s[2:]), H1))
+                k += 1
+                continue
+
+            mnum = re.match(r"^(\d+)\.\s+(.*)$", s)
+            if mnum:
+                el.append(Paragraph("<b>%s.</b>&nbsp;&nbsp;%s" % (mnum.group(1), inline(mnum.group(2))), NUM))
+                k += 1
+                continue
+
+            if s.startswith("- [ ] "):
+                el.append(Paragraph("&#9744;&nbsp;&nbsp;" + inline(s[6:]), BUL))
+                k += 1
+                continue
+
+            if s.startswith("- ") or s.startswith("* "):
+                el.append(Paragraph("&#8226;&nbsp;&nbsp;" + inline(s[2:]), BUL))
+                k += 1
+                continue
+
+            if s.startswith("*") and s.endswith("*") and s.count("*") == 2:
+                el += [Spacer(1, 4), Paragraph(inline(s), SMALL)]
+                k += 1
+                continue
+
+            el.append(Paragraph(inline(s), P))
+            k += 1
+
+        doc.build(el)
+
+
+def build_doc(src: Path, out: Path, header_label: str, footer_label: str, cover_draw=None):
+    """cover_draw: optional (canvas, doc) -> None replacing the default navy cover."""
+    global _IMG_BASE
+    _IMG_BASE = src.resolve().parent
     lines = src.read_text(encoding="utf-8").splitlines()
 
     # cover: title, subtitle, meta lines, up to the first rule
@@ -256,11 +363,16 @@ def build_doc(src: Path, out: Path, header_label: str, footer_label: str):
     doc.addPageTemplates([
         PageTemplate(id="cover",
                      frames=[Frame(MARGIN, 150, AVAIL, PAGE_H - 300, id="cover")],
-                     onPage=cover_bg),
+                     onPage=cover_draw or cover_bg),
         PageTemplate(id="content",
                      frames=[Frame(MARGIN, 42, AVAIL, PAGE_H - 52 - 42, id="content")],
                      onPage=content_bg),
     ])
+
+    if cover_draw is not None:
+        el = [Spacer(1, 1), NextPageTemplate("content"), PageBreak()]
+        _body_only(doc, el, body)
+        return
 
     el = [Spacer(1, 30), Paragraph(inline(title), ParagraphStyle(
         "ctitle", fontName="Helvetica-Bold", fontSize=27, leading=31, textColor=white))]
@@ -279,6 +391,12 @@ def build_doc(src: Path, out: Path, header_label: str, footer_label: str):
         s = body[k].strip()
 
         if s in ("---", ""):
+            k += 1
+            continue
+
+        mimg = _IMG_RE.match(s)
+        if mimg:
+            el.append(render_image(mimg.group(1), mimg.group(2)))
             k += 1
             continue
 

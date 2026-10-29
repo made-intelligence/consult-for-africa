@@ -34,6 +34,8 @@ export interface Row {
   notes: string | null;
   source: keyof typeof SOURCE_LABELS;
   sourceDetail: string | null;
+  /** The ?src= or ?i= on the link they came through. */
+  tag: string | null;
   status: keyof typeof STATUS_LABELS;
   /** Event guests only. Where they stand with the room, not with the call. */
   eventStage: keyof typeof LYFE_STAGE_LABELS | null;
@@ -255,6 +257,7 @@ function EnquiryRow({
                   k="Found us"
                   v={SOURCE_LABELS[row.source] + (row.sourceDetail ? `, ${row.sourceDetail}` : "")}
                 />
+                {row.tag && <Fact k="Link" v={row.tag} />}
                 {row.ownerName && <Fact k="Owned by" v={row.ownerName} />}
                 {row.nextActionAtLabel && (
                   <Fact k="Next" v={`${row.nextAction ?? "Follow up"}, ${row.nextActionAtLabel}`} />

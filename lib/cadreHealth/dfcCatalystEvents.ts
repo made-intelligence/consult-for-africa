@@ -44,9 +44,7 @@ export const DFC_CATALYST_EVENTS: DfcCatalystEvent[] = [
     topic: "Identifying and managing children with ADHD",
     when: "Saturday 24 October 2026, 12:00 PM WAT",
     venue: "Zoom",
-    // The flyer says the link follows. Replace this the moment it exists,
-    // because an invitation that cannot be acted on is worse than none.
-    registerUrl: DFC_SITE_URL,
+    registerUrl: "https://www.dfcare.org/events/dfc-catalyst-series-featuring-dr-tare-biu",
   },
 ];
 

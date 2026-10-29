@@ -27,6 +27,7 @@ interface Desk {
   yoursNow: Row[];
   waitingOnOthers: Row[];
   scheduled: Row[];
+  nobodyHolds: Row[];
   headline: Record<string, number>;
 }
 
@@ -84,8 +85,10 @@ export default function DeskClient({ firstName, currentUserId }: { firstName: st
     return <div className="flex-1 flex items-center justify-center text-sm text-gray-500">Could not load your desk.</div>;
   }
 
+  const nobodyHolds = desk.nobodyHolds ?? [];
   const nothingAtAll =
-    desk.yoursNow.length === 0 && desk.waitingOnOthers.length === 0 && desk.scheduled.length === 0;
+    desk.yoursNow.length === 0 && desk.waitingOnOthers.length === 0 &&
+    desk.scheduled.length === 0 && nobodyHolds.length === 0;
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -109,10 +112,11 @@ export default function DeskClient({ firstName, currentUserId }: { firstName: st
         )}
 
         {!nothingAtAll && (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Stat n={desk.headline.yoursNow} label="yours now" sub={desk.headline.late ? `${desk.headline.late} late` : ""} tone={desk.headline.late ? "#DC2626" : "#0F2744"} />
             <Stat n={desk.headline.waiting} label="on other people" sub={desk.headline.toChase ? `${desk.headline.toChase} to chase` : ""} tone={desk.headline.blocked ? "#DC2626" : "#0F2744"} />
             <Stat n={desk.headline.scheduled} label="coming up" sub="" tone="#0F2744" />
+            <Stat n={nobodyHolds.length} label="nobody holds" sub="" tone={nobodyHolds.length ? "#B45309" : "#0F2744"} />
           </div>
         )}
 
@@ -148,6 +152,12 @@ export default function DeskClient({ firstName, currentUserId }: { firstName: st
               blurb="Waiting on a date rather than a person."
               rows={desk.scheduled}
               emptyLine="Nothing in the next seven days."
+            />
+            <Bucket
+              title="Nobody holds these"
+              blurb="Real, open, and on no one's list. They sat under yours before, which is how four people could each see the same overdue invoice and each assume the other three had it."
+              rows={nobodyHolds}
+              emptyLine="Nothing is falling between people."
             />
           </>
         )}

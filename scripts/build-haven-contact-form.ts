@@ -1,0 +1,201 @@
+/**
+ * Render public/haven-contacts.html from lib/haven-delivery.ts.
+ *
+ * Generated, not hand-written, so the seats on the form cannot drift from the
+ * seats the daily push and the digest work against.
+ *
+ *   npx tsx scripts/build-haven-contact-form.ts
+ */
+import fs from "fs";
+import path from "path";
+import { WORKSTREAMS } from "../lib/haven-delivery";
+
+const OUT = path.resolve(process.cwd(), "public/haven-contacts.html");
+
+const options = WORKSTREAMS.map(
+  (w) => `      <option value="${w.key}">${w.role}</option>`,
+).join("\n");
+
+const seatHelp = WORKSTREAMS.filter((w) => w.key !== "other")
+  .map((w) => `      <li><b>${w.role}.</b> ${w.owns}</li>`)
+  .join("\n");
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Haven Paediatric Centre: the delivery team</title>
+<style>
+  :root{
+    --navy:#0B3C5D; --deep:#081521; --gold:#D4AF37; --teal:#1F7A8C;
+    --ink:#1F2937; --muted:#6B7280; --line:#E4E9EF; --surface:#F6F8FA; --paper:#fff;
+    --good:#15803D; --bad:#B91C1C;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    --serif:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#eef1f5;color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .wrap{max-width:660px;margin:0 auto;padding:0 16px}
+  header.hero{background:linear-gradient(160deg,#0d456a,#081726);color:#fff;padding:34px 0 30px;margin-bottom:22px}
+  .hero .mark{font-size:11px;letter-spacing:.24em;font-weight:800;color:#eaf1f6}
+  .hero .mark b{color:var(--gold)}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15;margin:16px 0 8px}
+  .hero p{color:#c3d3de;font-size:14.5px;max-width:56ch}
+  .note{background:#fff;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+    padding:14px 18px;font-size:13.5px;color:#3a4956;margin-bottom:22px}
+  .note b{color:var(--navy)}
+  .note ul{margin:10px 0 0 18px}
+  .note li{margin-bottom:5px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 20px;margin-bottom:16px}
+  .sec-n{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:800}
+  .card h2{font-size:17px;color:var(--navy);margin:6px 0 4px;font-weight:700}
+  .card .lead{font-size:13.5px;color:var(--muted);margin-bottom:14px}
+  label.fld{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:14px 0 6px}
+  label.fld span{font-weight:400;color:var(--muted)}
+  select,textarea,input[type=text],input[type=email],input[type=tel]{width:100%;font-family:var(--sans);
+    font-size:15px;color:var(--ink);border:1px solid #cbd5e1;border-radius:8px;padding:11px 12px;background:#fff}
+  textarea{min-height:70px;resize:vertical}
+  select:focus,textarea:focus,input:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+  .inline{display:flex;align-items:center;gap:9px;margin:12px 0 0;font-size:13.5px;color:var(--ink)}
+  .inline input{width:17px;height:17px;accent-color:var(--teal)}
+  button{width:100%;background:var(--navy);color:#fff;border:0;border-radius:9px;padding:15px;
+    font-size:15.5px;font-weight:700;font-family:var(--sans);cursor:pointer;margin-top:8px}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .err{color:var(--bad);font-size:13px;margin-top:10px;display:none}
+  .thanks{display:none;background:#fff;border:1px solid var(--line);border-top:3px solid var(--good);
+    border-radius:12px;padding:30px 22px;text-align:center}
+  .thanks h2{color:var(--navy);font-family:var(--serif);font-weight:400;font-size:22px;margin-bottom:8px}
+  .thanks p{color:var(--muted);font-size:14px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px;line-height:1.7}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="mark">CONSULT FOR <b>AFRICA</b></div>
+    <h1>Haven Paediatric Centre: the delivery team</h1>
+    <p>The six-month growth plan starts on Tuesday 6 October. This is how we reach you while it runs.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="note">
+    <b>Why we are asking.</b> From Tuesday, each seat below gets its own short list of what is
+    due that week, and somewhere to put the evidence when it is done. We cannot send you yours
+    if we do not know you hold it. It takes a minute.
+    <ul>
+${seatHelp}
+    </ul>
+  </div>
+
+  <form id="f">
+    <div class="card">
+      <div class="sec-n">You</div>
+      <h2>Who you are</h2>
+      <p class="lead">Your name as colleagues say it, not as it appears on a certificate.</p>
+
+      <label class="fld" for="name">Full name</label>
+      <input type="text" id="name" autocomplete="name" required />
+
+      <label class="fld" for="role">Your job title <span>(optional)</span></label>
+      <input type="text" id="role" autocomplete="organization-title" />
+
+      <label class="fld" for="workstream">Which seat are you holding for this project?</label>
+      <select id="workstream" required>
+        <option value="">Choose one</option>
+${options}
+      </select>
+
+      <label class="fld" for="reportsTo">Who do you report to? <span>(optional)</span></label>
+      <input type="text" id="reportsTo" />
+    </div>
+
+    <div class="card">
+      <div class="sec-n">Reaching you</div>
+      <h2>How we reach you</h2>
+      <p class="lead">Used for this project only, by us and by Haven's leadership. Nothing else, and nobody else.</p>
+
+      <label class="fld" for="email">Email</label>
+      <input type="email" id="email" autocomplete="email" required />
+
+      <label class="fld" for="mobile">Mobile</label>
+      <input type="tel" id="mobile" autocomplete="tel" required placeholder="0803 000 0000" />
+
+      <div class="inline">
+        <input type="checkbox" id="whatsappSame" checked />
+        <label for="whatsappSame" style="margin:0;font-weight:400">This number is on WhatsApp</label>
+      </div>
+
+      <div id="waWrap" style="display:none">
+        <label class="fld" for="whatsapp">WhatsApp number <span>(if different)</span></label>
+        <input type="tel" id="whatsapp" />
+      </div>
+
+      <label class="fld" for="bestTime">Best time to reach you <span>(optional)</span></label>
+      <input type="text" id="bestTime" placeholder="Before the 8am handover, say" />
+
+      <label class="fld" for="note">Anything we should know <span>(optional)</span></label>
+      <textarea id="note" placeholder="Leave, night shifts, a second role you are covering"></textarea>
+
+      <button type="submit" id="go">Register me</button>
+      <div class="err" id="err"></div>
+    </div>
+  </form>
+
+  <div class="thanks" id="thanks">
+    <h2>Thank you</h2>
+    <p>You are on the list. You will hear from us on Tuesday morning with the first week.</p>
+  </div>
+
+  <footer>
+    Consult for Africa Management Services Limited<br />
+    Held for the Haven engagement only, and not shared outside it.
+  </footer>
+</div>
+
+<script>
+  var waSame = document.getElementById('whatsappSame');
+  var waWrap = document.getElementById('waWrap');
+  waSame.addEventListener('change', function(){ waWrap.style.display = waSame.checked ? 'none' : 'block'; });
+
+  document.getElementById('f').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var err = document.getElementById('err');
+    var go = document.getElementById('go');
+    err.style.display = 'none';
+    var v = function(id){ return (document.getElementById(id).value || '').trim(); };
+    var body = {
+      name: v('name'), role: v('role'), workstream: v('workstream'),
+      email: v('email'), mobile: v('mobile'),
+      whatsappSame: waSame.checked, whatsapp: v('whatsapp'),
+      reportsTo: v('reportsTo'), bestTime: v('bestTime'), note: v('note')
+    };
+    if (!body.name || !body.workstream || !body.email || !body.mobile) {
+      err.textContent = 'Please fill in your name, seat, email and mobile.';
+      err.style.display = 'block'; return;
+    }
+    go.disabled = true; go.textContent = 'Sending...';
+    try {
+      var res = await fetch('/api/haven-delivery/contacts', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error('bad status');
+      document.getElementById('f').style.display = 'none';
+      document.getElementById('thanks').style.display = 'block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    } catch (_) {
+      go.disabled = false; go.textContent = 'Register me';
+      err.textContent = 'That did not save. Please try once more, or reply to the email you came from.';
+      err.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(OUT, html);
+console.log(`wrote ${OUT} (${WORKSTREAMS.length} seats)`);

@@ -316,6 +316,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       source: entry.source,
       sourceDetail: entry.sourceDetail,
       utmCampaign: entry.utmCampaign,
+      utmSource: entry.utmSource,
     });
   } catch (err) {
     console.error("[lyfe/enquiry] coordinator notification failed:", err);

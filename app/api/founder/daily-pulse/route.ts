@@ -87,10 +87,10 @@ export const POST = handler(async function POST() {
   let newsContext = "";
   try {
     const newsRes = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-5-5",
       max_tokens: 512,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tools: [{ type: "web_search", name: "web_search", max_uses: 3 } as any],
+      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 3 } as any],
       messages: [{
         role: "user",
         content: `Search for the latest Nigerian healthcare industry news, medical tourism policy updates, and healthcare workforce regulation changes from the last 7 days. Focus on: NMA, MDCN, NHIA, HMO policy, medical brain drain, and healthcare investment in Nigeria. Summarise the 3 most relevant headlines with source names.`,
@@ -107,7 +107,7 @@ export const POST = handler(async function POST() {
 
   // Generate pulse with Claude (Opus for quality briefing)
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-5-5",
     max_tokens: 1024,
     messages: [{
       role: "user",
@@ -142,7 +142,7 @@ Generate 3-5 insights from the business metrics. Add 1-3 macroNews items if rele
     }],
   });
 
-  const responseText = message.content[0].type === "text" ? message.content[0].text : "";
+  const responseText = message.content.find((b) => b.type === "text")?.text ?? "";
   let parsed: { summary: string; insights: Array<{ type: string; title: string; detail: string; priority: string }>; macroNews?: Array<{ headline: string; source: string; relevance: string }> };
 
   try {
