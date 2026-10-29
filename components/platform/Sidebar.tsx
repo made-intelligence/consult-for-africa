@@ -139,6 +139,7 @@ const OFFICE_NAV: NavSection[] = [
       { label: "Knowledge",      href: "/knowledge",      icon: BookOpen },
       { label: "Asset Library",  href: "/knowledge/library", icon: FileSearch },
       { label: "Inventory",      href: "/inventory",      icon: Package },
+      { label: "Academy",        href: "/academy",        icon: GraduationCap },
       { label: "Nuru",           href: "/ai",             icon: Sparkles },
     ],
   },
