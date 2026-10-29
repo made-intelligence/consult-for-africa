@@ -45,9 +45,7 @@ export default async function CadreHealthAdmin({
     ];
   }
 
-  const [totalProfessionals, verified, byStatus, byCadre, signups, filteredTotal] = await Promise.all([
-    prisma.cadreProfessional.count(),
-    prisma.cadreProfessional.count({ where: { accountStatus: "VERIFIED" } }),
+  const [byStatus, byCadre, signups, filteredTotal, openMandates, totalReviews, totalSalaryReports] = await Promise.all([
     prisma.cadreProfessional.groupBy({ by: ["accountStatus"], _count: true }),
     prisma.cadreProfessional.groupBy({ by: ["cadre"], _count: true, orderBy: { _count: { cadre: "desc" } } }),
     prisma.cadreProfessional.findMany({
@@ -68,14 +66,23 @@ export default async function CadreHealthAdmin({
       },
     }),
     prisma.cadreProfessional.count({ where }),
+    prisma.cadreMandate.count({ where: { status: "OPEN" } }),
+    prisma.cadreFacilityReview.count(),
+    prisma.cadreSalaryReport.count(),
   ]);
 
+  const totalProfessionals = byStatus.reduce((n, g) => n + g._count, 0);
+  const verified = byStatus.find((g) => g.accountStatus === "VERIFIED")?._count ?? 0;
   const totalPages = Math.ceil(filteredTotal / PAGE_SIZE);
   const recentSignups = signups;
-
-  const openMandates = await prisma.cadreMandate.count({ where: { status: "OPEN" } });
-  const totalReviews = await prisma.cadreFacilityReview.count();
-  const totalSalaryReports = await prisma.cadreSalaryReport.count();
+  const pageHref = (n: number) => {
+    const qs = new URLSearchParams({ page: String(n) });
+    if (statusFilter) qs.set("status", statusFilter);
+    if (cadreFilter) qs.set("cadre", cadreFilter);
+    if (search) qs.set("q", search);
+    if (cvFilter) qs.set("cv", cvFilter);
+    return `/admin/cadrehealth?${qs}`;
+  };
   const verificationRate =
     totalProfessionals > 0
       ? `${Math.round((verified / totalProfessionals) * 100)}%`
@@ -96,62 +103,38 @@ export default async function CadreHealthAdmin({
             background: "radial-gradient(circle at 80% 20%, rgba(212,175,55,0.08) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(26,157,217,0.1) 0%, transparent 50%)",
           }}
         />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              CadreHealth
-            </h1>
-            <p className="mt-1 text-sm text-white/60">
-              Healthcare workforce platform
-            </p>
-          </div>
-          <div className="flex gap-3">
+        <div className="relative space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-white">
+                CadreHealth
+              </h1>
+              <p className="mt-1 text-sm text-white/60">
+                Healthcare workforce platform
+              </p>
+            </div>
             <Link
               href="/admin/cadrehealth/mandates"
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-[#0F2744] shadow-sm transition hover:shadow-md"
-              style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)" }}
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-semibold text-[#0F2744] shadow-sm transition hover:shadow-md"
+              style={{ background: "rgba(255,255,255,0.95)" }}
             >
               Manage Mandates
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-            <Link
-              href="/admin/cadrehealth/import"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              style={{ backdropFilter: "blur(8px)" }}
-            >
-              Import Professionals
-            </Link>
-            <Link
-              href="/admin/cadre-internships"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              style={{ backdropFilter: "blur(8px)" }}
-            >
-              Nurse Internships
-            </Link>
-            <Link
-              href="/admin/cadre-employers"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              style={{ backdropFilter: "blur(8px)" }}
-            >
-              Employer Accounts
-            </Link>
-            <Link
-              href="/admin/cadrehealth/duplicates"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              style={{ backdropFilter: "blur(8px)" }}
-            >
-              Duplicates
-            </Link>
-            <Link
-              href="/admin/cadrehealth/send-targeted"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              style={{ backdropFilter: "blur(8px)" }}
-            >
-              Send to list
-            </Link>
-            <RecoveryEmailButton />
-            <ReEngagementButton />
-            <PushToOutreachButton mode="all" />
+          </div>
+          <div className="grid gap-4 border-t border-white/10 pt-5 lg:grid-cols-[auto_1fr]">
+            <HeroGroup label="Records">
+              <HeroLink href="/admin/cadrehealth/import">Import Professionals</HeroLink>
+              <HeroLink href="/admin/cadre-internships">Nurse Internships</HeroLink>
+              <HeroLink href="/admin/cadre-employers">Employer Accounts</HeroLink>
+              <HeroLink href="/admin/cadrehealth/duplicates">Duplicates</HeroLink>
+            </HeroGroup>
+            <HeroGroup label="Outreach">
+              <HeroLink href="/admin/cadrehealth/send-targeted">Send to list</HeroLink>
+              <RecoveryEmailButton />
+              <ReEngagementButton />
+              <PushToOutreachButton mode="all" />
+            </HeroGroup>
           </div>
         </div>
       </div>
@@ -173,6 +156,7 @@ export default async function CadreHealthAdmin({
           iconBg="bg-emerald-50"
           iconColor="text-emerald-600"
           accent="#059669"
+          href="/admin/cadrehealth?status=VERIFIED"
         />
         <StatCard
           label="Open Mandates"
@@ -215,9 +199,7 @@ export default async function CadreHealthAdmin({
       <div
         className="rounded-2xl border border-white/60 p-6 shadow-sm"
         style={{
-          background: "rgba(255,255,255,0.72)",
-          backdropFilter: "blur(16px) saturate(200%)",
-          WebkitBackdropFilter: "blur(16px) saturate(200%)",
+          background: "rgba(255,255,255,0.85)",
         }}
       >
         <h2 className="mb-1 text-base font-bold tracking-tight" style={{ color: "#0F2744" }}>
@@ -236,25 +218,31 @@ export default async function CadreHealthAdmin({
             ];
             const color = colors[i % colors.length];
             return (
-              <div
+              <Link
                 key={g.cadre}
-                className="flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:shadow-sm hover:-translate-y-0.5"
-                style={{ background: color.bg, border: `1px solid ${color.border}` }}
+                href={`/admin/cadrehealth?cadre=${g.cadre}`}
+                className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-all hover:shadow-sm hover:-translate-y-0.5"
+                style={{
+                  background: color.bg,
+                  border: `1px solid ${g.cadre === cadreFilter ? "#0B3C5D" : color.border}`,
+                }}
               >
-                <span className="text-sm font-medium text-gray-700">
+                <span className="min-w-0 text-sm font-medium text-gray-700">
                   {g.cadre.replace(/_/g, " ")}
+                  <span className="ml-2 text-xs font-normal text-gray-400">
+                    {totalProfessionals > 0 ? `${((g._count / totalProfessionals) * 100).toFixed(g._count / totalProfessionals < 0.01 ? 1 : 0)}%` : ""}
+                  </span>
                 </span>
                 <span
                   className="rounded-lg px-2.5 py-0.5 text-sm font-bold shadow-sm"
                   style={{
                     background: "rgba(255,255,255,0.9)",
                     color: "#0B3C5D",
-                    backdropFilter: "blur(4px)",
                   }}
                 >
-                  {g._count}
+                  {g._count.toLocaleString("en-NG")}
                 </span>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -264,9 +252,7 @@ export default async function CadreHealthAdmin({
       <div
         className="overflow-hidden rounded-2xl border border-white/60 shadow-sm"
         style={{
-          background: "rgba(255,255,255,0.72)",
-          backdropFilter: "blur(16px) saturate(200%)",
-          WebkitBackdropFilter: "blur(16px) saturate(200%)",
+          background: "rgba(255,255,255,0.85)",
         }}
       >
         <div className="border-b border-gray-100/80 px-6 py-5">
@@ -276,7 +262,7 @@ export default async function CadreHealthAdmin({
                 {statusFilter || cadreFilter || search ? "Filtered Professionals" : "Recent Signups"}
               </h2>
               <p className="mt-0.5 text-xs text-gray-400">
-                {filteredTotal} professional{filteredTotal !== 1 ? "s" : ""}
+                {filteredTotal.toLocaleString("en-NG")} professional{filteredTotal !== 1 ? "s" : ""}
                 {statusFilter || cadreFilter || search ? " matching filters" : ""}
                 {totalPages > 1 ? ` \u00b7 Page ${page} of ${totalPages}` : ""}
               </p>
@@ -358,7 +344,7 @@ export default async function CadreHealthAdmin({
             <div className="flex items-center gap-1">
               {page > 1 && (
                 <Link
-                  href={`/admin/cadrehealth?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}${cadreFilter ? `&cadre=${cadreFilter}` : ""}${search ? `&q=${encodeURIComponent(search)}` : ""}`}
+                  href={pageHref(page - 1)}
                   className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
                   style={{ border: "1px solid #e5eaf0" }}
                 >
@@ -379,7 +365,7 @@ export default async function CadreHealthAdmin({
                 return (
                   <Link
                     key={pageNum}
-                    href={`/admin/cadrehealth?page=${pageNum}${statusFilter ? `&status=${statusFilter}` : ""}${cadreFilter ? `&cadre=${cadreFilter}` : ""}${search ? `&q=${encodeURIComponent(search)}` : ""}`}
+                    href={pageHref(pageNum)}
                     className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                     style={{
                       background: pageNum === page ? "#0B3C5D" : "transparent",
@@ -393,7 +379,7 @@ export default async function CadreHealthAdmin({
               })}
               {page < totalPages && (
                 <Link
-                  href={`/admin/cadrehealth?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}${cadreFilter ? `&cadre=${cadreFilter}` : ""}${search ? `&q=${encodeURIComponent(search)}` : ""}`}
+                  href={pageHref(page + 1)}
                   className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
                   style={{ border: "1px solid #e5eaf0" }}
                 >
@@ -432,9 +418,7 @@ function StatCard({
       {...wrapperProps as { href: string }}
       className="group relative block overflow-hidden rounded-2xl border border-white/60 p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
       style={{
-        background: "rgba(255,255,255,0.72)",
-        backdropFilter: "blur(16px) saturate(200%)",
-        WebkitBackdropFilter: "blur(16px) saturate(200%)",
+        background: "rgba(255,255,255,0.85)",
         cursor: href ? "pointer" : "default",
       }}
     >
@@ -448,9 +432,29 @@ function StatCard({
           <div className={`rounded-xl p-2.5 ${iconBg} ${iconColor}`}>{icon}</div>
         </div>
         <p className="mt-3 text-3xl font-bold tracking-tight" style={{ color: "#0F2744" }}>
-          {value}
+          {typeof value === "number" ? value.toLocaleString("en-NG") : value}
         </p>
       </div>
     </Wrapper>
+  );
+}
+
+function HeroGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/40">{label}</p>
+      <div className="flex flex-wrap gap-2 [&>*]:whitespace-nowrap">{children}</div>
+    </div>
+  );
+}
+
+function HeroLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+    >
+      {children}
+    </Link>
   );
 }
