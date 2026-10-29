@@ -22,6 +22,7 @@ export const MERGE_FIELDS: { key: string; meaning: string }[] = [
   { key: "centres", meaning: "Approved centres on the list" },
   { key: "intake", meaning: INTAKE_LABEL },
   { key: "centresPage", meaning: "Link to the page for centres" },
+  { key: "claimLink", meaning: "This centre's private link to claim its account and agree to be listed" },
   { key: "senderName", meaning: "Your name" },
   { key: "senderRole", meaning: "Your role on the programme" },
 ];
@@ -34,6 +35,7 @@ export interface OutreachVars {
   centres: string;
   intake: string;
   centresPage: string;
+  claimLink: string;
   senderName: string;
   senderRole: string;
 }
@@ -45,8 +47,11 @@ export interface Preset {
   when: string;
   subject: string;
   body: string;
-  /** Leave out centres nobody has chosen yet: the email only works with a number in it. */
-  needsChoices?: boolean;
+}
+
+/** An email asking a centre to claim its account makes no sense to one that has. */
+export function asksToClaim(subject: string, body: string): boolean {
+  return /\{\{\s*claimLink\s*\}\}/.test(subject + body);
 }
 
 export const PRESETS: Preset[] = [
@@ -63,9 +68,12 @@ Graduates apply once, rank up to five centres, and sit a ${QUESTION_COUNT}-quest
 
 It replaces your own written exam and the pile of unscreened applications, and it costs the centre nothing for the {{intake}}.
 
-The details are here: {{centresPage}}
+{{centreName}} is not shown to graduates unless you agree. To take part, claim the centre's account here. It takes five minutes, and it is where you set your places and minimum score:
+{{claimLink}}
 
-Could we have 20 minutes with you or your Head of Nursing in the next fortnight?
+How it works: {{centresPage}}
+
+If you would rather talk it through first, reply and I will arrange 20 minutes with you or your Head of Nursing.
 
 Kind regards,
 {{senderName}}
@@ -75,18 +83,16 @@ CadreHealth, Consult For Africa`,
   {
     key: "demand",
     label: "Demand update",
-    when: "Once applicants have chosen the centre. The number is the strongest thing we can say.",
-    needsChoices: true,
-    subject: "{{choices}} BNSc graduates have chosen {{centreName}} for their internship",
+    when: "Once graduates are applying. The number is the strongest thing we can say.",
+    subject: "{{applicants}} BNSc graduates are applying for internship places in Lagos",
     body: `{{greeting}},
 
-{{choices}} BNSc graduates applying for the {{intake}} have ranked {{centreName}} among their choices of internship centre.
+{{applicants}} BNSc graduates have applied through CadreHealth for internship places in the {{intake}}. They can only choose centres that have joined, and {{centreName}} has not joined yet.
 
-When {{centreName}} joins, you receive their assessment results as a ranked list, filtered by the minimum score you set, with section scores for each candidate. You invite the ones you want to interview from your CadreHealth login, and we tell the candidates.
+When you claim the centre's account, graduates can choose {{centreName}}, and you receive the results of those who do as a ranked list, filtered by the minimum score you set, with section scores for each candidate. You invite the ones you want to interview, and we tell the candidates.
 
-To start receiving the list we need three things: how many places you have, the minimum score you want, and the name of the person who will review candidates.
-
-The details are here: {{centresPage}}
+Claim the account here. It takes five minutes:
+{{claimLink}}
 
 Kind regards,
 {{senderName}}
@@ -102,9 +108,8 @@ CadreHealth, Consult For Africa`,
 
 I wrote recently about the shared internship application for BNSc graduates in Lagos. {{applicants}} graduates have applied for the {{intake}} so far.
 
-If it would help, I can come to {{centreName}} and take your Head of Nursing through it in 20 minutes. If someone else handles intern recruitment, I would be grateful for their name.
-
-{{centresPage}}
+If it would help, I can come to {{centreName}} and take your Head of Nursing through it in 20 minutes. If someone else handles intern recruitment, I would be grateful for their name, or you can forward them this link to claim the centre's account:
+{{claimLink}}
 
 Kind regards,
 {{senderName}}
@@ -113,20 +118,17 @@ CadreHealth, Consult For Africa`,
   },
   {
     key: "commit",
-    label: "Confirm terms",
-    when: "After a centre has said yes in a meeting.",
-    subject: "Confirming {{centreName}} for the {{intake}}",
+    label: "After a yes",
+    when: "A centre agreed in a meeting or on the phone. The claim is how they confirm it.",
+    subject: "Your link to claim {{centreName}} for the {{intake}}",
     body: `{{greeting}},
 
 Thank you for agreeing to take {{centreName}}'s interns for the {{intake}} through CadreHealth.
 
-To open your list, please confirm:
-1. The number of internship places for this intake
-2. The minimum assessment score you want candidates to reach
-3. When your intake starts
-4. The name and email of the person who will review candidates. We will send them a CadreHealth login.
+To confirm, please claim the centre's account here:
+{{claimLink}}
 
-Candidates appear on your list as they finish the assessment. You invite, offer or decline from the list, and we tell each candidate.
+It asks for the person who will review candidates, the number of places, the minimum score you want, and when your intake starts. Once claimed, {{centreName}} is listed for graduates and your list fills as they finish the assessment.
 
 Kind regards,
 {{senderName}}

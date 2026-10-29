@@ -103,12 +103,13 @@ export default async function CadreInternshipsAdminPage({ searchParams }: { sear
         <h1 className="mt-1 text-2xl font-bold text-gray-900">Nurse internship placement, {INTAKE_LABEL}</h1>
         <p className="mt-1 text-sm text-gray-500">
           Nurses apply at <Link href="/oncadre/internships" className="underline">/oncadre/internships</Link>. Centres read about it and ask to join at{" "}
-          <Link href="/oncadre/internships/centres" className="underline">/oncadre/internships/centres</Link>. A centre sees its list once it is Committed and linked to an employer login.
+          <Link href="/oncadre/internships/centres" className="underline">/oncadre/internships/centres</Link>. A centre appears to graduates only once it claims its account or its consent is recorded.
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-8">
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-9">
         {[
+          ["Listed publicly", `${centres.filter((c) => c.listed).length} of ${centres.length}`],
           ["Centres committed", `${byStage.COMMITTED} of ${centres.length}`],
           ["In conversation", String(byStage.MEETING + byStage.CONTACTED)],
           ["With an email", `${withEmail} of ${centres.length}`],
@@ -201,6 +202,12 @@ export default async function CadreInternshipsAdminPage({ searchParams }: { sear
                     minScore: c.minScore,
                     intakeNote: c.intakeNote,
                     employerOrgId: c.employerOrgId,
+                    listed: c.listed,
+                    consentAt: c.consentAt?.toISOString().slice(0, 10) ?? null,
+                    consentName: c.consentName,
+                    consentRole: c.consentRole,
+                    consentSource: c.consentSource,
+                    consentNote: c.consentNote,
                   }}
                   ownerName={c.ownerUserId ? staffName.get(c.ownerUserId) ?? "Unknown" : null}
                   choices={choices.get(c.id) ?? 0}
@@ -270,6 +277,7 @@ export default async function CadreInternshipsAdminPage({ searchParams }: { sear
               id: c.id,
               name: c.name,
               partnerLed: PARTNER_LED.has(c.slug),
+              listed: c.listed,
               area: c.area,
               stage: c.stage,
               ownerUserId: c.ownerUserId,

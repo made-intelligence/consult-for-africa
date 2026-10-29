@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CURRENT_INTAKE, INTAKE_LABEL, MAX_PREFERENCES } from "@/lib/cadreHealth/internship/programme";
 import { QUESTION_COUNT, SECTIONS, TIME_LIMIT_MINUTES } from "@/lib/cadreHealth/internship/paper";
 import { PROGRAMME_EMAIL, PROGRAMME_LEAD } from "@/lib/cadreHealth/internship/outreach";
+import { PUBLIC_CENTRE } from "@/lib/cadreHealth/internship/listing";
 import InternshipApplyForm from "./InternshipApplyForm";
 import PracticeQuestions from "./PracticeQuestions";
 
@@ -32,6 +33,7 @@ const FAQS: [string, string][] = [
   ["Can I sit the assessment again?", "No. You sit it once for this intake, so start when you have a quiet place and a steady connection."],
   ["What if my connection drops?", "Your answers save as you go. The clock keeps running if you close the page, so reopen your link as soon as you can."],
   ["Do I still apply to each hospital?", "Not for centres taking part. The centre interviews you and may ask for your documents, but you do not sit its exam."],
+  ["What if no centre I want is listed yet?", "Apply and sit the assessment anyway. Centres are joining through this intake, and you can choose or change your centres from your private link until a centre acts on your application."],
   ["What if a centre does not take me?", "Your other choices are not affected. Rank more than one centre to give yourself the best chance."],
   ["Is this an NMCN scheme?", "No. CadreHealth works alongside NMCN's rules: the internship, its length and its approval of centres are all NMCN's. We make the application and selection simpler."],
   ["What happens to my details?", "Only the centres you chose see them, and only after you agree. Your phone and email reach a centre once it invites you to interview."],
@@ -39,14 +41,14 @@ const FAQS: [string, string][] = [
 
 export default async function InternshipsPage() {
   const [centres, applicants] = await Promise.all([
+    // Only centres that agreed to be listed. Being on NMCN's list is not consent.
     prisma.cadreInternshipCentre.findMany({
-      where: { stage: { not: "DECLINED" } },
+      where: PUBLIC_CENTRE,
       orderBy: { name: "asc" },
-      select: { id: true, name: true, area: true, stage: true },
+      select: { id: true, name: true, area: true },
     }),
     prisma.cadreInternshipApplication.count({ where: { intake: CURRENT_INTAKE } }),
   ]);
-  const participating = centres.filter((c) => c.stage === "COMMITTED").length;
   const byArea = new Map<string, typeof centres>();
   for (const c of centres) {
     const a = c.area && c.area !== "Lagos" ? c.area : "Across Lagos";
@@ -72,7 +74,7 @@ export default async function InternshipsPage() {
           </div>
           <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl sm:grid-cols-4" style={{ background: "rgba(255,255,255,0.12)" }}>
             {[
-              [String(centres.length || 31), "approved centres"],
+              [centres.length ? String(centres.length) : "New", centres.length === 1 ? "centre taking part" : centres.length ? "centres taking part" : "centres joining now"],
               [`Up to ${MAX_PREFERENCES}`, "centres, ranked by you"],
               [`${QUESTION_COUNT} in ${TIME_LIMIT_MINUTES}`, "questions, minutes"],
               ["₦0", "to apply, always"],
@@ -146,14 +148,11 @@ export default async function InternshipsPage() {
         {/* Centres */}
         <section>
           <div className="flex flex-wrap items-end justify-between gap-2">
-            <h2 className="text-2xl font-bold text-gray-900">The approved centres</h2>
-            <p className="text-sm text-gray-500">
-              {participating > 0 ? `${participating} taking their intern lists through CadreHealth now` : "Centres receive your result as they join this intake"}
-            </p>
+            <h2 className="text-2xl font-bold text-gray-900">Centres taking part</h2>
           </div>
-          <p className="mt-2 text-gray-600">Every centre here is on NMCN&apos;s list of approved internship centres in Lagos. You choose up to {MAX_PREFERENCES} on the form.</p>
+          <p className="mt-2 text-gray-600">NMCN-approved internship centres in Lagos that have joined this intake. More join as the intake runs, and you can add them from your private link.</p>
           {centres.length === 0 ? (
-            <p className="mt-6 rounded-2xl bg-white p-6 text-sm text-gray-500" style={card}>The list of centres is being loaded. Please check back shortly.</p>
+            <p className="mt-6 rounded-2xl bg-white p-6 text-sm text-gray-600" style={card}>The first centres are confirming now. Apply and sit the assessment today, then choose centres from your private link as they join.</p>
           ) : (
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {areas.map(([area, list]) => (
@@ -163,7 +162,6 @@ export default async function InternshipsPage() {
                     {list.map((c) => (
                       <li key={c.id} className="flex items-start justify-between gap-2">
                         <span>{c.name}</span>
-                        {c.stage === "COMMITTED" && <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "#ecfdf5", color: "#065f46" }}>Taking part</span>}
                       </li>
                     ))}
                   </ul>
@@ -183,7 +181,7 @@ export default async function InternshipsPage() {
                 We email you a private link. Nothing goes to a centre until you finish the assessment{applicants >= 25 ? `, and ${applicants} graduates have applied so far` : ""}.
               </p>
             </div>
-            <InternshipApplyForm centres={centres.map((c) => ({ id: c.id, name: c.name, area: c.area, participating: c.stage === "COMMITTED" }))} />
+            <InternshipApplyForm centres={centres.map((c) => ({ id: c.id, name: c.name, area: c.area }))} />
           </div>
         </section>
 

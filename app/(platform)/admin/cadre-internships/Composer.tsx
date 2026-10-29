@@ -3,12 +3,13 @@
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { INTAKE_LABEL, STAGE_LABEL } from "@/lib/cadreHealth/internship/programme";
-import { MERGE_FIELDS, PRESETS, PROGRAMME_LEAD, greetingFor, renderText, unknownFields, type OutreachVars } from "@/lib/cadreHealth/internship/outreach";
+import { MERGE_FIELDS, PRESETS, PROGRAMME_LEAD, asksToClaim, greetingFor, renderText, unknownFields, type OutreachVars } from "@/lib/cadreHealth/internship/outreach";
 
 type Centre = {
   id: string;
   name: string;
   partnerLed: boolean;
+  listed: boolean;
   area: string | null;
   stage: string;
   ownerUserId: string | null;
@@ -78,7 +79,8 @@ export default function Composer({
       ),
     [centres, stages, owner, notRecent, weekAgo],
   );
-  const sendable = (c: Centre) => !c.partnerLed && !!c.contactEmail && (!p?.needsChoices || c.choices > 0);
+  const claiming = asksToClaim(subject, body);
+  const sendable = (c: Centre) => !c.partnerLed && !!c.contactEmail && !(claiming && c.listed);
   const selected = audience.filter((c) => chosen.has(c.id) && sendable(c));
   const previewCentre = centres.find((c) => c.id === previewId) ?? selected[0] ?? audience.find(sendable) ?? null;
   const bad = unknownFields(subject + body);
@@ -91,6 +93,7 @@ export default function Composer({
     centres: String(figures.centres),
     intake: INTAKE_LABEL,
     centresPage,
+    claimLink: centresPage.replace(/centres$/, "claim/") + "(this centre's private link)",
     senderName: senderName || PROGRAMME_LEAD.name,
     senderRole: PROGRAMME_LEAD.role,
   });
@@ -105,7 +108,7 @@ export default function Composer({
     if (key === "intro") setStages(["PROSPECT"]);
     if (key === "followup") setStages(["CONTACTED"]);
     if (key === "demand") setStages(["PROSPECT", "CONTACTED", "MEETING"]);
-    if (key === "commit") setStages(["MEETING", "COMMITTED"]);
+    if (key === "commit") setStages(["MEETING"]);
   }
 
   function insert(field: string) {
@@ -215,7 +218,7 @@ export default function Composer({
             {audience.length === 0 && <p className="p-4 text-center text-sm text-gray-400">No centres match.</p>}
             {audience.map((c) => {
               const ok = sendable(c);
-              const why = c.partnerLed ? "Goes through Debo first" : !c.contactEmail ? "No email yet: add one on the Contacts tab" : !ok ? "Nobody has chosen it yet" : null;
+              const why = c.partnerLed ? "Goes through Debo first" : !c.contactEmail ? "No email yet: add one on the Contacts tab" : !ok ? "Already listed, so it needs no claim link" : null;
               return (
                 <label key={c.id} className="flex cursor-pointer items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50" style={{ borderBottom: "1px solid #F1F3F6", opacity: ok ? 1 : 0.5 }}>
                   <input type="checkbox" disabled={!ok} checked={chosen.has(c.id) && ok} onChange={() => toggle(c.id)} className="accent-[#0B3C5D]" />

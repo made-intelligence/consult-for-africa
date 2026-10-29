@@ -6,6 +6,7 @@ import { handler } from "@/lib/api-handler";
 import { contactLimiter } from "@/lib/rate-limit-redis";
 import { CURRENT_INTAKE, MAX_PREFERENCES, QUALIFICATIONS } from "@/lib/cadreHealth/internship/programme";
 import { sendInternshipLink } from "@/lib/cadreHealth/internship/email";
+import { PUBLIC_CENTRE } from "@/lib/cadreHealth/internship/listing";
 
 const thisYear = new Date().getFullYear();
 
@@ -17,7 +18,9 @@ const schema = z.object({
   school: z.string().trim().min(2).max(160),
   graduationYear: z.number().int().min(thisYear - 5).max(thisYear + 1),
   nmcnNumber: z.string().trim().max(40).optional(),
-  centreIds: z.array(z.string().min(1)).min(1).max(MAX_PREFERENCES),
+  // Empty is allowed: before any centre has joined, a graduate can apply and
+  // sit the assessment, then choose centres from their private link.
+  centreIds: z.array(z.string().min(1)).max(MAX_PREFERENCES),
   consent: z.literal(true),
 });
 
@@ -36,11 +39,11 @@ export const POST = handler(async function POST(req: NextRequest) {
   }
 
   const parsed = schema.safeParse(await req.json());
-  if (!parsed.success) return Response.json({ error: "Please complete every field and choose at least one centre." }, { status: 400 });
+  if (!parsed.success) return Response.json({ error: "Please complete every field." }, { status: 400 });
   const a = parsed.data;
 
   const centreIds = [...new Set(a.centreIds)];
-  const centres = await prisma.cadreInternshipCentre.count({ where: { id: { in: centreIds }, stage: { not: "DECLINED" } } });
+  const centres = await prisma.cadreInternshipCentre.count({ where: { id: { in: centreIds }, ...PUBLIC_CENTRE } });
   if (centres !== centreIds.length) return Response.json({ error: "One of the centres you chose is no longer taking applications." }, { status: 400 });
 
     let professional = await prisma.cadreProfessional.findUnique({ where: { email: a.email }, select: { id: true, firstName: true, phone: true } });

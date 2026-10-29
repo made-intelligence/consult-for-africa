@@ -6,7 +6,7 @@ import { MAX_PREFERENCES, QUALIFICATIONS } from "@/lib/cadreHealth/internship/pr
 const input = "w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B3C5D]/20";
 const inputStyle = { border: "1px solid #E8EBF0", background: "#F8F9FB" };
 
-type Centre = { id: string; name: string; area: string | null; participating: boolean };
+type Centre = { id: string; name: string; area: string | null };
 
 export default function InternshipApplyForm({ centres }: { centres: Centre[] }) {
   const [f, setF] = useState({ name: "", email: "", phone: "", school: "", graduationYear: String(new Date().getFullYear()), nmcnNumber: "" });
@@ -31,7 +31,7 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!chosen.length) return setError("Choose at least one centre.");
+    if (centres.length && !chosen.length) return setError("Choose at least one centre.");
     setStatus("loading");
     setError("");
     try {
@@ -95,6 +95,11 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
         </div>
       </div>
 
+      {centres.length === 0 ? (
+        <div className="rounded-lg p-4 text-sm text-gray-600" style={{ background: "#F8F9FB", border: "1px solid #E8EBF0" }}>
+          No centre has joined this intake yet. Apply now and sit the assessment; you choose your centres from your private link as they join.
+        </div>
+      ) : (
       <div>
         <p className="text-sm font-semibold text-gray-900">Choose up to {MAX_PREFERENCES} centres, in order of preference</p>
         <p className="mt-0.5 text-xs text-gray-500">Tap a centre to add it. Your first choice is number 1; use the arrows to reorder.</p>
@@ -137,15 +142,15 @@ export default function InternshipApplyForm({ centres }: { centres: Centre[] }) 
                   {c.name}
                   {c.area && <span className="text-gray-400"> · {c.area}</span>}
                 </span>
-                {c.participating && <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "#ecfdf5", color: "#065f46" }}>Participating</span>}
               </button>
             ))}
         </div>
       </div>
+      )}
 
       <label className="flex items-start gap-2.5 text-sm text-gray-700">
         <input required type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 accent-[#0B3C5D]" />
-        I agree that the centres I have chosen may see my assessment result and the details above, so they can decide whether to interview me. No other employer sees them.
+        I agree that the centres I choose may see my assessment result and the details above, so they can decide whether to interview me. No other employer sees them.
       </label>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

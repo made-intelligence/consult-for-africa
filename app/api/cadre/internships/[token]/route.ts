@@ -5,6 +5,8 @@ import { handler } from "@/lib/api-handler";
 import { apiLimiter } from "@/lib/rate-limit-redis";
 import { drawPaper, GRACE_MS, readPaper } from "@/lib/cadreHealth/internship/assessment";
 import { closeAttempt, loadApplication, publicView } from "@/lib/cadreHealth/internship/state";
+import { MAX_PREFERENCES } from "@/lib/cadreHealth/internship/programme";
+import { PUBLIC_CENTRE } from "@/lib/cadreHealth/internship/listing";
 
 const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("start") }),
@@ -12,6 +14,7 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("submit") }),
   z.object({ action: z.literal("accept"), preferenceId: z.string().min(1) }),
   z.object({ action: z.literal("decline"), preferenceId: z.string().min(1) }),
+  z.object({ action: z.literal("choose"), centreIds: z.array(z.string().min(1)).max(MAX_PREFERENCES) }),
 ]);
 
 type Ctx = { params: Promise<{ token: string }> };
@@ -96,6 +99,21 @@ export const POST = handler(async function POST(req: NextRequest, { params }: Ct
       }
       break;
     }
+  }
+
+  if (body.action === "choose") {
+    // Choices can change until any centre acts. After that, the record of what
+    // a centre was shown stays as it was.
+    if (app.status === "PLACED" || app.preferences.some((p) => p.status !== "PENDING")) {
+      return Response.json({ error: "A centre has already acted on your application, so your choices are fixed." }, { status: 409 });
+    }
+    const ids = [...new Set(body.centreIds)];
+    const ok = await prisma.cadreInternshipCentre.count({ where: { id: { in: ids }, ...PUBLIC_CENTRE } });
+    if (ok !== ids.length) return Response.json({ error: "One of those centres is not taking part." }, { status: 400 });
+    await prisma.$transaction([
+      prisma.cadreInternshipPreference.deleteMany({ where: { applicationId: app.id } }),
+      prisma.cadreInternshipPreference.createMany({ data: ids.map((centreId, i) => ({ applicationId: app.id, centreId, rank: i + 1 })) }),
+    ]);
   }
 
   const fresh = await loadApplication(token);

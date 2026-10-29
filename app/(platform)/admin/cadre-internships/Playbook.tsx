@@ -17,11 +17,20 @@ export default function Playbook() {
       ],
     },
     {
+      title: "Consent comes first",
+      items: [
+        ["The rule", "A centre is shown to graduates only after it agrees. Being on NMCN's list is not agreement."],
+        ["How it agrees", "It claims its account from the private link in our emails: who reviews candidates, places, minimum score, two ticks. That is the consent, and it lists the centre."],
+        ["By phone or letter", "If a centre agrees but will not use the link, open it on the Centres tab, choose 'They agreed by phone or letter', and record who agreed and how. Keep the letter."],
+        ["Changing its mind", "Take it off the public list from the same place, with the reason."],
+      ],
+    },
+    {
       title: "The weekly rhythm",
       items: [
         ["Monday", "Add any new contacts on the Contacts tab. Send the First approach to every Not yet approached centre that now has an email."],
         ["Wednesday", "Phone every centre emailed a week ago. Each one shows a follow-up date on the Centres tab, in red when it is late."],
-        ["Friday", "Send the Demand update to centres that nurses have chosen. It only goes to centres with a number above zero."],
+        ["Friday", "Once graduates are applying, send the Demand update to centres that have not claimed. The number is the reason to claim."],
         ["Every day", "Check Centres that asked to join at the top of the page. Reply within one working day."],
       ],
     },
@@ -39,8 +48,8 @@ export default function Playbook() {
       items: [
         ["Open", `"I am ${PROGRAMME_LEAD.name.split(" ")[0]} from CadreHealth. We run one application and one assessment for BNSc graduates looking for internship places in Lagos."`],
         ["The point", `"Instead of setting your own exam, you get a ranked list of the graduates who chose your hospital, filtered by the score you set. You still interview and decide."`],
-        ["The proof", `"Some nurses have already chosen you." Use the number on the centre's row.`],
-        ["The ask", `"Can I have 20 minutes with you this week or next?"`],
+        ["The proof", `"Graduates are already applying." Use the number at the top of the page.`],
+        ["The ask", `"May I send you the link to claim your centre's account? Or can I have 20 minutes with you this week?"`],
       ],
     },
     {
@@ -51,15 +60,15 @@ export default function Playbook() {
         ["Is this NMCN's scheme?", "No. NMCN's central scheme is approved but not yet funded. We work alongside it, and the centre keeps the decision."],
         ["Can we trust the scores?", "Each nurse sits once, on a timed paper drawn from a bank, through a link sent to their own email. You still interview and check documents."],
         ["Who sees the data?", "A centre sees only the nurses who chose it and agreed to share. Contact details appear once the centre invites someone."],
+        ["Will you list us without asking?", "No. The centre is listed only when it claims its account or tells us in writing."],
         ["Can we choose more than one?", "The centre sets its number of places and its minimum score. It can invite as many as it wants from its list."],
       ],
     },
     {
       title: "When a centre says yes",
       items: [
-        ["Get four things", "Places for this intake, minimum score, when the intake starts, and who reviews candidates. The Confirm terms email asks for all four."],
-        ["Record them", "On the centre: places, minimum score, intake timing. Move it to Committed."],
-        ["Give them a login", "Create the employer login for the reviewer, then link it on the centre. Their Interns tab fills as nurses finish the assessment."],
+        ["Send the claim link", "Use the After a yes email, or Copy claim link on the centre. Claiming asks for places, minimum score, intake timing and the reviewer, creates their login and lists the centre."],
+        ["Then", "The centre moves to Committed by itself and you get an email. Make the welcome call within two days."],
       ],
     },
     {
