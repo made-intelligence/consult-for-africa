@@ -2649,3 +2649,92 @@ export async function emailPlatformResetBriefing({
     `)
   );
 }
+
+// ─── Market Watch ─────────────────────────────────────────────────────────
+
+const WATCH_ALERT_LABEL: Record<string, { word: string; color: string }> = {
+  NEGATIVE_REVIEW: { word: "Review", color: "#B91C1C" },
+  NEGATIVE_MENTION: { word: "Negative post", color: "#B91C1C" },
+  RISK: { word: "Risk", color: "#B91C1C" },
+  SPIKE: { word: "Spike", color: "#B45309" },
+  LEAD: { word: "Lead", color: "#166534" },
+  COMPETITOR_MOVE: { word: "Competitor", color: "#1D4ED8" },
+};
+
+/** Same-day alerts for one watch, batched into a single message per run. */
+export async function emailWatchAlerts({
+  to,
+  watchId,
+  watchName,
+  alerts,
+}: {
+  to: string;
+  watchId: string;
+  watchName: string;
+  alerts: { kind: string; title: string; detail: string; url: string | null; replyDraft: string | null }[];
+}) {
+  const items = alerts
+    .map((a) => {
+      const l = WATCH_ALERT_LABEL[a.kind] ?? { word: a.kind, color: "#374151" };
+      return `<div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;margin:10px 0;">
+        <span style="font-size:11px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:.04em;">${esc(l.word)}</span>
+        <p style="margin:4px 0 2px;font-size:14px;font-weight:600;color:#0F2744;">${esc(a.title)}</p>
+        <p style="margin:0;font-size:13px;color:#374151;">${esc(a.detail)}</p>
+        ${a.replyDraft ? `<p style="margin:8px 0 0;font-size:12px;color:#6B7280;"><strong>Suggested public reply:</strong> ${esc(a.replyDraft)}</p>` : ""}
+        ${a.url ? `<p style="margin:6px 0 0;font-size:12px;"><a href="${esc(a.url)}" style="color:#1D4ED8;">Open the original</a></p>` : ""}
+      </div>`;
+    })
+    .join("");
+  await send(
+    to,
+    `${watchName}: ${alerts.length === 1 ? alerts[0].title : `${alerts.length} things to look at today`}`,
+    layout(`
+      ${h1(`${watchName}: today`)}
+      ${items}
+      ${btn("Open Market Watch", `${BASE_URL}/admin/market-watch/${watchId}`)}
+    `)
+  );
+}
+
+/** The weekly brief: the headline, the numbers, and what to do. */
+export async function emailWatchBrief({
+  to,
+  watchId,
+  watchName,
+  headline,
+  oneThing,
+  kpis,
+  actions,
+  dashboardId,
+}: {
+  to: string;
+  watchId: string;
+  watchName: string;
+  headline: string;
+  oneThing?: string;
+  kpis: { label: string; value: string; note?: string }[];
+  actions: { headline: string; detail: string }[];
+  dashboardId: string | null;
+}) {
+  const tiles = kpis
+    .map(
+      (k) => `<td style="padding:10px;border:1px solid #E5E7EB;vertical-align:top;width:20%;">
+        <span style="display:block;font-size:11px;color:#6B7280;">${esc(k.label)}</span>
+        <span style="display:block;font-size:18px;font-weight:700;color:#0F2744;">${esc(k.value)}</span>
+        ${k.note ? `<span style="display:block;font-size:11px;color:#9CA3AF;">${esc(k.note)}</span>` : ""}
+      </td>`
+    )
+    .join("");
+  const list = actions.map((a) => `<li style="margin:0 0 8px;font-size:13px;color:#374151;"><strong style="color:#0F2744;">${esc(a.headline)}.</strong> ${esc(a.detail)}</li>`).join("");
+  await send(
+    to,
+    `${watchName} weekly: ${headline}`,
+    layout(`
+      ${h1(headline)}
+      ${oneThing ? p(oneThing) : ""}
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;"><tr>${tiles}</tr></table>
+      ${list ? `<ol style="padding-left:18px;margin:12px 0;">${list}</ol>` : ""}
+      ${dashboardId ? btn("Review the client dashboard draft", `${BASE_URL}/admin/client-dashboards/${dashboardId}`) : btn("Open Market Watch", `${BASE_URL}/admin/market-watch/${watchId}`)}
+    `)
+  );
+}

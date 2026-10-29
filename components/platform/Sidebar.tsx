@@ -43,6 +43,7 @@ import {
   Banknote,
   MessageSquare,
   Star,
+  Radar,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
@@ -224,6 +225,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: "Marketing",
     items: [
       { label: "Campaigns",      href: "/campaigns",      icon: Megaphone },
+      { label: "Market Watch",   href: "/admin/market-watch", icon: Radar, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
       { label: "AGELESS",        href: "/admin/lyfe-enquiries", icon: Ticket, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
       { label: "Invitations",    href: "/admin/lyfe-enquiries/invitations", icon: FileText, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
     ],

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { displayNameFor } from "@/lib/cadreSalutation";
 import { replyOverdueCutoff } from "@/lib/cadreHealth/matchStages";
+import { readRelocationFit, withoutRelocationBlock } from "@/lib/cadreHealth/zuriRelocationFit";
 import type { PipelineEntry } from "@/app/(oncadre-employer)/oncadre/employer/pipeline/PipelineBoard";
 
 /**
@@ -53,7 +54,9 @@ export async function loadPipeline(orgId: string, mandateId?: string) {
     source: m.source,
     matchScore: m.matchScore,
     matchExplanation: m.matchExplanation,
-    notes: m.notes,
+    notes: withoutRelocationBlock(m.notes) || null,
+    relocation: readRelocationFit(m.notes),
+    relocationAnswers: m.notes?.includes("--- Relocation fit") ? m.notes.slice(m.notes.indexOf("--- Relocation fit")).split("\n").slice(3) : [],
     createdAt: m.createdAt.toISOString(),
     // Only an applicant can be overdue. Nobody is owed a reply to a message they
     // never sent.
