@@ -228,16 +228,30 @@ def _portraits(c, entries, x, y, width, per_row=4):
     return y - rows * (ch + 40) + 10
 
 
-def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True):
-    """Header row in forest, body banded on paper, chartreuse keyline under the head."""
+def _table(c, rows, x, y, widths, size=9.2, lead=12, pad=7, headed=True, new_page=None):
+    """Header row in forest, body banded on paper, chartreuse keyline under the head.
+
+    A table longer than the page continues on the next one with its header
+    repeated. Without new_page the rows ran off the foot of the page unseen.
+    """
     n = len(widths)
     cy = y
-    for i, row in enumerate(rows):
+    order = list(enumerate(rows))
+    k = 0
+    while k < len(order):
+        i, row = order[k]
+        k += 1
         cells, head = [], (i == 0 and headed)
         for j in range(n):
             f = SANS_B if (head or j == 0) else SANS
             cells.append(_wrap(c, _clean(str(row[j])), f, size, widths[j] - 2 * pad))
         h = max(len(cl) for cl in cells) * lead + pad * 1.7
+        if new_page and not head and cy - h < 70:
+            cy = new_page()
+            if headed:
+                order[k - 1:k - 1] = [(0, rows[0])]
+                k -= 1
+                continue
         if head:
             c.setFillColor(HexColor(_pal()["tbl_head"]))
             c.rect(x, cy - h, sum(widths), h, fill=1, stroke=0)
@@ -344,6 +358,24 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential", dark:
             # next one is the commonest way a short document looks careless.
             if y < 165:
                 y = new_page()
+            else:
+                # A table that will jump to the next page takes its heading with it.
+                j = i + 1
+                while j < len(md) and not md[j].strip():
+                    j += 1
+                if j < len(md) and md[j].startswith("|"):
+                    rows = []
+                    while j < len(md) and md[j].startswith("|"):
+                        cells = [x.strip() for x in md[j].strip().strip("|").split("|")]
+                        if not (all(set(x) <= set("-: ") for x in cells) and any("-" in x for x in cells)):
+                            rows.append(cells)
+                        j += 1
+                    n = len(rows[0])
+                    widths = [W * 0.30] + [(W * 0.70) / (n - 1)] * (n - 1) if n > 1 else [W]
+                    need = sum(max(len(_wrap(c, _clean(str(r[k])), SANS, 9.2, widths[k] - 14))
+                                   for k in range(n)) * 12 + 12 for r in rows)
+                    if y - 40 - need < 90 and need < PH - 200:
+                        y = new_page()
             y -= 10
             c.setFillColor(HexColor(_pal()["head"])); c.setFont(DISPLAY, 17)
             for ln in _wrap(c, _clean(line[3:]), DISPLAY, 17, W):
@@ -373,7 +405,7 @@ def build(src: Path, out: Path, header: str, footer: str = "Confidential", dark:
                            for j in range(n)) * 12 + 12 for r in tbl)
             if y - need < 90 and need < PH - 200:
                 y = new_page()
-            y = _table(c, tbl, M, y, widths, headed=headed) - 14
+            y = _table(c, tbl, M, y, widths, headed=headed, new_page=new_page) - 14
             continue
         elif line.startswith("- "):
             txt = _clean(line[2:])

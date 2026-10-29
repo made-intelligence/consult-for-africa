@@ -21,8 +21,23 @@ CLIENT_FOOTER = "Confidential  /  Prepared for Dr Chito Nwana and Arabella Women
 
 DOCS_TO_BUILD = [
     (
+        "arabella-data-review-and-request-cfa",
+        "Arabella Women's Health  /  Data Review and Additional Request",
+        CLIENT_FOOTER,
+    ),
+    (
         "arabella-audit-information-request-cfa",
         "Arabella Women's Health  /  Information Request",
+        CLIENT_FOOTER,
+    ),
+    (
+        "arabella-diagnostic-report-cfa",
+        "Arabella Women's Health  /  Diagnostic Audit, Interim Report",
+        CLIENT_FOOTER,
+    ),
+    (
+        "arabella-diagnostic-full-report-cfa",
+        "Arabella Women's Health  /  Diagnostic Audit, Findings and Recommendations",
         CLIENT_FOOTER,
     ),
 ]

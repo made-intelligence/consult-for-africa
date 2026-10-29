@@ -5,12 +5,14 @@ Africa, for the setup and management of the CFA managed special division.
 Records the terms settled between Dr Itunu Akinware and Dr Adebowale Odulana on
 WhatsApp, 20 and 21 September 2026:
 
-  - CFA sets up the division for NGN 25m across five months, Lagos and Abuja,
-    in tranches of 12.5 / 5 / 4 / 3.5 against agreed measures.
+  - CFA sets up the division for NGN 18m across five months, Lagos only,
+    in tranches of 9 / 4 / 3 / 2 against agreed measures. Abuja removed on
+    16 October 2026 at Medbury's request, with the Lagos-Abuja travel clause.
+    Fees revised on 25 October 2026 to 18m setup and 2m a month support.
   - From month six CFA manages it. Two chief operating officers are recruited by
     CFA, employed and paid by Medbury, and seconded to CFA reporting to Debo
     Odulana.
-  - Medbury pays CFA NGN 3m a month for the shared support functions.
+  - Medbury pays CFA NGN 2m a month for the shared support functions.
   - CFA earns 3.5 per cent of collected net revenue and 3 per cent of EBITDA,
     both subject to the revenue and EBITDA goals being met.
 
@@ -210,27 +212,28 @@ def sig_block(el, party, signatory):
 
 
 # ---------------------------------------------------------------- the terms
-SETUP_FEE = 25
-TRANCHES = [("On signature", 12.5, "Mobilisation. The team is deployed in full and every "
+SETUP_FEE = 18
+TRANCHES = [("On signature", 9.0, "Mobilisation. The team is deployed in full and every "
              "workstream opens."),
-            ("Month 1", 5.0, "The rate card delivered with the primary price research, the "
+            ("Month 1", 4.0, "The rate card delivered with the primary price research, the "
              "bottom-up cost to serve and the sensitivity model behind it. Internal supply "
              "specified and routed."),
-            ("Month 3", 4.0, "The first business lawfully trading and first revenue banked, "
+            ("Month 3", 3.0, "The first business lawfully trading and first revenue banked, "
              "every service partner under a signed service level agreement, and the "
              "pre-opening programme revenue target met."),
-            ("Month 6", 3.5, "At the switch to management. The handover complete, the Division "
+            ("Month 6", 2.0, "At the switch to management. The handover complete, the Division "
              "running on the normal management rhythm, and the measures above still met.")]
-SUPPORT_FEE = 3.0
+SUPPORT_FEE = 2
 REV_RATE = "3"
 EBITDA_RATE = None          # no EBITDA share: Itunu required a single element
 TERM_MONTHS = 24
 REVIEW_MONTHS = 12
 
 BUSINESSES = [
-    ("Cosmetic dentistry", "Veneers, whitening, alignment and implants"),
+    ("Dentistry", "General and preventive, restorative, cosmetic, orthodontic, implant and oral "
+     "surgery"),
     ("Hair restoration", "Surgical and non-surgical hair restoration"),
-    ("Plastics and dermatology", "Lyfe Plastics and Dermatology, which has its own "
+    ("Plastics and dermatology", "Plastic surgery and dermatology, which has its own "
      "shareholders and its own memorandum"),
     ("Weight and bariatric", "Medical weight management and metabolic health"),
     ("Medlyfe wellness and regenerative", "Regenerative medicine, longevity programmes and "
@@ -362,9 +365,9 @@ def build():
                         "dermatology has its own shareholders and its own memorandum, and "
                         "nothing here varies that.", REC))
     el.append(Paragraph("(C) The Parties settled the commercial terms in correspondence on 20 "
-                        "and 21 September 2026 and wish to record them.", REC))
-    el.append(Paragraph(_res("(D) This Memorandum is not intended to be legally binding except "
-                             "as stated at clause {status}."), REC))
+                        "and 21 September 2026, revised them in October 2026, and wish to "
+                        "record them.", REC))
+    el.append(Paragraph(_res("(D) This Memorandum is binding as stated at clause {status}."), REC))
     el.append(Spacer(1, 6))
     el.append(Paragraph("<b>IT IS AGREED</b> as follows.", PLAIN))
 
@@ -380,7 +383,9 @@ def build():
           "{platform}; <b>Collected Net Revenue</b> has the meaning at clause {cnr}; "
           "<b>EBITDA</b> means "
           "earnings before interest, tax, depreciation and amortisation for the Division, "
-          "prepared on the accounting policies the Board approves; and <b>Board</b> means the "
+          "prepared on the accounting policies the Board approves, and excluding any group "
+          "management charge, cost allocation or change to intra-group pricing not provided "
+          "for in the approved budget, unless CFA has agreed to it in writing; and <b>Board</b> means the "
           "board of Medbury or such committee as it appoints.")
     c(el, "A reference to a clause or Schedule is to a clause of or Schedule to this Memorandum. "
           "The Schedules form part of it. Headings do not affect its construction. Amounts are "
@@ -401,26 +406,28 @@ def build():
 
     # ------------------------------------------------------------------ 3
     heading(el, "The Division")
-    c(el, "The Division comprises the five Businesses at Schedule 1, in Lagos and, when that site "
-          "is ready, in Abuja.")
+    c(el, "The Division comprises the five Businesses at Schedule 1, in Lagos. Any other site, "
+          "including Abuja, is outside this Memorandum and, if the Parties wish to add it, is "
+          "scoped and priced separately.")
     c(el, "The Division is grouped for operating efficiency. Where a Business grows to a size at "
           "which it is better run on its own, the Parties will consider separating it, and "
           "clause {review} applies.")
 
     # ------------------------------------------------------------------ 4
     heading(el, "The setup")
-    c(el, "The Setup Period is five months from the Commencement Date and covers both Lagos and "
-          "Abuja.")
-    c(el, "CFA will deliver the operating system once for the whole Division, and it will apply "
-          "to Abuja from the day that site is ready. It comprises the rate card and the model "
+    c(el, "The Setup Period is five months from the Commencement Date.")
+    c(el, "CFA will deliver the operating system once for the whole Division. It comprises the rate card and the model "
           "beneath it, the clinical protocol set, the build and configuration of the Platform, "
           "the standard operating procedures, the procurement framework and the partner terms.")
-    c(el, "The registrations, licensing, recruitment and commissioning of each site, in both "
-          "cities, are inside the setup fee at clause {setupfee}.")
+    c(el, "The registrations, licensing, recruitment and commissioning of the Lagos site are "
+          "inside the setup fee at clause {setupfee}.")
     c(el, "Project management of any building works is not inside that fee. Where Medbury's own "
           "contractors manage the works, CFA charges nothing for it. Where Medbury asks CFA to "
           "manage them, that is quoted separately against a defined programme and scope.",
       label="pm")
+    c(el, "A service or business added after the date of this Memorandum, including a service "
+          "not listed at Schedule 1, is scoped and priced separately and is not inside the setup "
+          "fee.")
     c(el, "The setup deliverables are at Schedule 3.")
 
     # ------------------------------------------------------------------ 5
@@ -432,7 +439,7 @@ def build():
           "permissions, data protection filings and trade mark filings, are payable by Medbury. "
           "Medbury may settle them directly or reimburse CFA at cost against receipts, and CFA "
           "applies no mark-up to them.", label="govfees")
-    c(el, "CFA will provide a schedule of the expected fees for both cities before the "
+    c(el, "CFA will provide a schedule of the expected fees before the "
           "Commencement Date and will notify Medbury before incurring any fee not on that "
           "schedule, so that none of them arrives as a surprise.")
     c(el, "It is payable in four tranches, the first on signature and the remainder against the "
@@ -442,9 +449,12 @@ def build():
           [88, 56, FULLW - 34 - 144], header=["When", "NGN m", "What has to be true"])
     c(el, "Where a tranche measure is not met, that tranche is not payable until it is. No "
           "tranche measure may be waived except in writing by both Parties.")
-    c(el, "Travel and accommodation between Lagos and Abuja are inside the setup fee. Travel "
-          "outside those two cities is not, and is recharged at cost with Medbury's prior "
-          "approval.")
+    c(el, "Where a measure is not met because of an act or omission of Medbury, including a delay "
+          "in a decision, an approval, a payment, the premises or a registration held in its "
+          "name, or because of a regulator's delay outside CFA's control, the tranche is payable "
+          "on the date it would otherwise have fallen due.")
+    c(el, "Travel outside Lagos is not inside the setup fee and is recharged at cost with "
+          "Medbury's prior approval.", label="travel")
 
     # ------------------------------------------------------------------ 6
     heading(el, "Management from month six")
@@ -471,15 +481,21 @@ def build():
           "work, sets their objectives and appraises them, and the Board holds CFA rather than "
           "either individual accountable for the measures at Schedule 4.", label="secondment")
     c(el, "Where CFA considers that a chief operating officer is not performing, CFA will say so "
-          "in writing and the Parties will agree a remedy or a replacement. CFA will conduct any "
-          "replacement search at its own cost.")
+          "in writing and the Parties will agree a remedy or a replacement. Medbury may, where it "
+          "reasonably determines that a chief operating officer is unsuitable, underperforming "
+          "or otherwise not in the best interests of the Division, require CFA to recommend and "
+          "conduct a replacement search at no additional cost to Medbury. CFA will conduct any "
+          "replacement search at its own cost. Where a chief operating officer post is vacant "
+          "for a reason not attributable to CFA, including a replacement Medbury requires, the "
+          "measures at Schedule 4 for which that officer is responsible are suspended until the "
+          "replacement is in post.")
     c(el, "The Parties record that this arrangement gives CFA direction without employment, and "
           "gives Medbury the employment relationship. It works only while the reporting line at "
           "clause {secondment} is observed in practice as well as in writing.")
 
     # ------------------------------------------------------------------ 8
     heading(el, "The support fee")
-    c(el, f"Medbury will pay CFA NGN {SUPPORT_FEE:.0f}m a month, exclusive of value added tax, "
+    c(el, f"Medbury will pay CFA NGN {SUPPORT_FEE:g}m a month, exclusive of value added tax, "
           f"monthly in advance from month six, on the payment date at clause {{paydate}}.",
       label="support")
     c(el, "The fee is for two things and not one. First, the support functions at Schedule 2, "
@@ -492,19 +508,17 @@ def build():
           "engagement, and that the support functions exist to make it deliverable.")
     c(el, "The fee covers the functions, their output and the service levels behind them. It does "
           "not reserve any named individual to the Division, because the functions are shared "
-          "across CFA's clients, which is why the fee is what it is.")
-    c(el, "The fee is fixed for the first twelve months. It is reviewed on each anniversary "
-          "against the actual cost of the agreed establishment, on an open book basis.")
-    c(el, "On review the fee moves by the National Bureau of Statistics headline consumer price "
-          "index, year on year for the month preceding the anniversary, subject to a floor of "
-          "nil and a cap of 15 per cent. Where that index exceeds 15 per cent in two consecutive "
-          "years, either Party may call a review.")
-    c(el, "Either Party may call a review outside the anniversary where the actual cost of the "
-          "agreed establishment moves by more than 15 per cent between anniversaries. Such a "
-          "review is to be concluded within 30 days.")
-    c(el, "Where the Division's demand on the support functions grows materially beyond what is "
-          "assumed at Schedule 2, that is a matter for the annual review and not for a separate "
-          "charge in the meantime.")
+          "across CFA's clients.")
+    c(el, "The fee is fixed for the first twelve months.")
+    c(el, "On each anniversary the fee moves by the National Bureau of Statistics headline "
+          "consumer price index, year on year for the month preceding the anniversary, subject "
+          "to a floor of nil and a cap of 15 per cent. The Parties agree this adjustment now, in "
+          "writing, and it applies without further approval.")
+    c(el, "Any other adjustment to the fee takes effect only by written agreement of both "
+          "Parties, and CFA may not otherwise increase the fee unilaterally.")
+    c(el, "Either Party may call a review of the fee outside the anniversary where the scope of "
+          "the support functions, or the Division's demand on them, grows materially beyond what "
+          "is assumed at Schedule 2. Such a review is to be concluded within 30 days.")
 
     # ------------------------------------------------------------------ 9
     heading(el, "Performance remuneration")
@@ -523,13 +537,14 @@ def build():
           "before the Management Period begins and review it at each anniversary.")
     c(el, "It is payable only where the Division meets both the revenue goal and the EBITDA goal "
           "in the Board-approved budget for the period. Although CFA is paid on revenue, it is "
-          "not paid on revenue bought at the expense of profit.", label="goals")
+          "not paid on revenue bought at the expense of profit. No performance remuneration is "
+          "payable for any period in which the Division records a negative EBITDA.",
+      label="goals")
     c(el, "It is paid quarterly in arrears, measured on a rolling basis, and trued up at the "
           "year end once the audited or Board-approved figures are available. Where the annual "
-          "goals are not met, the true-up recovers what was paid.")
-    c(el, "The Parties record that CFA's margin on the support fee is slight, and that CFA's "
-          "return on this arrangement depends on this clause. Neither Party should treat the "
-          "performance remuneration as incidental.")
+          "goals are not met, the true-up recovers what was paid. Any overpayment is a debt "
+          "due from CFA within 30 days of the true-up and, if not paid by then, may at "
+          "Medbury's election be set off against any amount otherwise payable to CFA.")
 
     # ------------------------------------------------------------------ 10
     heading(el, "The budget")
@@ -539,8 +554,9 @@ def build():
           "end, Business by Business, showing the volume and price assumptions rather than a "
           "single revenue line.")
     c(el, "The Board approves or amends it. Whatever the Board approves is the budget. Where the "
-          "Board raises CFA's proposal, the goals and the measures rise with it. Where the Board "
-          "lowers it, they fall with it.")
+          "Board lowers CFA's proposal, the goals and the measures fall with it. Where the Board "
+          "raises it, the goals at clause {goals} and the measures at Schedule 4 remain those in "
+          "CFA's proposal unless CFA agrees otherwise in writing.")
     c(el, "Neither Party may re-base the approved budget during the year except by written "
           "agreement, so that a target is neither lowered to release remuneration nor raised to "
           "withhold it.")
@@ -569,6 +585,8 @@ def build():
           "runs procurement and Medbury bears the cost of the goods; and CFA administers the "
           "Platform while Medbury bears its hosting, licences, hardware, connectivity and "
           "payment gateway charges.", label="whopays_tech")
+    c(el, "CFA will not incur any expenditure, or commit Medbury to any third party liability, "
+          "above the approved budget without Medbury's prior written consent.")
     c(el, "Schedule 5 records who employs and pays each post. Where a post is not listed, the "
           "tests are whether its number changes as revenue grows and whether it must be at a "
           "site to do the job. A post that grows with volume or must be on site is Medbury's.",
@@ -583,8 +601,10 @@ def build():
           "are the agreed standard against which performance is judged, and clause {review} is "
           "the agreed consequence of failing them.")
     c(el, "Medbury will provide CFA with timely access to the premises, records, systems, staff "
-          "and decisions it reasonably requires, and CFA is not responsible for a failure caused "
-          "by Medbury not doing so.")
+          "and decisions it reasonably requires, and CFA is not responsible for a failure, "
+          "including a failure against a measure at Schedule 4, caused by Medbury not doing so, "
+          "by Medbury withholding budget or consent, or by Medbury acting outside the "
+          "arrangement at clause {secondment}.")
 
     # ------------------------------------------------------------------ 12B
     heading(el, "Invoicing, payment and taxes")
@@ -592,9 +612,6 @@ def build():
           "the month to which it relates, on a fixed date each month and not by reference to a "
           "period running from an invoice. CFA will issue its invoice by the twenty fifth day of "
           "the preceding month.", label="paydate")
-    c(el, "The Parties will put the support fee on a standing payment instruction so that it "
-          "does not depend on a monthly approval, and Medbury will notify CFA before cancelling "
-          "or varying that instruction.")
     c(el, "Each setup tranche is payable within ten business days of the relevant measure being "
           "met and CFA's invoice for it. The first tranche is payable on signature.")
     c(el, "All fees are exclusive of value added tax, which Medbury pays in addition at the "
@@ -604,7 +621,9 @@ def build():
           "of remittance so that CFA can claim the credit.", label="wht")
     c(el, "Payment is made in full and in cleared funds, without set-off, counterclaim, "
           "withholding or deduction of any kind, other than a withholding tax Medbury is "
-          "required by law to deduct under clause {wht}.", label="nosetoff")
+          "required by law to deduct under clause {wht}, save that either Party may set off any "
+          "amount due and payable by the other against any amount it owes, provided that the "
+          "amount is undisputed or has been finally determined.", label="nosetoff")
     c(el, "The support fee is payable for CFA making the functions and the management available "
           "for the month. It is not conditional on the approval of any particular deliverable, "
           "report or outcome, and no deliverable is a precondition to it falling due.")
@@ -617,10 +636,9 @@ def build():
           "reached CFA by its due date, CFA notifies that contact, and if it is not resolved "
           "within five business days the matter is escalated to the Group Chief Executive.")
     c(el, "Before the Management Period begins Medbury will pay CFA a sum equal to one month's "
-          "support fee, which CFA holds and applies against the final month of the arrangement. "
-          "It is not additional consideration and it is refundable to the extent it is not so "
-          "applied. Its purpose is that a delay in any single month does not interrupt the "
-          "running of the Division.", label="deposit")
+          "support fee, which CFA holds as security and applies against the final month of the "
+          "arrangement. It is not additional consideration. On termination it is refundable within "
+          "14 days, after deduction of any sums due to CFA under this Memorandum.", label="deposit")
     c(el, "An amount not paid by its due date carries interest from that date until payment at "
           "three per cent a year above the Central Bank of Nigeria monetary policy rate, "
           "accruing daily. CFA may waive interest in any instance without affecting the right.")
@@ -634,9 +652,9 @@ def build():
 
     # ------------------------------------------------------------------ 12C
     heading(el, "Records and audit")
-    c(el, "CFA will keep proper records of the establishment it provides and of the costs it "
-          "puts forward on an open book basis under clause {support}, and will retain them for "
-          "three years.")
+    c(el, "CFA will keep proper records of the costs it recharges to Medbury at cost under clauses "
+          "{govfees} and {travel}, and will retain them for three years. CFA's own costs, "
+          "margins and establishment are not open to audit.")
     c(el, "Medbury may audit those records once in any twelve month period, on 14 days' notice, "
           "during normal business hours, itself or through an adviser bound to confidentiality. "
           "Medbury bears the cost of the audit unless it shows an overcharge of more than five "
@@ -649,9 +667,11 @@ def build():
     c(el, "CFA provides the functions at Schedule 2 from a shared bench that serves other "
           "clients, and this Memorandum is not exclusive. Medbury acknowledges that this is the "
           "basis on which the support fee is set.")
-    c(el, "CFA will not, during the term, manage or advise a competing aesthetics, longevity or "
-          "regenerative business operating in the same city as a Business, without Medbury's "
-          "prior written consent, which will not be unreasonably withheld.")
+    c(el, "CFA will not, during the term, take on the operating management of a competing "
+          "aesthetics, longevity or regenerative business in Lagos without Medbury's prior "
+          "written consent, which will not be unreasonably withheld. This does not restrict "
+          "advisory work, work for any client CFA serves at the date of this Memorandum, or "
+          "anything after the term ends.")
     c(el, "CFA will disclose any actual or potential conflict of interest promptly, and will not "
           "place a CFA-related supplier with the Division without disclosing the relationship "
           "and obtaining the Board's approval.")
@@ -705,8 +725,7 @@ def build():
           "belong on their own retainer because they carry a different cost base and a different "
           "risk profile.")
     c(el, "Before they can be priced the Parties must settle whether the scope is the whole of "
-          "Lyfe Place or only the spaces the Division occupies, and Lagos and Abuja are quoted "
-          "separately. Until a retainer is agreed, facilities and biomedical remain with Medbury.")
+          "Lyfe Place or only the spaces the Division occupies. Until a retainer is agreed, facilities and biomedical remain with Medbury.")
 
     # ------------------------------------------------------------------ 14
     heading(el, "Intellectual property and data", label="ip")
@@ -754,9 +773,15 @@ def build():
           "remedy it. Where it is not remedied, Medbury may terminate on 30 days' notice.")
     c(el, "Either Party may terminate for material breach not remedied within 30 days of written "
           "notice, or on the insolvency of the other.")
+    c(el, "Either Party may terminate this Memorandum for convenience on 90 days' written "
+          "notice, which may not expire before the review at clause {termclause}. Where Medbury "
+          "terminates under this clause, every setup tranche not yet paid falls due on the date "
+          "of the notice, and the support fee remains payable for the notice period.")
     c(el, "On termination CFA will hand over every operating document, the Platform "
           "configuration and the data, and will provide reasonable transition assistance for up "
-          "to 60 days. Fees accrued to the date of termination remain payable, and the "
+          "to 60 days, charged at CFA's published rates beyond any notice period for which the "
+          "support fee was paid. The Platform passes to Medbury only once the setup fee is paid "
+          "in full under clause {platformowned}. Fees accrued to the date of termination remain payable, and the "
           "performance remuneration is apportioned to that date.")
     c(el, "The secondments at clause {secondment} end on termination and the chief operating "
           "officers report to Medbury from that date.")
@@ -792,8 +817,9 @@ def build():
 
     # ------------------------------------------------------------------ 17
     heading(el, "Status of this Memorandum", label="status")
-    c(el, "This Memorandum records the Parties' intentions and is not legally binding, save for "
-          "clauses {conf}, {status}, {law} and {gen}, which are binding.")
+    c(el, "Except where expressly stated otherwise, this Memorandum constitutes a legally "
+          "binding agreement between the Parties and remains binding until superseded by the "
+          "definitive services agreement.")
     c(el, "The Parties will negotiate a definitive services agreement in good faith. Until it is "
           "executed, the Parties will conduct themselves in accordance with this Memorandum.")
 
@@ -865,8 +891,8 @@ def build():
     el.append(Paragraph(_res("What CFA delivers across the Setup Period. The tranche measures "
                              "that test them, and the amounts, are at clause {setuptranches} "
                              "and are not repeated here."), PLAIN))
-    el.append(Paragraph("Delivered across the Setup Period, once for the whole Division and "
-                        "applying to both cities: the rate card and the model beneath it; the "
+    el.append(Paragraph("Delivered across the Setup Period, once for the whole Division: the "
+                        "rate card and the model beneath it; the "
                         "operating model across the five Businesses; the clinical protocol set "
                         "and governance framework; the build and configuration of the Platform "
                         "and the migration onto it; the standard operating procedures; the "

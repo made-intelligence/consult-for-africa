@@ -136,7 +136,7 @@ ${recentConversations
   let answer: string;
   try {
     const message = await anthropic.messages.create({
-      model: "claude-opus-4-20250514",
+      model: "claude-sonnet-5-5",
       max_tokens: 2000,
       system: SYSTEM_PROMPT,
       messages: [
@@ -146,7 +146,7 @@ ${recentConversations
         },
       ],
     });
-    answer = (message.content[0] as { text: string }).text;
+    answer = message.content.find((b) => b.type === "text")?.text ?? "";
   } catch (err) {
     console.error("AI coach error:", err);
     return Response.json({ error: "Failed to get answer. Please try again." }, { status: 500 });

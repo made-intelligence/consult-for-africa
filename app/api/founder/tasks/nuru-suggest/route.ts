@@ -35,7 +35,7 @@ export const POST = handler(async function POST() {
   const existingTaskTitles = existingTasks.map(t => t.title).join(", ") || "none";
 
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 600,
     messages: [{
       role: "user",
@@ -68,7 +68,7 @@ Focus on what moves the needle THIS WEEK. Be specific to C4A. Never use em dashe
     }],
   });
 
-  const text = message.content[0].type === "text" ? message.content[0].text : "[]";
+  const text = message.content.find((b) => b.type === "text")?.text ?? "[]";
 
   try {
     const jsonMatch = text.match(/\[[\s\S]*\]/);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import DocumentUploader from "@/components/dennis-ashley/DocumentUploader";
-import { PRIORITY_NINE, REQUEST_SECTIONS, SURVEYS } from "@/lib/dennis-ashley-audit";
+import { PRIORITY, RECEIVED, REQUEST_SECTIONS, SURVEYS } from "@/lib/dennis-ashley-audit";
 
 // One private link for Dr Oti and the Dennis Ashley board: what the audit is,
 // the information we need, and somewhere to put it. Deliberately not indexed.
@@ -79,15 +79,40 @@ export default function DennisAshleyProjectPage() {
           </p>
         </section>
 
-        {/* 1. The nine */}
+        {/* 1. What has come in, then what we need next */}
+        <section style={{ marginTop: 40 }}>
+          <SectionHeading
+            eyebrow="Received, thank you"
+            title="What we have so far"
+            lead="These have reached us. There is no need to send them again."
+          />
+          <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+            {RECEIVED.map((r, i) => (
+              <div
+                key={r.what}
+                style={{
+                  display: "flex", gap: 14, padding: "12px 18px",
+                  borderTop: i === 0 ? "none" : `1px solid #eef1f0`,
+                }}
+              >
+                <span style={{ color: TEAL_D, fontWeight: 800, fontSize: 15, minWidth: 18 }}>&#10003;</span>
+                <span style={{ flex: 1, fontSize: 14.5, color: "#1F2937", lineHeight: 1.5 }}>{r.what}</span>
+                <span style={{ color: TEAL_D, fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap" }}>
+                  section {r.section}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section style={{ marginTop: 40 }}>
           <SectionHeading
             eyebrow="Start here"
-            title="The nine that matter most"
-            lead="These nine unlock everything else. If the week runs away, send these first and let the rest follow over the fortnight after."
+            title="What we need next"
+            lead="Updated after the first documents arrived. These unlock everything else, so please send them first and let the rest follow."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-            {PRIORITY_NINE.map((p, i) => (
+            {PRIORITY.map((p, i) => (
               <div
                 key={p.n}
                 style={{
@@ -124,7 +149,7 @@ export default function DennisAshleyProjectPage() {
           <SectionHeading
             eyebrow="For reference"
             title="Everything we have asked for"
-            lead="The same request as the letter of 22 September, set out section by section rather than in eight areas, so nothing is ambiguous about where a document belongs. Send whatever you keep, in whatever format you keep it: exports, spreadsheets, PDFs or photographs of paper are all fine."
+            lead="The request of 22 September, set out section by section so every document has one place to go. It now covers each of the five departments in the board pack. Send whatever you keep, in whatever format you keep it: exports, spreadsheets, PDFs or photographs of paper are all fine."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {REQUEST_SECTIONS.map((s, i) => (

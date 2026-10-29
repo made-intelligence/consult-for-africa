@@ -26,6 +26,7 @@ from reportlab.platypus import (
     NextPageTemplate,
     PageBreak,
     PageTemplate,
+    Image,
     Paragraph,
     Spacer,
     Table,
@@ -229,6 +230,25 @@ def render_table(rows):
     return t
 
 
+# Markdown images, "![caption](path)" on a line of their own, path relative to
+# the source file. Scaled to the text width and kept with their caption.
+_IMG_BASE = ROOT
+_IMG_RE = re.compile(r"^!\[(.*)\]\((.+)\)$")
+
+
+def render_image(caption: str, path: str):
+    p = Path(path)
+    if not p.is_absolute():
+        p = _IMG_BASE / p
+    iw, ih = ImageReader(str(p)).getSize()
+    w = AVAIL
+    parts = [Spacer(1, 4), Image(str(p), width=w, height=w * ih / iw)]
+    if caption:
+        parts += [Spacer(1, 2), Paragraph(inline(caption), SMALL)]
+    parts.append(Spacer(1, 8))
+    return KeepTogether(parts)
+
+
 def _body_only(doc, el, body):
         n = len(body)
         k = 0
@@ -236,6 +256,12 @@ def _body_only(doc, el, body):
             s = body[k].strip()
 
             if s in ("---", ""):
+                k += 1
+                continue
+
+            mimg = _IMG_RE.match(s)
+            if mimg:
+                el.append(render_image(mimg.group(1), mimg.group(2)))
                 k += 1
                 continue
 
@@ -309,6 +335,8 @@ def _body_only(doc, el, body):
 
 def build_doc(src: Path, out: Path, header_label: str, footer_label: str, cover_draw=None):
     """cover_draw: optional (canvas, doc) -> None replacing the default navy cover."""
+    global _IMG_BASE
+    _IMG_BASE = src.resolve().parent
     lines = src.read_text(encoding="utf-8").splitlines()
 
     # cover: title, subtitle, meta lines, up to the first rule
@@ -363,6 +391,12 @@ def build_doc(src: Path, out: Path, header_label: str, footer_label: str, cover_
         s = body[k].strip()
 
         if s in ("---", ""):
+            k += 1
+            continue
+
+        mimg = _IMG_RE.match(s)
+        if mimg:
+            el.append(render_image(mimg.group(1), mimg.group(2)))
             k += 1
             continue
 

@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CFA Growth Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+:root{--navy:#0B3C5D;--deep:#081521;--gold:#D4AF37;--goldd:#9A7B17;--teal:#1F7A8C;--body:#1F2937;--slate:#374151;--muted:#6B7280;--line:#E5E7EB;--bg:#F8FAFC;--tint:#FBF6E4;--tealt:#E8F3F5;--warn:#FFF1EC;--red:#B42318}
+@page{size:A4;margin:17mm 16mm 19mm 16mm;
+  @bottom-left{content:"CFA Growth Book · internal · October 2026";font-family:"Inter",sans-serif;font-size:7.6pt;color:#6B7280}
+  @bottom-right{content:counter(page);font-family:"Inter",sans-serif;font-size:7.6pt;color:#6B7280}}
+@page bleed{margin:0;@bottom-left{content:none}@bottom-right{content:none}}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--body);background:#fff;font-size:9.8pt;line-height:1.55}
+h1,h2,h3,h4{font-family:"Source Serif 4",Georgia,serif;margin:0;color:var(--navy)}
+p{margin:0 0 8px;color:var(--slate)}
+li{color:var(--slate);margin-bottom:3px}
+ul,ol{margin:0 0 10px;padding-left:18px}
+b,strong{color:var(--body)}
+sup{font-size:6.5pt;color:var(--teal);font-weight:700}
+.cover{page:bleed;height:297mm;width:210mm;background:var(--navy);color:#fff;padding:26mm 22mm;position:relative;overflow:hidden;page-break-after:always}
+.cover img.logo{height:46px}
+.cover .eyebrow{color:var(--gold);margin-top:62mm}
+.cover h1{color:#fff;font-size:42pt;line-height:1.05;font-weight:700;margin-top:10px;max-width:160mm}
+.cover h1 span{color:var(--gold)}
+.cover .sub{font-size:12.5pt;color:#C9D6E0;margin-top:18px;max-width:145mm;line-height:1.5}
+.cover .meta{position:absolute;left:22mm;bottom:24mm;font-size:9pt;color:#9FB3C4;line-height:1.7}
+.cover .rule{position:absolute;left:22mm;bottom:52mm;width:40mm;height:2px;background:var(--gold)}
+.eyebrow{font-family:"Inter";font-size:7.6pt;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--goldd);margin-bottom:6px}
+.part{page:bleed;break-before:page;break-after:page;background:var(--navy);color:#fff;margin:0;padding:80mm 22mm 0;height:297mm;width:210mm;overflow:hidden}
+.part .eyebrow{color:var(--gold)}
+.part h1{color:#fff;font-size:32pt;font-weight:700;line-height:1.08}
+.part p{color:#C9D6E0;font-size:11.5pt;max-width:145mm;margin-top:14px}
+.part ol{margin-top:20px}
+.part ol li{color:#E3EAF0;font-size:10.5pt;margin-bottom:6px}
+.module{page-break-before:always}
+.module>h2{font-size:21pt;font-weight:700;line-height:1.12;margin-bottom:6px}
+.goal{font-size:10.4pt;color:var(--slate);border-left:3px solid var(--gold);padding:2px 0 2px 12px;margin:8px 0 16px}
+h3{font-size:12.5pt;font-weight:700;margin:16px 0 6px}
+h4{font-size:10pt;font-weight:700;margin:12px 0 4px;font-family:"Inter"}
+table{width:100%;border-collapse:collapse;margin:6px 0 14px;page-break-inside:auto}
+tr{page-break-inside:avoid}
+th{text-align:left;font-size:7.2pt;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 5px 0;border-bottom:1px solid var(--line)}
+td{font-size:8.7pt;color:var(--slate);padding:6px 8px 6px 0;border-bottom:1px solid #EEF1F4;vertical-align:top;line-height:1.42}
+td:first-child{color:var(--navy);font-weight:600}
+.box{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0 14px;page-break-inside:avoid}
+.box.gold{background:var(--tint);border-color:#EAD9A0}
+.box.teal{background:var(--tealt);border-color:#BFDDE3}
+.box.warn{background:var(--warn);border-color:#FFD3C5}
+.box h4{margin-top:0}
+.box p:last-child,.box ul:last-child,.box ol:last-child,.box table:last-child{margin-bottom:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;page-break-inside:avoid}
+.status>div{border-radius:8px;padding:10px 12px;border:1px solid var(--line)}
+.status .done{background:var(--tealt);border-color:#BFDDE3}
+.status .pend{background:var(--warn);border-color:#FFD3C5}
+.status h4{margin:0 0 4px;font-size:8.6pt;letter-spacing:.5px;text-transform:uppercase}
+.status ul{margin:0;padding-left:16px}
+.status li{font-size:8.5pt;line-height:1.4}
+.check{border-top:1px solid var(--line);margin-top:14px;padding-top:8px;page-break-inside:avoid}
+.check h4{font-size:8.4pt;letter-spacing:1px;text-transform:uppercase;color:var(--goldd);margin:0 0 4px}
+.check ol li{font-size:8.8pt}
+figure{margin:10px 0 14px;page-break-inside:avoid}
+figcaption{font-size:8.2pt;color:var(--muted);margin-top:4px}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:"Inter",sans-serif}
+.big{font-family:"Source Serif 4";font-size:19pt;font-weight:700;color:var(--navy);line-height:1}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 14px;page-break-inside:avoid}
+.kpi div{border:1px solid var(--line);border-radius:8px;padding:10px}
+.kpi span{display:block;font-size:7.9pt;color:var(--slate);margin-top:5px;line-height:1.35}
+.toc{columns:2;column-gap:12mm;font-size:9pt}
+.toc div{break-inside:avoid;margin-bottom:9px}
+.toc b{display:block;font-family:"Source Serif 4";font-size:10.5pt;margin-bottom:2px;color:var(--navy)}
+.toc span{display:block;color:var(--slate);line-height:1.45}
+.quote{font-family:"Source Serif 4";font-size:13.5pt;font-weight:600;color:var(--navy);line-height:1.35;margin:10px 0 12px}
+.small{font-size:8.3pt}
+.src{font-size:7.9pt;color:var(--muted)}
+.nobreak{page-break-inside:avoid}
+.refs li{font-size:8pt;margin-bottom:4px;word-break:break-word}
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <img class="logo" src="../c4a-logo-reversed.png" alt="Consult for Africa">
+  <div class="eyebrow">The growth and marketing book</div>
+  <h1>Growing a firm that is <span>bought on trust</span></h1>
+  <div class="sub">How Consult for Africa finds, wins, grows and keeps clients. The evidence on how organisations buy advice, the state of the market we sell into, the growth system, the play for each kind of buyer, and the weekly rhythm that runs it. A course for everyone who brings work into the firm.</div>
+  <div class="rule"></div>
+  <div class="meta">Consult for Africa<br>Edition 1 · 13 October 2026 · Internal, not for circulation<br>Owner: the growth team · Revised every quarter</div>
+</section>
+
+<section>
+  <div class="eyebrow">Before you start</div>
+  <h2 style="font-size:21pt;font-weight:700">How to use this book</h2>
+  <p class="goal">This is the single reference for how Consult for Africa grows. When a plan, a pitch or a campaign contradicts it, the book wins until the book is changed, and when the book is wrong, change the book.</p>
+  <div class="cols">
+    <div>
+      <h3>Who it is for</h3>
+      <p>Everyone who brings work into the firm or keeps it here: the partners and directors who lead engagements, the business development lead, the marketing team, the Office of the Founding Partner who keep the record, and every consultant on a client site, because most of our next work is noticed by the person already in the building. It assumes no prior context.</p>
+      <h3>How it relates to the other documents</h3>
+      <p>The <b>Marketing Handbook</b> holds the brands, the voice and the anonymised case study library. The <b>Marketing Operating Brief</b> sets the agency's service levels and KPIs. The <b>Growth Pack</b> is the business development lead's briefing on each client and the live pipeline. This book sits above all three and explains the system they belong to, so it points to them rather than repeating them.</p>
+      <h3>How it is built</h3>
+      <p>Five parts and 28 modules. Each module opens with what you will be able to do after reading it, teaches one idea, shows what is done and what is pending, and ends with questions to check yourself. Read Parts I and II in full. Read the modules in Part III and IV that match your work. Keep Part V open.</p>
+    </div>
+    <div>
+      <h3>The one idea</h3>
+      <p class="quote">Clients buy advice from people they trust, and trust reaches them through other people. The firm grows when more people can vouch for us, when they can find and understand us once they have heard our name, and when each engagement leads to the next one.</p>
+      <p>Today nearly all of that trust runs through one person, Dr Debo Odulana, and his relationships from Doctoora, Evercare, Cedarcrest and the boards he sits on. That is why our win rate is high and our pipeline is thin and unforecastable. The purpose of this book is to turn one man's network into a firm's reputation without losing what makes the network work.</p>
+      <p>When you are unsure what to prioritise, ask which choice puts us in front of more people who could vouch for us, or turns more of today's clients into tomorrow's.</p>
+    </div>
+  </div>
+  <div class="box">
+    <h4>Status language used throughout</h4>
+    <table>
+      <tr><th>Word</th><th>Meaning</th></tr>
+      <tr><td>Live</td><td>Running and usable today. You can point a client or a prospect at it.</td></tr>
+      <tr><td>Built, unused</td><td>Exists in the platform or the repository but nobody is running it. Do not promote it until it has an owner.</td></tr>
+      <tr><td>Pending</td><td>Agreed, not yet built or not yet done.</td></tr>
+      <tr><td>Founder decision</td><td>Blocked on a call only Debo can make. Module 28 lists every one.</td></tr>
+    </table>
+    <p class="small">Status is as of 13 October 2026. Figures carry a small number that points to the source list in Appendix A. A figure without a number is our own data.</p>
+  </div>
+  <h3>Contents</h3>
+  <div class="toc">
+    <div><b>Part I · Foundations</b><span>1 What we sell and how it is bought · 2 The market we grow in · 3 How organisations buy advice · 4 Who we serve · 5 Positioning and the message house · 6 The rules we never break</span></div>
+    <div><b>Part II · The growth system</b><span>7 The growth model · 8 The pipeline · 9 Entry offers and the engagement ladder · 10 Proposals, pricing and closing · 11 Growing inside accounts · 12 Referrals and references</span></div>
+    <div><b>Part III · Creating demand</b><span>13 Visible expertise · 14 The content engine · 15 LinkedIn, email and WhatsApp · 16 Rooms: roundtables, platforms and boards · 17 Target accounts and outreach · 18 The website as the place a referral lands</span></div>
+    <div><b>Part IV · The plays</b><span>19 Hospital owners and promoters · 20 Groups, boards and family businesses · 21 Investors, lenders and development finance · 22 Payers and HMOs · 23 Government, foundations and tenders · 24 Specialists, clinics and the agency · 25 The products as growth lines</span></div>
+    <div><b>Part V · Operating system</b><span>26 Team, roles and cadence · 27 The scoreboard · 28 The first ninety days and the open decisions · Appendices: sources, campaign calendar, checklists, glossary</span></div>
+  </div>
+</section>
+
+<!-- ================= PART I ================= -->
+<section class="part">
+  <div class="eyebrow">Part I</div>
+  <h1>Foundations</h1>
+  <p>What we sell, the market we sell it into, how our buyers actually decide, who they are, what we say to them, and the lines we never cross. Everything else in the book rests on these six modules.</p>
+  <ol><li>What we sell and how it is bought</li><li>The market we grow in</li><li>How organisations buy advice</li><li>Who we serve</li><li>Positioning and the message house</li><li>The rules we never break</li></ol>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 1</div>
+  <h2>What we sell and how it is bought</h2>
+  <p class="goal">After this module you can name the five things clients actually sign, explain the five-stage progression, and say why the audit is the commercial engine of the firm.</p>
+  <p class="quote">Consult for Africa is a healthcare management firm that has run hospitals. We are hired to find out what is really wrong, decide what to do about it, and then do it, which often means running the thing afterwards.</p>
+  <p>The website publishes seven service lines (clinical governance, strategy and growth, fractional leadership, digital health, health systems strengthening, diaspora expertise and the healthcare marketing agency) and an eighth page for claims recovery went live on 7 October. Clients do not buy from that menu. They sign one of five things, and the menu is how we describe the expertise behind them.</p>
+  <table>
+    <tr><th>What clients sign</th><th>What it is</th><th>Where we have done it</th></tr>
+    <tr><td>Organisational audit</td><td>A structured diagnostic across ten domains, ending in a maturity assessment and a set of decisions for the board</td><td>Osteon, Arabella, Haven phase two, Dennis Ashley</td></tr>
+    <tr><td>Turnaround and growth mandate</td><td>A target, a set of levers and delivery against it</td><td>Haven phase three, House of Refuge</td></tr>
+    <tr><td>Board governance</td><td>Boards, committees, delegation of authority, director training</td><td>Havana Specialist Hospital</td></tr>
+    <tr><td>Venture structuring</td><td>Holding companies, joint ventures, cap tables, shareholder terms, alongside the client's counsel</td><td>The Kemi Balogun group, the Medbury aesthetics vehicle</td></tr>
+    <tr><td>Build and operate</td><td>We design and set up the facility or the venture, then manage it under an agreement</td><td>The Medbury division, Lyfe Place Abuja, ilé</td></tr>
+  </table>
+
+  <h3>The progression, and why the audit matters most</h3>
+  <p>Most of our engagements move through the same five stages, though not every one goes the whole way. Each stage has its own document and its own conversation, and the commercial point is that each stage sells the next.</p>
+  <figure>
+  <svg viewBox="0 0 760 170">
+    <g font-size="11" text-anchor="middle">
+      <rect x="10" y="20" width="136" height="74" rx="8" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="78" y="46" font-weight="700" fill="#0B3C5D">1 Options note</text><text x="78" y="64" fill="#374151">ranges, not a plan</text><text x="78" y="80" fill="#6B7280">free or near free</text>
+      <rect x="160" y="20" width="136" height="74" rx="8" fill="#FBF6E4" stroke="#D4AF37" stroke-width="2"/>
+      <text x="228" y="46" font-weight="700" fill="#0B3C5D">2 Diagnostic</text><text x="228" y="64" fill="#374151">the audit</text><text x="228" y="80" fill="#6B7280">small, buyable</text>
+      <rect x="310" y="20" width="136" height="74" rx="8" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="378" y="46" font-weight="700" fill="#0B3C5D">3 Strategy</text><text x="378" y="64" fill="#374151">decisions with options</text><text x="378" y="80" fill="#6B7280">project fee</text>
+      <rect x="460" y="20" width="136" height="74" rx="8" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="528" y="46" font-weight="700" fill="#0B3C5D">4 Delivery</text><text x="528" y="64" fill="#374151">named team, milestones</text><text x="528" y="80" fill="#6B7280">resourced days</text>
+      <rect x="610" y="20" width="140" height="74" rx="8" fill="#0B3C5D"/>
+      <text x="680" y="46" font-weight="700" fill="#fff">5 Operate</text><text x="680" y="64" fill="#E3EAF0">management agreement</text><text x="680" y="80" fill="#D4AF37">the annuity</text>
+    </g>
+    <g stroke="#9FB3C4" stroke-width="2"><line x1="146" y1="57" x2="160" y2="57"/><line x1="296" y1="57" x2="310" y2="57"/><line x1="446" y1="57" x2="460" y2="57"/><line x1="596" y1="57" x2="610" y2="57"/></g>
+    <text x="10" y="128" font-size="11" fill="#374151">Alongside every stage: leadership assessment, recruitment, workforce data, claims recovery and marketing, which the products and the HR practice deliver.</text>
+    <text x="10" y="148" font-size="11" fill="#6B7280">The audit is highlighted because it is the stage a stranger will buy, and it reliably finds something larger than its own brief.</text>
+  </svg>
+  <figcaption>Figure 1. The engagement ladder. Each stage is priced to stand alone and designed to show the client the next one.</figcaption>
+  </figure>
+  <p>The audit is the commercial engine because it is small enough for a hospital owner to say yes to without a board meeting, and because it almost always finds that the presenting problem is not the real one. Haven came to us about stock and the binding constraint was culture and incentives. A surgeon who believed his postcode was the problem turned out to have no referral pipeline. When the audit is done well, the client asks us what to do next, and that is the cheapest sale this firm ever makes.</p>
+
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Five things clients sign, each with at least one live or completed engagement</li><li>Rate card live in code and visible to directors at /finance/rate-card</li><li>Two clients have moved from audit to a larger mandate (Haven, Medbury)</li><li>One operate mandate signed with a group (the Medbury division, September 2026)</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>No standard audit offer page a stranger could read and buy from</li><li>No case study route on the website, so none of the progression is visible</li><li>Agency has no rate card (founder decision)</li><li>Recruitment fee band recorded in two places at two levels; reconcile to the rate card</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>A hospital owner says "we just need a marketing plan". Which of the five would you suggest first, and why?</li><li>Why does an operate mandate matter more than its share of today's revenue suggests?</li><li>Name one engagement that moved up the ladder and the finding that moved it.</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 2</div>
+  <h2>The market we grow in</h2>
+  <p class="goal">After this module you can quote the facts that explain why private healthcare in Nigeria needs a firm like ours now, name the forces that create demand for each thing we sell, and say which numbers we never cite.</p>
+  <p>Our clients run private facilities in a market where patients mostly pay from their own pockets, where costs have been repriced by two years of devaluation and inflation, where the doctors they need are leaving, and where capital is available but selective. Each of those forces creates a specific kind of demand for us, and a growth team that knows them can tell which prospects are in the market before the prospects say so.</p>
+  <div class="kpi">
+    <div><div class="big">71.9%</div><span>of current health spending in Nigeria was out of pocket in 2023, by the WHO and World Bank series<sup>1</sup></span></div>
+    <div><div class="big">21.7m</div><span>people enrolled in any health insurance scheme at the end of 2025, roughly one Nigerian in ten<sup>3</sup></span></div>
+    <div><div class="big">$685m</div><span>paid abroad for medical travel in 2025, up from $643m in 2024, by CBN balance of payments data<sup>4</sup></span></div>
+    <div><div class="big">~55,000</div><span>practising doctors in 2025, down from 66,241 a year earlier; 4,193 left in 2024<sup>5</sup></span></div>
+  </div>
+
+  <h3>The five forces, and what each one sells</h3>
+  <table>
+    <tr><th>Force</th><th>The evidence</th><th>The demand it creates for us</th></tr>
+    <tr><td>Patients pay cash</td><td>Out of pocket was 71.9% of current health expenditure in 2023 (WHO and World Bank)<sup>1</sup>. The National Health Accounts, on a different method, put it at 58.3% in 2024 against total health spending of ₦10.42 trillion<sup>2</sup>. Never mix the two series.</td><td>Pricing and tariff work, the patient's experience of the bill, front-desk conversion, collections. A cash hospital lives or dies on whether patients trust its price.</td></tr>
+    <tr><td>Costs were repriced</td><td>The naira averaged about 645 to the dollar in 2023, 1,480 in 2024 and 1,517 in 2025<sup>10</sup>. Inflation ran at 33.2% in 2024 and had eased to 15.39% by August 2026 on the rebased index<sup>9</sup>. In April 2024 BusinessDay estimated that about one in five small and medium private hospitals had closed under operating costs<sup>7</sup>.</td><td>Turnarounds, cost-to-serve reviews, tariff resets, and owners who need someone to tell them the truth about whether the business still works.</td></tr>
+    <tr><td>The doctors are leaving</td><td>Practising doctors fell by about 17% in one year to roughly 55,000, and around two thirds of the 4,193 who left in 2024 went to the United Kingdom<sup>5</sup>.</td><td>Recruitment, retention, leadership assessment, workforce planning and diaspora engagement. Retention has become a board issue.</td></tr>
+    <tr><td>Insurance is growing slowly</td><td>The NHIA Act 2022 made cover mandatory, and enrolment reached 21.73 million by the end of 2025, with Lagos second at 2.76 million<sup>3</sup>.</td><td>HMO network strategy, tariff negotiation with payers, and claims recovery for hospitals waiting to be paid.</td></tr>
+    <tr><td>Capital is selective</td><td>Nigeria received about 8% of the $4.2 billion invested in African healthcare since 2016, and the IFC put $24.5 million into a Nigerian cancer facility in February 2026<sup>6</sup>. Evercare Lekki is owned by a $1 billion TPG Rise fund, and Iwosan has acquired Lagoon and Euracare<sup>29</sup>.</td><td>Venture structuring, investor readiness, fundraising support, post-acquisition integration, and build and operate for owners with capital but no operator.</td></tr>
+  </table>
+
+  <h3>Medical travel is a domestic opportunity</h3>
+  <p>Roughly $650 to $700 million a year leaves the country for treatment abroad<sup>4</sup>, and a Health Federation of Nigeria estimate puts total Nigerian health spending at $34 billion in 2026<sup>6</sup>. Every "bring it home" thesis we have worked on (Clearview's fertility destination, Osteon's revision arthroplasty, the Lyfe Place medipark) rests on the same observation, which is that local care is often already better value and is not believed. That is a trust problem, and trust problems are what we sell against.</p>
+
+  <h3>Quality starts low and moves when measured</h3>
+  <p>In one SafeCare programme in Kaduna, 17 of 25 private facilities started at the lowest of five levels, and on reassessment 19 of them had moved up one or two levels<sup>8</sup>. The sample is small and the lesson is general: most private facilities have never been measured, and once they are, they improve. That is the case for the audit, and the case for accreditation readiness as an offer.</p>
+
+  <h3>Where the facilities are</h3>
+  <p>Lagos had 3,670 registered health facilities when HEFAMAA last published a count in 2020<sup>11</sup>, and the agency continues to seal facilities that fail inspection. A current national count of private hospitals is not reliably published, so build target lists from named facilities rather than from a market-size number.</p>
+
+  <div class="box warn">
+    <h4>Numbers we never cite</h4>
+    <p>"91.47% out of pocket", any "Africa healthcare market worth $259 billion by 2030" figure (no traceable source), "70 plus accredited HMOs" (no NHIA list behind it), "3.9 doctors per 10,000" until we have it from the source, and any 2022 or earlier naira price used as a 2026 anchor. The BusinessDay closure estimate is a press estimate and must be described as one, never as a survey. When a number is not in Appendix A, it does not go into anything we publish.</p>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>An owner tells you insurance will save his hospital. What two numbers would you put in front of him?</li><li>Which force creates demand for the HR practice, and which creates demand for claims recovery?</li><li>Why do we say medical travel is a trust problem rather than a price problem?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 3</div>
+  <h2>How organisations buy advice</h2>
+  <p class="goal">After this module you can explain, with evidence, why most of the people who will hire us are not looking today, why referrals fail when the referred firm is hard to understand, and what that means for how we spend our time.</p>
+  <p>Professional services are bought differently from products. The buyer cannot inspect the work before paying for it, so they buy the firm's reputation and the person in front of them. The research on how that happens is consistent, and it explains both our strengths and our gap.</p>
+
+  <h3>Seven findings that shape this book</h3>
+  <table>
+    <tr><th>Finding</th><th>The evidence</th><th>What we do about it</th></tr>
+    <tr><td>Most buyers are not in the market</td><td>The Ehrenberg-Bass Institute estimates that only about 5% of business buyers are in market for a given category at any time<sup>17</sup>.</td><td>A hospital owner changes adviser rarely. We have to be remembered in the years between purchases, so most of our effort goes into being known, not into chasing.</td></tr>
+    <tr><td>Growth needs both brand and pursuit</td><td>Binet and Field's analysis for the LinkedIn B2B Institute found business-to-business firms grow best with roughly 46% of effort on building the brand and 54% on activation<sup>18</sup>.</td><td>Half the growth team's time goes on visibility (articles, rooms, Debo and the directors being seen), and half on named pursuit.</td></tr>
+    <tr><td>Referrals come from non-clients too</td><td>81.5% of professional services firms had received a referral from someone who had never been a client, and nearly half of those referrals were based on the firm's visible expertise<sup>16</sup>.</td><td>Publishing what we know creates referrers we have never met.</td></tr>
+    <tr><td>Referrals die when the firm is unclear</td><td>51.9% of buyers ruled out a referred firm before speaking to it, and the top reason (43.6%) was that they could not understand how the firm could help them<sup>16</sup>.</td><td>Every offer needs a page or a note a referred stranger can understand in two minutes. Module 18.</td></tr>
+    <tr><td>Clients refer when asked</td><td>In the same study 69% of clients were willing to refer, and 72% of those who had not referred said nobody had asked<sup>16</sup>.</td><td>The referral ask is a formal step at the close of every engagement. Module 12.</td></tr>
+    <tr><td>Thought leadership gets you invited</td><td>86% of decision-makers said they were likely to invite a firm that produces high-quality thought leadership to bid, and 73% found it more trustworthy than marketing material<sup>19</sup>.</td><td>Our diagnostic findings, written up properly, are the most persuasive material we have. Module 14.</td></tr>
+    <tr><td>Buyers research before they talk</td><td>61% of business buyers say they prefer a buying experience without a salesperson, and 73% actively avoid suppliers who send irrelevant outreach<sup>20</sup>.</td><td>The website, the options note and the leave-behind do the early selling. Outreach is only sent when it says something specific about the recipient.</td></tr>
+  </table>
+
+  <h3>High-growth firms behave differently</h3>
+  <p>Hinge's long-running study of professional services firms defines high growth as 20% a year or more for three years. In its consulting sample, high-growth firms were 82% more likely to research their target market regularly and 52% more likely to spend 15% or more of revenue on marketing<sup>14</sup>. The 2025 edition, covering 770 firms, found high-growth firms growing four times faster and 30% more profitable than their peers<sup>15</sup>. The two habits that separate them are the two we have least of: systematic research on our own market, and a deliberate budget for being known.</p>
+
+  <h3>Keeping a client is cheaper than finding one</h3>
+  <p>The figure usually cited, from work by Bain's Fred Reichheld reported in Harvard Business Review, is that acquiring a new customer costs five to twenty-five times as much as keeping an existing one, and that a five-point rise in retention lifts profit by 25 to 95%<sup>24</sup>. The figures come from other industries and should be quoted as such, but our own record points the same way: the Medbury division, the Haven growth mandate and the House of Refuge retainer all began as smaller pieces of work for the same client.</p>
+
+  <div class="box gold">
+    <h4>What this means in one paragraph</h4>
+    <p>Our network-led model already does the hard part, which is trust. What it cannot do is reach the 95% who are not yet looking, explain us to a stranger who has just been given our name, or remember to ask the client who would happily refer us. Those three gaps are what Parts II and III are built to close.</p>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why would an inbound lead count make a good quarter look bad in this firm?</li><li>A director says "we do not need content, all our work comes from referrals". What does the Hinge referral study say to that?</li><li>What proportion of effort should go to being known, and what is the evidence?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 4</div>
+  <h2>Who we serve</h2>
+  <p class="goal">After this module you can place any prospect in one of seven segments, name the event that usually puts them in the market, and say who else in their organisation influences the decision.</p>
+  <p>Organisations are split by what they own and what they are trying to do. Every prospect falls into exactly one row. Part IV has a module for each.</p>
+  <table>
+    <tr><th>Segment</th><th>Who</th><th>What puts them in the market</th><th>Usual first purchase</th><th>Module</th></tr>
+    <tr><td>Hospital owners and promoters</td><td>Doctor-owners and founders of single-site private hospitals and clinics</td><td>Cash pressure, an incident, a failed expansion, a HEFAMAA notice, a new site, a key resignation</td><td>Audit</td><td>19</td></tr>
+    <tr><td>Groups, boards and family businesses</td><td>Multi-site groups, family-owned hospitals, holding companies</td><td>Expansion, succession, a split board, business units the centre cannot direct</td><td>Governance or a scoped strategy piece</td><td>20</td></tr>
+    <tr><td>Investors, lenders and development finance</td><td>Funds, family offices, DFIs, banks, fintech lenders</td><td>A deal in diligence, a portfolio company in trouble, a new fund looking for an operator</td><td>Diligence, options note, structuring</td><td>21</td></tr>
+    <tr><td>Payers and HMOs</td><td>HMOs, corporate health schemes, takaful and mutual plans</td><td>Entering a new state, a provider network that is long but inadequate, rising medical loss</td><td>Network strategy</td><td>22</td></tr>
+    <tr><td>Government, foundations and federations</td><td>Ministries, state agencies, foundations, the HFN, professional bodies</td><td>A published tender, a programme with funding, a policy problem needing a brief</td><td>Tendered review or policy work</td><td>23</td></tr>
+    <tr><td>Specialists and clinics</td><td>Specialist practices, aesthetics, fertility, diagnostics, day-case centres</td><td>A new clinic, a referral pipeline that has dried up, a competitor opening nearby</td><td>Positioning or a front-desk programme</td><td>24</td></tr>
+    <tr><td>Workforce buyers</td><td>HR directors and medical directors of any of the above</td><td>A senior vacancy, a failed hire, staff turnover, a culture problem after an incident</td><td>Recruitment or leadership assessment</td><td>25</td></tr>
+  </table>
+
+  <h3>The buying group</h3>
+  <p>The person who calls us is rarely the only person who decides. In a doctor-owned hospital the spouse, a sibling on the board and the accountant all have a view, and in a group the finance director and the business unit heads do. Assume every document we send will be forwarded to someone we have not met, and write it so that it works without us in the room. A proposal that only makes sense with Debo explaining it will lose to one that explains itself.</p>
+  <div class="box">
+    <h4>Profiles of the people we sell to most</h4>
+    <div class="cols">
+      <div><p><b>The founder-physician, 55, Lagos.</b> Built a forty-bed hospital over twenty years. Revenue flat since 2023, costs not. Trusts doctors more than consultants, and trusts people who have run a hospital more than either. Needs: someone who understands without being told, a finding he did not expect, and discretion.</p>
+      <p><b>The second-generation director, 38.</b> Returned from abroad to a family hospital. Wants governance and a plan, and needs an outside voice the older generation will accept. Needs: a structure that settles who decides, and a document that can be shown to the family.</p></div>
+      <div><p><b>The group chief executive.</b> Runs several business units with strong leads she will not override. Needs: options presented as decisions, respect for her managers' autonomy, and proposals split by who signs.</p>
+      <p><b>The investor or lender.</b> Has capital and a thesis and no operator. Needs: an honest options note with ranges, what has to be true, and what kills the deal, plus someone who can run the asset afterwards.</p></div>
+    </div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>An HMO medical director asks about recruitment for its own clinic. Which segment, and which module?</li><li>Name three events that put a single-site owner in the market.</li><li>Who are the hidden members of the buying group in a family-owned hospital?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 5</div>
+  <h2>Positioning and the message house</h2>
+  <p class="goal">After this module you can state our position in one sentence, back it with four pillars and their proof, and choose the right words and avoid the wrong ones.</p>
+  <figure>
+  <svg viewBox="0 0 760 300">
+    <polygon points="380,10 740,70 20,70" fill="#0B3C5D"/>
+    <text x="380" y="46" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">We do not hand you a report and walk away.</text>
+    <text x="380" y="63" text-anchor="middle" font-size="11" fill="#D4AF37">Healthcare management from people who have run hospitals, and who stay to deliver.</text>
+    <g font-size="11" text-anchor="middle">
+      <rect x="20" y="80" width="170" height="160" rx="6" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="105" y="104" font-weight="700" fill="#0B3C5D">We have run hospitals</text>
+      <text x="105" y="128" fill="#374151">Cedarcrest, Evercare</text><text x="105" y="145" fill="#374151">Doctoora built and sold</text><text x="105" y="162" fill="#374151">Directors who have held</text><text x="105" y="177" fill="#374151">the job the client holds</text>
+      <rect x="200" y="80" width="170" height="160" rx="6" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="285" y="104" font-weight="700" fill="#0B3C5D">We find the real problem</text>
+      <text x="285" y="128" fill="#374151">Instrumented diagnostics</text><text x="285" y="145" fill="#374151">Case traces, surveys,</text><text x="285" y="162" fill="#374151">measured geometry</text><text x="285" y="177" fill="#374151">not interviews alone</text>
+      <rect x="380" y="80" width="170" height="160" rx="6" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="465" y="104" font-weight="700" fill="#0B3C5D">We stay to deliver</text>
+      <text x="465" y="128" fill="#374151">Delivery teams</text><text x="465" y="145" fill="#374151">Management agreements</text><text x="465" y="162" fill="#374151">Rehab centre in Lekki</text><text x="465" y="177" fill="#374151">run under our management</text>
+      <rect x="560" y="80" width="180" height="160" rx="6" fill="#F8FAFC" stroke="#9FB3C4"/>
+      <text x="650" y="104" font-weight="700" fill="#0B3C5D">We bring the people</text>
+      <text x="650" y="128" fill="#374151">Recruitment and assessment</text><text x="650" y="145" fill="#374151">Workforce data</text><text x="650" y="162" fill="#374151">Five hundred diaspora</text><text x="650" y="177" fill="#374151">physicians to call on</text>
+    </g>
+    <rect x="20" y="250" width="720" height="40" rx="6" fill="#FBF6E4" stroke="#D4AF37"/>
+    <text x="380" y="275" text-anchor="middle" font-size="11.5" fill="#0B3C5D" font-weight="600">Foundation: discretion · real numbers only · Africa-specific proof · a senior person answers</text>
+  </svg>
+  <figcaption>Figure 2. The message house. Every page, proposal opening and conversation draws on these four pillars.</figcaption>
+  </figure>
+  <h3>How we sit against the alternatives</h3>
+  <table>
+    <tr><th>The client's alternative</th><th>What they get</th><th>What we say (never naming them)</th></tr>
+    <tr><td>International strategy firms</td><td>A strong framework and a report, priced for multinationals</td><td>We have run hospitals in this market and we stay to deliver it</td></tr>
+    <tr><td>Local boutiques and individual consultants</td><td>The founder's time and interviews</td><td>A bench, instrumented diagnostics, and products that do the work after we leave</td></tr>
+    <tr><td>Software vendors</td><td>A system, with the outcome left to the client</td><td>We start from the outcome and use technology only where it helps</td></tr>
+    <tr><td>Recruitment agencies</td><td>A filled role</td><td>We assess whether the person can lead, and we live with the result inside a client we also advise</td></tr>
+    <tr><td>Doing nothing, or asking a friend</td><td>No fee and no change</td><td>A small, fixed piece of work that tells them what is actually wrong</td></tr>
+  </table>
+  <p>Doing nothing is the competitor we lose to most often, and it is the one we should write for. An owner who has lived with a problem for three years needs a reason to act this quarter, which is why our best material names the cost of the status quo in the owner's own numbers.</p>
+  <h3>Words</h3>
+  <table>
+    <tr><th>We say</th><th>We never say</th><th>Why</th></tr>
+    <tr><td>Turnaround, governance, tariff, receivables, occupancy, establishment</td><td>Synergy, disruptive, revolutionary, world-class solutions</td><td>Operators use the first list. The second reads as a pitch.</td></tr>
+    <tr><td>A structured leadership assessment</td><td>Maarova, CadreHealth, HospitlOS, in client body copy</td><td>We describe what is done, not which product does it</td></tr>
+    <tr><td>Intelligent analysis, structured review</td><td>AI-powered, AI-driven</td><td>Our audience hears a data privacy risk</td></tr>
+    <tr><td>We are writing to you</td><td>We are excited to invite you</td><td>Senior clinicians read the second as spam</td></tr>
+  </table>
+  <div class="check"><h4>Check yourself</h4><ol><li>Write the one sentence and the proof point you would use with an investor.</li><li>Which pillar does the House of Refuge reference prove?</li><li>Why do we write against "doing nothing" rather than against other firms?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 6</div>
+  <h2>The rules we never break</h2>
+  <p class="goal">After this module you know the rules that govern every message, page and proposal, and where the full version of each one lives.</p>
+  <p>The Marketing Handbook (section 3.5) has the full text. The short form is here because most of these rules exist because something went wrong once.</p>
+  <table>
+    <tr><th>Rule</th><th>What it means in practice</th></tr>
+    <tr><td>No em dash</td><td>Anywhere: copy, headlines, bios, slides, interfaces. Use a comma, a full stop or a colon.</td></tr>
+    <tr><td>No AI framing</td><td>Describe the outcome, not the engine.</td></tr>
+    <tr><td>No platform names in client body copy</td><td>Name the products only in an appendix the client asked for. Product marketing is the exception.</td></tr>
+    <tr><td>No client named without written clearance</td><td>The only cleared reference is Pastor Tony Rapu's twenty-one bed rehabilitation centre in Lekki. Havana is never used as a reference.</td></tr>
+    <tr><td>No incident, patient outcome or regulatory finding in public</td><td>Ever. If unsure, the answer is no, and then ask Debo.</td></tr>
+    <tr><td>No price in marketing</td><td>Fees are discussed on a call. Staff documents carry the shape of a deal, never its fee or balance; figures live on /finance.</td></tr>
+    <tr><td>Check the relationship first</td><td>Before writing to anyone, ask how Debo knows them. Most of our prospects know him, and a cold register insults them.</td></tr>
+    <tr><td>Senior medic register</td><td>"Colleagues like you", "your name appears on". Never "job opportunities", "sign up" or "earn extra income".</td></tr>
+    <tr><td>Practitioners do not advertise themselves</td><td>Part F of the MDCN Code of Medical Ethics treats a doctor's self-advertisement as a disciplinary matter<sup>26</sup>. The facility advertises and the doctor educates.</td></tr>
+    <tr><td>Adverts are vetted before they run</td><td>Section 53 of the ARCON Act 2022 requires approval before any advert runs, including on social media, and health claims need supporting evidence<sup>27</sup>. Build the vetting time into every client campaign plan.</td></tr>
+    <tr><td>Consent before marketing</td><td>The NDPA 2023 gives everyone the right to object to direct marketing at any time, and 2025 decisions have treated unsolicited marketing messages without a lawful basis as unlawful<sup>28</sup>. Never buy a list, never reuse data collected for another purpose, honour every opt-out the day it arrives.</td></tr>
+    <tr><td>Bulk email goes through ZeptoMail, from hello@</td><td>Never Zoho for bulk. Verify the destination with a real payload before any send, and read the stored row back.</td></tr>
+    <tr><td>Be generous about people</td><td>Assume every internal document reaches the person it describes. Attribute shortfalls to the brief or the system, never to a named junior.</td></tr>
+  </table>
+  <div class="check"><h4>Check yourself</h4><ol><li>A client's surgeon wants a billboard with his face and name on it. What do you advise?</li><li>A partner firm offers us a list of 2,000 hospital owners' phone numbers. What do you say?</li><li>Where does a fee figure live if a staff member needs it?</li></ol></div>
+</section>
+
+<!-- ================= PART II ================= -->
+<section class="part">
+  <div class="eyebrow">Part II</div>
+  <h1>The growth system</h1>
+  <p>Four engines bring work in, one pipeline keeps the record, and a small set of disciplines turns a conversation into a signed engagement and a signed engagement into the next one.</p>
+  <ol start="7"><li>The growth model</li><li>The pipeline</li><li>Entry offers and the engagement ladder</li><li>Proposals, pricing and closing</li><li>Growing inside accounts</li><li>Referrals and references</li></ol>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 7</div>
+  <h2>The growth model</h2>
+  <p class="goal">After this module you can name the four engines, say which one your own work feeds, and explain the single number that tells us whether the firm is becoming less dependent on one person.</p>
+  <figure>
+  <svg viewBox="0 0 760 330">
+    <rect x="0" y="0" width="760" height="330" rx="10" fill="#F8FAFC"/>
+    <circle cx="380" cy="165" r="78" fill="#0B3C5D"/>
+    <text x="380" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Conversion</text>
+    <text x="380" y="168" text-anchor="middle" font-size="10.5" fill="#E3EAF0">same-hour reply</text>
+    <text x="380" y="184" text-anchor="middle" font-size="10.5" fill="#E3EAF0">options note · audit</text>
+    <text x="380" y="200" text-anchor="middle" font-size="10.5" fill="#D4AF37">proposal · close</text>
+    <g font-size="11" text-anchor="middle">
+      <rect x="30" y="30" width="220" height="100" rx="8" fill="#fff" stroke="#D4AF37" stroke-width="2"/>
+      <text x="140" y="56" font-weight="700" fill="#0B3C5D" font-size="12.5">1 Expand</text>
+      <text x="140" y="78" fill="#374151">grow inside clients we have</text><text x="140" y="96" fill="#374151">audit to strategy to operate</text><text x="140" y="114" fill="#6B7280">Module 11</text>
+      <rect x="510" y="30" width="220" height="100" rx="8" fill="#fff" stroke="#D4AF37" stroke-width="2"/>
+      <text x="620" y="56" font-weight="700" fill="#0B3C5D" font-size="12.5">2 Refer</text>
+      <text x="620" y="78" fill="#374151">clients, peers and partners</text><text x="620" y="96" fill="#374151">who send us people</text><text x="620" y="114" fill="#6B7280">Module 12</text>
+      <rect x="30" y="200" width="220" height="100" rx="8" fill="#fff" stroke="#1F7A8C" stroke-width="2"/>
+      <text x="140" y="226" font-weight="700" fill="#0B3C5D" font-size="12.5">3 Be known</text>
+      <text x="140" y="248" fill="#374151">writing, rooms, visible experts</text><text x="140" y="266" fill="#374151">for the 95% not yet looking</text><text x="140" y="284" fill="#6B7280">Modules 13 to 16, 18</text>
+      <rect x="510" y="200" width="220" height="100" rx="8" fill="#fff" stroke="#1F7A8C" stroke-width="2"/>
+      <text x="620" y="226" font-weight="700" fill="#0B3C5D" font-size="12.5">4 Pursue</text>
+      <text x="620" y="248" fill="#374151">named target accounts,</text><text x="620" y="266" fill="#374151">channel partners and tenders</text><text x="620" y="284" fill="#6B7280">Modules 17, 21 to 23</text>
+    </g>
+    <g stroke="#9FB3C4" stroke-width="2" fill="none"><line x1="250" y1="110" x2="318" y2="130"/><line x1="510" y1="110" x2="442" y2="130"/><line x1="250" y1="220" x2="318" y2="200"/><line x1="510" y1="220" x2="442" y2="200"/></g>
+  </svg>
+  <figcaption>Figure 3. Four engines feed one conversion core. Gold engines run on relationships we already have; teal engines create relationships we do not have yet.</figcaption>
+  </figure>
+  <p>The two gold engines are where nearly all our work comes from today, and they depend on Debo's relationships and on the quality of our delivery. The two teal engines barely run. They are the ones that reach people Debo has not met, and building them is the main growth task for the next twelve months. None of this replaces the network. A visible firm makes Debo's introductions land faster, because the person he introduces us to can look us up and find something worth reading.</p>
+
+  <h3>How effort should be split</h3>
+  <p>The Binet and Field evidence suggests roughly half of effort on being known and half on pursuit<sup>18</sup>. For a firm of our size and stage we translate that as follows, measured in the growth team's hours rather than in money.</p>
+  <table>
+    <tr><th>Engine</th><th>Share of growth effort</th><th>Who leads</th><th>What good looks like in a quarter</th></tr>
+    <tr><td>Expand</td><td>25%</td><td>Engagement leads, with the BD lead</td><td>An account plan for every active client and a next-stage conversation opened before each engagement ends</td></tr>
+    <tr><td>Refer</td><td>15%</td><td>Debo and the BD lead</td><td>The referral and reference ask made at every close, and every referrer thanked and updated</td></tr>
+    <tr><td>Be known</td><td>40%</td><td>Marketing lead</td><td>Six articles, a monthly letter, one room, every director published at least once</td></tr>
+    <tr><td>Pursue</td><td>20%</td><td>BD lead</td><td>A worked list of fifty named accounts, partners actively referring, and every tender through the go or no-go gate</td></tr>
+  </table>
+
+  <h3>The number that matters most</h3>
+  <p>We will track many numbers (Module 27), and one of them tells us whether this book is working: <b>the share of new qualified opportunities that did not come through Debo personally</b>. Today it is close to zero. The proposal is 30% by the end of June 2027. It should rise without the absolute number of Debo's introductions falling, because the aim is to add engines, not to swap one for another.</p>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Expand engine proven: Haven, Medbury and House of Refuge all grew after the first piece of work</li><li>Referral engine proven through Debo's network</li><li>Lead, Referral, DiscoveryCall and Proposal models exist on the platform</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>No source field consistently recorded, so the headline number cannot yet be measured</li><li>None of the ten case studies published, so the be-known engine has no fuel</li><li>No target account list exists</li><li>Agent channel and partner firm portal built, unused</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Which engine does a consultant on site at a client feed most directly?</li><li>Why does a visible firm make Debo's introductions convert faster?</li><li>What is the headline number and what is today's value?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 8</div>
+  <h2>The pipeline</h2>
+  <p class="goal">After this module you can put an opportunity on the platform at the right stage, qualify it with the five questions, and apply the rules that stop a pipeline filling with people who were once polite to us.</p>
+  <p>A pipeline is only useful if it is the truth. Today the platform shows one live lead and four draft proposals dating from March and April, while the real pipeline (Duchess, Solace, Clearview, Iwosan, Afya, Grandville, the recruitment conversations and more) lives in Debo's head and in WhatsApp. Nobody can help with a pipeline they cannot see. The first rule of this module is therefore that <b>if it is not on /pipeline, it does not exist</b>.</p>
+  <h3>Stages, and what moves an opportunity between them</h3>
+  <table>
+    <tr><th>Stage on the platform</th><th>It is here when</th><th>It moves on when</th><th>Owner</th></tr>
+    <tr><td>New</td><td>A name has arrived from any source, with the source recorded</td><td>Someone has looked at it within one working day</td><td>Office of the Founding Partner</td></tr>
+    <tr><td>Researching</td><td>We are finding out who they are, how Debo knows them, and what trigger may be in play</td><td>We know who signs and have a reason to talk</td><td>BD lead</td></tr>
+    <tr><td>Outreach</td><td>We have written or called with something specific</td><td>They reply</td><td>BD lead or Debo</td></tr>
+    <tr><td>Responded</td><td>They have replied and a conversation is possible</td><td>A discovery call is in the diary</td><td>BD lead</td></tr>
+    <tr><td>Discovery scheduled</td><td>A call or meeting is booked</td><td>The five questions below score seven or more</td><td>Whoever leads the call</td></tr>
+    <tr><td>Proposal sent</td><td>An options note or proposal has been sent, with a date to discuss it</td><td>Signed, or closed with a reason</td><td>Proposal owner</td></tr>
+    <tr><td>Converted or Lost</td><td>Signed and handed to delivery, or closed with a written reason</td><td>Lost opportunities go to nurture with a date to revisit</td><td>BD lead</td></tr>
+  </table>
+  <h3>The five questions</h3>
+  <p>Score each from 0 to 2. Seven or more out of ten is a qualified opportunity, and only qualified opportunities count on the scoreboard.</p>
+  <table>
+    <tr><th>Question</th><th>0</th><th>1</th><th>2</th></tr>
+    <tr><td>Trigger: why now?</td><td>No reason to act this quarter</td><td>A general wish to improve</td><td>A named event: cash, incident, expansion, deal, deadline</td></tr>
+    <tr><td>Access: are we talking to the person who signs?</td><td>No</td><td>To someone who influences them</td><td>To the signatory, or they have asked us in</td></tr>
+    <tr><td>Fit: is this work we do well?</td><td>Outside the five things we sell</td><td>Adjacent</td><td>One of the five, in a setting we know</td></tr>
+    <tr><td>Means: can they pay at our rates?</td><td>No sign of it</td><td>Possibly, with a smaller first piece</td><td>Clearly, or they have named a budget</td></tr>
+    <tr><td>Next step: is there a date?</td><td>None</td><td>Vague</td><td>A meeting or decision date in the diary</td></tr>
+  </table>
+  <h3>The rules that keep it honest</h3>
+  <ul>
+    <li><b>Every record carries a source</b>: Debo introduction, client referral, non-client referral, partner, inbound web, inbound WhatsApp, event, content, target account outreach, tender. Without it Module 7's headline number cannot be measured.</li>
+    <li><b>Every record carries a next action and a date.</b> The Thursday sweep (Module 26) lists every opportunity with no logged action in fourteen days.</li>
+    <li><b>Forty-five days without a response</b> closes the opportunity as lost with a reason, or moves it to nurture with a date to revisit. Closing is not failure; an honest pipeline is the point.</li>
+    <li><b>A draft proposal older than thirty days</b> is sent, rewritten or closed. Six-month-old drafts make every forecast meaningless.</li>
+    <li><b>Inbound enquiries get a reply from a named person within one working hour.</b> In the HBR audit of 2,241 firms the average response took 42 hours and 23% never responded<sup>21</sup>, so answering the same hour is the cheapest differentiator we have. The one website enquiry of the last month went unanswered for weeks because no inbox had an owner; that is a system gap, and the Office of the Founding Partner now owns it.</li>
+  </ul>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Lead model with the stages above, qualification score and owner fields</li><li>Thursday pipeline sweep run by the Office of the Founding Partner</li><li>Contact and recruitment forms write Lead rows and notify hello@</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>Every live opportunity in Debo's head entered with stage, source, next action and date</li><li>Decision on the four March and April drafts</li><li>The whitepaper gate posts to a third-party form service and writes no Lead row; move it onto our own table</li><li>No model for consulting opportunities larger than a Lead (founder decision whether one is needed)</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Score a prospect who met Debo at a wedding, owns a hospital, and said "we should talk sometime".</li><li>What happens to an opportunity with no logged action for fourteen days?</li><li>Why is "inbound lead volume" the wrong measure here?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 9</div>
+  <h2>Entry offers and the engagement ladder</h2>
+  <p class="goal">After this module you can match a prospect to the right first offer, write the brief for an options note, and explain why our first offers are deliberately small.</p>
+  <p>A stranger will not sign a twelve-month mandate with a firm they met last week. They will buy something small, fixed and useful that lets them judge us, and our best engagements started exactly that way. The entry offers below are the first rung for each segment. Each one is designed to be worth its fee on its own and to show the client the next rung.</p>
+  <table>
+    <tr><th>Entry offer</th><th>What the client gets</th><th>Best for</th><th>Leads naturally to</th></tr>
+    <tr><td>Options note</td><td>A short note setting out the strategic options, capital and revenue as ranges, what has to be true, what kills each option, and what we cannot yet know</td><td>Investors, promoters, any prospect before a commitment</td><td>Diagnostic or feasibility</td></tr>
+    <tr><td>Organisational audit</td><td>A ten-domain diagnostic with live staff surveys, a case trace, a maturity assessment and a set of board decisions</td><td>Hospital owners, groups, boards</td><td>Turnaround, growth mandate, governance</td></tr>
+    <tr><td>Focused review</td><td>One domain done deeply: tariff and pricing, revenue cycle and receivables, workforce and establishment, clinical governance readiness</td><td>Owners with a named pain who will not yet buy a full audit</td><td>Audit or delivery in that domain</td></tr>
+    <tr><td>Board governance framework</td><td>Board and committee structure, delegation of authority, charters, a director induction</td><td>Family hospitals, groups taking outside capital</td><td>Board secretariat support, audit</td></tr>
+    <tr><td>Front-desk and client experience programme</td><td>A training and standards programme for reception and patient-facing teams, with a handbook</td><td>Clinics, aesthetics, fertility, diagnostics</td><td>Positioning, agency retainer, audit</td></tr>
+    <tr><td>Leadership assessment</td><td>Structured assessment of a leadership team or shortlisted candidates, with a report</td><td>HR and medical directors</td><td>Coaching, recruitment, culture work</td></tr>
+    <tr><td>Recruitment brief</td><td>A search for one named senior role, with assessment built in</td><td>Any employer with a senior vacancy</td><td>Further roles, workforce planning</td></tr>
+  </table>
+  <h3>The options note, in detail</h3>
+  <p>The options note is the document we write most and the one that wins most. It is short (three to six pages), it uses ranges rather than point estimates, it states what has to be true and what would kill each option, and it is honest about what we do not yet know. It is deliberately not a feasibility study, because a confident twenty-six page plan answers every question and leaves the prospect no reason to call us. It carries no fee table. Its job is to make the prospect want the conversation in which the next piece of work is scoped.</p>
+  <div class="box">
+    <h4>The options note brief, which the BD lead fills before anyone writes</h4>
+    <ol class="small"><li>Who is it for, and how does Debo know them?</li><li>What is the trigger in their words?</li><li>What decision are they facing, and by when?</li><li>Which options are genuinely open, including doing nothing?</li><li>What do we know, what do we assume, and what can only a diagnostic tell us?</li><li>What is the next piece of work we would propose, and roughly what shape?</li></ol>
+  </div>
+  <h3>When the first piece is at our cost</h3>
+  <p>We have carried audits at our own cost where the strategic value justified it (Osteon, Dennis Ashley). That is a founder decision each time, never a sales tactic, and it is never described to the client as a discount or a favour. Module 10 explains why.</p>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Options notes written for Solace, Kemi Balogun, Lyfe Place and others</li><li>Audit method instrumented: live surveys, case trace, the link-style project page per client</li><li>Front-desk programme delivered once and written up as a handbook</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>A one-page description of each entry offer that a referred stranger can read</li><li>Focused reviews not yet packaged as named offers</li><li>The front-desk programme not yet offered to a second clinic</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>An investor asks what a forty-bed hospital in Abuja would earn. Which offer, and why not a feasibility study?</li><li>Which entry offer suits an aesthetics clinic whose enquiries do not convert?</li><li>Why does an options note carry no fee table?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 10</div>
+  <h2>Proposals, pricing and closing</h2>
+  <p class="goal">After this module you can build a proposal that a forwarded reader will understand, apply the pricing rules, run the go or no-go gate on a tender, and know who may discuss a fee.</p>
+  <h3>Who owns what</h3>
+  <p>Debo owns price. The BD lead owns the shape of the deal: what is in scope, the stages, the timetable and the terms. Engagement leads own the delivery plan and the team. Nobody else discusses a fee with a client, and nobody discusses one before Debo has set the opening position.</p>
+  <h3>How a proposal is built</h3>
+  <ul>
+    <li><b>Answer first.</b> The opening page states what we recommend and what it will achieve for the client, in their numbers. RAIN Group's research on what sales winners do differently found buyers rank demonstrated value above everything else<sup>23</sup>.</li>
+    <li><b>Decisions, not recommendations.</b> Present options so the board is choosing, not being told.</li>
+    <li><b>Deck for the principal, prose for the file.</b> A busy principal gets a ten to fourteen slide landscape deck; the prose document is the leave-behind. Both must stand on their own, because buyers spend most of their decision time without us<sup>20</sup>.</li>
+    <li><b>Split by who signs.</b> Where a group has strong business unit leads, send group-level and unit-level proposals to the people who own each decision.</li>
+    <li><b>No product names in the body.</b> Describe what is done. Name products only in an appendix the client asked for.</li>
+    <li><b>An opening partner proposal carries no fees.</b> When the relationship is a partnership, the first document sets out the model and principles; figures are discussed in a meeting.</li>
+  </ul>
+  <h3>How we price</h3>
+  <p>Price has more leverage on profit than volume. In Marn and Rosiello's classic analysis, a 1% price improvement with no loss of volume lifted operating profit by 11.1%, against 3.3% for a 1% rise in volume<sup>25</sup>. Holding our price on the work we win matters more than winning one more engagement at a discount.</p>
+  <table>
+    <tr><th>Rule</th><th>In practice</th></tr>
+    <tr><td>Bill consultancy time</td><td>Setup and delivery work is priced as grades times days times published rates, with one visible programme concession. The rate card lives at /finance/rate-card.</td></tr>
+    <tr><td>Standard, one concession, net</td><td>The proposal shows the full standard fee, a single named concession and the net figure. It reads as transparent and it records what we gave.</td></tr>
+    <tr><td>Anchor, do not open at the floor</td><td>The opening position sits well above the walk-away. Concessions are held in a private ladder and spent one at a time, late, and only for something in return.</td></tr>
+    <tr><td>When pushed, cut scope, not rate</td><td>A lower fee buys less work. A lower rate teaches the client that our rates are negotiable.</td></tr>
+    <tr><td>Do not sell against ourselves</td><td>Never volunteer our margin, our costs, that we are absorbing anything, or a cap. State terms; do not argue them.</td></tr>
+    <tr><td>Invoices say non-refundable</td><td>Every invoice states its terms: non-refundable, free substitution of a named participant, one reschedule.</td></tr>
+  </table>
+  <h3>Tenders: the go or no-go gate</h3>
+  <p>Open tenders are won less often than relationship work. Loopio's 2026 benchmark of more than 1,500 teams found an average win rate of 39%, and 81% of top performers use a formal go or no-go process<sup>22</sup>. Before any tender, the BD lead answers five questions in writing and Debo decides: do we know the buyer; do we have a reference they will accept; does the scoring favour us; can we staff it without taking partners off paying work; and is the fee worth the bid cost. Two noes means no bid.</p>
+  <h3>Closing</h3>
+  <p>A proposal is sent with a date to discuss it, never into silence. After the meeting, follow up within one working day with a written summary of what was agreed and what remains open. If a decision slips, ask what has changed rather than offering a discount, because a discount offered to a silent client answers a question nobody asked.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>A client says your fee is too high. Write your first sentence back.</li><li>Why is cutting scope better than cutting rate?</li><li>Run the five tender questions on a ministry RFP we heard about yesterday.</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 11</div>
+  <h2>Growing inside accounts</h2>
+  <p class="goal">After this module you can write a one-page account plan, spot the signals that a client needs the next piece of work, and run a value review with a client principal.</p>
+  <p>Every engagement we have that grew did so because somebody on our team noticed something the client needed and said so at the right moment. At Haven an audit about stock found a culture problem, and the culture work found a growth opportunity. At Medbury a location search led to a joint venture and then to running a division. This engine is the cheapest we have<sup>24</sup>, and it runs on the people who are on site rather than on the growth team.</p>
+  <h3>The account plan</h3>
+  <p>Every active client has a one-page plan, written by the engagement lead in the first fortnight and reviewed monthly with the BD lead.</p>
+  <table>
+    <tr><th>Section</th><th>What goes in it</th></tr>
+    <tr><td>The outcome</td><td>The client's own measure of success for this engagement, agreed in writing at the start</td></tr>
+    <tr><td>What we have noticed</td><td>Problems and opportunities outside our current scope, logged as they are seen</td></tr>
+    <tr><td>The next logical piece</td><td>The engagement that should follow this one, and the finding that will justify it</td></tr>
+    <tr><td>Who knows us</td><td>Everyone in the client who has seen our work, beyond the principal</td></tr>
+    <tr><td>Proof status</td><td>Whether a reference, a case study or a referral has been asked for, and the answer</td></tr>
+    <tr><td>Risk</td><td>Anything that could end the relationship: unpaid invoices, a sponsor leaving, a conflict</td></tr>
+  </table>
+  <h3>Signals worth logging</h3>
+  <p>A senior vacancy or a resignation; a new site or service line under discussion; receivables the client mentions in passing; staff complaints about a manager; a board disagreement; an investor or lender in the conversation; a regulator's visit; a competitor opening nearby. Each one maps to something in Module 1 or Module 25. The consultant who notices it logs it on the account plan the same week and tells the engagement lead; the engagement lead decides when to raise it.</p>
+  <h3>The value review</h3>
+  <p>At the midpoint and the end of every engagement, the engagement lead meets the principal for thirty minutes with one page: the outcome agreed, what has happened against it, what we have learned about the organisation, and what we think should happen next. It is not a sales meeting, and it is the meeting in which most of our follow-on work has been agreed.</p>
+  <div class="box gold">
+    <h4>Cross-selling the products without naming them</h4>
+    <p>When an audit finds weak leadership, propose "a structured assessment of the leadership team". When it finds unpaid HMO claims, propose "a receivables recovery programme". When a client needs a specialist, propose "a search, including senior Nigerians working abroad where the role suits a returner". The products do the work; the proposal describes it.</p>
+  </div>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Expansion has happened at Haven, Medbury and House of Refuge</li><li>ClientExpansionRequest and ClientRecommendation models exist on the platform</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>No written account plan for any client</li><li>Several active engagements (the Medbury division, House of Refuge strands, Dennis Ashley) have no Engagement or Client record, so they are invisible to planning</li><li>Twenty-six completed leadership reports never followed by a coaching conversation</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>You hear the finance manager say two HMOs owe the hospital six months. What do you do this week?</li><li>Who writes the account plan, and when?</li><li>Why is the value review not a sales meeting?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 12</div>
+  <h2>Referrals and references</h2>
+  <p class="goal">After this module you can name our referral sources, make the ask at the right moment and in the right words, look after a referrer, and run the clearance process for a named reference.</p>
+  <p>Referrals are our largest source of work and we have never asked for one systematically. The research says most willing referrers simply have not been asked<sup>16</sup>. The ask is now part of closing every engagement, owned by the engagement lead, with the BD lead tracking it.</p>
+  <h3>Who refers us</h3>
+  <table>
+    <tr><th>Source</th><th>Examples</th><th>How we look after them</th></tr>
+    <tr><td>Clients</td><td>Principals and directors of current and past clients</td><td>The ask at close; a note when something we did for them pays off</td></tr>
+    <tr><td>Peers who have not hired us</td><td>Doctors, owners and executives who know Debo or a director, board colleagues</td><td>The monthly letter; an invitation to a room; a short thank-you and an update whenever they send someone</td></tr>
+    <tr><td>Professional bodies</td><td>Health Federation of Nigeria, the Guild of Medical Directors, specialty associations, the diaspora physician network</td><td>Contributing policy work, speaking, hosting; never asking for business in their rooms</td></tr>
+    <tr><td>Advisers to owners</td><td>Lawyers, accountants, bankers, lenders, insurers who see a hospital in trouble before anyone else</td><td>A short briefing on what we do and when to call us; a reciprocal relationship</td></tr>
+    <tr><td>Commercial partners</td><td>Funding partners, equipment and implant suppliers, HMOs, technology partners</td><td>A named partner contact, a written referral route, and clarity on any fee</td></tr>
+  </table>
+  <h3>Making the ask</h3>
+  <p>The right moment is when the client has just seen the value: the end-of-engagement value review, or the day a result lands. The engagement lead asks three things in one conversation, in this order. Would they be willing to be a named reference for a prospect who asks, by phone and only with notice? Is there someone they know who is facing a similar question? Would they allow an anonymised write-up of the method, which they will see before anyone else?</p>
+  <p>A good form of words: "We are a young firm and almost all our work comes through people who know us. If someone you respect is facing what you faced last year, I would be grateful if you would mention us, and I will make sure they are looked after."</p>
+  <h3>Looking after a referrer</h3>
+  <ul><li>Thank them within one working day, personally, from whoever they know best.</li><li>Tell them when the conversation happens and, with the prospect's permission, how it went.</li><li>Never pay a clinician for referring a patient. Fees exist only for business introductions through the agent channel or a written partner agreement.</li></ul>
+  <h3>References</h3>
+  <p>We have one cleared named reference, the rehabilitation centre in Lekki run under our management. Getting to five by June 2027 is the highest-value proof task in the firm. Every reference needs written clearance from the client principal, covering exactly what may be said and to whom; the clearance is filed with the client record. Havana is never a reference because Debo sits on its board.</p>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>One named reference cleared and already used in our own advertising</li><li>Referral model on the platform (client, consultant and staff referrals)</li><li>Agent channel built for business introductions</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>The ask has never been made formally of any client; Haven is the natural first, at the end of its growth phase</li><li>No referrer list or thank-you routine</li><li>Agent channel has four approved agents and no deals</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>When in an engagement do you make the ask, and who makes it?</li><li>A bank relationship manager sends us a hospital owner. What do you do in the next twenty-four hours?</li><li>Why is Havana never a reference?</li></ol></div>
+</section>
+
+<!-- ================= PART III ================= -->
+<section class="part">
+  <div class="eyebrow">Part III</div>
+  <h1>Creating demand</h1>
+  <p>How a firm becomes known to the people who will need it in two years, and how it reaches the people who need it now. Six modules on writing, speaking, convening, targeting and the website.</p>
+  <ol start="13"><li>Visible expertise</li><li>The content engine</li><li>LinkedIn, email and WhatsApp</li><li>Rooms: roundtables, platforms and boards</li><li>Target accounts and outreach</li><li>The website as the place a referral lands</li></ol>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 13</div>
+  <h2>Visible expertise</h2>
+  <p class="goal">After this module you can explain why named experts win work for professional firms, name the subject each director should be known for, and run the thirty-minute interview that turns a director's knowledge into a published piece.</p>
+  <p>People hire people. Nearly half of the non-client referrals in the Hinge study were based on the firm's visible expertise<sup>16</sup>, and decision-makers in the Edelman and LinkedIn research said good thought leadership made them more likely to invite a firm to bid<sup>19</sup>. In this market the person is Debo, whose record is the firm's strongest single proof. The aim is not to make him less visible but to add four or five more named voices, so that a prospect who has never met him still meets someone senior who clearly knows the subject.</p>
+  <table>
+    <tr><th>Voice</th><th>Known for</th><th>First pieces to write</th></tr>
+    <tr><td>Dr Debo Odulana</td><td>Running and turning around private hospitals; health venture structuring; the diaspora</td><td>What the audit finds that the owner did not ask about; pricing a hospital after the naira; why medical travel is a trust problem</td></tr>
+    <tr><td>Dr Adediwura Okeleye</td><td>Quality, accreditation readiness and clinical governance</td><td>What moving up an accreditation level actually takes; the clinical governance questions a board should ask</td></tr>
+    <tr><td>Oludayo Olugbamigbe</td><td>Workforce, recruitment and HR practice in health</td><td>The real cost of a failed senior hire; retaining doctors when the exit is open</td></tr>
+    <tr><td>Tito Ipinmoye</td><td>Product, strategy and running an audit</td><td>How an instrumented diagnostic differs from an interview round</td></tr>
+    <tr><td>Matthew Aloba</td><td>Data, compliance and evidence</td><td>The five numbers every private hospital should know by Monday</td></tr>
+  </table>
+  <h3>The thirty-minute interview</h3>
+  <p>Directors are busy and most do not want to write. The marketing team interviews them for thirty minutes on one question, drafts the piece in their voice within three working days, and sends it back for one round of correction. Accuracy comes first, then clearance, then craft. A director should never spend more than an hour on a piece in total.</p>
+  <h3>Debo's record, used properly</h3>
+  <p>The person proof is publishable and underused: the former chief executive of Cedarcrest Hospitals Abuja, former Chief Innovation and Strategy Officer at Evercare Hospital Lekki, the founder who built Doctoora to twenty-one states and sold it to Evercare, and President of the Doctors Foundation for Care. In formal contexts he is always Dr Debo Odulana.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why add more voices rather than more Debo?</li><li>Which director would you interview for a piece on HEFAMAA readiness?</li><li>What is the order of review for a director's piece?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 14</div>
+  <h2>The content engine</h2>
+  <p class="goal">After this module you can name the five formats we publish, the cadence for each, the one flagship piece of research we will run every year, and how one piece of work becomes five assets.</p>
+  <p>Our material is unusually strong and almost none of it is published. We have traced surgical cases end to end to find where money leaked, recovered a building's true geometry from a CAD file, and told a board its revenue record was a nursing handover sheet. Ten case studies are written and anonymised in the Marketing Handbook, and none is live. Most firms in this market publish generic commentary because they have nothing like this. The content engine exists to get our method into the world.</p>
+  <table>
+    <tr><th>Format</th><th>What it is</th><th>Cadence</th><th>Owner</th></tr>
+    <tr><td>Insights article</td><td>800 to 1,500 words on one finding or method, on the website</td><td>One a fortnight</td><td>Marketing lead, with a director</td></tr>
+    <tr><td>Case study</td><td>The brief, what we found, the method, what it changed, the transferable principle, anonymised to the handbook standard</td><td>One a month until the ten are live</td><td>Marketing lead, cleared by Debo</td></tr>
+    <tr><td>The monthly letter</td><td>An email from Debo to the people who know us: one observation about the market, one piece we published, one thing we are watching</td><td>Monthly, first Tuesday</td><td>Marketing, in Debo's voice</td></tr>
+    <tr><td>Market brief</td><td>A two-page note on one force from Module 2, with sources: tariffs after devaluation, NHIA payments, the doctor exit</td><td>Quarterly</td><td>Marketing, with Matthew Aloba</td></tr>
+    <tr><td>The annual study</td><td>Original research: a survey of private hospital owners and directors on costs, prices, staffing and plans</td><td>Once a year, published in the first quarter</td><td>BD lead and marketing</td></tr>
+  </table>
+  <h3>The annual study</h3>
+  <p>Hinge found high-growth consulting firms 82% more likely to research their target market regularly<sup>14</sup>. An annual survey of private hospital owners is the single piece of content most likely to make us the firm people quote. It gives every director something to talk about for a year, it is a reason to contact every target account, and its respondents become a list of people who have already engaged with us. The first edition should aim for at least eighty respondents, collected through Debo's network, the professional bodies and our own clients, with the instrument built in the same live-survey form we use in audits. Aggregate results only; nobody is named.</p>
+  <h3>One piece, five uses</h3>
+  <p>Every case study becomes an insights article (indexed and linkable), three LinkedIn posts from the person who led the work, a paragraph in the monthly letter, a slide in the firm profile deck, and an appendix page a proposal can carry. Write once, publish five times. The article is always first, because an article can be linked from a post, sent to a prospect and found by search, and a post cannot.</p>
+  <div class="box">
+    <h4>The first six to publish</h4>
+    <p class="small">From the handbook library, lowest sensitivity first: the building that was two hundred square metres bigger than the brief; the phase three decision taken in phase one; counting providers when the number that mattered was coverage; then the surgeon who blamed his postcode, once Dr Bola has seen it; then two method pieces (the ten-case trace and the live staff survey). The nursing handover sheet and the split board are high sensitivity and wait for Debo.</p>
+  </div>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Ten case studies written and anonymised with publication guidance</li><li>Insights section live on the website, served from the Sanity studio</li><li>Live survey forms built and proven in audits</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>No case study published</li><li>No CFA newsletter or letter list exists (only CadreHealth has one)</li><li>Annual study not designed</li><li>No case study route on the site</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why does the article come before the LinkedIn post?</li><li>Who must see a case study before it is published?</li><li>Name three ways the annual study creates pipeline.</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 15</div>
+  <h2>LinkedIn, email and WhatsApp</h2>
+  <p class="goal">After this module you can say what each channel is for in our business, the cadence for each, and the rules that keep us lawful and welcome.</p>
+  <p>Nigeria has about 13 million LinkedIn members, around 12% of internet users and growing by 18% a year<sup>12</sup>, and it is where owners, directors and investors look a firm up. WhatsApp is used by over 96% of internet users<sup>13</sup> and is where business conversations actually happen once people know each other. Email remains the channel of record for proposals, letters and anything a client may forward.</p>
+  <table>
+    <tr><th>Channel</th><th>What it is for</th><th>Cadence</th><th>Rules</th></tr>
+    <tr><td>Debo's LinkedIn</td><td>The firm's most-read voice. Observations, findings, milestones, people</td><td>Two to three posts a week</td><td>Drafted by marketing, approved by Debo, never a hard sell</td></tr>
+    <tr><td>Directors' LinkedIn</td><td>Each director's subject (Module 13)</td><td>One post a fortnight each</td><td>Their own voice; marketing drafts if asked</td></tr>
+    <tr><td>Company page</td><td>Articles, case studies, hiring, the firm's news</td><td>Four a week</td><td>Every post links somewhere useful</td></tr>
+    <tr><td>Monthly letter (email)</td><td>Staying remembered by people who already know us</td><td>Monthly</td><td>Opt-in list only, sent from hello@ through ZeptoMail, one-click unsubscribe</td></tr>
+    <tr><td>WhatsApp</td><td>Conversations, follow-ups, forwarding a piece to someone who asked</td><td>As needed</td><td>Never cold. Never broadcast to people who have not agreed to hear from us.</td></tr>
+  </table>
+  <h3>Building the letter list lawfully</h3>
+  <p>The letter goes only to people who have agreed to receive it. Start with Debo's direct contacts, each sent one personal note asking whether they would like the letter, and add the people who sign up on the website, at our rooms and through the annual study. Every address carries its source and the date of consent. Under the NDPA a person may object at any time and marketing must stop<sup>28</sup>, so unsubscribes are honoured the same day and recorded as suppressions.</p>
+  <div class="box warn"><h4>Before any bulk send</h4><p>Send through ZeptoMail from hello@, never through Zoho. Post a real test payload to the live endpoint and read the stored row back. Confirm suppressions are loaded. For CadreHealth lists, the historic bounce back-fill must be complete first, because 11.09% of past sends hard-bounced and a second bad send damages the domain for every brand.</p></div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why is WhatsApp never used for cold contact?</li><li>Where does a new contact's consent date get recorded?</li><li>What must be true before a CadreHealth bulk send?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 16</div>
+  <h2>Rooms: roundtables, platforms and boards</h2>
+  <p class="goal">After this module you can plan a closed-door roundtable from invitation to follow-up, choose which external platforms to accept, and explain why board seats and policy work are part of growth.</p>
+  <p>Hospital owners trust people they have sat in a room with. A room puts us in front of eight to twelve owners for two hours, lets them see how we think, and lets them meet each other through us, which is a service in itself. It is the most efficient trust-building activity we can run.</p>
+  <h3>The roundtable</h3>
+  <table>
+    <tr><th>Element</th><th>Standard</th></tr>
+    <tr><td>Size and guests</td><td>Eight to twelve owners or directors, invited personally, one per organisation, no competitors seated together without their agreement</td></tr>
+    <tr><td>Subject</td><td>One live problem drawn from Module 2: pricing after the naira, retaining doctors, getting paid by HMOs, raising capital, succession</td></tr>
+    <tr><td>Format</td><td>Breakfast or early evening, two hours. A ten-minute opening from a director with one piece of data, then discussion under the Chatham House rule</td></tr>
+    <tr><td>Cadence</td><td>Quarterly in Lagos, twice a year in Abuja</td></tr>
+    <tr><td>Follow-up</td><td>A two-page note of themes (nobody named) to every guest within a week, an invitation to the letter, and a personal call to anyone who raised a problem we can help with</td></tr>
+    <tr><td>Measure</td><td>Opportunities opened within ninety days, not attendance</td></tr>
+  </table>
+  <h3>External platforms</h3>
+  <p>Accept speaking invitations where the audience includes owners, investors or payers, and decline those where it is mainly vendors. Prefer panels where a director can share a specific finding over keynotes about the future of healthcare. Every talk ends with one piece people can take away and an invitation to the letter. The Health Federation of Nigeria, the Guild of Medical Directors, specialty associations and investor forums are the priority; check dates each quarter rather than relying on last year's calendar.</p>
+  <h3>Boards and policy</h3>
+  <p>Board seats and policy work (Debo's independent directorship at Havana, the housemanship brief drafted for the HFN) build standing that no campaign can buy. They are never used to sell. The rule is that a board seat creates a conflict to manage before it creates an opportunity to pursue, and any overlap between a board role and a commercial conversation is declared openly.</p>
+  <div class="box"><h4>Events we run for clients are not our marketing</h4><p>The Medlyfe launch evening on 21 October is the client's event and the client's brand. It shows what we can do, and it may be described later as method with the client's permission, but nothing about CFA appears in it.</p></div>
+  <div class="check"><h4>Check yourself</h4><ol><li>What is the measure of a roundtable's success?</li><li>Two competing hospital owners both accept. What do you do?</li><li>Why do we never sell in a professional body's room?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 17</div>
+  <h2>Target accounts and outreach</h2>
+  <p class="goal">After this module you can build and tier the target account list, run the trigger watch, and write outreach a senior person would welcome.</p>
+  <p>Most of the people we want to work with are not looking for us<sup>17</sup>, and 73% of business buyers avoid suppliers who send irrelevant outreach<sup>20</sup>. So we do not run campaigns at lists. We choose a small number of organisations we would most like to work with, learn them properly, and contact them only when we have something specific to say.</p>
+  <h3>The list of fifty</h3>
+  <p>The BD lead builds and owns a list of fifty named organisations across the segments in Module 4, chosen by fit (we could do excellent work for them), means (they can pay) and access (someone we know can introduce us). It is reviewed quarterly with Debo, who marks the relationship he has with each.</p>
+  <table>
+    <tr><th>Tier</th><th>How many</th><th>Treatment</th></tr>
+    <tr><td>Tier 1</td><td>Ten</td><td>One-to-one. A named owner in the firm, a written account brief, a personal introduction through Debo or a mutual contact, an invitation to a room, a tailored options note when a trigger appears</td></tr>
+    <tr><td>Tier 2</td><td>Forty</td><td>One-to-few. Grouped by segment, invited to rooms, sent the relevant market brief personally, watched for triggers</td></tr>
+    <tr><td>Everyone else</td><td>Unlimited</td><td>One-to-many. The letter, LinkedIn and the website</td></tr>
+  </table>
+  <h3>The trigger watch</h3>
+  <p>A trigger is the event that moves an organisation from the 95% into the 5%. The Office of the Founding Partner keeps a weekly log of triggers for the list of fifty and for clients, taken from the press, HEFAMAA notices, LinkedIn job changes, DFI disclosures, new facility openings, fund announcements and what our consultants hear. The Thursday sweep turns each relevant trigger into an action: a note from Debo, an invitation, or an options note.</p>
+  <h3>Writing outreach that is welcome</h3>
+  <ul><li>Check the relationship first. If Debo knows them, the message comes from him in a warm register.</li><li>Open with something specific about them: a site they opened, a move they made, a problem their segment is facing. Never open with us.</li><li>Offer something useful with no strings: the market brief, a seat at a room, a finding relevant to them.</li><li>Ask for twenty minutes, with a reason.</li><li>Senior clinicians: follow the senior medic register in Module 6 to the letter.</li></ul>
+  <div class="box warn"><h4>The lawful basis question</h4><p>Writing one personal message to a named executive at their work address, about their business, is very different from a bulk campaign to a purchased list. We do the first and never the second. A written legal view on cold business outreach under the NDPA (including the claims recovery outreach to 799 hospitals) is a pending founder decision, and no bulk cold send happens until we have it.</p></div>
+  <div class="status">
+    <div class="done"><h4>Done</h4><ul><li>Hospital model on the platform with pipeline stage, distress scores and contact logs</li><li>SalesCampaign with daily caps, tracked links and unsubscribe</li></ul></div>
+    <div class="pend"><h4>Pending</h4><ul><li>The list of fifty does not exist</li><li>No trigger log</li><li>Legal view on cold outreach (founder decision)</li></ul></div>
+  </div>
+  <div class="check"><h4>Check yourself</h4><ol><li>Name four sources for the trigger watch.</li><li>Rewrite "We are a leading healthcare consultancy offering..." as a first line to a hospital that just opened a second site.</li><li>Why are there only ten Tier 1 accounts?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 18</div>
+  <h2>The website as the place a referral lands</h2>
+  <p class="goal">After this module you can explain the website's real job, list what every offer page needs, and name the fixes that come first.</p>
+  <p>In our business the website rarely creates a client. It decides whether a referral turns into a conversation. Somebody has been told our name, they look us up on a phone between meetings, and in two minutes they either understand how we could help them or they move on. More than half of buyers in the Hinge study ruled out a referred firm before speaking to it, most often because they could not see how it would help<sup>16</sup>, and buyers who prefer to research alone<sup>20</sup> judge us there first.</p>
+  <h3>What every offer page needs</h3>
+  <ol><li>The problem in the owner's words, in one line.</li><li>What the client gets in the first thirty days.</li><li>One piece of proof: a case study, a method, or a named reference where cleared.</li><li>The senior person who would lead it, with a photograph.</li><li>One call to action that reaches a named person who replies within the working hour.</li></ol>
+  <p>Say less and hit hard. Depth lives in articles and frequently asked questions, not on the offer page.</p>
+  <h3>Search</h3>
+  <p>Search volume for consulting is small, and the searches that matter are by owners trying to solve a problem: how to register with HEFAMAA, how to price hospital services, how to get paid by HMOs, how to recruit a medical director. Each of those deserves a plain, accurate explainer that ends with an offer. We do not promise rankings and we do not buy links.</p>
+  <h3>Fixes that come first</h3>
+  <table>
+    <tr><th>Fix</th><th>Why</th></tr>
+    <tr><td>A case study route and the first three published</td><td>Proof is the single biggest gap on the site</td></tr>
+    <tr><td>One page per entry offer from Module 9</td><td>So a referred stranger can see what to buy first</td></tr>
+    <tr><td>Resolve "135+ years" against "60+" in documents</td><td>Two claims about the same thing undermine both</td></tr>
+    <tr><td>Move the whitepaper gate onto our own Lead table</td><td>It currently sends contact details to a third-party service and creates no record</td></tr>
+    <tr><td>A letter sign-up on every article</td><td>Converts readers into people we can stay in touch with</td></tr>
+    <tr><td>Contact form notifications sent as hello@</td><td>So every enquiry is visible in the mailbox Debo checks</td></tr>
+  </table>
+  <div class="check"><h4>Check yourself</h4><ol><li>What is the website's real job in a referral-led firm?</li><li>List the five things an offer page needs.</li><li>Why does the whitepaper gate need to move?</li></ol></div>
+</section>
+
+<!-- ================= PART IV ================= -->
+<section class="part">
+  <div class="eyebrow">Part IV</div>
+  <h1>The plays</h1>
+  <p>One module for each kind of buyer: what puts them in the market, what to offer first, what proof they need, where to find them, how the work grows, and what to watch for. The last module covers the products and the practices as growth lines of their own.</p>
+  <ol start="19"><li>Hospital owners and promoters</li><li>Groups, boards and family businesses</li><li>Investors, lenders and development finance</li><li>Payers and HMOs</li><li>Government, foundations and tenders</li><li>Specialists, clinics and the agency</li><li>The products as growth lines</li></ol>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 19</div>
+  <h2>Hospital owners and promoters</h2>
+  <p class="goal">After this module you can run the play for a single-site private hospital from first trigger to management agreement.</p>
+  <p>This is our core segment and the one the market forces in Module 2 hit hardest. Most owners are physicians who built the hospital themselves, carry it personally, and have never had it measured. They trust people who have run a hospital, and they do not like being sold to.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>Cash pressure or a missed payroll; an incident; a key doctor or manager leaving; a failed or stalled expansion; a HEFAMAA notice or inspection; an HMO dispute; a new competitor nearby; an offer from a buyer</td></tr>
+    <tr><td>First offer</td><td>The organisational audit, or a focused review if the owner names one pain (pricing, receivables, staffing)</td></tr>
+    <tr><td>Proof they need</td><td>That we have run a hospital; one case study that sounds like their problem; a director they would respect; discretion</td></tr>
+    <tr><td>Where they are</td><td>Debo's network, the Guild of Medical Directors, the HFN, specialty associations, their banker and accountant, roundtables</td></tr>
+    <tr><td>How it grows</td><td>Audit, then turnaround or growth mandate, then a management agreement; alongside, recruitment, leadership assessment, receivables recovery and marketing</td></tr>
+    <tr><td>Watch for</td><td>An owner who wants validation rather than truth; family members with different views; unpaid invoices from a client already in distress (stage payments in advance)</td></tr>
+  </table>
+  <h3>The conversation that works</h3>
+  <p>Ask about the hospital before the problem: how it started, what it does best, what has changed since 2023. Then ask what the owner would fix first with a free hand. Then say what we usually find in hospitals like theirs, which is rarely what owners expect, and offer the audit as the way to know. Do not diagnose in the first meeting, and do not leave without a date for the next one.</p>
+  <div class="box gold"><h4>The reference play</h4><p>Haven's growth mandate runs to January 2027. If it meets its targets, Haven is the reference that sells this segment better than any article: a hospital whose owner can say what changed. Plan the reference ask now, for the January value review.</p></div>
+  <div class="check"><h4>Check yourself</h4><ol><li>An owner says "my problem is my staff". What do you offer and why?</li><li>Why do we not diagnose in the first meeting?</li><li>How should a distressed client's fees be staged?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 20</div>
+  <h2>Groups, boards and family businesses</h2>
+  <p class="goal">After this module you can sell to a group without going around its business unit leads, and help a family-owned hospital settle who decides.</p>
+  <p>Groups buy differently from owners. The chief executive may want our help and still refuse to impose it on strong business unit leads, which is exactly what happened at Medbury and why proposals there are split between the group and each unit. Family hospitals face a different version of the same issue: the founder, the second generation and outside capital each need a structure they can trust.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>A new site or division; a joint venture; succession; a board that cannot agree; outside investors arriving; a unit underperforming</td></tr>
+    <tr><td>First offer</td><td>Board governance framework, or a scoped strategy piece for one decision; for a group, a small mandate that proves us to the unit leads</td></tr>
+    <tr><td>Proof they need</td><td>Evidence we respect their managers; fair-process governance work; build and operate experience</td></tr>
+    <tr><td>How it grows</td><td>Governance, then a strategy office or embedded team, then building and running new divisions under management agreements</td></tr>
+    <tr><td>Watch for</td><td>Being seen to take sides in a family or between units; conflicts between board roles and commercial work; a sponsor who is not the decision-maker</td></tr>
+  </table>
+  <p>The Medbury relationship shows the full ladder: a location search, a joint venture, a division we now help set up and run. The lesson is that we earned each step with the person who owned that decision, and never by asking the chief executive to override her managers.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why are group proposals split by who signs?</li><li>What is the first offer to a family hospital about to take outside capital?</li><li>Name one conflict to declare before pursuing a board-adjacent opportunity.</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 21</div>
+  <h2>Investors, lenders and development finance</h2>
+  <p class="goal">After this module you can explain what capital providers need from an operator-adviser, and how one relationship with a funder can bring us several hospitals.</p>
+  <p>Capital for Nigerian healthcare is available and selective<sup>6</sup>. Funds, family offices and lenders need three things we can provide: an honest view of an asset before they commit, a plan they can hold management to, and someone who can run the asset if management cannot. One funder relationship can therefore send us a portfolio of work, which makes this the highest-leverage segment for the pursue engine.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>A deal in diligence; a fund close; a portfolio company missing plan; a new thesis that needs an operator; an acquisition needing integration</td></tr>
+    <tr><td>First offer</td><td>An options note on a specific asset or thesis; operational diligence; a hundred-day plan after acquisition</td></tr>
+    <tr><td>Proof they need</td><td>Ranges and kill criteria rather than optimism; Debo's operating and exit record; financial models that survive scrutiny</td></tr>
+    <tr><td>How it grows</td><td>Diligence on one asset, then portfolio support, then build and operate, then becoming the funder's preferred operator-adviser</td></tr>
+    <tr><td>Watch for</td><td>Being asked to bless a deal; equity-for-fees arrangements that conflict with advisory independence (founder decision each time)</td></tr>
+  </table>
+  <h3>Funders as channel partners</h3>
+  <p>A lender sees a distressed hospital before anyone else. The claims recovery partnership with Carbon is the first example of a funder whose interest is aligned with ours: hospitals that need receivables financed are often hospitals that need their revenue cycle fixed. Banks, fintech lenders and DFI programmes are all potential channel partners on the same logic, each with a written referral route.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>What three things does a capital provider need from us?</li><li>Why is a lender a referral source for turnaround work?</li><li>What is the risk in equity-for-fees, and who decides?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 22</div>
+  <h2>Payers and HMOs</h2>
+  <p class="goal">After this module you can sell network strategy to an HMO and explain how payer work connects to the rest of the firm.</p>
+  <p>Insurance covers about one Nigerian in ten<sup>3</sup> and is growing under the NHIA Act. HMOs entering a new state need a provider network that covers their members, not just a long list of hospitals, and our Lagos network work for a takaful HMO expanding south is the model: data-led selection anchored to where members actually are.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>Entry into a new state; a large new employer group; rising medical loss; regulatory pressure on network adequacy</td></tr>
+    <tr><td>First offer</td><td>Network strategy for one state, with provider acquisition</td></tr>
+    <tr><td>Proof they need</td><td>Coverage analysis rather than provider counts; access to specialists; speed</td></tr>
+    <tr><td>How it grows</td><td>Network strategy, then provider quality programmes, then tariff and contracting work</td></tr>
+    <tr><td>Watch for</td><td>Never mix payer clients into hospital-side receivables material; say "payor" in claims recovery copy, and keep each client's information separate</td></tr>
+  </table>
+  <p>Payer work also strengthens our hospital work: we understand how HMOs select and pay providers, which is exactly what a hospital waiting on claims needs to know. Keep the two sides of that knowledge separate in every document.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why is a provider count the wrong measure of a network?</li><li>Which product helped justify our fee on the HMO network engagement?</li><li>What must never appear in claims recovery copy?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 23</div>
+  <h2>Government, foundations and tenders</h2>
+  <p class="goal">After this module you can decide whether a tender is worth bidding, and explain how policy work builds standing without selling.</p>
+  <p>Public and philanthropic work is won by formal process, scored on method, experience, personnel and price, and lost more often than relationship work<sup>22</sup>. It is worth doing selectively for three reasons: it pays, it brings references outside the private sector, and it puts our directors in front of the people who shape the market.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>A published tender or request for proposals; a funded programme; a policy question a federation or ministry needs answered</td></tr>
+    <tr><td>First offer</td><td>A tendered review or evaluation; a policy brief</td></tr>
+    <tr><td>Proof they need</td><td>Named personnel with credentials; method scored against their criteria; references they accept</td></tr>
+    <tr><td>How it grows</td><td>Repeat cycles with the same funder; framework agreements; workforce intelligence offered as a dataset</td></tr>
+    <tr><td>Watch for</td><td>Bidding on strengths only (no padded capabilities); naming references only with their consent; partner time lost to bids we should not have entered</td></tr>
+  </table>
+  <p>The Tony Elumelu Foundation tender is the template: a named engagement director, a bid built on what we actually do well, and references cited only with consent. Every tender goes through the five-question gate in Module 10 before any work starts.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Name the four usual scoring criteria and where we are strongest.</li><li>What do we never include in a bid to look larger?</li><li>How does a policy brief create growth without selling?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 24</div>
+  <h2>Specialists, clinics and the agency</h2>
+  <p class="goal">After this module you can run the play for a specialist practice or clinic, and explain where the healthcare marketing agency fits and what it must not do.</p>
+  <p>Specialists and clinics (aesthetics, fertility, orthopaedics, diagnostics, day-case surgery) are many, quick to decide, and usually limited by referrals and conversion rather than by clinical quality. They are also bound by the rule that the doctor may not advertise himself<sup>26</sup>, which means their growth must come through the facility's brand, through education and through referring doctors.</p>
+  <table>
+    <tr><th>Element</th><th>The play</th></tr>
+    <tr><td>Triggers</td><td>A new clinic or service; enquiries that do not convert; a referral source drying up; a competitor opening nearby; a plan to attract patients from abroad</td></tr>
+    <tr><td>First offer</td><td>Front-desk and client experience programme; positioning; a referral engine</td></tr>
+    <tr><td>Proof they need</td><td>That we understand admissions and referrals rather than impressions; the front-desk programme handbook; the specialist positioning work</td></tr>
+    <tr><td>How it grows</td><td>Positioning, then a digital front door, then an agency retainer, then an audit of the practice as a business</td></tr>
+    <tr><td>Watch for</td><td>Conflicts between clinics competing for the same patients; practitioner self-advertising; ARCON vetting lead times</td></tr>
+  </table>
+  <h3>The agency</h3>
+  <p>The agency is the one service line delivered wholly by the marketing team. Its promise, from the Operating Brief, is that most agencies sell hospitals impressions and we sell them admissions, referrals and the service lines that carry margin. Its standard shapes and service levels are in the Operating Brief. Two growth rules apply here. No agency quote goes out until the agency rate card is approved (founder decision). And every new agency prospect is checked against current clients for conflict before the first meeting: a group with an aesthetics arm competes directly with the Medlyfe aesthetics business we help build.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why must specialist growth run through the facility's brand?</li><li>What must happen before any agency quote is sent?</li><li>Which first offer suits a fertility clinic with plenty of enquiries and few bookings?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 25</div>
+  <h2>The products as growth lines</h2>
+  <p class="goal">After this module you can say where each product and practice stands, the one move that would grow it most, and how each one feeds the consulting work.</p>
+  <p>The products exist because the same things break in every institution we enter: leadership, workforce, receivables and the economics of a practice. They grow in two ways: as businesses with their own users, and as the means by which consulting recommendations get delivered. In client documents they are described, never named.</p>
+  <table>
+    <tr><th>Line</th><th>Where it stands</th><th>The one move</th><th>How it feeds consulting</th></tr>
+    <tr><td>HR and workforce practice</td><td>Live, led by Oludayo Olugbamigbe. Recruitment, assessment, coaching, culture, benchmarking, interim. Two recruitment conversations waiting since May</td><td>Answer the waiting conversations with the existing pricing playbook</td><td>Every audit finds a people problem; this practice fixes it</td></tr>
+    <tr><td>Maarova</td><td>Live. Twenty-six leadership reports completed, four coaches onboarded, no coaching yet delivered</td><td>Offer each organisation holding a report a debrief that proposes coaching</td><td>Leadership assessment inside audits and recruitment</td></tr>
+    <tr><td>CadreHealth</td><td>Live. Over ten thousand professional records with salary data; activation around six per cent; historic bounces not yet back-filled</td><td>Finish the bounce back-fill, then offer workforce intelligence to an institution</td><td>Salary and workforce data for benchmarking, recruitment sourcing, the annual study</td></tr>
+    <tr><td>Mezo Health</td><td>Live at mezohealth.com. Nearly a thousand doctors seeded and very few claimed; claim links expire between 11 and 27 October; doctors told about their place converted far better than those who were not</td><td>Tell the seeded doctors before the links expire, following the senior medic register</td><td>Specialists for managed facilities; practices for clients needing capacity</td></tr>
+    <tr><td>Claims recovery</td><td>Page, directory and desk live; 799 hospitals imported; advances off until the funding partner signs</td><td>Sign the pilot terms, then reach hospitals through warm routes while the legal view on cold outreach is obtained</td><td>Finds hospitals with cash-flow pain, the turnaround trigger</td></tr>
+    <tr><td>Hospital operating software</td><td>Used inside managed facilities; staff app built, not deployed</td><td>None for growth. It is an internal tool</td><td>Makes our management agreements run; never named to clients</td></tr>
+  </table>
+  <div class="box gold"><h4>The flywheel, for internal use only</h4><p>Workforce data makes our thought leadership and sources our placements. Engagements surface leadership problems, which assessment and coaching address. Doctors who want a practice rather than a job are who Mezo is for, and facilities we manage are where they can practise. Hospitals waiting on claims are hospitals that need their revenue cycle fixed. We tell this story inside the firm and never as a pitch.</p></div>
+  <div class="check"><h4>Check yourself</h4><ol><li>An audit finds three weak heads of department. Which lines could help, and how do you describe them in the proposal?</li><li>What must happen before any CadreHealth bulk send?</li><li>Why is the Mezo claim deadline the most urgent move on this page?</li></ol></div>
+</section>
+
+<!-- ================= PART V ================= -->
+<section class="part">
+  <div class="eyebrow">Part V</div>
+  <h1>Operating system</h1>
+  <p>Who does what, the weekly rhythm, the numbers we watch, the first ninety days, and the decisions only Debo can make. Keep this part open on your desk.</p>
+  <ol start="26"><li>Team, roles and cadence</li><li>The scoreboard</li><li>The first ninety days and the open decisions</li></ol>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 26</div>
+  <h2>Team, roles and cadence</h2>
+  <p class="goal">After this module you know what you own in the growth system, who you hand to, and which meeting you bring it to.</p>
+  <table>
+    <tr><th>Who</th><th>Owns in the growth system</th></tr>
+    <tr><td>Dr Debo Odulana, Founding Partner</td><td>Relationships and introductions; price and every concession; the firm's voice; clearance of case studies and references; founder decisions</td></tr>
+    <tr><td>Dorathy Michael, Director of BD and Growth</td><td>The pipeline and its truth; the shape of every deal; the list of fifty; tenders; growth of the products. Full time from January 2027, and practice lead for the HMO network engagement until then</td></tr>
+    <tr><td>Toluwanimi Olayeni (Nimi), Marketing lead</td><td>Being known: content, the letter, rooms, the website, the directors' voices, the annual study; the agency</td></tr>
+    <tr><td>Ejiro Alechenu, Marketing</td><td>Production: articles to publication, LinkedIn scheduling, the letter build, event logistics</td></tr>
+    <tr><td>Engagement leads (Dr Adediwura Okeleye, Tito Ipinmoye, Matthew Aloba, Oludayo Olugbamigbe and others)</td><td>Account plans, value reviews, the referral ask at close, signals from site, method notes for case studies, one published piece a quarter</td></tr>
+    <tr><td>Ezinne Orji, Office of the Founding Partner</td><td>The record: every opportunity on /pipeline with source, stage and next date; the inbound inbox to the one-hour standard; the Thursday sweep; the commitments register; the trigger log</td></tr>
+    <tr><td>Abigail Oladejo, Office of the Founding Partner</td><td>New clients and contacts onto the platform; references and clearances filed; the letter list's consent records</td></tr>
+    <tr><td>Every consultant</td><td>Noticing. Anything outside scope that a client needs is logged on the account plan the same week</td></tr>
+  </table>
+  <p>Until January, the BD lead's pipeline duties are covered by the Office of the Founding Partner for the record and by Debo for the relationships. Nothing in this book should wait for January if it can be done by the people already here.</p>
+  <h3>The rhythm</h3>
+  <table>
+    <tr><th>When</th><th>What</th><th>Who</th><th>Output</th></tr>
+    <tr><td>Monday</td><td>Engagement updates</td><td>Engagement leads</td><td>Signals from site added to account plans</td></tr>
+    <tr><td>Wednesday</td><td>Platform upkeep</td><td>Abigail</td><td>New clients, contacts and clearances recorded</td></tr>
+    <tr><td>Thursday, 45 minutes</td><td>The growth sweep</td><td>Debo, BD lead, marketing lead, Ezinne</td><td>Every stale opportunity actioned or closed; triggers turned into actions; what was published; what is blocked</td></tr>
+    <tr><td>First Tuesday</td><td>The monthly letter goes out</td><td>Marketing</td><td>Letter sent; new subscribers recorded</td></tr>
+    <tr><td>First Thursday</td><td>Scoreboard review</td><td>Same as the sweep</td><td>The Module 27 numbers, with one decision taken on the weakest</td></tr>
+    <tr><td>Quarterly</td><td>Book review and list of fifty review</td><td>Debo and the growth team</td><td>This book revised; the list re-tiered; next quarter's rooms and briefs set</td></tr>
+  </table>
+  <div class="check"><h4>Check yourself</h4><ol><li>Who answers an enquiry that arrives on the website at 3pm on a Friday?</li><li>Which meeting do you bring a trigger to?</li><li>What does an engagement lead owe the growth system each quarter?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 27</div>
+  <h2>The scoreboard</h2>
+  <p class="goal">After this module you can name the numbers we watch, why each matters, and today's value where it exists.</p>
+  <p>The scoreboard is short on purpose. Inbound lead volume is not on it, because in a referral-led firm it rewards the wrong activity. The targets are proposals for Debo to approve as a set.</p>
+  <table>
+    <tr><th>Number</th><th>Why it matters</th><th>Today</th><th>Proposed, 31 Mar 2027</th><th>Proposed, 30 Jun 2027</th></tr>
+    <tr><td>Qualified opportunities live on /pipeline</td><td>Whether there is a pipeline anyone can help with</td><td>1</td><td>15</td><td>25</td></tr>
+    <tr><td>Share of new qualified opportunities not introduced by Debo</td><td>Whether the firm is becoming more than one network</td><td>Near zero, not measured</td><td>15%</td><td>30%</td></tr>
+    <tr><td>Cleared named references</td><td>The proof a stranger trusts most</td><td>1</td><td>3</td><td>5</td></tr>
+    <tr><td>Case studies published</td><td>Whether the be-known engine has fuel</td><td>0 of 10</td><td>4</td><td>6</td></tr>
+    <tr><td>Clients asked for a referral at close</td><td>Whether the cheapest engine is running</td><td>Not recorded</td><td>100%</td><td>100%</td></tr>
+    <tr><td>Active clients with an account plan</td><td>Whether expansion is deliberate</td><td>0</td><td>All</td><td>All</td></tr>
+    <tr><td>Inbound enquiries answered within one working hour</td><td>Whether a referral that finds us is caught</td><td>Not measured</td><td>90%</td><td>95%</td></tr>
+    <tr><td>Monthly letter subscribers, consented</td><td>The audience we can reach between purchases</td><td>0</td><td>300</td><td>600</td></tr>
+    <tr><td>Proposal win rate</td><td>Whether the offer and the qualification are right</td><td>Not measured</td><td>Measured</td><td>Above 50% for relationship work</td></tr>
+    <tr><td>Days from first conversation to signature</td><td>Sales efficiency</td><td>Not measured</td><td>Measured</td><td>Falling</td></tr>
+    <tr><td>Share of revenue from clients who bought before</td><td>Whether expansion is working</td><td>Not measured</td><td>Measured</td><td>Rising</td></tr>
+  </table>
+  <h3>The marketing budget</h3>
+  <p>The firm has no budget line for being known. Hinge found high-growth consulting firms far more likely to spend 15% or more of revenue on marketing<sup>14</sup>, and B2B growth evidence favours a near-even split between brand and activation<sup>18</sup>. A budget is a founder decision. The proposal is to set one in three lines (people, rooms and production, and research) for the first half of 2027, reviewed against the scoreboard at the end of June.</p>
+  <div class="check"><h4>Check yourself</h4><ol><li>Why is inbound lead volume not on the scoreboard?</li><li>Which number tells us whether this book is working?</li><li>What three lines would the marketing budget have?</li></ol></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Module 28</div>
+  <h2>The first ninety days and the open decisions</h2>
+  <p class="goal">After this module you know what happens between now and mid-January, who does it, and which decisions are waiting on Debo.</p>
+  <h3>Days 1 to 30, to 12 November: make the record true and catch what we already have</h3>
+  <ul>
+    <li>Every live opportunity entered on /pipeline with source, stage, next action and date (Ezinne, with Debo, by 24 October).</li>
+    <li>Inbound inbox and WhatsApp owned to the one-hour standard (Ezinne, from this week).</li>
+    <li>The four March and April drafts sent, rewritten or closed (Debo decides at the first sweep).</li>
+    <li>Mezo seeded doctors told before their claim links expire (product team, before 27 October).</li>
+    <li>The waiting recruitment conversations answered (HR practice).</li>
+    <li>First case study published on a new case study route (marketing and engineering).</li>
+    <li>Account plans written for every active client (engagement leads, by 7 November).</li>
+  </ul>
+  <h3>Days 31 to 60, to 12 December: start being known</h3>
+  <ul>
+    <li>The monthly letter launched to a consented starting list built from Debo's direct contacts.</li>
+    <li>Two more case studies and the first two director pieces published.</li>
+    <li>First Lagos roundtable held, on pricing and costs after the naira.</li>
+    <li>The list of fifty drafted and tiered with Debo; the trigger log running.</li>
+    <li>One-page offer descriptions for every entry offer, on the website.</li>
+    <li>Maarova report holders offered a debrief.</li>
+  </ul>
+  <h3>Days 61 to 90, to 11 January: prepare for the BD lead and the year</h3>
+  <ul>
+    <li>The annual study designed and in the field, for publication in the first quarter.</li>
+    <li>Haven reference ask planned for the January value review.</li>
+    <li>First scoreboard review on real data; targets approved.</li>
+    <li>Handover to Dorathy Michael on arrival: the pipeline, the list of fifty, the trigger log and this book.</li>
+  </ul>
+  <h3>Open decisions for Debo</h3>
+  <table>
+    <tr><th>Decision</th><th>Why it blocks growth</th></tr>
+    <tr><td>Approve the scoreboard targets as a set</td><td>Nobody can be held to a number that is not agreed</td></tr>
+    <tr><td>Set a marketing budget for the first half of 2027</td><td>Rooms, the annual study and production need money</td></tr>
+    <tr><td>Approve the agency rate card</td><td>No agency quote can go out without it</td></tr>
+    <tr><td>Clear the first three case studies for publication</td><td>The be-known engine has no fuel until they are live</td></tr>
+    <tr><td>Agree which clients to ask for a named reference, and when</td><td>Proof is the scarcest asset we have</td></tr>
+    <tr><td>Commission a legal view on cold business outreach under the NDPA</td><td>Claims recovery outreach and any target-account email depend on it</td></tr>
+    <tr><td>Resolve "135+ years" against "60+"</td><td>Two claims about the same thing undermine both</td></tr>
+    <tr><td>Decide whether consulting needs an opportunity record larger than a Lead</td><td>Multi-stage deals currently have nowhere to live on the platform</td></tr>
+    <tr><td>Name the conflict rule for competing clients in one specialty</td><td>The agency and the clinic play cannot grow safely without it</td></tr>
+  </table>
+  <div class="check"><h4>Check yourself</h4><ol><li>What must be true of /pipeline by 24 October?</li><li>Which three things happen before Dorathy Michael starts full time?</li><li>Pick one open decision and write the one-line case you would put to Debo.</li></ol></div>
+</section>
+
+<!-- ================= APPENDICES ================= -->
+<section class="module">
+  <div class="eyebrow">Appendix A</div>
+  <h2>Sources</h2>
+  <p class="small">Every figure in this book with a superscript number comes from the source below. Where we could only see a figure through a reputable secondary report, the entry says so. Check the source before quoting any figure externally, and never quote a figure that is not on this list.</p>
+  <ol class="refs">
+    <li>World Bank, World Development Indicators, drawing on the WHO Global Health Expenditure Database: out-of-pocket share of current health expenditure, Nigeria, 71.9% (2023); current health expenditure per capita US$66.82 (2023). data.worldbank.org/indicator/SH.XPD.OOPC.CH.ZS?locations=NG, accessed 13 October 2026.</li>
+    <li>Federal Ministry of Health and Social Welfare, National Health Accounts 2023 to 2024, as reported by NAN and Peoples Gazette, 21 December 2025: out of pocket 58.3% (2024); total health expenditure ₦10.42 trillion. A different method from source 1.</li>
+    <li>NHIA enrolment data, as reported by Nairametrics, 2 July 2026: 21.73 million enrolled across all schemes at end Q4 2025; Lagos 2,757,892.</li>
+    <li>Central Bank of Nigeria balance of payments data, as reported by Financial Vanguard via allAfrica, June 2026: medical travel payments US$684.72 million (2025), US$643.15 million (2024).</li>
+    <li>BusinessDay, "Doctors practising in Nigeria fall by nearly 17% in one year", 27 January 2026, citing the 2025 Joint Annual Review: 66,241 (2024) to about 55,000 (2025); 4,193 doctors and dentists left in 2024.</li>
+    <li>Semafor, "Investors push for more private capital in Nigerian healthcare", 11 September 2026: Nigeria's 8% of US$4.2 billion invested in African healthcare since 2016 (Africa Health Business); IFC US$24.5 million into a Nigerian cancer facility, February 2026; US$34 billion health spending in 2026 (Health Federation of Nigeria estimate).</li>
+    <li>BusinessDay, "20% of Nigeria's private hospitals shut down on crippling operating costs", 9 April 2024. A press estimate, not a survey.</li>
+    <li>Nigeria Health Watch, "Saving mothers and giving life through quality accreditation of private health facilities", 16 April 2024: SafeCare levels for 25 private facilities in Kaduna.</li>
+    <li>National Bureau of Statistics consumer price index, as reported by PRNigeria, 16 September 2026: headline inflation 15.39% (August 2026, rebased index); World Bank: 33.2% (2024).</li>
+    <li>FocusEconomics, Nigeria exchange rate (annual average naira per US dollar): 645 (2023), 1,480 (2024), 1,517 (2025). An aggregator, not the CBN.</li>
+    <li>Lagos State Health Facility Monitoring and Accreditation Agency (HEFAMAA), "Franchise of HEFAMAA monitoring activities": 3,670 registered health facilities (2020).</li>
+    <li>DataReportal and Kepios, Digital 2026: Nigeria: 13.0 million LinkedIn members, 12.0% of internet users, up 18.2% year on year; 109 million internet users.</li>
+    <li>Statista, leading social media platforms in Nigeria, Q3 2025: WhatsApp used by over 96% of internet users aged 16 and over.</li>
+    <li>Hinge Research Institute, "The research is out on 2018 high-growth consulting firms", 2018.</li>
+    <li>Hinge Research Institute, High Growth Study 2025 (770 firms).</li>
+    <li>Hinge Research Institute, Referral Marketing for Professional Services Firms, 2015.</li>
+    <li>Ehrenberg-Bass Institute, "The 95:5 rule is the new 60:40 rule" (John Dawes, with the LinkedIn B2B Institute), marketingscience.info.</li>
+    <li>Les Binet and Peter Field for the LinkedIn B2B Institute, The 5 Principles of Growth in B2B Marketing, October 2019. Based on effectiveness award entries, not a random sample.</li>
+    <li>Edelman and LinkedIn, 2024 B2B Thought Leadership Impact Report (about 3,500 respondents, seven markets), seen through reputable secondary reports.</li>
+    <li>Gartner, press release, 25 June 2025: survey of 632 B2B buyers, 61% prefer a rep-free buying experience, 73% avoid suppliers who send irrelevant outreach. Seen through the Gartner newsroom listing and trade press.</li>
+    <li>Oldroyd, McElheran and Elkington, "The short life of online sales leads", Harvard Business Review, March 2011: audit of 2,241 US firms.</li>
+    <li>Loopio, RFP Response Trends and Benchmarks Report, 2026 (more than 1,500 teams): average win rate 39%; 81% of top performers use go or no-go.</li>
+    <li>RAIN Group Center for Sales Research, "Average sales win rates" and What Sales Winners Do Differently.</li>
+    <li>Amy Gallo, "The value of keeping the right customers", Harvard Business Review, 29 October 2014, citing Bain and Company research by Frederick Reichheld.</li>
+    <li>Michael Marn and Robert Rosiello, "Managing price, gaining profit", Harvard Business Review, September to October 1992.</li>
+    <li>Makinde, Brown and Olaleye, Pan African Medical Journal 2014;19:103, on Part F of the MDCN Code of Medical Ethics (self-advertisement).</li>
+    <li>Advertising Regulatory Council of Nigeria Act No. 23 of 2022, section 53, and the ARCON vetting guidelines.</li>
+    <li>Nigeria Data Protection Act 2023, sections 25, 26 and 36; Templars, "Unsolicited messaging and the limits of opt-out provisions", February 2025.</li>
+    <li>TPG, Evercare Group announcement on Evercare Hospital Lekki; ThisDay and BusinessDay reporting on Iwosan Investments' acquisitions of Lagoon Hospitals and Euracare.</li>
+  </ol>
+  <div class="box"><h4>Gaps to close before the next edition</h4><p class="small">A current national count of private hospitals from the Health Facility Registry; a current HEFAMAA count; the NHIA list of accredited HMOs; the current number of Nigerian-trained doctors on the UK medical register; the CBN primary table for medical travel; the ARCON penalty schedule; any data on how Nigerian doctors and executives use email. The annual study (Module 14) should fill some of these with our own data.</p></div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Appendix B</div>
+  <h2>Campaign calendar, October 2026 to June 2027</h2>
+  <table>
+    <tr><th>Month</th><th>Theme</th><th>Main pieces</th><th>Room</th></tr>
+    <tr><td>October</td><td>Getting the record right</td><td>First case study; Mezo claim outreach</td><td>None</td></tr>
+    <tr><td>November</td><td>What the audit finds</td><td>Two case studies; Debo on the problem behind the problem; letter launches</td><td>None</td></tr>
+    <tr><td>December</td><td>The private hospital in 2027</td><td>Market brief on costs, prices and the naira; year-end letter</td><td>Lagos roundtable: pricing after the naira</td></tr>
+    <tr><td>January</td><td>Pricing and tariffs</td><td>Tariff explainer; director piece on cost-to-serve</td><td>None</td></tr>
+    <tr><td>February</td><td>Getting paid</td><td>HMO receivables brief; claims recovery story if the pilot is live</td><td>Abuja roundtable: getting paid by payers</td></tr>
+    <tr><td>March</td><td>The annual study</td><td>Study published; every target account contacted with it</td><td>Lagos launch breakfast for the study</td></tr>
+    <tr><td>April</td><td>Keeping your doctors</td><td>Workforce brief from aggregate salary data; the cost of a failed senior hire</td><td>None</td></tr>
+    <tr><td>May</td><td>Governance for family hospitals</td><td>Board governance piece; succession</td><td>Lagos roundtable: succession and outside capital</td></tr>
+    <tr><td>June</td><td>Quality you can show</td><td>Accreditation readiness piece; half-year letter</td><td>None; scoreboard and book review</td></tr>
+  </table>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Appendix C</div>
+  <h2>Checklists</h2>
+  <div class="cols">
+    <div>
+      <div class="box"><h4>Before you write to anyone outside the firm</h4><ol class="small"><li>How does Debo know them?</li><li>What is specific to them in the first line?</li><li>Is there an em dash, an AI phrase or a product name in client body copy?</li><li>Is any client named without clearance?</li><li>Does it work if forwarded to someone we have not met?</li><li>Is it going from hello@ with Debo copied where it is a client?</li></ol></div>
+      <div class="box"><h4>Qualifying an opportunity</h4><ol class="small"><li>Trigger, access, fit, means, next step: score each 0 to 2.</li><li>Seven or more is qualified.</li><li>Source recorded.</li><li>Next action and date recorded.</li></ol></div>
+      <div class="box"><h4>Before you quote a price</h4><ol class="small"><li>Has Debo set the opening position?</li><li>Is it built from the rate card?</li><li>Standard, one concession, net?</li><li>Is the concession ladder written and private?</li><li>Do the invoice terms say non-refundable?</li></ol></div>
+    </div>
+    <div>
+      <div class="box"><h4>Closing an engagement</h4><ol class="small"><li>Value review held with the principal.</li><li>Next logical piece proposed or noted.</li><li>Reference asked; answer and scope filed.</li><li>Referral asked.</li><li>Case study permission asked.</li><li>Account plan updated and the client moved to nurture.</li></ol></div>
+      <div class="box"><h4>Before any bulk send</h4><ol class="small"><li>Every address has a source and a consent date.</li><li>Suppressions loaded; bounces back-filled.</li><li>ZeptoMail from hello@, never Zoho.</li><li>Real payload posted to the live endpoint and the stored row read back.</li><li>One-click unsubscribe works.</li></ol></div>
+      <div class="box"><h4>Before a tender</h4><ol class="small"><li>Do we know the buyer?</li><li>Have we a reference they will accept, with consent?</li><li>Does the scoring favour us?</li><li>Can we staff it without taking partners off paying work?</li><li>Is the fee worth the bid cost? Two noes means no bid.</li></ol></div>
+    </div>
+  </div>
+</section>
+
+<section class="module">
+  <div class="eyebrow">Appendix D</div>
+  <h2>Glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Meaning here</th></tr>
+    <tr><td>Account plan</td><td>The one-page plan for an active client: outcome, signals, next piece, who knows us, proof status, risk</td></tr>
+    <tr><td>Engine</td><td>One of the four ways work arrives: expand, refer, be known, pursue</td></tr>
+    <tr><td>Entry offer</td><td>A small, fixed first engagement designed to stand alone and show the next one</td></tr>
+    <tr><td>List of fifty</td><td>The named organisations we most want to work with, tiered one-to-one, one-to-few and one-to-many</td></tr>
+    <tr><td>Options note</td><td>A short pre-engagement note with ranges, kill criteria and honest unknowns, and no fee table</td></tr>
+    <tr><td>Qualified opportunity</td><td>An opportunity scoring seven or more on the five questions</td></tr>
+    <tr><td>Room</td><td>A closed-door roundtable or briefing we host for owners and directors</td></tr>
+    <tr><td>The sweep</td><td>The Thursday growth meeting that keeps the pipeline true</td></tr>
+    <tr><td>Trigger</td><td>An event that moves an organisation into the market for what we sell</td></tr>
+    <tr><td>Value review</td><td>The midpoint and closing meeting with a client principal on outcome and next steps</td></tr>
+    <tr><td>95:5</td><td>The finding that only about one in twenty business buyers is in the market at any time</td></tr>
+  </table>
+  <p class="small" style="margin-top:14px">Related documents: the Marketing Handbook and the Marketing Operating Brief (docs/marketing), the Growth Pack (docs/office), the rate card (/finance/rate-card), the brand guide (docs/brand-guide-cfa.pdf). This book is built by scripts/build-cfa-growth-book.py from docs/growth/cfa-growth-book.html.</p>
+</section>
+
+</body>
+</html>

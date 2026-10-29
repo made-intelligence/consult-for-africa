@@ -3,11 +3,20 @@
 // three cannot disagree about what was asked for.
 //
 // Modelled on lib/osteon-audit.ts. Section letters here must stay in step with
-// the SECTIONS regex in app/api/dennis-ashley-audit/upload/route.ts (A..N).
+// the SECTIONS regex in app/api/dennis-ashley-audit/upload/route.ts (A..P).
 //
 // Client: Dennis Ashley Medical Clinic & Endoscopy Suites (Oniru, Victoria
-// Island, Lagos). Premium primary/wellness + endoscopy suites + a corporate
-// employee-health book across an eleven-payer panel.
+// Island, Lagos).
+//
+// Revised 13 Oct 2026 after the first two documents (the May 2026 board pack
+// and the visit log). The sections are cut so every document has exactly one
+// home: the company, then the money (results, then cash and obligations), then
+// revenue by who pays (self-pay, HMO, corporate), then activity and delivery
+// cost by service line (the five lines the board pack reports), then people,
+// premises and systems, licences and clinical governance, demand, direction.
+// Prices sit with the payer they apply to; clinician terms sit under people;
+// regulator-issued documents sit under licences, the operating records under
+// the service line that keeps them.
 
 export const DA_ENGAGEMENT = "dennis-ashley";
 
@@ -19,45 +28,54 @@ export type RequestSection = {
   hint: string;
 };
 
-/** The nine that turn a tour into an audit. Ordered by what unlocks the most. */
-export const PRIORITY_NINE: { n: number; what: string; why: string; section: string }[] = [
-  { n: 1, section: "C", what: "Management accounts or the income and expenditure record, monthly, last 12 months", why: "What the clinic earns, and what it costs to stand still" },
-  { n: 2, section: "C", what: "Bank statements for all business accounts, last 6 months", why: "The only unarguable record of what actually came in" },
-  { n: 3, section: "E", what: "The eleven payers, with the tariff schedule and claims-settlement history for each, last 12 months", why: "Yield is decided here, and no two payers pay alike" },
-  { n: 4, section: "F", what: "The corporate contract book: client, lives covered, scope, annual value and renewal date", why: "The demand base, and where its renewal risk sits" },
-  { n: 5, section: "G", what: "Consultation and endoscopy volumes by month, last 12 months, against suite capacity", why: "Utilisation is the profit driver and the suite is the asset" },
-  { n: 6, section: "H", what: "The current price card, and how a consultation and an endoscopy quote are built", why: "We cannot judge yield without knowing the list" },
-  { n: 7, section: "D", what: "Billings and collections by month, split by payer and self-pay, last 12 months", why: "How much of what is billed actually converts to cash" },
-  { n: 8, section: "K", what: "Full staff list with role, employment type and days worked per week, plus the rota", why: "Establishment against service is where small clinics fail" },
-  { n: 9, section: "I", what: "Endoscopy scope and stack inventory, and the reprocessing / AER validation records", why: "The suite's core asset, and its single biggest compliance exposure" },
+/** What has come in, so the team can see it landed and not send it twice. */
+export const RECEIVED: { what: string; section: string }[] = [
+  { section: "B", what: "Board pack of 19 May 2026: 2025 and 2024 year end, Q1 2026 and Q1 2025, by department" },
+  { section: "G", what: "Visit log, March 2025 to October 2026: virtual consultations and endoscopy" },
+  { section: "G", what: "Monthly activity for 2026: GP, endoscopy and pharmacy visits by type and funder" },
+];
+
+/** What we need next, ordered by what unlocks the most. */
+export const PRIORITY: { n: number; what: string; why: string; section: string }[] = [
+  { n: 1, section: "C", what: "Bank statements for every business account, January 2025 to date", why: "The record every other figure is checked against" },
+  { n: 2, section: "B", what: "Monthly management accounts or trial balance for 2025 and 2026 to date, and how overheads are split between departments", why: "The board pack is annual and quarterly; we need the months, and the basis of the 80/10/10 split" },
+  { n: 3, section: "M", what: "The lease, title or other arrangement for the Landmark Towers space, and who pays the rent and service charge", why: "No rent appears in the accounts, so we need to know how the premises are held" },
+  { n: 4, section: "H", what: "Every endoscopy since January 2024: date, procedure, who performed it, what they were paid, and the consumables and histology used", why: "To see what a procedure really costs once the doctor and materials are counted" },
+  { n: 5, section: "E", what: "Each HMO and insurer you are contracted with: the contract, the tariff, and claims submitted, paid and refused since January 2025", why: "The visit log shows few HMO patients; we need the whole panel" },
+  { n: 6, section: "F", what: "Corporate clients, current and past, including Stanbic: lives covered, scope, annual value, and when and why any ended", why: "What replaced the largest endoscopy client, and what can be won back" },
+  { n: 7, section: "K", what: "Ambulance work in 2025: each job, the client, what was charged, what the provider was paid, and the provider contract", why: "The largest line in 2025 and nil in Q1 2026; we need to know why" },
+  { n: 8, section: "L", what: "Staff list with role, start date, pay and days worked, plus payroll by month since January 2024", why: "Salaries roughly doubled in clinic and pharmacy in 2025" },
+  { n: 9, section: "G", what: "The same monthly activity summary for 2024 and 2025", why: "One year of activity cannot show a trend, and 2025 is the year the accounts cover" },
 ];
 
 export const REQUEST_SECTIONS: RequestSection[] = [
-  { key: "A", title: "The company, ownership and how decisions get made", hint: "CAC documents, shareholding, any shareholders' agreement, board or management notes, loans" },
-  { key: "B", title: "Licensing, regulatory standing and insurance", hint: "HEFAMAA, MDCN and nursing licences, endoscopy decontamination compliance, NAFDAC where drugs are held, indemnity cover, clinical-waste contract" },
-  { key: "C", title: "Money, in and out", hint: "Management accounts, bank statements, trial balance, asset register, monthly fixed costs" },
-  { key: "D", title: "Billings, collections and receivables", hint: "Billings and collections by month, by payer and self-pay, claims ageing, denials with reasons, days to payment" },
-  { key: "E", title: "Who pays: the payer panel", hint: "The eleven payers, the tariff or contract for each, claims performance and any debtor position" },
-  { key: "F", title: "The corporate book", hint: "Employee-health contracts: client, lives, scope, annual value, renewal date, and any capitation or retainer" },
-  { key: "G", title: "Activity and capacity", hint: "Consultation volumes by service line, endoscopy volumes by type against suite sessions, wellness and screening packages, no-shows and cancellations" },
-  { key: "H", title: "Price card and how a quote is built", hint: "Self-pay price list, endoscopy bundles, and any published corporate or package rates" },
-  { key: "I", title: "The endoscopy suite, decontamination and consumables", hint: "Scope and stack inventory, reprocessing and AER service and validation, consumable and reagent suppliers with unit prices, traceability" },
-  { key: "J", title: "Clinical governance, outcomes and safety", hint: "Consent forms, incident and complication register, adverse events, follow-up, protocols and any outcome measures" },
-  { key: "K", title: "People", hint: "Staff list, payroll, contracts, rota, joiners and leavers, visiting-consultant arrangements and fee splits, opening hours" },
-  { key: "L", title: "Systems, records and premises", hint: "EMR, practice-management and billing systems and what they export, patient-database size, equipment register, lease or title, floor plan, power" },
-  { key: "M", title: "Brand, referral and demand", hint: "Website analytics, marketing spend, referral sources and records, the corporate pipeline" },
-  { key: "N", title: "Where you want to take it", hint: "Service lines designed but not yet launched, and where the board wants to take the clinic. Notes or a conversation are fine" },
+  { key: "A", title: "Ownership and governance", hint: "CAC documents, shareholding, shareholders' agreement, board minutes, and any arrangement with a shareholder or related company" },
+  { key: "B", title: "Financial results", hint: "Audited accounts for the last three years, monthly management accounts or trial balance, the basis of the overhead split, and billings and collections by month split by self-pay, HMO and corporate" },
+  { key: "C", title: "Cash and what the business owes", hint: "Bank statements, loans and other financing, what is owed to suppliers, and tax filings (CIT, VAT, PAYE) with any assessments or penalties" },
+  { key: "D", title: "Self-pay patients", hint: "The self-pay price list and packages, discount and waiver practice, deposits, and balances patients still owe" },
+  { key: "E", title: "HMOs and insurers", hint: "Each payer you are contracted with: the contract, the tariff, claims submitted, paid and refused, and what each still owes, by age" },
+  { key: "F", title: "Corporate clients", hint: "Current and past employee-health contracts: client, lives, scope, price, annual value, renewal date, what each owes, and proposals in progress" },
+  { key: "G", title: "Clinic and virtual consultations", hint: "Consultations by month, in person and virtual, new and returning, by doctor; clinic hours and sessions; no-shows and cancellations; ECG and other in-clinic tests" },
+  { key: "H", title: "Endoscopy", hint: "Procedures by type and month, lists available against lists used, who performs and anaesthetises, consumables and histology per case, scope and stack inventory, reprocessing and AER validation records" },
+  { key: "I", title: "Laboratory", hint: "Tests by month, which tests go to which laboratory (Lancet, Afriglobal or others), the agreement and price per test with each, and turnaround times" },
+  { key: "J", title: "Pharmacy", hint: "Sales and customers by month, supplier list and prices, stock on hand, stock-takes, expiries and write-offs" },
+  { key: "K", title: "Ambulance and other services", hint: "Ambulance jobs by client and month, what was charged and what the provider was paid, the provider contract, and what MERC was and why it stopped" },
+  { key: "L", title: "People", hint: "Staff list, payroll by month, contracts, rota, joiners and leavers, and the terms for visiting and UK-based consultants: fee or split, and how often they come" },
+  { key: "M", title: "Premises, equipment and systems", hint: "Lease or title, rent and service charge and who pays them, floor plan, power, equipment register other than the endoscopy stack, and the EMR and billing systems and what they export" },
+  { key: "N", title: "Licences, insurance and clinical governance", hint: "HEFAMAA, MDCN, nursing, pharmacy and any ambulance licences, indemnity cover, clinical-waste contract, consent forms, protocols, and the incident and complication register" },
+  { key: "O", title: "Demand and marketing", hint: "How patients find you, referral sources and referring doctors, website and social analytics, marketing spend, and the size of the patient database" },
+  { key: "P", title: "Where you want to take it", hint: "Service lines planned but not yet launched, and where the board wants the clinic to go. Notes or a conversation are fine" },
 ];
 
 /** Sections offered in the uploader, priority first and a catch-all last. */
 export const UPLOAD_SECTIONS: RequestSection[] = [
-  { key: "priority", title: "One of the nine priority items", hint: "The nine we need first" },
+  { key: "priority", title: "One of the priority items", hint: "The items we need first" },
   ...REQUEST_SECTIONS,
   { key: "other", title: "Something else", hint: "Anything you think we should see that we did not ask for" },
 ];
 
 export const sectionLabel = (key: string): string => {
-  if (key === "priority") return "Priority nine";
+  if (key === "priority") return "Priority items";
   if (key === "other") return "Other";
   const s = REQUEST_SECTIONS.find((x) => x.key === key);
   return s ? `${s.key}. ${s.title}` : key;

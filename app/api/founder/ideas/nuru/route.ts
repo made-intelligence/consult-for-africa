@@ -15,7 +15,7 @@ export const POST = handler(async function POST(req: Request) {
   }
 
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-5-5",
     max_tokens: 600,
     messages: [{
       role: "user",
@@ -37,7 +37,7 @@ Be direct, specific to C4A's context. No em dashes. No generic advice.`,
     }],
   });
 
-  const nuruNotes = message.content[0].type === "text" ? message.content[0].text : "";
+  const nuruNotes = message.content.find((b) => b.type === "text")?.text ?? "";
 
   await prisma.founderIdea.update({
     where: { id: ideaId },

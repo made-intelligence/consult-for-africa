@@ -175,28 +175,27 @@ def build():
     el.append(card(
         "<b>This summarises the Memorandum. It does not replace it.</b> Where this page and a "
         "clause differ, the clause governs. The Memorandum records the terms we settled between "
-        "ourselves on 20 and 21 September, and it is not binding except on confidentiality, "
-        "status, governing law and the general clauses. The definitive services agreement "
-        "follows.", bg=CREAM))
+        "ourselves on 20 and 21 September, revised on 16 October. It is binding until the "
+        "definitive services agreement replaces it.", bg=CREAM))
 
     el.append(Paragraph("The commercial terms", H))
     tbl(el, [
-        ["Setup", f"NGN {MOU.SETUP_FEE}M across five months, Lagos and Abuja, in tranches of "
+        ["Setup", f"NGN {MOU.SETUP_FEE}M across five months, Lagos, in tranches of "
          + " / ".join(f"{a:.1f}" for _w, a, _n in MOU.TRANCHES) +
          ". Exclusive of VAT and of government and regulatory fees, which Medbury pays at cost. "
          "The platform build is inside it", "4, 5, 21"],
         ["The two COOs", "Medbury employs and pays salary and benefits. CFA recruits both at its "
          "own cost and Medbury approves each appointment. Both are seconded to CFA and report to "
          "CFA for delivery", "7"],
-        ["Support fee", f"NGN {MOU.SUPPORT_FEE:.0f}M a month from month six, payable in advance "
-         f"on the fifth business day of the month, on a standing instruction", "8, 14"],
+        ["Support fee", f"NGN {MOU.SUPPORT_FEE:g}M a month from month six, payable in advance "
+         f"on the fifth business day of the month. Any change by written agreement", "8, 14"],
         ["Performance", f"{MOU.REV_RATE} per cent of collected net revenue, paid quarterly and "
          f"trued up annually. One element only, with no share of EBITDA. Payable only where the "
          f"Board's revenue and EBITDA goals for the period are both met, so it is not paid on "
          f"revenue bought at the expense of profit. Only items passed through at cost are "
          f"outside the base", "9"],
-        ["Term", f"{MOU.TERM_MONTHS} months, with a formal review at {MOU.REVIEW_MONTHS} months",
-         "22"],
+        ["Term", f"{MOU.TERM_MONTHS} months, with a formal review at {MOU.REVIEW_MONTHS} months. "
+         "Either party may end it on 90 days' notice, not before the review", "22"],
     ], ["", "What it says", "Clause"], [74, FULLW - 136, 62])
 
     el.append(Paragraph("What the monthly fee buys, which is two things and not one", H))
@@ -228,8 +227,7 @@ def build():
         ["Facilities is not inside this",
          "CFA does facilities management and biomedical engineering and would like to, but it "
          "belongs on its own retainer. Before it can be priced we need to settle whether the "
-         "scope is the whole of Lyfe Place or only the division's spaces, and Lagos and Abuja "
-         "are quoted apart", "20"],
+         "scope is the whole of Lyfe Place or only the division's spaces", "20"],
         ["Clinical responsibility stays with Medbury",
          "The facility, clinical and professional registrations are held in Medbury's name, and "
          "clinical care and clinical negligence remain Medbury's. CFA is not a healthcare "
@@ -242,8 +240,7 @@ def build():
         f"tranche is received, so that date is the Commencement Date.",
         "<b>The two chief operating officer briefs approved</b>, so recruitment can open in week "
         "one rather than after mobilisation.",
-        "<b>A named finance contact on each side</b>, and the standing instruction for the "
-        "monthly fee set up before month six.",
+        "<b>A named finance contact on each side</b> before month six.",
     ])
     el.append(Spacer(1, 2))
     el.append(card(

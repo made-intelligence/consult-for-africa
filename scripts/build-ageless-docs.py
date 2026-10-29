@@ -30,10 +30,14 @@ PACK = {
         "AGELESS  ·  The programme", f"MedLYFE with Consult for Africa  ·  {TODAY}"),
     "ageless-speaker-pack-cfa": (
         "AGELESS  ·  Speaker pack", f"MedLYFE  ·  {EVENING}"),
+    "ageless-mc-pack-cfa": (
+        "AGELESS  ·  MC pack", f"MedLYFE  ·  {EVENING}"),
     "ageless-promoter-brief-cfa": (
         "AGELESS  ·  Promoter brief", f"Medlyfe  ·  {EVENING}"),
     "ageless-status-2pp-cfa": (
         "AGELESS  ·  Status", "Consult for Africa  ·  Confidential"),
+    "ageless-final-checklist-cfa": (
+        "AGELESS  ·  Final checklist", "Consult for Africa  ·  Internal"),
     "ageless-task-plan-cfa": (
         "AGELESS  ·  Task plan", f"Medlyfe with Consult for Africa  ·  {TODAY}"),
     "ageless-invite-links-cfa": (
@@ -44,6 +48,8 @@ PACK = {
         "AGELESS  ·  Plan summary", "Consult for Africa  ·  Confidential"),
     "ageless-mc-pack-cfa": (
         "AGELESS  ·  MC pack", f"MedLYFE  ·  {EVENING}"),
+    "ageless-post-event-report-cfa": (
+        "AGELESS  ·  Post-event report", "Consult for Africa  ·  For Medbury Healthcare Group"),
     "ageless-closure-note-cfa": (
         "AGELESS  ·  Closure note", "Consult for Africa  ·  For MedLYFE"),
     "ageless-thanks-chinwe-cfa": (

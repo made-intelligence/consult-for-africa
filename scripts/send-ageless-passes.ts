@@ -16,6 +16,7 @@
  *   npx tsx --env-file=.env.local scripts/send-ageless-passes.ts
  *   npx tsx --env-file=.env.local scripts/send-ageless-passes.ts --test
  *   npx tsx --env-file=.env.local scripts/send-ageless-passes.ts --send
+ *   npx tsx --env-file=.env.local scripts/send-ageless-passes.ts --send --only=a@x.com,b@y.com
  */
 import { execFileSync } from "child_process";
 import { createHash } from "crypto";
@@ -53,6 +54,9 @@ async function main() {
   const args = process.argv.slice(2);
   const test = args.includes("--test");
   const send = args.includes("--send");
+  // --only=a@x.com,b@y.com sends to those registrations alone, when the room
+  // cannot take everybody still waiting.
+  const only = args.find((a) => a.startsWith("--only="))?.slice(7).toLowerCase().split(",").filter(Boolean);
 
   if ((send || test) && !process.env.ZEPTOMAIL_API_KEY) {
     console.error("No ZEPTOMAIL_API_KEY. Refusing to fall through to Zoho.");
@@ -88,7 +92,7 @@ async function main() {
     }
     seen.set(k, `${r.fullName} <${r.email}>`);
     if (r.coordinatorNotes?.includes(PASS_SENT)) already.push(r.fullName);
-    else targets.push(r);
+    else if (!only || only.includes(r.email.trim().toLowerCase())) targets.push(r);
   }
 
   const heads = (rs: typeof rows) => rs.reduce((n, r) => n + 1 + (r.guestCount ?? 0), 0);

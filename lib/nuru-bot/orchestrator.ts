@@ -145,7 +145,7 @@ export class NuruMeetingSession {
     );
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 2000,
       messages: [
         {
@@ -179,8 +179,8 @@ Respond in this exact JSON format:
     let keyDecisions: string[] = [];
 
     try {
-      const firstBlock = response.content[0];
-      const text = firstBlock?.type === "text" ? firstBlock.text : "";
+      const firstBlock = response.content.find((b) => b.type === "text");
+      const text = firstBlock?.text ?? "";
       // Strip markdown fences if present
       const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "");
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);

@@ -20,7 +20,7 @@ Wednesday, 21 October 2026
 - Your questions are below. They are a brief, not a script. Tell us what you would rather be asked.
 - Speaker focus is what to prepare to open with, two to three minutes.
 - 70 guests. The room is for women and men who care about prevention, performance, metabolic health, body composition, self-care, skin health, aesthetics and ageing with more energy and confidence.
-- No slides, no lectern. Cocktail dress.
+- No slides, no lectern. Smart casual.
 
 ## What we need from you
 

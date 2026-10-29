@@ -1,5 +1,11 @@
 """
-Kakulus Media: three invoices to Medbury for the AGELESS films.
+Kakulus Media: invoices to Medbury for AGELESS. Three for the films, and a
+fourth (IVN15100601, 15 Oct) for photography and video coverage of the
+evening itself. IVN15100602/03 are the two 90-second films at the client's
+N750k each, replacing Kakulus's own IVN14102602 (N1.0m) and the 13 Oct drafts.
+Coverage is N1.2m. All plus VAT. IVN15100604 puts all three on ONE invoice
+with models (+200k, MedLYFE shoot) and an express fee of 200k per film;
+that is the one to send.
 
 One per film, each against its brief in docs/ageless/kakulus-brief-*.md:
 the ten minute opening film, the MedLYFE Experience (90s) and LyfePlace (90s).
@@ -8,7 +14,8 @@ invoice's rates. The half day live shoot sits on the opening film invoice;
 the MedLYFE Experience film carries only its extra setups on the same day.
 
 Run:
-  python3 scripts/build-kakulus-medbury-invoices.py
+  python3 scripts/build-kakulus-medbury-invoices.py               # all
+  python3 scripts/build-kakulus-medbury-invoices.py IVN15100601   # one
 """
 
 from __future__ import annotations
@@ -104,6 +111,81 @@ INVOICES = [
         "notes": "Final file by Monday 19 October 2026. Two rounds of notes are included.<br/>"
                  "Full, perpetual, worldwide rights to Medbury Healthcare Group.",
     },
+    {
+        "no": "IVN15100601",
+        "date": "15 October 2026",
+        "project": "AGELESS, Wednesday 21 October 2026, Capital Club, Victoria Island: photography and video "
+                   "coverage of the evening, arrival to close, and the post-production that follows.",
+        "lines": [
+            ("1", "Event photography", "Lead photographer, arrival at 6:00pm to close at 9:30pm", 300_000),
+            ("2", "Video coverage", "Two camera operators, every stage session recorded, sound from the house desk", 350_000),
+            ("3", "Kit, lighting and logistics", "Cameras, lenses, lighting, audio recorders, transport and setup from 4:00pm", 80_000),
+            ("4", "Same-night selects", "Twenty edited photographs delivered by 10:00am on Thursday 22 October, for social", 70_000),
+            ("5", "Photography post-production", "Edit and retouch of the set, with an online gallery for download", 150_000),
+            ("6", "Highlight film", "Two minute recap film, plus one 9:16 cut for social", 200_000),
+            ("7", "Session recordings", "The address, the panel and the fireside, each delivered in full as recorded", 50_000),
+        ],
+        "notes": "Highlight film, gallery and session recordings by Friday 23 October 2026. "
+                 "Two rounds of notes are included.<br/>"
+                 "The 70% deposit is non-refundable once the crew is booked. One change of date is free with 72 hours' notice.<br/>"
+                 "Full, perpetual, worldwide rights to Medbury Healthcare Group.",
+    },
+    {
+        "no": "IVN15100602",
+        "date": "15 October 2026",
+        "project": "The MedLYFE Experience: a 90-second brand film for MedLYFE, Lekki, delivered by Monday 19 October 2026. "
+                   "Replaces invoice IVN14102602.",
+        "lines": [
+            ("1", "Pre-production and shot list", "Treatment proposing which lines are voiceover and which are on screen, shot list", 80_000),
+            ("2", "Additional setups on the shared shoot day", "Quiet room, slow pushes, guest point of view, one held frame per service, framed for 16:9, 9:16 and 1:1", 80_000),
+            ("3", "Stock footage licences", "Shots the centre cannot provide, licensed for online advertising, licences supplied with delivery", 100_000),
+            ("4", "Voiceover", "Same artist as the opening film, recorded in the same session", 50_000),
+            ("5", "Edit, to two rounds of notes", "90-second master, final file 19 October", 140_000),
+            ("6", "Typography and end card", "Animated copy one line at a time, mark resolve, end card", 100_000),
+            ("7", "Grade, sound design and mix", "Grade and sound design for the slow-burn pace, stereo mix", 90_000),
+            ("8", "Music licence", "Cleared for paid online advertising in Nigeria", 70_000),
+            ("9", "Versioning and delivery", "Master 1920 x 1080, H.264, 25fps, stereo; social versions 1080 x 1920 and 1080 x 1080; archive drive with licences", 40_000),
+        ],
+        "notes": "Final file by Monday 19 October 2026. The half-day shoot at the MedLYFE centre is billed on invoice IVN14102601 "
+                 "for the opening film; this invoice covers only the additional setups.<br/>"
+                 "All rights in the film assign to Medbury Healthcare Group on final payment. Stock footage and music are licensed, not assigned.",
+    },
+    {
+        "no": "IVN15100603",
+        "date": "15 October 2026",
+        "project": "LyfePlace: a 90-second film to the client's copy, slow at the start and building to swift cuts, "
+                   "from licensed stock, delivered by Monday 19 October 2026.",
+        "lines": [
+            ("1", "Pre-production and shot list", "Treatment and shot list built from the copy", 60_000),
+            ("2", "Stock footage licences", "Commercially licensed clips, enough for the fast cut to the climax", 210_000),
+            ("3", "Voiceover", "Voice artist and recording", 60_000),
+            ("4", "Edit, to two rounds of notes", "90-second master, final file 19 October", 160_000),
+            ("5", "Typography and end card", "On-screen copy and end card", 90_000),
+            ("6", "Grade, sound design and mix", "Colour grade, sound design and mix", 70_000),
+            ("7", "Music licence", "Cleared for paid online advertising in Nigeria", 50_000),
+            ("8", "Versioning and delivery", "16:9 master, 9:16 and 1:1, archive drive with licences", 50_000),
+        ],
+        "notes": "Final file by Monday 19 October 2026.<br/>"
+                 "All rights in the film assign to Medbury Healthcare Group on final payment. Stock footage and music are licensed, not assigned.",
+    },
+    {
+        "no": "IVN15100604",
+        "date": "15 October 2026",
+        "project": "AGELESS, Capital Club, Wednesday 21 October 2026: the MedLYFE Experience and LyfePlace films, "
+                   "each 90 seconds and delivered by Monday 19 October, and coverage of the evening. "
+                   "Replaces invoices IVN14102602 and IVN15100601 to IVN15100603.",
+        "lines": [
+            ("1", "The MedLYFE Experience, 90 seconds", "Treatment, additional setups on the shared shoot day, stock, voiceover, edit to two rounds of notes, typography, grade and mix, music, 16:9, 9:16 and 1:1 versions", 750_000),
+            ("2", "Models, MedLYFE shoot", "Talent for the shoot at the MedLYFE centre, Lekki, with usage for the film and its social versions", 200_000),
+            ("3", "Express delivery, MedLYFE Experience", "Final file on Monday 19 October", 200_000),
+            ("4", "LyfePlace, 90 seconds", "Treatment, stock, voiceover, edit to two rounds of notes, typography, grade and mix, music, 16:9, 9:16 and 1:1 versions", 750_000),
+            ("5", "Express delivery, LyfePlace", "Final file on Monday 19 October", 200_000),
+            ("6", "Event photography and videography", "Photographer and two camera operators from 6:00pm to 9:30pm, twenty same-night selects, edited gallery, two minute highlight film with a 9:16 cut, session recordings", 1_200_000),
+        ],
+        "notes": "Both films by Monday 19 October 2026; event selects by 10:00am on Thursday 22 October; gallery, highlight film and "
+                 "session recordings by Friday 23 October. The half-day shoot at the MedLYFE centre is billed on invoice IVN14102601.<br/>"
+                 "All rights in the films and coverage assign to Medbury Healthcare Group on final payment. Stock footage and music are licensed, not assigned.",
+    },
 ]
 
 ss = {
@@ -140,7 +222,7 @@ def lines_of(c, x, y, rows, lead=10.2):
 def build(inv: dict) -> tuple[Path, int, int]:
     no = inv["no"]
     subtotal = sum(a for *_, a in inv["lines"])
-    vat = subtotal * 75 // 1000
+    vat = subtotal * 75 // 1000 if inv.get("vat", True) else 0
     total = subtotal + vat
     deposit = total * 70 // 100
     balance = total - deposit
@@ -171,7 +253,7 @@ def build(inv: dict) -> tuple[Path, int, int]:
     label(c, col3, top, "INVOICE NUMBER")
     lines_of(c, col3, top - 5 * mm, [(no, True)])
     label(c, col3, top - 12 * mm, "INVOICE DATE")
-    lines_of(c, col3, top - 17 * mm, [(INVOICE_DATE, True)])
+    lines_of(c, col3, top - 17 * mm, [(inv.get("date", INVOICE_DATE), True)])
 
     y = top - 32 * mm
     c.setStrokeColor(INK)
@@ -209,7 +291,7 @@ def build(inv: dict) -> tuple[Path, int, int]:
 
     tx = M + W - 78 * mm
     c.setStrokeColor(RULE)
-    for lab, val in (("Subtotal", naira(subtotal)), ("VAT at 7.5%", naira(vat))):
+    for lab, val in (("Subtotal", naira(subtotal)),) + ((("VAT at 7.5%", naira(vat)),) if vat else ()):
         c.setFont("Sans", 8.4)
         c.setFillColor(BODY)
         c.drawString(tx + 3 * mm, y - 4 * mm, lab)
@@ -269,6 +351,10 @@ def build(inv: dict) -> tuple[Path, int, int]:
 
 
 if __name__ == "__main__":
+    import sys
+    only = set(sys.argv[1:])
     for inv in INVOICES:
+        if only and inv["no"] not in only:
+            continue
         out, sub, tot = build(inv)
         print(f"{out.name}  subtotal {naira(sub)}  total {naira(tot)}")
