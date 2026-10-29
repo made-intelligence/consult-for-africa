@@ -33,7 +33,7 @@ export default async function OncadreEmployerLayout({
 
   // Counts that belong on the navigation itself, because an applicant nobody
   // looks at is the failure this product is trying to prevent.
-  const [newApplicants, answeredApproaches, pending] = await Promise.all([
+  const [newApplicants, answeredApproaches, pending, internshipCentre] = await Promise.all([
     prisma.cadreMandateMatch.count({
       where: {
         mandate: { employerOrgId: ctx.org.id },
@@ -45,6 +45,7 @@ export default async function OncadreEmployerLayout({
       where: { orgId: ctx.org.id, status: "ACCEPTED" },
     }),
     pendingFitFor(ctx.org),
+    prisma.cadreInternshipCentre.findUnique({ where: { employerOrgId: ctx.org.id }, select: { id: true } }),
   ]);
 
   return (
@@ -76,6 +77,7 @@ export default async function OncadreEmployerLayout({
             variant="top"
             newApplicants={newApplicants}
             answeredApproaches={answeredApproaches}
+            showInterns={Boolean(internshipCentre)}
           />
 
           <div className="flex shrink-0 items-center gap-3">
@@ -126,6 +128,7 @@ export default async function OncadreEmployerLayout({
         variant="bottom"
         newApplicants={newApplicants}
         answeredApproaches={answeredApproaches}
+        showInterns={Boolean(internshipCentre)}
       />
 
       <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 sm:pb-8 lg:px-8">
