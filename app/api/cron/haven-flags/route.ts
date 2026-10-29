@@ -77,6 +77,28 @@ export async function GET(req: NextRequest) {
   for (const u of used) if (u._min.usedAt) firstIn.set(u.staffId, u._min.usedAt);
 
   const now = new Date();
+
+  // Let old chases lapse. Nothing ever closed a flag except ticking the task,
+  // so a missed day stayed open for good: 144 sat open by late October, more
+  // than six for every person signed in, and a list that long says ticking
+  // changes nothing. A nudge is about one day and is stale after two; a flag
+  // stands for a week. Escalations are a human's to close and never lapse.
+  // The row stays, resolved, so the record of the miss is not lost.
+  const lapsed = await prisma.staffTaskFlag.updateMany({
+    where: {
+      resolvedAt: null,
+      staff: { clientId: client.id },
+      OR: [
+        // Aged from when it was raised, not forDate: a weekly flag is keyed to
+        // the Monday of a week that has already closed, so it would lapse the
+        // hour it was raised.
+        { level: "NUDGE", createdAt: { lt: new Date(now.getTime() - 2 * 864e5) } },
+        { level: "FLAG", createdAt: { lt: new Date(now.getTime() - 7 * 864e5) } },
+      ],
+    },
+    data: { resolvedAt: now, resolution: "Lapsed" },
+  });
+
   // Yesterday, not today. A task with a two hour grace is still inside it for
   // most of the morning, and flagging a nurse at 08:00 for a shift that ends at
   // 14:00 is how a system loses credibility on its first day.
@@ -118,6 +140,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  console.log(`[haven-flags] raised=${raised} for ${target.toISOString().slice(0, 10)}`);
-  return NextResponse.json({ ok: true, raised, forDate: target.toISOString().slice(0, 10) });
+  console.log(`[haven-flags] raised=${raised} lapsed=${lapsed.count} for ${target.toISOString().slice(0, 10)}`);
+  return NextResponse.json({ ok: true, raised, lapsed: lapsed.count, forDate: target.toISOString().slice(0, 10) });
 }

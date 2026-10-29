@@ -538,6 +538,7 @@ model Client {
   scoreboard         ScoreboardEntry[]
   trainingSessions   TrainingSession[]
   staffTasks         StaffTask[]
+  safetyReports      SafetyReport[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -8271,6 +8272,7 @@ model StaffMember {
   scoreboardAgreed  ScoreboardEntry[]     @relation("ScoreboardAgreements")
   presenting        TrainingSession[]     @relation("TrainingPresenter")
   trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
+  safetyInvestigations SafetyReport[]    @relation("SafetyInvestigator")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8772,6 +8774,72 @@ model StaffTaskFlag {
   @@unique([taskId, staffId, forDate, level])
   @@index([staffId, resolvedAt])
   @@index([resolvedAt])
+}
+
+/// One thing a member of staff reported at Haven, and what was done about it.
+///
+/// The near miss and what-is-broken forms stored a response and stopped there:
+/// fourteen reports in three weeks, a caught overdose among them, and not one
+/// investigated, because nothing gave a report an owner or an end. A report
+/// that is never visibly acted on is the last report that person files.
+///
+/// sourceId is the AuditSurveyResponse or StaffTaskCompletion it was raised
+/// from, unique so the backfill can be re-run without doubling anything.
+model SafetyReport {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  kind           SafetyReportKind
+  sourceId       String           @unique
+  what           String           @db.Text
+  why            String?          @db.Text
+  reachedPatient String?
+  /// Only where the reporter chose to give it. Never shown beyond leadership.
+  reportedBy     String?
+  reportedAt     DateTime
+
+  status   SafetyReportStatus @default(NEW)
+  severity SafetySeverity?
+
+  investigatorId String?
+  investigator   StaffMember? @relation("SafetyInvestigator", fields: [investigatorId], references: [id], onDelete: SetNull)
+  takenAt        DateTime?
+
+  /// What made it possible. A system, never a person.
+  findings    String?   @db.Text
+  action      String?   @db.Text
+  /// A role or a name. Free text because the owner may not have a login.
+  actionOwner String?
+  actionDueAt DateTime?
+
+  closedAt DateTime?
+  /// What changed, told to the whole team. No names.
+  teamNote String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, status])
+  @@index([investigatorId])
+}
+
+enum SafetyReportKind {
+  NEAR_MISS
+  BROKEN
+}
+
+enum SafetyReportStatus {
+  NEW
+  INVESTIGATING
+  ACTION_AGREED
+  CLOSED
+}
+
+enum SafetySeverity {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 /// A question from the room at an AGELESS evening, posted from a guest's phone
