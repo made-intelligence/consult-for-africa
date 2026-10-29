@@ -32,6 +32,8 @@ const STAGE_STYLE: Record<string, { bg: string; fg: string }> = {
   DECLINED: { bg: "#FEE2E2", fg: "#991B1B" },
 };
 
+type Outreach = { id: string; direction: string; subject: string; status: string; error: string | null; date: string; by: string | null };
+
 const input = "w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B3C5D]/20";
 const inputStyle = { border: "1px solid #E8EBF0", background: "#F8F9FB" };
 
@@ -41,12 +43,14 @@ export default function CentreRow({
   choices,
   staff,
   orgs,
+  history,
 }: {
   centre: Centre;
   ownerName: string | null;
   choices: number;
   staff: { id: string; name: string | null }[];
   orgs: { id: string; name: string }[];
+  history: Outreach[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,6 +76,7 @@ export default function CentreRow({
 
   const st = STAGE_STYLE[centre.stage] ?? STAGE_STYLE.PROSPECT;
   const overdue = centre.nextActionDue && centre.nextActionDue < new Date().toISOString().slice(0, 10);
+  const sent = history.filter((o) => o.direction === "OUT" && o.status === "SENT");
 
   return (
     <div className="rounded-xl bg-white" style={{ border: "1px solid #E8EBF0" }}>
@@ -83,6 +88,9 @@ export default function CentreRow({
         </span>
         <span className="text-xs text-gray-500">{ownerName ?? "No owner"}</span>
         <span className="text-xs tabular-nums text-gray-500">{choices} chose it</span>
+        <span className="text-xs text-gray-500">
+          {!centre.contactEmail ? <span style={{ color: "#B45309" }}>No email</span> : sent.length ? `Emailed ${sent.length}x, last ${sent[0].date}` : "Not emailed"}
+        </span>
         {centre.nextAction && (
           <span className="w-full text-xs sm:w-auto" style={{ color: overdue ? "#B91C1C" : "#6B7280" }}>
             Next: {centre.nextAction}
@@ -137,6 +145,19 @@ export default function CentreRow({
             </label>
             <label className="block text-xs text-gray-600 sm:col-span-2 lg:col-span-3">Notes<textarea rows={3} className={`${input} mt-1`} style={inputStyle} value={f.notes ?? ""} onChange={set("notes")} /></label>
           </div>
+          {history.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-700">History</p>
+              <ul className="mt-1 space-y-1 text-xs text-gray-600">
+                {history.map((o) => (
+                  <li key={o.id}>
+                    <span className="tabular-nums text-gray-400">{o.date}</span> {o.direction === "IN" ? "They enquired" : `Emailed${o.by ? ` by ${o.by}` : ""}`}: {o.subject}
+                    {o.status === "FAILED" && <span className="text-red-600"> (failed: {o.error})</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             onClick={() =>

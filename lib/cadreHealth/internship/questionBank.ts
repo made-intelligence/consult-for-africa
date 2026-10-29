@@ -11,21 +11,10 @@
 
 export const BANK_VERSION = "2026-10-a";
 
-/** Questions drawn per section, and the time allowed for the whole paper. */
-export const PER_SECTION = 6;
-export const TIME_LIMIT_MINUTES = 50;
-
-export const SECTIONS = {
-  FUND: "Fundamentals and the nursing process",
-  MEDSURG: "Medical and surgical nursing",
-  PHARM: "Pharmacology and drug calculations",
-  MCH: "Maternal, newborn and child health",
-  IPC: "Infection prevention and patient safety",
-  PROF: "Professional practice and ethics",
-  EMERG: "Emergency care",
-} as const;
-
-export type SectionKey = keyof typeof SECTIONS;
+// The shape of the paper lives in ./paper so pages that only quote it never
+// bundle the answers.
+import { PER_SECTION, SECTIONS, TIME_LIMIT_MINUTES, type SectionKey } from "./paper";
+export { PER_SECTION, SECTIONS, TIME_LIMIT_MINUTES, type SectionKey };
 
 export interface Question {
   id: string;

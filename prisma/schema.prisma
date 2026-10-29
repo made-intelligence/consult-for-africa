@@ -8844,11 +8844,35 @@ model CadreInternshipCentre {
   employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: SetNull)
 
   preferences CadreInternshipPreference[]
+  outreach    CadreInternshipOutreach[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([stage])
+}
+
+/// Every email we send a centre, and every enquiry a centre sends us from the
+/// centres page. The history the person working the list needs before the next
+/// approach, and what stops one centre getting the same email twice.
+model CadreInternshipOutreach {
+  id        String                 @id @default(cuid())
+  centreId  String?
+  centre    CadreInternshipCentre? @relation(fields: [centreId], references: [id], onDelete: SetNull)
+  direction String // OUT (we emailed them) | IN (they enquired)
+  email     String
+  subject   String
+  body      String                 @db.Text
+  /// Which preset it started from, e.g. "intro", "demand".
+  template  String?
+  status    String // SENT | FAILED | RECEIVED
+  error     String?
+  /// Staff user who sent it. Plain id, resolved on read.
+  sentById  String?
+  createdAt DateTime               @default(now())
+
+  @@index([centreId, createdAt])
+  @@index([direction, createdAt])
 }
 
 enum CadreInternshipStatus {

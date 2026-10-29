@@ -73,6 +73,12 @@ export const LAGOS_CENTRES: { name: string; area?: string; ownership: string }[]
   { name: "Police Hospital, Falomo", area: "Ikoyi", ownership: "FEDERAL" },
 ];
 
+/**
+ * Centres Debo approaches himself: Evercare through the chairman, Duchess as a
+ * current client. Bulk email never goes to them.
+ */
+export const PARTNER_LED = new Set(["evercare-hospital-lekki", "duchess-international-hospital"]);
+
 export function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }

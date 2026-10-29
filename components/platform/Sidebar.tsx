@@ -113,6 +113,7 @@ const OFFICE_NAV: NavSection[] = [
     items: [
       { label: "Tasks",          href: "/tasks",          icon: ClipboardList },
       { label: "Campaigns",      href: "/campaigns",      icon: Megaphone },
+      { label: "Nurse internships", href: "/admin/cadre-internships", icon: GraduationCap },
     ],
   },
   {
