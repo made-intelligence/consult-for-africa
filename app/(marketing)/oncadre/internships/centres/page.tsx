@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CURRENT_INTAKE, INTAKE_LABEL } from "@/lib/cadreHealth/internship/programme";
 import { QUESTION_COUNT, SECTIONS, TIME_LIMIT_MINUTES } from "@/lib/cadreHealth/internship/paper";
 import { PROGRAMME_EMAIL, PROGRAMME_LEAD } from "@/lib/cadreHealth/internship/outreach";
+import { PUBLIC_CENTRE } from "@/lib/cadreHealth/internship/listing";
 import CentreJoinForm from "./CentreJoinForm";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +43,7 @@ const EXAMPLE = {
 
 export default async function CentresPage() {
   const [centres, applicants] = await Promise.all([
-    prisma.cadreInternshipCentre.findMany({ where: { stage: { not: "DECLINED" } }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.cadreInternshipCentre.findMany({ where: PUBLIC_CENTRE, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.cadreInternshipApplication.count({ where: { intake: CURRENT_INTAKE } }),
   ]);
 
@@ -151,7 +152,7 @@ export default async function CentresPage() {
         <section id="join" className="scroll-mt-24 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Ask to join</h2>
-            <p className="mt-2 text-gray-600">Twenty minutes with your Head of Nursing is enough to set it up. We reply within one working day.</p>
+            <p className="mt-2 text-gray-600">Your centre is listed for graduates only once you agree. Tell us who to talk to and we send your private link to claim the account. We reply within one working day.</p>
             {applicants >= 25 && <p className="mt-3 text-sm font-semibold" style={{ color: NAVY }}>{applicants} graduates have applied for the {INTAKE_LABEL} so far.</p>}
             <div className="mt-6 rounded-2xl bg-white p-5" style={card}>
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Your contact</p>
@@ -159,10 +160,18 @@ export default async function CentresPage() {
               <p className="text-sm text-gray-500">{PROGRAMME_LEAD.role}</p>
               <a href={`mailto:${PROGRAMME_EMAIL}?subject=Internship centre`} className="mt-2 inline-block text-sm font-semibold" style={{ color: NAVY }}>{PROGRAMME_EMAIL}</a>
             </div>
+            {centres.length > 0 && (
+              <div className="mt-4 rounded-2xl bg-white p-5" style={card}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Taking part</p>
+                <ul className="mt-2 space-y-1 text-sm text-gray-800">
+                  {centres.map((c) => <li key={c.id}>{c.name}</li>)}
+                </ul>
+              </div>
+            )}
             <Link href="/oncadre/internships" className="mt-4 inline-block text-sm text-gray-500 underline">See the page graduates apply on</Link>
           </div>
           <div className="rounded-3xl bg-white p-6 sm:p-8" style={{ ...card, boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 12px 32px rgba(11,60,93,0.08)" }}>
-            <CentreJoinForm centres={centres} />
+            <CentreJoinForm />
           </div>
         </section>
       </div>

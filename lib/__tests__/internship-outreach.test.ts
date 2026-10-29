@@ -22,6 +22,7 @@ const vars: OutreachVars = {
   centres: "31",
   intake: "2027 intake",
   centresPage: "https://consultforafrica.com/oncadre/internships/centres",
+  claimLink: "https://consultforafrica.com/oncadre/internships/claim/abc",
   senderName: "Favour Aina",
   senderRole: "Programme lead",
 };
@@ -40,10 +41,13 @@ describe("renderText", () => {
     expect(unknownFields("{{centrename}} {{greeting}} {{centrename}}")).toEqual(["centrename"]);
   });
 
-  it("puts the number in the demand subject", () => {
+  it("puts the applicant number in the demand subject", () => {
     const demand = PRESETS.find((p) => p.key === "demand")!;
-    expect(renderText(demand.subject, vars)).toBe("14 BNSc graduates have chosen Reddington Hospital for their internship");
-    expect(demand.needsChoices).toBe(true);
+    expect(renderText(demand.subject, vars)).toBe("212 BNSc graduates are applying for internship places in Lagos");
+  });
+
+  it("gives every preset the centre's claim link, because claiming is the consent", () => {
+    for (const p of PRESETS) expect(p.body).toContain("{{claimLink}}");
   });
 
   it("uses no em dash in any preset", () => {

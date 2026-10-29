@@ -2,14 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { publicView } from "@/lib/cadreHealth/internship/state";
-import { MATCH_LABEL } from "@/lib/cadreHealth/internship/programme";
+import { MATCH_LABEL, MAX_PREFERENCES } from "@/lib/cadreHealth/internship/programme";
 
 type View = ReturnType<typeof publicView>;
 
 const card = { border: "1px solid #E8EBF0", boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)" };
 
-export default function InternshipApplication({ token, initial, questionCount, minutes }: { token: string; initial: View; questionCount: number; minutes: number }) {
+type Centre = { id: string; name: string; area: string | null };
+
+export default function InternshipApplication({ token, initial, questionCount, minutes, centres }: { token: string; initial: View; questionCount: number; minutes: number; centres: Centre[] }) {
   const [view, setView] = useState<View>(initial);
+  const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -80,7 +83,33 @@ export default function InternshipApplication({ token, initial, questionCount, m
       )}
 
       <div className="rounded-2xl bg-white p-6 sm:p-8" style={card}>
-        <p className="text-base font-semibold text-gray-900">Your centres</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-base font-semibold text-gray-900">Your centres</p>
+          {view.preferences.every((p) => p.status === "PENDING") && view.status !== "PLACED" && centres.length > 0 && !editing && (
+            <button onClick={() => setEditing(true)} className="text-sm font-semibold text-[#0B3C5D] hover:underline">
+              {view.preferences.length ? "Change" : "Choose centres"}
+            </button>
+          )}
+        </div>
+        {editing && (
+          <Chooser
+            centres={centres}
+            initial={view.preferences.map((p) => p.centreId).filter((id) => centres.some((c) => c.id === id))}
+            busy={busy}
+            onCancel={() => setEditing(false)}
+            onSave={async (ids) => {
+              const r = await post({ action: "choose", centreIds: ids });
+              if (r) setEditing(false);
+            }}
+          />
+        )}
+        {!editing && view.preferences.length === 0 && (
+          <p className="mt-3 text-sm text-gray-600">
+            {centres.length
+              ? `You have not chosen any centres yet. Choose up to ${MAX_PREFERENCES}; your result goes only to them.`
+              : "No centre has joined this intake yet. Come back to this page as centres join, and choose up to " + MAX_PREFERENCES + "."}
+          </p>
+        )}
         <ul className="mt-4 space-y-2">
           {view.preferences.map((p) => (
             <li key={p.id} className="rounded-lg px-3 py-3" style={{ border: "1px solid #E8EBF0" }}>
@@ -89,7 +118,7 @@ export default function InternshipApplication({ token, initial, questionCount, m
                   <span className="mr-2 text-xs font-bold text-[#0B3C5D]">{p.rank}</span>
                   {p.centre}
                 </span>
-                <span className="shrink-0 text-xs text-gray-500">{p.participating ? MATCH_LABEL[p.status] : "Not yet participating"}</span>
+                <span className="shrink-0 text-xs text-gray-500">{p.participating ? MATCH_LABEL[p.status] : "No longer taking part"}</span>
               </div>
               {p.status === "OFFERED" && (
                 <div className="mt-3 flex gap-2">
@@ -231,6 +260,59 @@ function Paper({ token, view, onDone }: { token: string; view: View; onDone: (v:
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Choose or reorder centres, until a centre acts on the application. */
+function Chooser({ centres, initial, busy, onSave, onCancel }: { centres: Centre[]; initial: string[]; busy: boolean; onSave: (ids: string[]) => void; onCancel: () => void }) {
+  const [chosen, setChosen] = useState<string[]>(initial);
+  const [q, setQ] = useState("");
+  const byId = new Map(centres.map((c) => [c.id, c]));
+  const toggle = (id: string) => setChosen((p) => (p.includes(id) ? p.filter((x) => x !== id) : p.length >= MAX_PREFERENCES ? p : [...p, id]));
+  const move = (i: number, d: -1 | 1) =>
+    setChosen((p) => {
+      const n = [...p];
+      const j = i + d;
+      if (j < 0 || j >= n.length) return p;
+      [n[i], n[j]] = [n[j], n[i]];
+      return n;
+    });
+
+  return (
+    <div className="mt-4 space-y-3">
+      {chosen.length > 0 && (
+        <ol className="space-y-1.5">
+          {chosen.map((id, i) => (
+            <li key={id} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm" style={{ border: "1px solid #0B3C5D", background: "rgba(11,60,93,0.04)" }}>
+              <span className="w-5 text-xs font-bold text-[#0B3C5D]">{i + 1}</span>
+              <span className="min-w-0 flex-1 text-gray-800">{byId.get(id)?.name}</span>
+              <button type="button" onClick={() => move(i, -1)} className="px-1.5 text-gray-500" aria-label="Move up">↑</button>
+              <button type="button" onClick={() => move(i, 1)} className="px-1.5 text-gray-500" aria-label="Move down">↓</button>
+              <button type="button" onClick={() => toggle(id)} className="px-1.5 text-xs text-gray-500 hover:text-red-600">Remove</button>
+            </li>
+          ))}
+        </ol>
+      )}
+      <input className="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none" style={{ border: "1px solid #E8EBF0", background: "#F8F9FB" }} placeholder="Search by name or area" value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="max-h-64 overflow-y-auto rounded-lg" style={{ border: "1px solid #E8EBF0" }}>
+        {centres
+          .filter((c) => !chosen.includes(c.id))
+          .filter((c) => !q.trim() || `${c.name} ${c.area ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()))
+          .map((c) => (
+            <button key={c.id} type="button" onClick={() => toggle(c.id)} disabled={chosen.length >= MAX_PREFERENCES} className="block w-full px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-50 disabled:opacity-40" style={{ borderBottom: "1px solid #F1F3F6" }}>
+              {c.name}
+              {c.area && <span className="text-gray-400"> · {c.area}</span>}
+            </button>
+          ))}
+      </div>
+      <div className="flex gap-2">
+        <button type="button" onClick={() => onSave(chosen)} disabled={busy} className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white disabled:opacity-50" style={{ background: "#0B3C5D" }}>
+          {busy ? "Saving..." : "Save my centres"}
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2.5 text-sm text-gray-600" style={{ border: "1px solid #E8EBF0" }}>Cancel</button>
+      </div>
+      <p className="text-xs text-gray-400">Your result goes only to the centres you choose. You can change them until a centre acts on your application.</p>
     </div>
   );
 }

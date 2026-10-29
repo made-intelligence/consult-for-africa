@@ -5,12 +5,11 @@ import { useState } from "react";
 const input = "w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B3C5D]/20";
 const inputStyle = { border: "1px solid #E8EBF0", background: "#F8F9FB" };
 
-export default function CentreJoinForm({ centres }: { centres: { id: string; name: string }[] }) {
-  const [f, setF] = useState({ centreId: "", otherCentre: "", name: "", role: "", email: "", phone: "", places: "", message: "" });
+export default function CentreJoinForm() {
+  const [f, setF] = useState({ centre: "", name: "", role: "", email: "", phone: "", places: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
   const [error, setError] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setF((p) => ({ ...p, [k]: e.target.value }));
-  const other = f.centreId === "other";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,8 +19,7 @@ export default function CentreJoinForm({ centres }: { centres: { id: string; nam
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        centreId: other ? null : f.centreId,
-        otherCentre: other ? f.otherCentre : undefined,
+        centre: f.centre,
         name: f.name,
         role: f.role,
         email: f.email,
@@ -49,14 +47,7 @@ export default function CentreJoinForm({ centres }: { centres: { id: string; nam
 
   return (
     <form onSubmit={submit} className="space-y-3">
-      <select required className={input} style={inputStyle} value={f.centreId} onChange={set("centreId")}>
-        <option value="">Your centre</option>
-        {centres.map((c) => (
-          <option key={c.id} value={c.id}>{c.name}</option>
-        ))}
-        <option value="other">My centre is not listed</option>
-      </select>
-      {other && <input required className={input} style={inputStyle} placeholder="Name of your centre" value={f.otherCentre} onChange={set("otherCentre")} />}
+      <input required className={input} style={inputStyle} placeholder="Name of your centre" value={f.centre} onChange={set("centre")} />
       <div className="grid gap-3 sm:grid-cols-2">
         <input required className={input} style={inputStyle} placeholder="Your name" value={f.name} onChange={set("name")} />
         <input required className={input} style={inputStyle} placeholder="Your role, e.g. Head of Nursing" value={f.role} onChange={set("role")} />

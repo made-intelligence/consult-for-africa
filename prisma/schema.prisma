@@ -8839,6 +8839,18 @@ model CadreInternshipCentre {
   intakeNote   String? // e.g. "January and July intakes"
   committedAt  DateTime?
 
+  /// Public listing. A centre appears on the public pages only with its own
+  /// consent: normally by claiming its account through a private link, or,
+  /// when it agreed by phone or letter, recorded by staff with a note.
+  listed        Boolean   @default(false)
+  claimToken    String?   @unique
+  consentAt     DateTime?
+  consentName   String?
+  consentRole   String?
+  consentSource String? // CLAIMED | RECORDED
+  consentById   String? // staff user who recorded it; null when the centre claimed
+  consentNote   String?
+
   /// The employer login that sees this centre's candidates.
   employerOrgId String?           @unique
   employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: SetNull)
@@ -8850,6 +8862,7 @@ model CadreInternshipCentre {
   updatedAt DateTime @updatedAt
 
   @@index([stage])
+  @@index([listed])
 }
 
 /// Every email we send a centre, and every enquiry a centre sends us from the

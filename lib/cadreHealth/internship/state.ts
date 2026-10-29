@@ -13,7 +13,7 @@ export async function loadApplication(token: string) {
     include: {
       professional: { select: { firstName: true, lastName: true, email: true } },
       attempt: true,
-      preferences: { orderBy: { rank: "asc" }, include: { centre: { select: { id: true, name: true, stage: true, minScore: true } } } },
+      preferences: { orderBy: { rank: "asc" }, include: { centre: { select: { id: true, name: true, stage: true, listed: true, minScore: true } } } },
     },
   });
   if (!app) return null;
@@ -64,7 +64,8 @@ export function publicView(app: LoadedApplication) {
       id: p.id,
       rank: p.rank,
       centre: p.centre.name,
-      participating: p.centre.stage === "COMMITTED",
+      centreId: p.centre.id,
+      participating: p.centre.listed && p.centre.stage !== "DECLINED",
       status: p.status,
     })),
   };

@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { contactLimiter } from "@/lib/rate-limit-redis";
 import { notifyEnquiry, REPLY_TO } from "@/lib/cadreHealth/internship/outreachSend";
+import { matchCentre } from "@/lib/cadreHealth/internship/outreach";
 
 const schema = z.object({
-  centreId: z.string().min(1).nullable(),
-  otherCentre: z.string().trim().max(160).optional(),
+  centre: z.string().trim().min(2).max(160),
   name: z.string().trim().min(2).max(120),
   role: z.string().trim().min(2).max(120),
   email: z.string().trim().toLowerCase().email(),
@@ -31,16 +31,14 @@ export const POST = handler(async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return Response.json({ error: "Please complete your name, role, email and phone." }, { status: 400 });
   const d = parsed.data;
-  if (!d.centreId && !d.otherCentre) return Response.json({ error: "Choose your centre." }, { status: 400 });
+  // Typed, not picked from a list: the public page does not name centres that
+  // have not agreed to be listed. Matched here, and refused when unclear.
+  const all = await prisma.cadreInternshipCentre.findMany({ select: { id: true, name: true, stage: true, ownerUserId: true, contactName: true, contactRole: true, contactEmail: true, contactPhone: true } });
+  const centre = matchCentre(d.centre, all);
 
-  const centre = d.centreId
-    ? await prisma.cadreInternshipCentre.findUnique({ where: { id: d.centreId }, select: { id: true, name: true, stage: true, ownerUserId: true, contactName: true, contactRole: true, contactEmail: true, contactPhone: true, notes: true } })
-    : null;
-  if (d.centreId && !centre) return Response.json({ error: "Choose your centre." }, { status: 400 });
-
-  const centreName = centre?.name ?? d.otherCentre!;
+  const centreName = centre?.name ?? d.centre;
   const lines = [
-    `Centre: ${centreName}${centre ? "" : " (not on our list)"}`,
+    centre ? `Centre: ${centre.name} (they typed "${d.centre}")` : `Centre: ${d.centre} (not matched to our list)`,
     `From: ${d.name}, ${d.role}`,
     `Email: ${d.email}`,
     `Phone: ${d.phone}`,
@@ -63,7 +61,7 @@ export const POST = handler(async function POST(req: NextRequest) {
         ...(!centre.contactEmail ? { contactEmail: d.email } : {}),
         ...(!centre.contactPhone ? { contactPhone: d.phone } : {}),
         ...(centre.stage === "PROSPECT" || centre.stage === "CONTACTED" ? { stage: "MEETING" } : {}),
-        nextAction: `Reply to ${d.name}'s enquiry and book a meeting`,
+        nextAction: `Reply to ${d.name} and send the claim link`,
         nextActionDue: new Date(Date.now() + 24 * 3600_000),
       },
     });
