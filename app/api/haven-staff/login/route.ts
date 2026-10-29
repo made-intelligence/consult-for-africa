@@ -2,20 +2,26 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
-import { newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
+import { findStaffByIdentifier, greetingName, maskEmail, newLoginCode, TOKEN_TTL_MINUTES, type DeliveryChannel } from "@/lib/staffAuth";
 import { sendSMS } from "@/lib/cadreHealth/sms";
 
-// Public endpoint. A staff member gives their email and gets a six-digit code.
+// Public endpoint. A staff member gives their email or mobile number and gets a
+// six-digit code at the email we hold for them.
 //
-// The response is identical whether or not the address belongs to anybody, so
-// this cannot be used to find out who works at the hospital. For nineteen named
-// people that matters less than usual, but the surface is public and the cost
-// of getting it right is one line.
+// This used to answer identically whether or not the address matched anybody,
+// so it could not be used to learn who works at the hospital. The price was
+// seven of twenty-five staff who typed an address we did not hold, were told a
+// code was on its way, and waited for one that was never sent. Not one of them
+// produced a single code in a fortnight. For twenty-five people whose names and
+// numbers sit in a directory every colleague can open, "we cannot find that" is
+// worth far more than it gives away. The address itself is never returned.
 
 export const dynamic = "force-dynamic";
 
 const CLIENT_NAME = "Haven Paediatric Centre";
-const bodySchema = z.object({ email: z.string().email().max(200) });
+// "email" stays the field name for the page already open in people's browsers;
+// it now carries an email address or a mobile number.
+const bodySchema = z.object({ email: z.string().trim().min(3).max(200) });
 
 /**
  * SMS first where we hold a mobile, email behind it.
@@ -72,23 +78,24 @@ hello@consultforafrica.com`,
 
 export async function POST(req: NextRequest) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
-  // Same shape as success: a malformed address is not worth distinguishing.
-  if (!parsed.success) return NextResponse.json({ ok: true });
+  if (!parsed.success) return NextResponse.json({ ok: false, found: false });
 
-  const email = parsed.data.email.trim().toLowerCase();
+  const typed = parsed.data.email;
 
   try {
     const client = await prisma.client.findFirst({
       where: { name: CLIENT_NAME },
       select: { id: true },
     });
-    if (!client) return NextResponse.json({ ok: true });
+    if (!client) return NextResponse.json({ ok: false, found: false });
 
-    const staff = await prisma.staffMember.findFirst({
-      where: { clientId: client.id, email, isActive: true },
-      select: { id: true, name: true, phone: true },
-    });
-    if (!staff) return NextResponse.json({ ok: true });
+    const staff = await findStaffByIdentifier(client.id, typed);
+    if (!staff || !staff.email) {
+      // Logged so the next "I am not getting the code" can be answered from
+      // the logs: what they typed, against a list we can check.
+      console.warn("[haven-staff/login] no match for", typed);
+      return NextResponse.json({ ok: false, found: false });
+    }
 
     // Retire anything already outstanding, so only the newest code works and an
     // older email sitting in the inbox is inert.
@@ -98,7 +105,7 @@ export async function POST(req: NextRequest) {
     });
 
     const { code, hash } = newLoginCode(staff.id);
-    const via = await deliver(email, staff.phone, staff.name.split(" ")[0], code);
+    const via = await deliver(staff.email, staff.phone, greetingName(staff.name), code);
 
     await prisma.staffLoginToken.create({
       data: {
@@ -110,11 +117,12 @@ export async function POST(req: NextRequest) {
         userAgent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
       },
     });
-  } catch (err) {
-    // Never leak the reason. A failure here must look the same as success, or
-    // the error itself becomes the enumeration oracle.
-    console.error("[haven-staff/login]", err);
-  }
 
-  return NextResponse.json({ ok: true });
+    // Masked, so the person knows which inbox to open without the page reading
+    // anybody's address out to whoever typed their number.
+    return NextResponse.json({ ok: true, found: true, sentTo: via === "SMS" ? "your phone" : maskEmail(staff.email) });
+  } catch (err) {
+    console.error("[haven-staff/login]", err);
+    return NextResponse.json({ ok: false, found: true, error: "We could not send the code just now. Please try again in a minute." });
+  }
 }

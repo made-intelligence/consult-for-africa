@@ -546,6 +546,7 @@ model Client {
   ndas               Nda[]
   creditNotes        CreditNote[]
   agentOpportunities AgentOpportunity[]
+  marketWatches      MarketWatch[]
 
   // Communications CRM back-relations
   communications   Communication[]
@@ -660,6 +661,7 @@ model Engagement {
   ndas               Nda[]
   impactMetrics      EngagementImpactMetric[]
   dashboards         EngagementDashboard[]
+  marketWatches      MarketWatch[]
   knowledgeAssets    KnowledgeAsset[]
   frameworks         EngagementFramework[]
   staffingRequests   StaffingRequest[]
@@ -2819,6 +2821,18 @@ model Meeting {
   nuruEnabled Boolean @default(true)
   nuruJoined  Boolean @default(false)
 
+  /// The Daily room this meeting is held in. Rooms sit on the Daily domain
+  /// Mezo already pays for, named cfa-<id> so the two never collide. Daily
+  /// transcribes the call itself, so nothing has to join it to take notes.
+  dailyRoomName String? @unique
+
+  /// What Nuru heard promised, drafted from the transcript and waiting for
+  /// the office to confirm. Nothing here is in the register until somebody
+  /// has said yes to it, because a misheard owner becomes a wrong chase.
+  aiCommitments           Json?
+  commitmentsReviewedAt   DateTime?
+  commitmentsReviewedById String?
+
   // Transcript & Notes
   transcript     String?  @db.Text
   aiSummary      String?  @db.Text
@@ -4587,27 +4601,28 @@ model CadreProfessional {
   profileCompleteness Int @default(0) // 0-100
 
   // Relations
-  credentials          CadreCredential[]
-  qualifications       CadreQualification[]
-  cpdEntries           CadreCPDEntry[]
-  workHistory          CadreWorkHistory[]
-  facilityReviews      CadreFacilityReview[]
-  salaryReports        CadreSalaryReport[]
-  mandateMatches       CadreMandateMatch[]
-  readinessAssessments CadreReadinessAssessment[]
-  outreachRecord       CadreOutreachRecord?
-  whatsAppMessages     CadreWhatsAppMessage[]
-  facilityReferrals    CadreFacilityReferral[]    @relation("FacilityReferrals")
-  careerReports        CadreCareerReport[]
-  advisorMessages      CadreAdvisorMessage[]
-  mentorProfile        CadreMentorProfile?
-  menteeMentorships    CadreMentorship[]          @relation("MenteeMentorships")
-  notifications        CadreNotification[]
-  subscription         CadreSubscription?
-  coachingSessions     CadreCoachingSession[]
-  mezoInterest         CadreMezoInterest?
-  shortlistEntries     CadreShortlistEntry[]
-  contactRequests      CadreContactRequest[]
+  credentials            CadreCredential[]
+  qualifications         CadreQualification[]
+  cpdEntries             CadreCPDEntry[]
+  workHistory            CadreWorkHistory[]
+  facilityReviews        CadreFacilityReview[]
+  salaryReports          CadreSalaryReport[]
+  mandateMatches         CadreMandateMatch[]
+  readinessAssessments   CadreReadinessAssessment[]
+  outreachRecord         CadreOutreachRecord?
+  whatsAppMessages       CadreWhatsAppMessage[]
+  facilityReferrals      CadreFacilityReferral[]      @relation("FacilityReferrals")
+  careerReports          CadreCareerReport[]
+  advisorMessages        CadreAdvisorMessage[]
+  mentorProfile          CadreMentorProfile?
+  menteeMentorships      CadreMentorship[]            @relation("MenteeMentorships")
+  notifications          CadreNotification[]
+  subscription           CadreSubscription?
+  coachingSessions       CadreCoachingSession[]
+  mezoInterest           CadreMezoInterest?
+  shortlistEntries       CadreShortlistEntry[]
+  contactRequests        CadreContactRequest[]
+  internshipApplications CadreInternshipApplication[]
 
   // Profile analytics
   profileViews Int       @default(0)
@@ -4850,10 +4865,11 @@ model CadreEmployerOrg {
   /// first message. Null means the client is named openly.
   publicName String?
 
-  members         CadreEmployerAccount[]
-  mandates        CadreMandate[]
-  shortlists      CadreShortlist[]
-  contactRequests CadreContactRequest[]
+  members          CadreEmployerAccount[]
+  mandates         CadreMandate[]
+  shortlists       CadreShortlist[]
+  contactRequests  CadreContactRequest[]
+  internshipCentre CadreInternshipCentre?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -5222,6 +5238,13 @@ model CadreMandate {
   // Placement value tracking
   placementFeeNGN    Decimal? @db.Decimal(12, 2)
   placedConsultantId String? // FK to CadreProfessional who was placed
+
+  /// What the client says makes the right person for this role, in their own
+  /// words, collected through the fit request at /oncadre/fit/[token]. Every
+  /// applicant is scored against it, so nobody here filters by hand. Shape in
+  /// lib/cadreHealth/fitProfile.ts.
+  fitProfile   Json?
+  fitProfileAt DateTime?
 
   // Case study capture (once PLACED). Hospital must opt-in to public
   // reference before we use it for cold outreach.
@@ -7768,6 +7791,25 @@ model LyfeEnquiry {
   @@index([nextActionAt])
 }
 
+/// Who the AGELESS invitation was emailed to. The list itself is gathered by
+/// hand from several people's contacts and kept off git; this table is the
+/// copy the platform can show, so the queue can say who was written to, who
+/// bounced and who came back. One row per address.
+model LyfeInvitation {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String
+  /// Set when the address is an office inbox written to for a named person.
+  onBehalfOf String?
+  /// Whose list the name came from: main, office, sally, and so on.
+  source     String
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([sentAt])
+}
+
 // ─── Hospital sales: one directory, every product ───────────────────────────
 // Claims recovery is the first product sold through this. Each product gets a
 // stage per hospital, and every outbound email is a SalesCampaignSend so the
@@ -8730,4 +8772,415 @@ model StaffTaskFlag {
   @@unique([taskId, staffId, forDate, level])
   @@index([staffId, resolvedAt])
   @@index([resolvedAt])
+}
+
+/// A question from the room at an AGELESS evening, posted from a guest's phone
+/// at /ageless/live. Votes are a plain counter: the room is seventy-odd people
+/// and the stakes are which question the chair reads next, so a browser-side
+/// guard against double votes is enough. The chair hides anything unsuitable.
+model AgelessQuestion {
+  id        String   @id @default(cuid())
+  /// The edition, so the series can reuse the table. "2026-10" for the first.
+  edition   String
+  text      String   @db.Text
+  askerName String?
+  /// Who it is for, if the guest chose a speaker.
+  forWhom   String?
+  votes     Int      @default(0)
+  hidden    Boolean  @default(false)
+  answered  Boolean  @default(false)
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([edition, hidden, votes])
+}
+
+// ─── CadreHealth: Nurse internship placement ───
+//
+// Newly qualified nurses compete for a small number of internship places at
+// NMCN-approved centres, and each centre runs its own written exam before it
+// interviews. CadreHealth runs one assessment, and each centre gets a ranked
+// list of the people who chose it. The centre keeps the interview and the
+// decision; we take the exam and the admin off its hands.
+
+enum CadreInternshipCentreStage {
+  PROSPECT // on the approved list, not yet approached
+  CONTACTED // first approach made
+  MEETING // in conversation
+  COMMITTED // agreed slots and a minimum score; candidates flow to it
+  DECLINED
+}
+
+/// An approved internship centre, and the record of our engagement with it.
+/// The BD fields live here because the people working the list are the same
+/// people the centre will deal with once it says yes.
+model CadreInternshipCentre {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  area      String? // Lagos district, e.g. "Lekki", "Ikeja"
+  ownership String? // PRIVATE, STATE, FEDERAL, MILITARY, MISSION
+
+  stage         CadreInternshipCentreStage @default(PROSPECT)
+  /// Platform user (staff) who owns the relationship. Plain id, resolved on read.
+  ownerUserId   String?
+  contactName   String?
+  contactRole   String?
+  contactEmail  String?
+  contactPhone  String?
+  nextAction    String?
+  nextActionDue DateTime?
+  notes         String?                    @db.Text
+
+  /// What the centre has agreed, once it commits.
+  slotsOffered Int?
+  /// Minimum assessment score (percent) a candidate needs to reach this centre's list.
+  minScore     Int?
+  intakeNote   String? // e.g. "January and July intakes"
+  committedAt  DateTime?
+
+  /// The employer login that sees this centre's candidates.
+  employerOrgId String?           @unique
+  employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: SetNull)
+
+  preferences CadreInternshipPreference[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stage])
+}
+
+enum CadreInternshipStatus {
+  APPLIED // form in, assessment not finished
+  ASSESSED // assessment submitted and scored
+  PLACED // accepted an offer
+  WITHDRAWN
+}
+
+model CadreInternshipApplication {
+  id             String            @id @default(cuid())
+  professionalId String
+  professional   CadreProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  /// Intake label, e.g. "2027-H1". One application per person per intake.
+  intake         String
+
+  qualification  String // BNSC, RN, RM, RN_RM
+  school         String
+  graduationYear Int
+  /// NMCN registration (licence) number, if issued yet.
+  nmcnNumber     String?
+  phone          String
+
+  /// The link the applicant uses to sit and see the assessment. No password:
+  /// most applicants are new graduates with no account, and the link is emailed.
+  accessToken String @unique
+
+  /// The applicant agreed that the centres they chose may see their score and details.
+  consentAt DateTime
+  status    CadreInternshipStatus @default(APPLIED)
+
+  preferences CadreInternshipPreference[]
+  attempt     CadreInternshipAttempt?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([professionalId, intake])
+  @@index([intake, status])
+}
+
+enum CadreInternshipMatchStatus {
+  PENDING // on the centre's list, no decision yet
+  INVITED // invited to interview
+  OFFERED
+  ACCEPTED // the nurse took the place
+  DECLINED // the centre passed
+  WITHDRAWN // the nurse withdrew, or took a place elsewhere
+}
+
+/// One ranked choice of centre by one applicant. This is the row a centre acts on.
+model CadreInternshipPreference {
+  id            String                     @id @default(cuid())
+  applicationId String
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  centreId      String
+  centre        CadreInternshipCentre      @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  rank          Int
+  status        CadreInternshipMatchStatus @default(PENDING)
+  decidedAt     DateTime?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+
+  @@unique([applicationId, centreId])
+  @@index([centreId, status])
+}
+
+/// The one sitting of the assessment. The question set is drawn and fixed at
+/// start, scoring happens on the server, and the clock is the server's.
+model CadreInternshipAttempt {
+  id            String                     @id @default(cuid())
+  applicationId String                     @unique
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  bankVersion   String
+  /// [{ id, order: number[] }]: the questions drawn and the option order shown.
+  paper         Json
+  /// { [questionId]: optionIndex as shown }
+  answers       Json                       @default("{}")
+  startedAt     DateTime                   @default(now())
+  deadlineAt    DateTime
+  submittedAt   DateTime?
+  /// Percent correct, 0-100.
+  score         Int?
+  /// { [sectionKey]: { correct, total } }
+  sectionScores Json?
+}
+
+// ─── Market Watch ─────────────────────────────────────────────────────────
+// Social listening and market intelligence for a client's brand and its
+// competitors. A watch names who we follow; crons pull what the public says
+// about them from each source into WatchMention, read it, raise alerts, and
+// each week compose an EngagementDashboard draft for a partner to publish.
+// Only aggregates reach the client portal; the raw feed stays with CFA.
+
+model MarketWatch {
+  id           String            @id @default(cuid())
+  name         String
+  /// Optional: Mezo and other in-house brands have no client record.
+  clientId     String?
+  client       Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  /// Where the weekly dashboard draft lands. Without one, the watch is internal only.
+  engagementId String?
+  engagement   Engagement?       @relation(fields: [engagementId], references: [id], onDelete: SetNull)
+  status       MarketWatchStatus @default(ACTIVE)
+  /// healthcare, aesthetics, nutrition: picks the aspect taxonomy the reader tags with.
+  sector       String            @default("healthcare")
+  /// What the business does, in a sentence. The reader uses it to judge relevance.
+  context      String?           @db.Text
+  /// Who gets same-day alerts and the weekly brief. CFA staff by default.
+  alertEmails  String[]
+  lastRunAt    DateTime?
+  createdById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  entities WatchEntity[]
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  alerts   WatchAlert[]
+  runs     WatchRun[]
+
+  @@index([status])
+}
+
+enum MarketWatchStatus {
+  ACTIVE
+  PAUSED
+}
+
+/// One brand we follow: the client's own, or a competitor.
+model WatchEntity {
+  id              String          @id @default(cuid())
+  watchId         String
+  watch           MarketWatch     @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  name            String
+  role            WatchEntityRole @default(COMPETITOR)
+  /// Search terms. Any one matching counts, e.g. ["Medlyfe", "Lyfe Plastics"].
+  keywords        String[]
+  /// Words that make a match a false positive, e.g. a namesake in another trade.
+  excludes        String[]
+  /// Google Maps place, for reviews and rating.
+  googlePlaceId   String?
+  googleCid       String?
+  instagramHandle String?
+  tiktokHandle    String?
+  xHandle         String?
+  facebookPage    String?
+  youtubeChannel  String?
+  website         String?
+  /// The Awario alert that tracks this brand, when Awario is the web feed.
+  awarioAlertId   String?
+  /// Pages watched for changes: price lists, services, team.
+  trackedUrls     String[]
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  pages    WatchPageSnapshot[]
+
+  @@index([watchId])
+}
+
+enum WatchEntityRole {
+  OWN
+  COMPETITOR
+}
+
+enum WatchSource {
+  GOOGLE_REVIEW
+  NEWS
+  X
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+  YOUTUBE
+  REDDIT
+  NAIRALAND
+  WEB
+  WEBSITE_CHANGE
+  SEARCH_INTEREST
+}
+
+enum WatchSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  MIXED
+}
+
+model WatchMention {
+  id              String       @id @default(cuid())
+  watchId         String
+  watch           MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId        String?
+  entity          WatchEntity? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+  source          WatchSource
+  /// The source's own id, so a re-fetch updates rather than duplicates.
+  externalId      String
+  url             String?
+  authorName      String?
+  authorHandle    String?
+  /// Followers of the author where the source gives it; drives reach.
+  authorFollowers Int?
+  title           String?
+  text            String       @db.Text
+  publishedAt     DateTime
+  /// Star rating for reviews, 1 to 5.
+  rating          Int?
+  likes           Int?
+  comments        Int?
+  shares          Int?
+  views           Int?
+  /// The business's own reply, for reviews.
+  ownerReply      String?      @db.Text
+  ownerRepliedAt  DateTime?
+  raw             Json?
+
+  // Filled by the reader (lib/market-watch/classify.ts)
+  classifiedAt   DateTime?
+  relevant       Boolean?
+  sentiment      WatchSentiment?
+  /// -1 to 1.
+  sentimentScore Float?
+  /// Healthcare aspects, e.g. ["wait_time", "billing"].
+  aspects        String[]
+  /// Someone asking where to get what the client sells.
+  isLead         Boolean         @default(false)
+  isComplaint    Boolean         @default(false)
+  /// A claim or post that could become a regulatory or reputational problem.
+  isRisk         Boolean         @default(false)
+  language       String?
+  summary        String?
+  /// A suggested public reply for a review. Never confirms the reviewer is a patient.
+  replyDraft     String?         @db.Text
+  /// Set when staff corrected the reader, so a re-read does not undo them.
+  correctedBy    String?
+
+  /// CFA staff working the feed.
+  starred   Boolean   @default(false)
+  handledAt DateTime?
+  handledBy String?
+
+  fetchedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alerts WatchAlert[]
+
+  @@unique([watchId, source, externalId])
+  @@index([watchId, publishedAt])
+  @@index([watchId, classifiedAt])
+  @@index([entityId, publishedAt])
+}
+
+/// A number about an entity on a day: followers, rating, review count, search interest.
+model WatchMetric {
+  id       String       @id @default(cuid())
+  watchId  String
+  watch    MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId String
+  entity   WatchEntity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  metric   String
+  date     DateTime     @db.Date
+  value    Float
+  source   WatchSource?
+
+  @@unique([entityId, metric, date])
+  @@index([watchId, metric, date])
+}
+
+/// The last seen text of a tracked page, so a change can be spotted and described.
+model WatchPageSnapshot {
+  id        String      @id @default(cuid())
+  entityId  String
+  entity    WatchEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  url       String
+  hash      String
+  text      String      @db.Text
+  fetchedAt DateTime    @default(now())
+
+  @@index([entityId, url, fetchedAt])
+}
+
+enum WatchAlertKind {
+  NEGATIVE_REVIEW
+  NEGATIVE_MENTION
+  SPIKE
+  RISK
+  LEAD
+  COMPETITOR_MOVE
+}
+
+model WatchAlert {
+  id             String         @id @default(cuid())
+  watchId        String
+  watch          MarketWatch    @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  mentionId      String?
+  mention        WatchMention?  @relation(fields: [mentionId], references: [id], onDelete: SetNull)
+  kind           WatchAlertKind
+  title          String
+  detail         String         @db.Text
+  /// Stops the same thing alerting twice, e.g. "spike:<entity>:<date>".
+  dedupeKey      String
+  emailedAt      DateTime?
+  acknowledgedAt DateTime?
+  acknowledgedBy String?
+  createdAt      DateTime       @default(now())
+
+  @@unique([watchId, dedupeKey])
+  @@index([watchId, createdAt])
+}
+
+/// One pull from one source, so a silent source is visible rather than mistaken for a quiet week.
+model WatchRun {
+  id              String      @id @default(cuid())
+  watchId         String
+  watch           MarketWatch @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  /// The source's key in lib/market-watch/sources, e.g. "instagram-profiles".
+  source          String
+  startedAt       DateTime    @default(now())
+  finishedAt      DateTime?
+  fetched         Int         @default(0)
+  inserted        Int         @default(0)
+  skipped         String?
+  error           String?     @db.Text
+  /// Slow sources (Apify runs, DataForSEO review tasks) start a job in one run
+  /// and collect it in a later one. The job's id waits here until collected.
+  pendingRef      String?
+  pendingEntityId String?
+  collectedAt     DateTime?
+
+  @@index([watchId, startedAt])
+  @@index([pendingRef, collectedAt])
 }

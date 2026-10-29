@@ -28,6 +28,9 @@ Run:
 from __future__ import annotations
 
 from pathlib import Path
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cfa_company import LEGAL_LINE, RC, TIN  # noqa: E402
 
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.enums import TA_LEFT
@@ -134,7 +137,7 @@ def page_bg(c, doc):
     c.rect(MARGIN, 26, 20, 2, fill=1, stroke=0)
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.4)
-    c.drawString(MARGIN, 15, "Consult for Africa Management Services Limited")
+    c.drawString(MARGIN, 15, LEGAL_LINE)
     c.drawRightString(PAGE_W - MARGIN, 15, "Page %d" % doc.page)
     if DRAFT:
         c.saveState()

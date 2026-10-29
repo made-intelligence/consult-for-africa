@@ -40,20 +40,39 @@ export default function HavenStaffLogin() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function askForCode(e?: React.FormEvent) {
     e?.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await fetch("/api/haven-staff/login", {
+      const res = await fetch("/api/haven-staff/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      const body = await res.json().catch(() => null);
+      if (!body?.found) {
+        // Say so, and stay on this step. Moving on to "enter your code" when no
+        // code was sent is how seven people waited a fortnight for nothing.
+        setError(
+          "We cannot find that on Haven's staff list. Try your mobile number instead, or the email address you gave the hospital. Still stuck? Ask your head of department and we will sort it out."
+        );
+        setStep("email");
+        setBusy(false);
+        return;
+      }
+      if (!body.ok) {
+        setError(body.error ?? "We could not send the code just now. Please try again in a minute.");
+        setBusy(false);
+        return;
+      }
+      setSentTo(body.sentTo ?? null);
     } catch {
-      // The reply is deliberately identical either way, so there is nothing
-      // useful to say here beyond "check your email".
+      setError("No connection. Check your signal and try again.");
+      setBusy(false);
+      return;
     }
     setCode("");
     setStep("code");
@@ -103,19 +122,25 @@ export default function HavenStaffLogin() {
             <form onSubmit={askForCode}>
               <h2 style={{ color: NAVY, fontSize: 21, margin: 0 }}>Sign in</h2>
               <p style={{ color: MUTED, fontSize: 15.5, lineHeight: 1.65, margin: "10px 0 20px" }}>
-                Put in your email address and we will send you a six-digit code, by text message if we
-                have your number, otherwise by email. There is no password to remember.
+                Put in your email address or your mobile number and we will send you a six-digit code.
+                There is no password to remember.
               </p>
               <input
-                type="email"
+                type="text"
                 required
                 autoComplete="email"
-                inputMode="email"
-                placeholder="you@example.com"
+                autoCapitalize="none"
+                autoCorrect="off"
+                placeholder="Email or mobile number"
                 value={email}
                 onChange={(ev) => setEmail(ev.target.value)}
                 style={field}
               />
+              {error && (
+                <p style={{ background: "#FBEEE9", color: "#7A2F2F", fontSize: 14.5, lineHeight: 1.6, padding: "12px 14px", borderRadius: 10, margin: "14px 0 0" }}>
+                  {error}
+                </p>
+              )}
               <button type="submit" disabled={busy} style={{ ...primary, opacity: busy ? 0.6 : 1 }}>
                 {busy ? "Sending…" : "Send me a code"}
               </button>
@@ -124,8 +149,8 @@ export default function HavenStaffLogin() {
             <form onSubmit={submitCode}>
               <h2 style={{ color: NAVY, fontSize: 21, margin: 0 }}>Enter your code</h2>
               <p style={{ color: MUTED, fontSize: 15.5, lineHeight: 1.65, margin: "10px 0 20px" }}>
-                If <strong style={{ color: NAVY }}>{email}</strong> is on the staff list, a six-digit
-                code is on its way to you, by text message or by email. It lasts thirty minutes.
+                We have sent a six-digit code to <strong style={{ color: NAVY }}>{sentTo ?? "your email"}</strong>.
+                It lasts thirty minutes.
               </p>
               <input
                 required
@@ -156,7 +181,7 @@ export default function HavenStaffLogin() {
                 </button>
               </div>
               <p style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.6, margin: "18px 0 0" }}>
-                Nothing arrived? Check your texts and your spam folder, then ask any of us and we will sort it out.
+                Nothing after two minutes? Check your spam or promotions folder, then tap Send another code.
               </p>
             </form>
           )}

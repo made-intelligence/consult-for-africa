@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import TopBar from "@/components/platform/TopBar";
 import { SURVEYS } from "@/lib/surveys/registry";
-import { ARABELLA_ENGAGEMENT, PRIORITY_EIGHT, REQUEST_SECTIONS, sectionLabel } from "@/lib/arabella-audit";
+import { ADDITIONAL_ITEMS, ARABELLA_ENGAGEMENT, PRIORITY_EIGHT, REQUEST_SECTIONS, sectionLabel } from "@/lib/arabella-audit";
 
 export const dynamic = "force-dynamic";
 
@@ -48,8 +48,10 @@ export default async function ArabellaAuditPage() {
     (p) => !bySection.has(p.section) && !bySection.has("priority")
   );
   const silent = REQUEST_SECTIONS.filter((s) => !bySection.has(s.key));
+  const octoberOutstanding = ADDITIONAL_ITEMS.filter((i) => !bySection.has(`R${i.n}`));
   const ordered = [...bySection.entries()].sort(([a], [b]) => {
-    const rank = (k: string) => (k === "priority" ? -1 : k === "other" ? 99 : k.charCodeAt(0));
+    const rank = (k: string) =>
+      /^R\d+$/.test(k) ? -100 + Number(k.slice(1)) : k === "priority" ? -1 : k === "other" ? 99 : k.charCodeAt(0);
     return rank(a) - rank(b);
   });
 
@@ -78,6 +80,17 @@ export default async function ArabellaAuditPage() {
               </div>
             </div>
           </div>
+
+          {octoberOutstanding.length > 0 && (
+            <div className="text-sm" style={{ background: "#FDF3E3", borderLeft: "3px solid #D4AF37", padding: "10px 14px", color: "#7a5b1f" }}>
+              <b>October request: {octoberOutstanding.length} of {ADDITIONAL_ITEMS.length} items with nothing against them yet</b>
+              <ul className="mt-1 list-disc pl-5">
+                {octoberOutstanding.map((i) => (
+                  <li key={i.n}>{i.n}. {i.what}{i.first ? " (first)" : ""}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {priorityOutstanding.length > 0 && (
             <div className="text-sm" style={{ background: "#FDF3E3", borderLeft: "3px solid #D4AF37", padding: "10px 14px", color: "#7a5b1f" }}>

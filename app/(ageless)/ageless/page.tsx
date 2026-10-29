@@ -18,6 +18,11 @@ import EnquiryForm from "@/app/(lyfe)/lyfe/EnquiryForm";
 import LyfeNav from "@/app/(lyfe)/lyfe/LyfeNav";
 import AboutGroup from "@/app/(lyfe)/lyfe/AboutGroup";
 import StickyRsvp from "@/app/(lyfe)/lyfe/StickyRsvp";
+import { prisma } from "@/lib/prisma";
+import After from "./After";
+
+/** From the morning after, the page thanks the room instead of filling it. */
+const EVENING_OVER = new Date("2026-10-22T00:00:00+01:00");
 
 const DESCRIPTION = `MedLYFE and The Lyfe Place present Ageless: ${LYFE_EVENT.proposition.toLowerCase()}. An evening on ${LYFE_EVENT.date} at ${LYFE_EVENT.venueName}. ${LYFE_EVENT.standfirst}`;
 
@@ -92,9 +97,26 @@ export default async function LyfePage({
     utm_campaign?: string;
     i?: string;
     go?: string;
+    g?: string;
   }>;
 }) {
   const sp = await searchParams;
+  if (Date.now() >= EVENING_OVER.getTime()) {
+    // A personal link carries the guest's own invitation token, so the page
+    // can greet them and the forms need not ask who they are.
+    const token = sp.g?.trim().slice(0, 200) || null;
+    const guest = token
+      ? await prisma.lyfeEnquiry
+          .findUnique({ where: { inviteToken: token }, select: { fullName: true } })
+          .catch(() => null)
+      : null;
+    return (
+      <div style={{ fontFamily: sans }}>
+        <LyfeNav on="after" />
+        <After token={guest ? token : null} firstName={guest ? firstNameOf(guest.fullName) : null} />
+      </div>
+    );
+  }
   // Every inviter sends their own link, so the key on the URL is worth more
   // than a utm_source somebody pasted. It wins when both are present.
   const inviter = lyfeInviter(sp.i);
@@ -121,6 +143,13 @@ export default async function LyfePage({
       <StickyRsvp />
     </div>
   );
+}
+
+function firstNameOf(full: string): string {
+  const drop = /^(dr|prof|professor|mrs|mr|ms|miss|chief|barr|engr|sir)\.?$/i;
+  const parts = full.trim().split(/\s+/).filter((w) => !drop.test(w));
+  const f = parts[0] || full.trim();
+  return f === f.toUpperCase() ? f[0] + f.slice(1).toLowerCase() : f;
 }
 
 /* ─── brand furniture ──────────────────────────────────────────────────────── */
@@ -191,7 +220,9 @@ function Rule({ color = MB.lime, width = 56 }: { color?: string; width?: number 
   return <div className="h-px" style={{ width, background: color, opacity: 0.75 }} />;
 }
 
-function RsvpButton({ children = "Register your interest" }: { children?: React.ReactNode }) {
+function RsvpButton({
+  children = LYFE_EVENT.waitlistOnly ? "Join the waiting list" : "Register your interest",
+}: { children?: React.ReactNode }) {
   return (
     <a
       href="?go=rsvp#enquire"
@@ -387,8 +418,14 @@ function Hero() {
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
               <RsvpButton />
               <span className="text-[14px]" style={{ color: MB.greenSoft }}>
-                An intimate evening for {LYFE_EVENT.places}. Register your interest by{" "}
-                {LYFE_EVENT.rsvpBy} and we will come back to you.
+                {LYFE_EVENT.waitlistOnly ? (
+                  <>The room of {LYFE_EVENT.places} is full. Join the waiting list and we will write if a place opens.</>
+                ) : (
+                  <>
+                    An intimate evening for {LYFE_EVENT.places}. Register your interest by{" "}
+                    {LYFE_EVENT.rsvpBy} and we will come back to you.
+                  </>
+                )}
               </span>
             </div>
 
@@ -663,7 +700,7 @@ function Rsvp({
     <Section bg={MB.green} id="enquire">
       <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
-          <Eyebrow>Register your interest</Eyebrow>
+          <Eyebrow>{LYFE_EVENT.waitlistOnly ? "The waiting list" : "Register your interest"}</Eyebrow>
           <h2
             className="mt-5 text-[30px] leading-[1.14] md:text-[42px]"
             style={{ fontFamily: display, fontWeight: 600, color: MB.white, letterSpacing: "-0.02em" }}
@@ -671,9 +708,9 @@ function Rsvp({
             We would like you there.
           </h2>
           <p className="mt-5 text-[16px] leading-relaxed" style={{ color: MB.mist }}>
-            It is a small room, {LYFE_EVENT.places} places, so names are confirmed in advance
-            rather than taken at the door. Tell us you would like to come and we will write
-            back with a link of your own. Your place is held the moment you use it.
+            {LYFE_EVENT.waitlistOnly
+              ? `The room of ${LYFE_EVENT.places} is full. Leave your details and you join the waiting list. If a place opens we will write with a link of your own, and your place is held the moment you use it.`
+              : `It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. Tell us you would like to come and we will write back with a link of your own. Your place is held the moment you use it.`}
           </p>
 
           <div className="mt-9">

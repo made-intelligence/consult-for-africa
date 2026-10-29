@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getStaffSession } from "@/lib/staffAuth";
 import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
+import { checkAnswer } from "@/lib/havenTaskPrompts";
 
 // Tick a task, or untick it.
 //
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const task = await prisma.staffTask.findUnique({
     where: { id: parsed.data.taskId },
-    select: { id: true, clientId: true, isActive: true, cadence: true },
+    select: { id: true, clientId: true, isActive: true, cadence: true, code: true },
   });
   if (!task || task.clientId !== session.clientId || !task.isActive) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -46,6 +47,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, done: false });
   }
 
+  // Tasks that are an answer need the answer. See lib/havenTaskPrompts.
+  const missing = checkAnswer(task.code, parsed.data.note);
+  if (missing) return NextResponse.json({ error: missing }, { status: 422 });
+
   await prisma.staffTaskCompletion.upsert({
     where: { taskId_staffId_forDate: { taskId: task.id, staffId: session.sub, forDate } },
     update: { note: parsed.data.note?.trim() || null },
@@ -62,6 +67,14 @@ export async function POST(req: NextRequest) {
   await prisma.staffTaskFlag.updateMany({
     where: { taskId: task.id, staffId: session.sub, forDate, resolvedAt: null },
     data: { resolvedAt: new Date(), resolution: "Completed" },
+  });
+  // And an older period's chase on the same task. There is nowhere on the page
+  // to record last week, so without this a flag from a missed week sat beside
+  // a ticked box saying "Not recorded yet" for ever, and the person was left
+  // believing the tick had not saved.
+  await prisma.staffTaskFlag.updateMany({
+    where: { taskId: task.id, staffId: session.sub, forDate: { lt: forDate }, resolvedAt: null },
+    data: { resolvedAt: new Date(), resolution: "Completed in a later period" },
   });
 
   return NextResponse.json({ ok: true, done: true });

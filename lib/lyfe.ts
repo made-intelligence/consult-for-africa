@@ -168,10 +168,17 @@ export const LYFE_EVENT = {
   // of the eleven inviter links had been sent, so a Friday deadline was
   // closing a door nobody had been shown. The 19th gives a week of chasing
   // and still leaves two clear days to finalise the room.
-  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Monday, 19 October",
+  // Extended to the 20th on the 19th: places were still open and the
+  // two-days-to-go post went out that evening.
+  rsvpBy: process.env.NEXT_PUBLIC_LYFE_RSVP_BY || "Tuesday, 20 October",
   /// Curated rather than conference scale, and cut from 130 to 70 on 6 October.
   /// A real number, so the scarcity line on the page is a fact not a device.
-  places: 70,
+  /// Raised to 75 on 20 October, the eve of the evening.
+  places: 75,
+  /// From 20 October every new registration joins the waiting list rather
+  /// than the queue for an invitation. The team offers a place from it by
+  /// hand if one opens.
+  waitlistOnly: true,
 } as const;
 
 /**
@@ -309,6 +316,17 @@ export const LYFE_INVITERS: LyfeInviter[] = [
     bucket: "General invitations: micro-influencers and curated picks",
     places: 10,
     note: "The general link, and the one to use when nobody specific sent them.",
+  },
+  {
+    // The emailed invitation carries ?i=list. Without this entry the key was
+    // dropped on arrival and every registration from the email read as
+    // unattributed.
+    key: "list",
+    name: "The invitation email",
+    credit: null,
+    bucket: "General invitations: micro-influencers and curated picks",
+    places: 0,
+    note: "The email sent to the invitation list, and anybody it was forwarded to.",
   },
 ];
 
@@ -534,6 +552,7 @@ export const LYFE_EVENT_TAKEAWAY = "A thoughtfully designed Ageless takeaway";
 export const LYFE_SURGEON = {
   name: "Dr Chinwe Kpaduwa, MD FACS",
   shortName: "Dr Chinwe Kpaduwa",
+  strap: "Plastic surgeon and aesthetics specialist",
   // Cropped so she sits in the middle of the frame. The original has her right
   // of centre; the crop also stops above the KD mark on her scrubs, which would
   // otherwise be cut in half at the left edge.
@@ -1258,3 +1277,30 @@ export const LYFE_VISIT = {
     },
   ],
 } as const;
+
+/** Bookings line, carried from the Lyfe site branch for the consultation page. */
+export const LYFE_BOOKING_DISPLAY = "0703 052 7269";
+export const LYFE_BOOKING_WHATSAPP = "2347030527269";
+
+export const LYFE_PROCEDURES: { group: string; body: string }[] = [
+  {
+    group: "Face",
+    body: "Eyelids, face lift, neck lift and facial rejuvenation.",
+  },
+  {
+    group: "Breast",
+    body: "Reduction, lift, enlargement, breast reconstruction, and correcting earlier surgery.",
+  },
+  {
+    group: "Body",
+    body: "Tummy tuck, liposuction, body contouring and mommy makeover.",
+  },
+  {
+    group: "Skin and aesthetics",
+    body: "Injectables, scar revision, skin rejuvenation, peels and regenerative aesthetics.",
+  },
+  {
+    group: "Reconstruction",
+    body: "Scars, wound revision, deformities, breast reconstruction, and living with the result of an earlier operation.",
+  },
+];

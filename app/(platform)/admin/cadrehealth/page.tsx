@@ -13,6 +13,7 @@ import {
   TrendingUp,
   ArrowRight,
 } from "lucide-react";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function CadreHealthAdmin({
 }: {
   searchParams: Promise<{ page?: string; status?: string; cadre?: string; q?: string; cv?: string }>;
 }) {
+  await requireCadreAdmin();
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1") || 1);
   const statusFilter = params.status || undefined;
@@ -118,6 +120,13 @@ export default async function CadreHealthAdmin({
               style={{ backdropFilter: "blur(8px)" }}
             >
               Import Professionals
+            </Link>
+            <Link
+              href="/admin/cadre-internships"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+              style={{ backdropFilter: "blur(8px)" }}
+            >
+              Nurse Internships
             </Link>
             <Link
               href="/admin/cadre-employers"

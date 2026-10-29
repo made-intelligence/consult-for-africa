@@ -17,16 +17,22 @@ const NAV = [
   { href: "/oncadre/employer/account", label: "Account", icon: "account" },
 ] as const;
 
+/** Only for an org that is an approved internship centre on CadreHealth. */
+const INTERNS = { href: "/oncadre/employer/internships", label: "Interns", icon: "pipeline" } as const;
+
 export default function EmployerNav({
   variant,
   newApplicants,
   answeredApproaches,
+  showInterns = false,
 }: {
   variant: "top" | "bottom";
   newApplicants: number;
   answeredApproaches: number;
+  showInterns?: boolean;
 }) {
   const pathname = usePathname();
+  const items = showInterns ? [...NAV.slice(0, 4), INTERNS, NAV[4]] : [...NAV];
 
   const badgeFor = (href: string) => {
     if (href.endsWith("/pipeline")) return newApplicants;
@@ -40,7 +46,7 @@ export default function EmployerNav({
   if (variant === "top") {
     return (
       <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 sm:flex">
-        {NAV.map((item) => {
+        {items.map((item) => {
           const active = isActive(item.href);
           const badge = badgeFor(item.href);
           return (
@@ -80,7 +86,7 @@ export default function EmployerNav({
       }}
     >
       <div className="flex" style={{ minHeight: "56px" }}>
-        {NAV.map((item) => {
+        {items.map((item) => {
           const active = isActive(item.href);
           const badge = badgeFor(item.href);
           return (

@@ -10,6 +10,7 @@ import {
   licenceProvenance,
   availabilityIsStale,
 } from "@/lib/cadreHealth/candidateVisibility";
+import { hiddenAsOwnStaff } from "@/lib/cadreHealth/ownStaff";
 
 /**
  * One professional, as a hospital reads them.
@@ -74,6 +75,7 @@ export default async function CandidateProfilePage({
     },
   });
   if (!p) notFound();
+  if (await hiddenAsOwnStaff(ctx.org, id)) notFound();
 
   // Contact is released by consent, not by being logged in.
   const consent = await prisma.cadreContactRequest.findFirst({

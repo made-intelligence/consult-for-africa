@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCadreEmployerContext, canManageTeam } from "@/lib/cadreEmployerAuth";
 import { prisma } from "@/lib/prisma";
+import { pendingFitFor } from "@/lib/cadreHealth/pendingFit";
 import TeamManager from "./TeamManager";
 
 /**
@@ -53,6 +54,8 @@ export default async function AccountPage() {
     },
   });
   if (!org) redirect("/oncadre/employer/login");
+  // Accepting the fit terms verifies the organisation, so the generic route is hidden meanwhile.
+  const pending = await pendingFitFor(ctx.org);
 
   return (
     <div className="space-y-6">
@@ -66,6 +69,7 @@ export default async function AccountPage() {
         <p className="mt-1 text-sm text-gray-500">{org.name}</p>
       </div>
 
+      {!pending && (
       <section
         className="rounded-2xl p-6"
         style={
@@ -120,6 +124,7 @@ export default async function AccountPage() {
           </>
         )}
       </section>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Fact label="Roles posted" value={org._count.mandates} />

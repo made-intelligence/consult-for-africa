@@ -8,6 +8,7 @@ import { RequestCvsButton } from "@/components/cadrehealth/RequestCvsButton";
 import { MandateEditForm } from "@/components/cadrehealth/MandateEditForm";
 import { ArrowLeft, MapPin, Clock, Mail, Phone, Pencil } from "lucide-react";
 import MandateTabSwitcher from "./MandateTabSwitcher";
+import { mandateScope, requireMandateViewer } from "@/lib/cadreHealth/mandateAccess";
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-emerald-50 text-emerald-700",
@@ -44,12 +45,15 @@ export default async function MandateDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
+  const session = await requireMandateViewer();
   const { id } = await params;
   const { tab } = await searchParams;
   const isEditMode = tab === "edit";
 
-  const mandate = await prisma.cadreMandate.findUnique({
-    where: { id },
+  // Not found rather than forbidden: a role you cannot see should not confirm
+  // that it exists.
+  const mandate = await prisma.cadreMandate.findFirst({
+    where: { id, ...mandateScope(session.user) },
     include: {
       facility: { select: { name: true, slug: true } },
       matches: {

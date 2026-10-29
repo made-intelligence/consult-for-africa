@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmployerLogoutButton from "./EmployerLogoutButton";
 import EmployerNav from "./EmployerNav";
+import PendingFitBanner from "./PendingFitBanner";
+import { pendingFitFor } from "@/lib/cadreHealth/pendingFit";
 
 /**
  * The four sections an employer works in, and nothing else.
@@ -31,7 +33,7 @@ export default async function OncadreEmployerLayout({
 
   // Counts that belong on the navigation itself, because an applicant nobody
   // looks at is the failure this product is trying to prevent.
-  const [newApplicants, answeredApproaches] = await Promise.all([
+  const [newApplicants, answeredApproaches, pending, internshipCentre] = await Promise.all([
     prisma.cadreMandateMatch.count({
       where: {
         mandate: { employerOrgId: ctx.org.id },
@@ -42,6 +44,8 @@ export default async function OncadreEmployerLayout({
     prisma.cadreContactRequest.count({
       where: { orgId: ctx.org.id, status: "ACCEPTED" },
     }),
+    pendingFitFor(ctx.org),
+    prisma.cadreInternshipCentre.findUnique({ where: { employerOrgId: ctx.org.id }, select: { id: true } }),
   ]);
 
   return (
@@ -73,10 +77,19 @@ export default async function OncadreEmployerLayout({
             variant="top"
             newApplicants={newApplicants}
             answeredApproaches={answeredApproaches}
+            showInterns={Boolean(internshipCentre)}
           />
 
           <div className="flex shrink-0 items-center gap-3">
-            {ctx.org.isVerified ? (
+            {pending ? (
+              <Link
+                href={pending.href}
+                className="hidden items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition hover:opacity-80 sm:inline-flex"
+                style={{ background: "rgba(212,175,55,0.1)", color: "#B8941E", border: "1px solid rgba(212,175,55,0.2)" }}
+              >
+                Finish setup
+              </Link>
+            ) : ctx.org.isVerified ? (
               <span
                 className="hidden items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold sm:inline-flex"
                 style={{
@@ -115,9 +128,11 @@ export default async function OncadreEmployerLayout({
         variant="bottom"
         newApplicants={newApplicants}
         answeredApproaches={answeredApproaches}
+        showInterns={Boolean(internshipCentre)}
       />
 
       <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 sm:pb-8 lg:px-8">
+        {pending && <PendingFitBanner pending={pending} />}
         {children}
       </main>
     </div>

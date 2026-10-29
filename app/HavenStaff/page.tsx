@@ -11,7 +11,7 @@ import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
 import { periodKey, ON_TODAY, type Cadence } from "@/lib/havenTaskPeriod";
 import { DIRECTORY, staffWhere } from "@/lib/havenAudience";
 import { prisma } from "@/lib/prisma";
-import { getStaffSession, atLeast } from "@/lib/staffAuth";
+import { getStaffSession, atLeast, greetingName } from "@/lib/staffAuth";
 
 // The temporary staff page for Haven Paediatric Centre, standing in for the
 // staff app until that exists. Unindexed and unlisted: the link is the control,
@@ -149,7 +149,7 @@ export default async function HavenStaffPage() {
     });
     const allTasks = await prisma.staffTask.findMany({
       where: { clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
-      select: { id: true, title: true, why: true, roles: true, cadence: true },
+      select: { id: true, code: true, title: true, why: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     });
     // Daily and weekly completions key to different dates, so both periods are
@@ -179,7 +179,7 @@ export default async function HavenStaffPage() {
         const n = r.toLowerCase().replace(/^every /, "").replace(/s$/, "");
         return hay.includes(n) || n.includes("everybody") || n.includes("all ");
       }))
-      .map((x) => ({ id: x.id, title: x.title, why: x.why, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
+      .map((x) => ({ id: x.id, code: x.code, title: x.title, why: x.why, cadence: x.cadence as Cadence, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
     entitlement = me?.annualLeaveDays ?? 20;
     myDepartment = me?.department ?? "";
 
@@ -277,9 +277,13 @@ export default async function HavenStaffPage() {
         {session ? (
           <>
             <section id="today" style={{ marginTop: 40 }}>
-              <Eyebrow>{`Hello ${session.name.split(" ")[0]}`}</Eyebrow>
+              <Eyebrow>{`Hello ${greetingName(session.name)}`}</Eyebrow>
               <h2 style={{ color: NAVY, fontSize: 25, lineHeight: 1.2, margin: "8px 0 0", letterSpacing: "-0.01em" }}>
-                {waiting.length === 0 && todayTasks.every((x) => x.done) ? "Nothing is waiting on you" : "Today"}
+                {waiting.length === 0 && todayTasks.every((x) => x.done)
+                  ? "Nothing is waiting on you"
+                  : todayTasks.length > 0 && todayTasks.every((x) => x.cadence === "WEEKLY")
+                    ? "This week"
+                    : "Today"}
               </h2>
               {todayTasks.length > 0 && (
                 <div style={{ marginTop: 20 }}>
