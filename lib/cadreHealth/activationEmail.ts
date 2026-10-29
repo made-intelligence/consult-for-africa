@@ -9,6 +9,7 @@
  */
 import nodemailer from "nodemailer";
 import { sendTransactionalEmail } from "@/lib/zeptomail";
+import { salutationFor } from "@/lib/cadreSalutation";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST ?? "smtp.zoho.com",
@@ -73,7 +74,7 @@ function buildHTML(r: Recipient): string {
           <tr>
             <td style="padding:40px;">
               <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#111827;">
-                Dear Dr ${esc(r.lastName)},
+                ${esc(salutationFor(r, { assumeDoctor: true }))}
               </p>
               <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#111827;">
                 You set up your CadreHealth account, which we appreciate. Your profile is currently 30 per cent complete.

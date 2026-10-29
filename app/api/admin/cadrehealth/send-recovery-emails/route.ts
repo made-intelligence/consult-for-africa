@@ -20,6 +20,7 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { sendCadreEmail } from "@/lib/cadreEmail";
 import { logAudit } from "@/lib/audit";
+import { surnameFor } from "@/lib/cadreSalutation";
 
 const ALLOWED_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
 const SEND_DELAY_MS = 250;
@@ -67,7 +68,9 @@ export const POST = handler(async function POST(_req: NextRequest) {
       await sendCadreEmail({
         to: p.email,
         subject: "Your CadreHealth profile is active. Please sign in.",
-        heading: `Dr ${p.lastName}, your profile is active`,
+        heading: surnameFor(p.lastName)
+          ? `Dr ${surnameFor(p.lastName)}, your profile is active`
+          : "Your profile is active",
         body: `Earlier this week you set a password to activate your CadreHealth profile and the page returned an error. The error was on our side. Your account was actually saved with the password you chose.
 
 Your profile is active now. Please sign in at https://www.consultforafrica.com/oncadre/login using the email this message was sent to and the password you set during your first attempt. If you do not remember it, request a reset on the same page.
