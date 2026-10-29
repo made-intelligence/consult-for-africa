@@ -23,17 +23,8 @@ export interface ZeptoMailSendInput {
   replyTo?: ZeptoMailRecipient;
   /** Optional inline tracking tags - shows up in ZeptoMail logs */
   trackingTag?: string;
-  /** Files to attach, base64 content. */
-  attachments?: ZeptoMailFile[];
-  /** Images referenced from the HTML as src="cid:<cid>". */
-  inlineImages?: (ZeptoMailFile & { cid: string })[];
-}
-
-export interface ZeptoMailFile {
-  name: string;
-  mimeType: string;
-  /** Base64, no data: prefix. */
-  content: string;
+  /** Base64 content. ZeptoMail caps a message at 15MB including these. */
+  attachments?: { name: string; content: string; mimeType: string }[];
 }
 
 export interface ZeptoMailSendResult {
@@ -76,10 +67,11 @@ export async function sendViaZeptoMail(input: ZeptoMailSendInput): Promise<Zepto
     }),
     ...(input.trackingTag && { track_clicks: true, track_opens: true }),
     ...(input.attachments?.length && {
-      attachments: input.attachments.map((a) => ({ name: a.name, mime_type: a.mimeType, content: a.content })),
-    }),
-    ...(input.inlineImages?.length && {
-      inline_images: input.inlineImages.map((a) => ({ cid: a.cid, mime_type: a.mimeType, content: a.content })),
+      attachments: input.attachments.map((a) => ({
+        name: a.name,
+        content: a.content,
+        mime_type: a.mimeType,
+      })),
     }),
   };
 
@@ -135,7 +127,6 @@ export async function sendTransactionalEmail({
   html,
   text,
   attachments,
-  inlineImages,
 }: {
   from: string;
   replyTo?: string;
@@ -143,8 +134,7 @@ export async function sendTransactionalEmail({
   subject: string;
   html: string;
   text?: string;
-  attachments?: ZeptoMailSendInput["attachments"];
-  inlineImages?: ZeptoMailSendInput["inlineImages"];
+  attachments?: { name: string; content: string; mimeType: string }[];
 }): Promise<ZeptoMailSendResult> {
   return sendViaZeptoMail({
     from: parseAddress(from),
@@ -154,6 +144,5 @@ export async function sendTransactionalEmail({
     textbody: text,
     replyTo: replyTo ? parseAddress(replyTo) : undefined,
     attachments,
-    inlineImages,
   });
 }

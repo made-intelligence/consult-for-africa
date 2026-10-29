@@ -8,7 +8,31 @@ type Row = {
   file: File;
   status: "waiting" | "uploading" | "done" | "failed";
   message?: string;
+  /** 0 to 100 while the file itself is going up. */
+  pct?: number;
 };
+
+/**
+ * PUT with progress. fetch cannot report upload progress, and on a slow line a
+ * 20MB statement that says only "sending" for five minutes looks broken.
+ */
+function putWithProgress(url: string, file: File, contentType: string, onPct: (n: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Type", contentType);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onPct(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error("The file did not finish uploading. Please press send again."));
+    xhr.onerror = () => reject(new Error("The connection dropped while sending. Please press send again."));
+    xhr.ontimeout = xhr.onerror;
+    xhr.send(file);
+  });
+}
 
 const NAVY = "#0B3C5D";
 const TEAL = "#1F7A8C";
@@ -42,7 +66,7 @@ export default function DocumentUploader() {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...next } : r)));
 
   async function sendOne(row: Row) {
-    patch(row.id, { status: "uploading", message: undefined });
+    patch(row.id, { status: "uploading", message: undefined, pct: 0 });
     try {
       const presign = await fetch("/api/arabella-audit/upload", {
         method: "POST",
@@ -54,16 +78,11 @@ export default function DocumentUploader() {
           section,
         }),
       });
-      const meta = await presign.json();
+      const meta = await presign.json().catch(() => ({}));
       if (!presign.ok) throw new Error(meta.error || "Could not start the upload");
 
       // Straight to storage, so a large export never passes through the app.
-      const put = await fetch(meta.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": meta.contentType },
-        body: row.file,
-      });
-      if (!put.ok) throw new Error("The file did not finish uploading");
+      await putWithProgress(meta.uploadUrl, row.file, meta.contentType, (pct) => patch(row.id, { pct }));
 
       const record = await fetch("/api/arabella-audit/upload", {
         method: "PUT",
@@ -133,7 +152,7 @@ export default function DocumentUploader() {
       >
         <div style={{ fontSize: 16, fontWeight: 700, color: NAVY }}>Choose files, or drag them here</div>
         <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
-          PDF, Word, Excel, CSV, photographs and zip. Up to 25MB each. Photographs of a paper
+          PDF, Word, Excel, CSV, photographs, voice notes and zip. Up to 100MB each. Photographs of a paper
           register are perfectly fine.
         </div>
         <input
@@ -148,7 +167,7 @@ export default function DocumentUploader() {
       {rows.length > 0 && (
         <ul style={{ listStyle: "none", padding: 0, margin: "14px 0 0" }}>
           {rows.map((r) => (
-            <li key={r.id} style={{ display: "flex", gap: 10, alignItems: "baseline", padding: "8px 0", borderTop: `1px solid #F1F5F9`, fontSize: 14 }}>
+            <li key={r.id} style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "baseline", padding: "8px 0", borderTop: `1px solid #F1F5F9`, fontSize: 14 }}>
               <span style={{ flex: 1, color: "#1F2937", wordBreak: "break-word" }}>{r.file.name}</span>
               <span style={{ color: "#94a3b8", fontSize: 12 }}>{prettySize(r.file.size)}</span>
               <span
@@ -157,8 +176,16 @@ export default function DocumentUploader() {
                   color: r.status === "done" ? "#15803d" : r.status === "failed" ? "#b3261e" : TEAL,
                 }}
               >
-                {r.status === "done" ? "received" : r.status === "uploading" ? "sending" : r.status === "failed" ? "failed" : "ready"}
+                {r.status === "done" ? "received" : r.status === "uploading" ? `sending ${r.pct ?? 0}%` : r.status === "failed" ? "failed" : "ready"}
               </span>
+              {r.status === "uploading" && (
+                <span style={{ flexBasis: "100%", height: 4, background: "#F1F5F9", borderRadius: 4, overflow: "hidden" }}>
+                  <span style={{ display: "block", height: "100%", width: `${r.pct ?? 0}%`, background: TEAL, transition: "width .3s" }} />
+                </span>
+              )}
+              {r.status === "failed" && r.message && (
+                <span style={{ flexBasis: "100%", fontSize: 12.5, color: "#b3261e" }}>{r.message}</span>
+              )}
             </li>
           ))}
         </ul>
@@ -166,7 +193,7 @@ export default function DocumentUploader() {
 
       {rows.some((r) => r.status === "failed") && (
         <p style={{ fontSize: 13, color: "#b3261e", margin: "8px 2px 0" }}>
-          {rows.find((r) => r.status === "failed")?.message} Press send again to retry just the ones that failed.
+          Press send again to retry just the ones that failed.
         </p>
       )}
 
@@ -215,7 +242,7 @@ export default function DocumentUploader() {
       <p style={{ fontSize: 12, color: "#94a3b8", margin: "12px 2px 0", lineHeight: 1.6 }}>
         Files go straight to Consult for Africa&rsquo;s private storage, not to a public link, and
         they are used only for this audit. Nothing you upload here is shared with any hospital or
-        any third party. Anything over 25MB, or anything you would rather not put through a
+        any third party. Anything over 100MB, or anything you would rather not put through a
         browser, can go to <span style={{ color: TEAL }}>hello@consultforafrica.com</span> instead.
       </p>
     </div>

@@ -25,6 +25,8 @@ export default function ExpressApplyForm({ jobId, defaultCadre }: { jobId: strin
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState("");
   const [isNew, setIsNew] = useState(false);
+  const [cv, setCv] = useState<File | null>(null);
+  const [cvNote, setCvNote] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +40,17 @@ export default function ExpressApplyForm({ jobId, defaultCadre }: { jobId: strin
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to apply");
+      // The application stands even if the CV fails; say so rather than
+      // leaving them to think it all went through.
+      if (data.cvToken && cv) {
+        const fd = new FormData();
+        fd.append("file", cv);
+        const up = await fetch(`/api/cadre/cv/${data.cvToken}`, { method: "POST", body: fd });
+        if (!up.ok) {
+          const upData = await up.json().catch(() => ({}));
+          setCvNote(`Your application is in, but the CV did not upload: ${upData.error || "please try again"}. We will email you a link to send it.`);
+        }
+      }
       setIsNew(data.isNew);
       setStatus("success");
     } catch (err) {
@@ -56,6 +69,7 @@ export default function ExpressApplyForm({ jobId, defaultCadre }: { jobId: strin
         </div>
         <p className="mt-3 font-semibold text-gray-900">Application Submitted</p>
         <p className="mt-1 text-sm text-gray-500">We will be in touch if there is a match.</p>
+        {cvNote && <p className="mt-2 text-xs text-amber-700">{cvNote}</p>}
         {isNew && (
           <a
             href={`/oncadre/activate?email=${encodeURIComponent(form.email)}`}
@@ -72,7 +86,7 @@ export default function ExpressApplyForm({ jobId, defaultCadre }: { jobId: strin
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <p className="text-sm font-semibold text-gray-900">Quick Apply</p>
-      <p className="text-xs text-gray-500 -mt-1">No account needed. 30 seconds.</p>
+      <p className="text-xs text-gray-500 -mt-1">No account needed. Have your CV ready.</p>
       <input
         required type="text" placeholder="Full name"
         value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
@@ -99,6 +113,15 @@ export default function ExpressApplyForm({ jobId, defaultCadre }: { jobId: strin
         <option value="">Select your cadre</option>
         {CADRE_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
       </select>
+      <div>
+        <label className="mb-1 block text-xs font-medium text-gray-700">Your CV (PDF or Word)</label>
+        <input
+          required type="file"
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={e => setCv(e.target.files?.[0] ?? null)}
+          className="block w-full text-xs text-gray-600 file:mr-2 file:rounded-lg file:border-0 file:bg-[#0B3C5D]/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-[#0B3C5D]"
+        />
+      </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
       <button
         type="submit" disabled={status === "loading"}

@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { getCadreSession } from "@/lib/cadreAuth";
+import { signCvToken } from "@/lib/cadreHealth/cvRequest";
 import ApplyButtonClient from "./ApplyButton";
 import ExpressApplyForm from "./ExpressApplyForm";
 import ApplyIntent from "./ApplyIntent";
 import ShareButtons from "./ShareButtons";
+import { KENYA_FACILITY_SLUG, KENYA_ROLES } from "@/lib/cadreHealth/kenyaScreen";
 import JobAlertForm from "./JobAlertForm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -91,15 +93,24 @@ export default async function JobDetailPage({
   const facilityName = job.facility?.name || job.facilityName || "Confidential";
   const location = [job.locationCity, job.locationState].filter(Boolean).join(", ") || "Nigeria";
   const canonicalSlug = job.slug || job.id;
+  // The Kenya roles go through a screening form rather than one-click apply.
+  const kenyaRole = job.facility?.slug === KENYA_FACILITY_SLUG ? KENYA_ROLES.find((r) => r.subSpecialty === job.subSpecialty)?.value : undefined;
   const canonicalUrl = `https://consultforafrica.com/oncadre/jobs/${canonicalSlug}`;
 
   // Check if user already applied
   let hasApplied = false;
+  // Set when the member has no CV: the apply button then asks for one.
+  let cvUploadAction: string | null = null;
   if (session) {
     const existingMatch = await prisma.cadreMandateMatch.findUnique({
       where: { mandateId_professionalId: { mandateId: job.id, professionalId: session.sub } },
     });
     hasApplied = !!existingMatch;
+    const pro = await prisma.cadreProfessional.findUnique({
+      where: { id: session.sub },
+      select: { cvFileUrl: true },
+    });
+    if (pro && !pro.cvFileUrl) cvUploadAction = `/api/cadre/cv/${signCvToken(session.sub)}`;
   }
 
   // Average salary context
@@ -159,7 +170,7 @@ export default async function JobDetailPage({
         "@type": "PostalAddress",
         addressLocality: job.locationCity || undefined,
         addressRegion: job.locationState || undefined,
-        addressCountry: "NG",
+        addressCountry: job.locationState === "Kenya" ? "KE" : "NG",
       },
     },
     ...(job.salaryRangeMin || job.salaryRangeMax
@@ -445,8 +456,20 @@ export default async function JobDetailPage({
                     You have already applied for this role.
                   </p>
                 </div>
+              ) : kenyaRole ? (
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">Ready to relocate to Nairobi?</p>
+                  <p className="text-xs text-gray-500 mb-4">A few questions first, two minutes.</p>
+                  <Link
+                    href={`/oncadre/kenya?role=${kenyaRole}`}
+                    className="block w-full rounded-xl py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg, #D4AF37, #b8962e)", boxShadow: "0 2px 8px rgba(212,175,55,0.3)" }}
+                  >
+                    Apply
+                  </Link>
+                </div>
               ) : session ? (
-                <ApplyButtonClient jobId={job.id} />
+                <ApplyButtonClient jobId={job.id} cvUploadAction={cvUploadAction} />
               ) : (
                 <ApplyIntent jobId={job.id} defaultCadre={job.cadre} />
               )}

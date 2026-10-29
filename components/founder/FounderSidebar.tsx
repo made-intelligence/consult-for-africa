@@ -15,7 +15,6 @@ import {
   ChevronRight,
   X,
   ClipboardList,
-  Home,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useNavStore } from "@/lib/stores/navigation";
@@ -26,8 +25,7 @@ const NAV_ITEMS = [
   { label: "Progress",      href: "/founder/progress",   icon: TrendingUp },
   { label: "Knowledge Hub", href: "/founder/knowledge",  icon: BookOpen },
   { label: "Metrics",       href: "/founder/metrics",    icon: BarChart3 },
-  { label: "Survey",        href: "/founder/survey",     icon: ClipboardList },
-  { label: "Estate",        href: "/founder/estate",     icon: Home },
+  { label: "Surveys",       href: "/admin/surveys",      icon: ClipboardList },
   { label: "Ideation",     href: "/founder/ideation",   icon: Lightbulb },
   { label: "Nuru",         href: "/founder/ai-coach",   icon: Sparkles },
 ];

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { handler } from "@/lib/api-handler";
+import { isCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 function generateReferralCode(): string {
   return "CH" + crypto.randomBytes(4).toString("hex").toUpperCase();
@@ -38,6 +39,9 @@ const VALID_CADRES = [
 ];
 
 export const POST = handler(async function POST(req: NextRequest) {
+  if (!(await isCadreAdmin())) {
+    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+  }
   try {
     const { records } = await req.json();
 

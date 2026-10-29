@@ -49,8 +49,28 @@
       "schedule": "0 15 * * 4"
     },
     {
+      "path": "/api/cron/haven-today",
+      "schedule": "0 6 * * *"
+    },
+    {
       "path": "/api/cron/project-freshness",
       "schedule": "0 6 * * 1-5"
+    },
+    {
+      "path": "/api/cron/haven-flags",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/meeting-transcripts",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/market-watch",
+      "schedule": "15 */3 * * *"
+    },
+    {
+      "path": "/api/cron/market-watch-weekly",
+      "schedule": "0 5 * * 1"
     }
   ]
 }

@@ -21,6 +21,9 @@ const ALLOWED = [
   // costs the reporter anything is a near-miss report you stop receiving.
   "haven-near-miss",
   "haven-whats-broken",
+  // The weekly pulse. Answerable in one tap on purpose: the point of the first
+  // weeks is to build the habit of answering at all, not to gather rich data.
+  "haven-weekly-pulse",
 ] as const;
 
 const bodySchema = z.object({

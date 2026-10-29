@@ -6,6 +6,7 @@ import { isRateLimited } from "@/lib/rate-limit";
 import {
   LYFE_CONSENT_TEXT,
   MEDLYFE_EVENT_CONSENT_TEXT,
+  LYFE_EVENT,
   LYFE_CONSULT,
   LYFE_CONTACT_EMAIL,
   clientIpFrom,
@@ -48,6 +49,8 @@ const schema = z.object({
     .enum(["LONGEVITY", "METABOLIC", "SKIN", "SURGERY"])
     .optional()
     .nullable(),
+  /// An AGELESS guest's voucher, as they typed it. Read by the coordinator.
+  voucher: z.string().trim().max(60).optional().nullable(),
   guestCount: z.number().int().min(0).max(4).optional().nullable(),
   isClinician: z.boolean().optional().nullable(),
   pathway: z.enum(["AESTHETIC", "SURGICAL", "UNSURE"]),
@@ -208,8 +211,9 @@ export const POST = handler(async function POST(req: NextRequest) {
       email: data.email,
       phone,
       intent: data.intent,
-      // Interest, not a place. The team decides who is invited from here.
-      eventStage: rsvp ? "INTERESTED" : null,
+      // Interest, not a place. The team decides who is invited from here,
+      // and once the room is closed, everyone new waits for a place to open.
+      eventStage: rsvp ? (LYFE_EVENT.waitlistOnly ? "WAITLIST" : "INTERESTED") : null,
       guestCount: rsvp ? (data.guestCount ?? 0) : null,
       isClinician: rsvp ? (data.isClinician ?? null) : null,
       pathway: rsvp ? "UNSURE" : data.pathway,
@@ -230,6 +234,7 @@ export const POST = handler(async function POST(req: NextRequest) {
         data.requestedService
           ? `Asked about: ${SERVICE_LABEL[data.requestedService]}`
           : null,
+        data.voucher ? `AGELESS voucher: ${data.voucher}` : null,
         data.notes || null,
       ]
         .filter(Boolean)
@@ -277,6 +282,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       surgical,
       guestCount: entry.guestCount,
       slotAt: entry.slotAt,
+      waitlisted: entry.eventStage === "WAITLIST",
     });
   } catch (err) {
     console.error("[lyfe/enquiry] confirmation email failed:", err);
@@ -290,6 +296,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       email: entry.email,
       phone: entry.phone,
       intent: entry.intent,
+      waitlisted: entry.eventStage === "WAITLIST",
       slotAt: entry.slotAt,
       guestCount: entry.guestCount,
       isClinician: entry.isClinician,
@@ -309,7 +316,6 @@ export const POST = handler(async function POST(req: NextRequest) {
       source: entry.source,
       sourceDetail: entry.sourceDetail,
       utmCampaign: entry.utmCampaign,
-      utmSource: entry.utmSource,
     });
   } catch (err) {
     console.error("[lyfe/enquiry] coordinator notification failed:", err);

@@ -17,7 +17,14 @@ function normalizePhone(phone: string): string {
   return cleaned;
 }
 
-export async function sendSMS(to: string, message: string): Promise<boolean> {
+/**
+ * `senderId` overrides the default for callers outside CadreHealth. A hospital
+ * staff member signing in should not get a code from "CadreHlth", which means
+ * nothing to them and looks like a scam. Termii requires the ID to be
+ * registered, so an unregistered one will be rejected by the API rather than
+ * silently sent.
+ */
+export async function sendSMS(to: string, message: string, senderId?: string): Promise<boolean> {
   if (!TERMII_API_KEY) {
     console.log(`[sms] TERMII_API_KEY not set. Would send to ${to}: ${message}`);
     return false;
@@ -31,7 +38,7 @@ export async function sendSMS(to: string, message: string): Promise<boolean> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         to: normalizedPhone,
-        from: TERMII_SENDER_ID,
+        from: senderId ?? TERMII_SENDER_ID,
         sms: message,
         type: "plain",
         channel: "generic",

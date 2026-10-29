@@ -34,48 +34,17 @@ async function beginAssessmentAction() {
     redirect("/maarova/portal/assessment");
   }
 
-  const allModules = await prisma.maarovaModule.findMany({
-    where: { isActive: true },
+  // The session is created by POST /api/maarova/sessions when the first module
+  // opens, never here. That route asks the track and serves the form for it;
+  // creating it here served the non-clinical identity module, empty, to people
+  // on the clinical form, and took a slot at the start as well as at the end.
+  const first = await prisma.maarovaModule.findFirst({
+    where: { isActive: true, audience: "BOTH", type: { not: "THREE_SIXTY" } },
     orderBy: { order: "asc" },
+    select: { slug: true },
   });
-
-  // Gate CILTI to users with a clinical background. Non-clinical users skip it.
-  const hasClinicalBackground = !!user.clinicalBackground?.trim();
-  const modules = allModules.filter(
-    (m) => m.type !== "CILTI" || hasClinicalBackground
-  );
-
-  if (modules.length === 0) {
-    redirect("/maarova/portal/assessment?error=no-modules");
-  }
-
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
-
-  await prisma.$transaction([
-    prisma.maarovaAssessmentSession.create({
-      data: {
-        userId: user.id,
-        status: "NOT_STARTED",
-        sessionType: "full",
-        stream: org.stream,
-        expiresAt,
-        moduleResponses: {
-          create: modules.map((mod) => ({
-            moduleId: mod.id,
-            status: "NOT_STARTED",
-          })),
-        },
-      },
-    }),
-    prisma.maarovaOrganisation.update({
-      where: { id: org.id },
-      data: { usedAssessments: { increment: 1 } },
-    }),
-  ]);
-
-  revalidatePath("/maarova/portal/assessment");
-  redirect("/maarova/portal/assessment");
+  if (!first) redirect("/maarova/portal/assessment?error=no-modules");
+  redirect(`/maarova/portal/assessment/${first.slug}`);
 }
 
 const statusConfig: Record<

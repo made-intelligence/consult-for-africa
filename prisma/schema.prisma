@@ -532,6 +532,12 @@ model Client {
   engagements        Engagement[]
   invoices           Invoice[]
   contacts           ClientContact[]
+  staff              StaffMember[]
+  staffNotes         StaffNote[]
+  protocols          Protocol[]
+  scoreboard         ScoreboardEntry[]
+  trainingSessions   TrainingSession[]
+  staffTasks         StaffTask[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -540,6 +546,7 @@ model Client {
   ndas               Nda[]
   creditNotes        CreditNote[]
   agentOpportunities AgentOpportunity[]
+  marketWatches      MarketWatch[]
 
   // Communications CRM back-relations
   communications   Communication[]
@@ -653,6 +660,8 @@ model Engagement {
   meetings           Meeting[]
   ndas               Nda[]
   impactMetrics      EngagementImpactMetric[]
+  dashboards         EngagementDashboard[]
+  marketWatches      MarketWatch[]
   knowledgeAssets    KnowledgeAsset[]
   frameworks         EngagementFramework[]
   staffingRequests   StaffingRequest[]
@@ -1489,6 +1498,35 @@ model EngagementImpactMetric {
 
   @@index([engagementId], map: "ProjectImpactMetric_projectId_idx")
   @@map("ProjectImpactMetric")
+}
+
+/// A client-facing dashboard built from the client's own data during an
+/// engagement. One row per version: an analysis script writes a DRAFT, a
+/// partner reviews it at /admin/client-dashboards and publishes it, and the
+/// client portal shows the latest PUBLISHED row. `data` follows
+/// lib/client-dashboard/types.ts and holds aggregates only, never patient or
+/// staff level records.
+model EngagementDashboard {
+  id           String                    @id @default(cuid())
+  engagementId String
+  engagement   Engagement                @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  title        String
+  asOf         DateTime
+  data         Json
+  status       EngagementDashboardStatus @default(DRAFT)
+  publishedAt  DateTime?
+  publishedBy  String?
+  source       String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([engagementId, status])
+}
+
+enum EngagementDashboardStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 model KnowledgeAsset {
@@ -2783,6 +2821,18 @@ model Meeting {
   nuruEnabled Boolean @default(true)
   nuruJoined  Boolean @default(false)
 
+  /// The Daily room this meeting is held in. Rooms sit on the Daily domain
+  /// Mezo already pays for, named cfa-<id> so the two never collide. Daily
+  /// transcribes the call itself, so nothing has to join it to take notes.
+  dailyRoomName String? @unique
+
+  /// What Nuru heard promised, drafted from the transcript and waiting for
+  /// the office to confirm. Nothing here is in the register until somebody
+  /// has said yes to it, because a misheard owner becomes a wrong chase.
+  aiCommitments           Json?
+  commitmentsReviewedAt   DateTime?
+  commitmentsReviewedById String?
+
   // Transcript & Notes
   transcript     String?  @db.Text
   aiSummary      String?  @db.Text
@@ -3179,6 +3229,12 @@ model RecurringTask {
   /// Days after the task appears that the mid-point conversation is due.
   checkInOffsetDays Int?
   estimatedMinutes  Int?
+
+  /// Where the work happens, copied onto every task this template generates.
+  /// A recurring brief that names a section but cannot reach it sends the
+  /// assignee hunting through the sidebar once a month, every month.
+  linkedEntityType String?
+  linkedEntityId   String?
 
   active           Boolean   @default(true)
   /// The occurrence date most recently generated, so a run is never duplicated
@@ -4545,27 +4601,28 @@ model CadreProfessional {
   profileCompleteness Int @default(0) // 0-100
 
   // Relations
-  credentials          CadreCredential[]
-  qualifications       CadreQualification[]
-  cpdEntries           CadreCPDEntry[]
-  workHistory          CadreWorkHistory[]
-  facilityReviews      CadreFacilityReview[]
-  salaryReports        CadreSalaryReport[]
-  mandateMatches       CadreMandateMatch[]
-  readinessAssessments CadreReadinessAssessment[]
-  outreachRecord       CadreOutreachRecord?
-  whatsAppMessages     CadreWhatsAppMessage[]
-  facilityReferrals    CadreFacilityReferral[]    @relation("FacilityReferrals")
-  careerReports        CadreCareerReport[]
-  advisorMessages      CadreAdvisorMessage[]
-  mentorProfile        CadreMentorProfile?
-  menteeMentorships    CadreMentorship[]          @relation("MenteeMentorships")
-  notifications        CadreNotification[]
-  subscription         CadreSubscription?
-  coachingSessions     CadreCoachingSession[]
-  mezoInterest         CadreMezoInterest?
-  shortlistEntries     CadreShortlistEntry[]
-  contactRequests      CadreContactRequest[]
+  credentials            CadreCredential[]
+  qualifications         CadreQualification[]
+  cpdEntries             CadreCPDEntry[]
+  workHistory            CadreWorkHistory[]
+  facilityReviews        CadreFacilityReview[]
+  salaryReports          CadreSalaryReport[]
+  mandateMatches         CadreMandateMatch[]
+  readinessAssessments   CadreReadinessAssessment[]
+  outreachRecord         CadreOutreachRecord?
+  whatsAppMessages       CadreWhatsAppMessage[]
+  facilityReferrals      CadreFacilityReferral[]      @relation("FacilityReferrals")
+  careerReports          CadreCareerReport[]
+  advisorMessages        CadreAdvisorMessage[]
+  mentorProfile          CadreMentorProfile?
+  menteeMentorships      CadreMentorship[]            @relation("MenteeMentorships")
+  notifications          CadreNotification[]
+  subscription           CadreSubscription?
+  coachingSessions       CadreCoachingSession[]
+  mezoInterest           CadreMezoInterest?
+  shortlistEntries       CadreShortlistEntry[]
+  contactRequests        CadreContactRequest[]
+  internshipApplications CadreInternshipApplication[]
 
   // Profile analytics
   profileViews Int       @default(0)
@@ -4808,10 +4865,11 @@ model CadreEmployerOrg {
   /// first message. Null means the client is named openly.
   publicName String?
 
-  members         CadreEmployerAccount[]
-  mandates        CadreMandate[]
-  shortlists      CadreShortlist[]
-  contactRequests CadreContactRequest[]
+  members          CadreEmployerAccount[]
+  mandates         CadreMandate[]
+  shortlists       CadreShortlist[]
+  contactRequests  CadreContactRequest[]
+  internshipCentre CadreInternshipCentre?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -5180,6 +5238,13 @@ model CadreMandate {
   // Placement value tracking
   placementFeeNGN    Decimal? @db.Decimal(12, 2)
   placedConsultantId String? // FK to CadreProfessional who was placed
+
+  /// What the client says makes the right person for this role, in their own
+  /// words, collected through the fit request at /oncadre/fit/[token]. Every
+  /// applicant is scored against it, so nobody here filters by hand. Shape in
+  /// lib/cadreHealth/fitProfile.ts.
+  fitProfile   Json?
+  fitProfileAt DateTime?
 
   // Case study capture (once PLACED). Hospital must opt-in to public
   // reference before we use it for cold outreach.
@@ -7610,6 +7675,9 @@ enum LyfeEventStage {
   NO_SHOW
 }
 
+/// The coordinator's queue, not a marketing funnel. NEW means nobody has
+/// spoken to this person yet, and the dashboard counts how long that has been
+/// true.
 enum LyfeStatus {
   NEW
   CONTACTED
@@ -7638,8 +7706,8 @@ model LyfeEnquiry {
   isClinician Boolean?
 
   /// Facility visits only. Who they are and where to go.
-  facilityName String?
-  facilityArea String?
+  facilityName  String?
+  facilityArea  String?
   clinicianRole String?
 
   pathway    LyfePathway   @default(UNSURE)
@@ -7721,6 +7789,25 @@ model LyfeEnquiry {
   @@index([pathway, status])
   @@index([email])
   @@index([nextActionAt])
+}
+
+/// Who the AGELESS invitation was emailed to. The list itself is gathered by
+/// hand from several people's contacts and kept off git; this table is the
+/// copy the platform can show, so the queue can say who was written to, who
+/// bounced and who came back. One row per address.
+model LyfeInvitation {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String
+  /// Set when the address is an office inbox written to for a named person.
+  onBehalfOf String?
+  /// Whose list the name came from: main, office, sally, and so on.
+  source     String
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([sentAt])
 }
 
 // ─── Hospital sales: one directory, every product ───────────────────────────
@@ -7976,4 +8063,990 @@ model RecoveryPayment {
   createdAt    DateTime      @default(now())
 
   @@index([claimId])
+}
+
+/// A member of a CLIENT's own staff, as against a CFA consultant (User) or a
+/// client's commercial contact (ClientContact).
+///
+/// TEMPORARY, AND NOT THE CANONICAL STAFF MODEL. The real staff app is being
+/// built by Matthew into the Mezo Suite and HospitlOS, in their own codebases.
+/// This exists only so the nineteen at Haven have somewhere to sign in during
+/// the transformation, and it is expected to be superseded.
+///
+/// So: do not grow it into a product, and do not let a second client's needs
+/// shape it. What has to survive is the DATA, not this surface. Keep anything
+/// collected here exportable, and agree the shape with Matthew before adding
+/// fields, so what the hospital enters lands in HospitlOS rather than being
+/// re-keyed.
+model StaffMember {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name       String
+  email      String?
+  phone      String?
+  department String
+  position   String
+
+  /// What kind of person this row is.
+  ///
+  /// Every surface had been filtering on department, which worked until it did
+  /// not: founders were getting staff onboarding emails twice a week, a CFA
+  /// test account was in the directory a nurse sees, and the sprint denominator
+  /// counted both. Department answers where somebody works. It was never going
+  /// to answer whether they are an employee of this hospital.
+  kind StaffKind @default(EMPLOYEE)
+
+  /// What this person holds. A LIST, because at Haven dual roles are the norm
+  /// rather than the exception: Dr Odedina is Chief Medical Director and a
+  /// founder, Dr Shakirah is associate clinical director and a founder. One
+  /// tier each would force a choice between their clinical role and their
+  /// ownership, and either choice is wrong.
+  ///
+  /// Capabilities are the union of what the held tiers grant, so a founder who
+  /// also works clinically reads the ward's notes through LEADERSHIP while a
+  /// non-working owner holding BOARD alone does not.
+  ///
+  /// There is deliberately no tier for an individual's own assessment result.
+  /// That never reaches a shared surface, so it is not a permission.
+  tiers StaffTier[] @default([ALL_STAFF])
+
+  isActive           Boolean   @default(true)
+  lastLoginAt        DateTime?
+  /// May approve clinical content before it reaches a nurse. A person, never a
+  /// tier: Dr Shakirah is a founder and therefore BOARD, which is deliberately
+  /// the weakest tier on anything clinical. Her authority here is that she is a
+  /// doctor supporting the Chief Medical Director, not that she is an owner.
+  canApproveClinical Boolean   @default(false)
+  /// Annual entitlement in working days. Nigeria's statutory floor is six;
+  /// most hospitals here run well above it, so this is set per person.
+  annualLeaveDays    Int       @default(20)
+
+  loginTokens       StaffLoginToken[]
+  leave             StaffLeaveRequest[]   @relation("StaffLeave")
+  leaveDecisions    StaffLeaveRequest[]   @relation("StaffLeaveDecisions")
+  notes             StaffNote[]           @relation("StaffNotes")
+  protocolProgress  ProtocolProgress[]    @relation("ProtocolProgress")
+  observations      ProtocolProgress[]    @relation("ProtocolObservations")
+  protocolApprovals Protocol[]            @relation("ProtocolApprovals")
+  taskCompletions   StaffTaskCompletion[] @relation("TaskCompletions")
+  taskFlags         StaffTaskFlag[]       @relation("TaskFlags")
+  flagResolutions   StaffTaskFlag[]       @relation("FlagResolutions")
+  scoreboardEntries ScoreboardEntry[]     @relation("ScoreboardEntries")
+  scoreboardAgreed  ScoreboardEntry[]     @relation("ScoreboardAgreements")
+  presenting        TrainingSession[]     @relation("TrainingPresenter")
+  trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, email])
+  @@index([clientId, isActive])
+}
+
+/// EMPLOYEE is the hospital's own staff: the denominator for everything.
+/// FOUNDER is an owner. Several also work here, and those are EMPLOYEE with a
+/// BOARD tier rather than FOUNDER, because what they need from the system is an
+/// employee's needs plus the board's view.
+/// PARTNER is CFA embedded on site. In the directory because a nurse may need
+/// to call them, out of the denominator because we are not measuring ourselves.
+/// TEST is exactly that, and is excluded from every count and every send.
+enum StaffKind {
+  EMPLOYEE
+  FOUNDER
+  PARTNER
+  TEST
+}
+
+enum StaffTier {
+  ALL_STAFF
+  SUPERVISOR
+  LEADERSHIP
+  /// The founders. Above LEADERSHIP for the hospital's numbers and below it for
+  /// anything about a named person. Deliberately not a superset: see
+  /// BOARD_BLIND in lib/staffAuth.ts. A board that can read the ward's own
+  /// notes, or see which nurse failed which test, ends both of those things
+  /// within a month.
+  BOARD
+}
+
+/// Single-use sign-in code. No passwords: nineteen people on personal email,
+/// mostly on phones mid-shift, and nobody at the hospital to administer resets.
+/// A code beats a link here because links get mangled by email clients and by
+/// forwards, and a code can be read on one screen and typed on another.
+///
+/// Six digits is brute-forceable, so the row counts attempts and dies after
+/// five. What is stored is an HMAC keyed to the staff member, never the code.
+model StaffLoginToken {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  tokenHash String    @unique
+  attempts  Int       @default(0)
+  /// Which channel delivered it, and what they were on. Not needed to sign
+  /// anybody in; needed so L2 and L7 in lib/haven-learning.ts can be answered
+  /// with data rather than with an opinion, and neither can be reconstructed
+  /// after the fact.
+  channel   String?
+  userAgent String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([staffId])
+  @@index([expiresAt])
+}
+
+/// Leave, requested from a phone and planned against the rota.
+///
+/// The hospital has no HR function, so this is built to run on a line manager
+/// and a form rather than on an administrator. The useful part is not the
+/// request, which a WhatsApp message already does badly; it is that a decision
+/// can see how many people from the same department are already off on those
+/// days, which is what stops the rota breaking in the high season.
+model StaffLeaveRequest {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation("StaffLeave", fields: [staffId], references: [id], onDelete: Cascade)
+
+  type      StaffLeaveType @default(ANNUAL)
+  startDate DateTime
+  endDate   DateTime
+  /// Working days requested, stated by the person rather than computed, because
+  /// a hospital rota is not a Monday to Friday week.
+  days      Int
+  reason    String?        @db.Text
+
+  status       StaffLeaveStatus @default(REQUESTED)
+  decidedById  String?
+  decidedBy    StaffMember?     @relation("StaffLeaveDecisions", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt    DateTime?
+  decisionNote String?          @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId, startDate])
+  @@index([status, startDate])
+}
+
+enum StaffLeaveType {
+  ANNUAL
+  SICK
+  COMPASSIONATE
+  STUDY
+  UNPAID
+}
+
+enum StaffLeaveStatus {
+  REQUESTED
+  APPROVED
+  DECLINED
+  CANCELLED
+}
+
+/// Team notes: how colleagues co-work here.
+///
+/// Deliberately visible rather than private. Direct messages would make this a
+/// worse WhatsApp, which these nineteen already have and will not leave. A note
+/// posted to your department or to the whole hospital is a different thing: it
+/// is how a shift tells the next shift something, how somebody asks for cover,
+/// and how we close the loop by saying what changed because people spoke up.
+///
+/// Visibility is also the safeguard. People write differently when it is not a
+/// private thread, which matters because the risk in a hospital is patient
+/// detail being typed somewhere that is not the clinical record. The form says
+/// so, and anything clinical belongs in the record rather than here.
+model StaffNote {
+  id       String      @id @default(cuid())
+  clientId String
+  client   Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  authorId String
+  author   StaffMember @relation("StaffNotes", fields: [authorId], references: [id], onDelete: Cascade)
+
+  scope      StaffNoteScope @default(DEPARTMENT)
+  /// Set when scope is DEPARTMENT. Null for a note to the whole hospital.
+  department String?
+
+  body String @db.Text
+
+  /// A reply. Replies are one level deep on purpose: a thread of threads in a
+  /// nineteen person hospital is a thing nobody reads.
+  parentId String?
+  parent   StaffNote?  @relation("StaffNoteReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  StaffNote[] @relation("StaffNoteReplies")
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([parentId])
+}
+
+enum StaffNoteScope {
+  DEPARTMENT
+  ALL
+}
+
+/// The process library: where a protocol is documented, and the record of who
+/// has acknowledged, studied and been tested on it.
+///
+/// The audit found the thing this exists for. Procedures exist and are
+/// accessible, almost nobody has been trained on them, supervision is informal
+/// and nobody checks. A protocol nobody has been tested on is a document, not a
+/// control, and in a hospital that is worse than none because it creates the
+/// appearance of one.
+///
+/// `body` and the questions are authored by the hospital's clinical lead, never
+/// by us. Consult for Africa supplies the inventory, the structure and the
+/// chasing. Clinical content is a clinical decision and sits with the Chief
+/// Medical Director. A protocol with an empty body is therefore not a defect in
+/// this table: it is the gap, made visible.
+model Protocol {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Stable key from lib/haven-competency.ts, e.g. "A1". Lets the seed re-run.
+  code    String
+  domain  String
+  title   String
+  /// One line, safe to show in a list.
+  summary String  @db.Text
+  /// The documented procedure itself. Empty until the hospital supplies it.
+  body    String? @db.Text
+  /// Bumped when the content changes, which re-opens the loop for everybody.
+  version Int     @default(1)
+
+  /// Nothing reaches a nurse until a clinician has approved it. Cleared when
+  /// version changes, so an edit cannot inherit the previous approval.
+  approvedById String?
+  approvedBy   StaffMember? @relation("ProtocolApprovals", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt   DateTime?
+  approvalNote String?      @db.Text
+
+  /// Who this is relevant to. Matched loosely against position and department:
+  /// nineteen people do not need a role taxonomy.
+  roles       String[]
+  departments String[]
+
+  /// How competence is actually confirmed. Where failure harms a child this is
+  /// OBSERVED or SIMULATION and a passed quiz is not sufficient on its own.
+  method    String
+  frequency String
+
+  isActive Boolean @default(true)
+
+  questions ProtocolQuestion[]
+  progress  ProtocolProgress[]
+  sessions  TrainingSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, code])
+  @@index([clientId, isActive])
+}
+
+/// Authored by the clinical lead. Never generated.
+model ProtocolQuestion {
+  id         String   @id @default(cuid())
+  protocolId String
+  protocol   Protocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+
+  question  String   @db.Text
+  options   String[]
+  /// Index into options.
+  correct   Int
+  /// Shown after answering, right or wrong. The teaching happens here.
+  because   String?  @db.Text
+  sortOrder Int      @default(0)
+
+  @@index([protocolId])
+}
+
+/// One person against one protocol. The three steps are separate columns rather
+/// than a status enum because somebody can study without being tested, and
+/// knowing which of the three stalled is the whole management question.
+model ProtocolProgress {
+  id         String      @id @default(cuid())
+  protocolId String
+  protocol   Protocol    @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  staffId    String
+  staff      StaffMember @relation("ProtocolProgress", fields: [staffId], references: [id], onDelete: Cascade)
+
+  /// I have seen that this applies to me.
+  acknowledgedAt DateTime?
+  /// I have read it.
+  studiedAt      DateTime?
+  /// I have answered the questions.
+  testedAt       DateTime?
+  score          Int?
+  outOf          Int?
+  passed         Boolean?
+  attempts       Int       @default(0)
+
+  /// Watched doing it, by somebody competent. Required where a quiz cannot
+  /// stand in: a full mark on a neonatal resuscitation paper is not evidence of
+  /// being safe with a flat baby at three in the morning.
+  observedById String?
+  observedBy   StaffMember? @relation("ProtocolObservations", fields: [observedById], references: [id], onDelete: SetNull)
+  observedAt   DateTime?
+
+  /// The version this progress was against. If the protocol is reissued this
+  /// goes stale and the loop re-opens rather than silently counting.
+  againstVersion Int       @default(1)
+  nextDueAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([protocolId, staffId])
+  @@index([staffId])
+}
+
+/// One measure, one week, one number, and what moved it.
+///
+/// The whole system is meant to produce a measurable improvement every week. It
+/// cannot, until something is counted every week, and today nothing at Haven is.
+/// Six measures entered by hand beats sixty instrumented next quarter.
+///
+/// `movedBy` is the point. A number that changes and nobody can say why teaches
+/// the team that the scoreboard is weather. A number with "we fixed the reorder
+/// point on the fast movers" against it teaches them it is theirs.
+model ScoreboardEntry {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Stable key, e.g. "discharges-before-noon".
+  measure String
+  /// ISO week, e.g. "2026-W41". Weekly is the cadence a team can feel.
+  period  String
+
+  /// Held as text: some measures are counts, some percentages, one is a streak.
+  /// Parsing them into a number would force a shape onto six things that do not
+  /// share one.
+  value   String
+  /// What we did that moved it. Published to the whole team with the number.
+  movedBy String? @db.Text
+
+  /// Who may see this figure. Operational measures are ALL_STAFF. Financial
+  /// ones are LEADERSHIP, which the capability map also grants to BOARD for
+  /// viewing. Staff hear a revenue figure as a conversation about their pay.
+  visibility StaffTier @default(ALL_STAFF)
+
+  enteredById String?
+  enteredBy   StaffMember? @relation("ScoreboardEntries", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  /// A second person agrees the number is right. Deliberately "agreed" rather
+  /// than "verified" or "vetted": those are words for policing, and in a
+  /// hospital where the whole programme rests on people feeling able to speak
+  /// up, the register of the control matters as much as the control. This is
+  /// two people looking at the same figure and agreeing it, which is also what
+  /// actually happens in the room.
+  ///
+  /// It cannot be the person who entered it. Enforced in the route, because
+  /// comparing two columns in a check constraint is more trouble than it is
+  /// worth and the session is already in the route.
+  ///
+  /// Deliberately NOT applied to task completions. Countersigning every
+  /// handover tick across nineteen people makes the system unusable, and the
+  /// first thing that happens is that people stop ticking. Those are sampled by
+  /// a human instead, which is what the playbook already says.
+  agreedById String?
+  agreedBy   StaffMember? @relation("ScoreboardAgreements", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt   DateTime?
+  agreedNote String?      @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, measure, period])
+  @@index([clientId, period])
+}
+
+/// A peer-to-peer training session. Every two weeks, at the facility or
+/// virtually, one person given a topic and presenting it to everyone.
+///
+/// Peer-led on purpose, and the evidence is the reason rather than the budget.
+/// Positive deviance works because the practice arrives from a colleague under
+/// the same constraints, which is credible in a way an outside expert is not:
+/// the nurse presenting has done it on this ward, with this stock, at night.
+/// It also spreads capability instead of concentrating it, which matters in a
+/// hospital where six nurses cover every shift.
+///
+/// Presenting is the strongest form of learning available here, so the rota of
+/// presenters is the point as much as the attendance is.
+model TrainingSession {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  topic       String
+  description String?   @db.Text
+  /// Where this sits in the library, when the topic is a protocol.
+  protocolId  String?
+  protocol    Protocol? @relation(fields: [protocolId], references: [id], onDelete: SetNull)
+
+  /// Who is presenting. Null only while the slot is still unassigned.
+  presenterId String?
+  presenter   StaffMember? @relation("TrainingPresenter", fields: [presenterId], references: [id], onDelete: SetNull)
+
+  scheduledAt DateTime
+  mode        TrainingMode @default(ONSITE)
+  /// A room, or a meeting link.
+  whereAt     String?
+
+  status TrainingStatus @default(SCHEDULED)
+  /// What was covered, written after. Becomes the record for anybody absent.
+  notes  String?        @db.Text
+
+  /// Set when the invitation went out, so a reminder job cannot double-send.
+  invitedAt  DateTime?
+  remindedAt DateTime?
+
+  attendance TrainingAttendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, scheduledAt])
+}
+
+enum TrainingMode {
+  ONSITE
+  VIRTUAL
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  HELD
+  CANCELLED
+}
+
+/// Who was expected, who came. Expected rows are created when the session is
+/// scheduled, so an absence is visible rather than merely unrecorded.
+model TrainingAttendance {
+  id        String          @id @default(cuid())
+  sessionId String
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  staffId   String
+  staff     StaffMember     @relation("TrainingAttendance", fields: [staffId], references: [id], onDelete: Cascade)
+
+  attended   Boolean?
+  markedById String?
+  markedAt   DateTime?
+
+  @@unique([sessionId, staffId])
+  @@index([staffId])
+}
+
+/// A recurring thing somebody is expected to do, seeded from the playbook.
+/// Rows rather than code, so the hospital can change its own tasks without a
+/// deploy and so what Haven learns is exportable to the real staff app.
+model StaffTask {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  code        String
+  title       String
+  /// Matched loosely against position and department. Nineteen people do not
+  /// need a role taxonomy.
+  roles       String[]
+  departments String[]
+
+  cadence  StaffTaskCadence
+  /// What is actually captured, so a completion means something.
+  evidence String           @db.Text
+  why      String           @db.Text
+
+  /// Hours after the day starts before an undone task is chased. A crash
+  /// trolley check and a weekly stock count do not deserve the same patience.
+  graceHours  Int       @default(24)
+  flagLevel   FlagLevel @default(NUDGE)
+  /// Position or tier the flag escalates to, in words rather than an id,
+  /// because the postholder changes and the escalation does not.
+  escalatesTo String?
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  completions StaffTaskCompletion[]
+  flags       StaffTaskFlag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, code])
+  @@index([clientId, isActive])
+}
+
+enum StaffTaskCadence {
+  EVERY_SHIFT
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum FlagLevel {
+  NUDGE
+  FLAG
+  ESCALATE
+}
+
+/// One person, one task, one day. forDate rather than a timestamp so a night
+/// shift finishing at seven counts for the day it belongs to.
+model StaffTaskCompletion {
+  id      String      @id @default(cuid())
+  taskId  String
+  task    StaffTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  staffId String
+  staff   StaffMember @relation("TaskCompletions", fields: [staffId], references: [id], onDelete: Cascade)
+
+  forDate     DateTime
+  completedAt DateTime @default(now())
+  note        String?  @db.Text
+
+  @@unique([taskId, staffId, forDate])
+  @@index([staffId, forDate])
+}
+
+/// Raised when a task was not recorded in time. A FACT about a record, never a
+/// judgement about a person: the quality of a handover is sampled by a human
+/// and fed back privately, and conflating the two is how a hospital of nineteen
+/// loses its reporting culture in a fortnight.
+model StaffTaskFlag {
+  id      String      @id @default(cuid())
+  taskId  String
+  task    StaffTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  staffId String
+  staff   StaffMember @relation("TaskFlags", fields: [staffId], references: [id], onDelete: Cascade)
+
+  forDate DateTime
+  level   FlagLevel
+
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   StaffMember? @relation("FlagResolutions", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolution   String?      @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, staffId, forDate, level])
+  @@index([staffId, resolvedAt])
+  @@index([resolvedAt])
+}
+
+/// A question from the room at an AGELESS evening, posted from a guest's phone
+/// at /ageless/live. Votes are a plain counter: the room is seventy-odd people
+/// and the stakes are which question the chair reads next, so a browser-side
+/// guard against double votes is enough. The chair hides anything unsuitable.
+model AgelessQuestion {
+  id        String   @id @default(cuid())
+  /// The edition, so the series can reuse the table. "2026-10" for the first.
+  edition   String
+  text      String   @db.Text
+  askerName String?
+  /// Who it is for, if the guest chose a speaker.
+  forWhom   String?
+  votes     Int      @default(0)
+  hidden    Boolean  @default(false)
+  answered  Boolean  @default(false)
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([edition, hidden, votes])
+}
+
+// ─── CadreHealth: Nurse internship placement ───
+//
+// Newly qualified nurses compete for a small number of internship places at
+// NMCN-approved centres, and each centre runs its own written exam before it
+// interviews. CadreHealth runs one assessment, and each centre gets a ranked
+// list of the people who chose it. The centre keeps the interview and the
+// decision; we take the exam and the admin off its hands.
+
+enum CadreInternshipCentreStage {
+  PROSPECT // on the approved list, not yet approached
+  CONTACTED // first approach made
+  MEETING // in conversation
+  COMMITTED // agreed slots and a minimum score; candidates flow to it
+  DECLINED
+}
+
+/// An approved internship centre, and the record of our engagement with it.
+/// The BD fields live here because the people working the list are the same
+/// people the centre will deal with once it says yes.
+model CadreInternshipCentre {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  area      String? // Lagos district, e.g. "Lekki", "Ikeja"
+  ownership String? // PRIVATE, STATE, FEDERAL, MILITARY, MISSION
+
+  stage         CadreInternshipCentreStage @default(PROSPECT)
+  /// Platform user (staff) who owns the relationship. Plain id, resolved on read.
+  ownerUserId   String?
+  contactName   String?
+  contactRole   String?
+  contactEmail  String?
+  contactPhone  String?
+  nextAction    String?
+  nextActionDue DateTime?
+  notes         String?                    @db.Text
+
+  /// What the centre has agreed, once it commits.
+  slotsOffered Int?
+  /// Minimum assessment score (percent) a candidate needs to reach this centre's list.
+  minScore     Int?
+  intakeNote   String? // e.g. "January and July intakes"
+  committedAt  DateTime?
+
+  /// The employer login that sees this centre's candidates.
+  employerOrgId String?           @unique
+  employerOrg   CadreEmployerOrg? @relation(fields: [employerOrgId], references: [id], onDelete: SetNull)
+
+  preferences CadreInternshipPreference[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stage])
+}
+
+enum CadreInternshipStatus {
+  APPLIED // form in, assessment not finished
+  ASSESSED // assessment submitted and scored
+  PLACED // accepted an offer
+  WITHDRAWN
+}
+
+model CadreInternshipApplication {
+  id             String            @id @default(cuid())
+  professionalId String
+  professional   CadreProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  /// Intake label, e.g. "2027-H1". One application per person per intake.
+  intake         String
+
+  qualification  String // BNSC, RN, RM, RN_RM
+  school         String
+  graduationYear Int
+  /// NMCN registration (licence) number, if issued yet.
+  nmcnNumber     String?
+  phone          String
+
+  /// The link the applicant uses to sit and see the assessment. No password:
+  /// most applicants are new graduates with no account, and the link is emailed.
+  accessToken String @unique
+
+  /// The applicant agreed that the centres they chose may see their score and details.
+  consentAt DateTime
+  status    CadreInternshipStatus @default(APPLIED)
+
+  preferences CadreInternshipPreference[]
+  attempt     CadreInternshipAttempt?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([professionalId, intake])
+  @@index([intake, status])
+}
+
+enum CadreInternshipMatchStatus {
+  PENDING // on the centre's list, no decision yet
+  INVITED // invited to interview
+  OFFERED
+  ACCEPTED // the nurse took the place
+  DECLINED // the centre passed
+  WITHDRAWN // the nurse withdrew, or took a place elsewhere
+}
+
+/// One ranked choice of centre by one applicant. This is the row a centre acts on.
+model CadreInternshipPreference {
+  id            String                     @id @default(cuid())
+  applicationId String
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  centreId      String
+  centre        CadreInternshipCentre      @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  rank          Int
+  status        CadreInternshipMatchStatus @default(PENDING)
+  decidedAt     DateTime?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+
+  @@unique([applicationId, centreId])
+  @@index([centreId, status])
+}
+
+/// The one sitting of the assessment. The question set is drawn and fixed at
+/// start, scoring happens on the server, and the clock is the server's.
+model CadreInternshipAttempt {
+  id            String                     @id @default(cuid())
+  applicationId String                     @unique
+  application   CadreInternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  bankVersion   String
+  /// [{ id, order: number[] }]: the questions drawn and the option order shown.
+  paper         Json
+  /// { [questionId]: optionIndex as shown }
+  answers       Json                       @default("{}")
+  startedAt     DateTime                   @default(now())
+  deadlineAt    DateTime
+  submittedAt   DateTime?
+  /// Percent correct, 0-100.
+  score         Int?
+  /// { [sectionKey]: { correct, total } }
+  sectionScores Json?
+}
+
+// ─── Market Watch ─────────────────────────────────────────────────────────
+// Social listening and market intelligence for a client's brand and its
+// competitors. A watch names who we follow; crons pull what the public says
+// about them from each source into WatchMention, read it, raise alerts, and
+// each week compose an EngagementDashboard draft for a partner to publish.
+// Only aggregates reach the client portal; the raw feed stays with CFA.
+
+model MarketWatch {
+  id           String            @id @default(cuid())
+  name         String
+  /// Optional: Mezo and other in-house brands have no client record.
+  clientId     String?
+  client       Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  /// Where the weekly dashboard draft lands. Without one, the watch is internal only.
+  engagementId String?
+  engagement   Engagement?       @relation(fields: [engagementId], references: [id], onDelete: SetNull)
+  status       MarketWatchStatus @default(ACTIVE)
+  /// healthcare, aesthetics, nutrition: picks the aspect taxonomy the reader tags with.
+  sector       String            @default("healthcare")
+  /// What the business does, in a sentence. The reader uses it to judge relevance.
+  context      String?           @db.Text
+  /// Who gets same-day alerts and the weekly brief. CFA staff by default.
+  alertEmails  String[]
+  lastRunAt    DateTime?
+  createdById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  entities WatchEntity[]
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  alerts   WatchAlert[]
+  runs     WatchRun[]
+
+  @@index([status])
+}
+
+enum MarketWatchStatus {
+  ACTIVE
+  PAUSED
+}
+
+/// One brand we follow: the client's own, or a competitor.
+model WatchEntity {
+  id              String          @id @default(cuid())
+  watchId         String
+  watch           MarketWatch     @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  name            String
+  role            WatchEntityRole @default(COMPETITOR)
+  /// Search terms. Any one matching counts, e.g. ["Medlyfe", "Lyfe Plastics"].
+  keywords        String[]
+  /// Words that make a match a false positive, e.g. a namesake in another trade.
+  excludes        String[]
+  /// Google Maps place, for reviews and rating.
+  googlePlaceId   String?
+  googleCid       String?
+  instagramHandle String?
+  tiktokHandle    String?
+  xHandle         String?
+  facebookPage    String?
+  youtubeChannel  String?
+  website         String?
+  /// The Awario alert that tracks this brand, when Awario is the web feed.
+  awarioAlertId   String?
+  /// Pages watched for changes: price lists, services, team.
+  trackedUrls     String[]
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  mentions WatchMention[]
+  metrics  WatchMetric[]
+  pages    WatchPageSnapshot[]
+
+  @@index([watchId])
+}
+
+enum WatchEntityRole {
+  OWN
+  COMPETITOR
+}
+
+enum WatchSource {
+  GOOGLE_REVIEW
+  NEWS
+  X
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+  YOUTUBE
+  REDDIT
+  NAIRALAND
+  WEB
+  WEBSITE_CHANGE
+  SEARCH_INTEREST
+}
+
+enum WatchSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  MIXED
+}
+
+model WatchMention {
+  id              String       @id @default(cuid())
+  watchId         String
+  watch           MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId        String?
+  entity          WatchEntity? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+  source          WatchSource
+  /// The source's own id, so a re-fetch updates rather than duplicates.
+  externalId      String
+  url             String?
+  authorName      String?
+  authorHandle    String?
+  /// Followers of the author where the source gives it; drives reach.
+  authorFollowers Int?
+  title           String?
+  text            String       @db.Text
+  publishedAt     DateTime
+  /// Star rating for reviews, 1 to 5.
+  rating          Int?
+  likes           Int?
+  comments        Int?
+  shares          Int?
+  views           Int?
+  /// The business's own reply, for reviews.
+  ownerReply      String?      @db.Text
+  ownerRepliedAt  DateTime?
+  raw             Json?
+
+  // Filled by the reader (lib/market-watch/classify.ts)
+  classifiedAt   DateTime?
+  relevant       Boolean?
+  sentiment      WatchSentiment?
+  /// -1 to 1.
+  sentimentScore Float?
+  /// Healthcare aspects, e.g. ["wait_time", "billing"].
+  aspects        String[]
+  /// Someone asking where to get what the client sells.
+  isLead         Boolean         @default(false)
+  isComplaint    Boolean         @default(false)
+  /// A claim or post that could become a regulatory or reputational problem.
+  isRisk         Boolean         @default(false)
+  language       String?
+  summary        String?
+  /// A suggested public reply for a review. Never confirms the reviewer is a patient.
+  replyDraft     String?         @db.Text
+  /// Set when staff corrected the reader, so a re-read does not undo them.
+  correctedBy    String?
+
+  /// CFA staff working the feed.
+  starred   Boolean   @default(false)
+  handledAt DateTime?
+  handledBy String?
+
+  fetchedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alerts WatchAlert[]
+
+  @@unique([watchId, source, externalId])
+  @@index([watchId, publishedAt])
+  @@index([watchId, classifiedAt])
+  @@index([entityId, publishedAt])
+}
+
+/// A number about an entity on a day: followers, rating, review count, search interest.
+model WatchMetric {
+  id       String       @id @default(cuid())
+  watchId  String
+  watch    MarketWatch  @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  entityId String
+  entity   WatchEntity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  metric   String
+  date     DateTime     @db.Date
+  value    Float
+  source   WatchSource?
+
+  @@unique([entityId, metric, date])
+  @@index([watchId, metric, date])
+}
+
+/// The last seen text of a tracked page, so a change can be spotted and described.
+model WatchPageSnapshot {
+  id        String      @id @default(cuid())
+  entityId  String
+  entity    WatchEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  url       String
+  hash      String
+  text      String      @db.Text
+  fetchedAt DateTime    @default(now())
+
+  @@index([entityId, url, fetchedAt])
+}
+
+enum WatchAlertKind {
+  NEGATIVE_REVIEW
+  NEGATIVE_MENTION
+  SPIKE
+  RISK
+  LEAD
+  COMPETITOR_MOVE
+}
+
+model WatchAlert {
+  id             String         @id @default(cuid())
+  watchId        String
+  watch          MarketWatch    @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  mentionId      String?
+  mention        WatchMention?  @relation(fields: [mentionId], references: [id], onDelete: SetNull)
+  kind           WatchAlertKind
+  title          String
+  detail         String         @db.Text
+  /// Stops the same thing alerting twice, e.g. "spike:<entity>:<date>".
+  dedupeKey      String
+  emailedAt      DateTime?
+  acknowledgedAt DateTime?
+  acknowledgedBy String?
+  createdAt      DateTime       @default(now())
+
+  @@unique([watchId, dedupeKey])
+  @@index([watchId, createdAt])
+}
+
+/// One pull from one source, so a silent source is visible rather than mistaken for a quiet week.
+model WatchRun {
+  id              String      @id @default(cuid())
+  watchId         String
+  watch           MarketWatch @relation(fields: [watchId], references: [id], onDelete: Cascade)
+  /// The source's key in lib/market-watch/sources, e.g. "instagram-profiles".
+  source          String
+  startedAt       DateTime    @default(now())
+  finishedAt      DateTime?
+  fetched         Int         @default(0)
+  inserted        Int         @default(0)
+  skipped         String?
+  error           String?     @db.Text
+  /// Slow sources (Apify runs, DataForSEO review tasks) start a job in one run
+  /// and collect it in a later one. The job's id waits here until collected.
+  pendingRef      String?
+  pendingEntityId String?
+  collectedAt     DateTime?
+
+  @@index([watchId, startedAt])
+  @@index([pendingRef, collectedAt])
 }

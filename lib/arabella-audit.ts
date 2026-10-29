@@ -16,44 +16,117 @@ export type RequestSection = {
   hint: string;
 };
 
-/** The eight that turn a walkthrough into an audit. Ordered as in the document. */
-export const PRIORITY_EIGHT: { n: number; what: string; why: string; section: string }[] = [
-  { n: 1, section: "A", what: "Arabella's certificate of incorporation, RC number and CAC status report", why: "Nothing in the payer workstream can begin without it, and every introduction letter quotes it" },
-  { n: 2, section: "G", what: "The list of Tabitha's HMO panels, with tariff schedules and the contact at each", why: "The most valuable asset in the transition, and the hardest to rebuild if it is lost" },
-  { n: 3, section: "D", what: "The revenue record, monthly, last 12 months, by service line and by payer", why: "This becomes the agreed baseline, and the baseline is what every later judgement is measured against" },
-  { n: 4, section: "D", what: "Bank statements for every business account, last 6 months", why: "The only unarguable record of what came in, as opposed to what was invoiced" },
-  { n: 5, section: "F", what: "The price list and package architecture: maternity, gynaecology surgery, fertility", why: "We cannot see yield or leakage without knowing the list" },
-  { n: 6, section: "H", what: "The patient database export, in whatever form it exists", why: "The reactivation case rests on it, and its quality is unknown until we open it" },
-  { n: 7, section: "K", what: "Full staff list with role, employment type, days worked and reporting line", why: "Establishment against service is where specialist centres quietly fail" },
-  { n: 8, section: "C", what: "Facility registration and licences, including for the fertility service", why: "Category registered against service delivered is a live exposure, and worse in a new entity" },
+/** What has arrived, so the page thanks people for it rather than asking again. Update as things land. */
+export const RECEIVED: { what: string; status: "in" | "partly"; note: string }[] = [
+  { what: "Company certificate", status: "in", note: "RC 1802696, incorporated June 2021" },
+  { what: "Sales record, January to September 2026", status: "in", note: "Covers part of the income the bank statements show, so item 1 below asks for the billing export" },
+  { what: "Bank statements", status: "partly", note: "First Bank (both accounts) and GTB are in. Access is still to come" },
+  { what: "Expense sheets for both entities", status: "in", note: "Item 7 asks for the full line-item ledger behind them" },
+  { what: "Price list, staff list, pharmacy stock register", status: "in", note: "" },
+  { what: "HMO list, tariffs and contracts", status: "partly", note: "Leadway, AXA Mansard and Allianz tariffs; Reliance and Allianz agreements" },
+  { what: "Maternity, laboratory and fertility notes", status: "in", note: "" },
+  { what: "Registration pack and practising licences", status: "in", note: "" },
+  { what: "Patient list", status: "in", note: "4,379 records" },
 ];
 
+/**
+ * The eight we need next, after the first uploads. Ordered as in the
+ * document. Kept as PRIORITY_EIGHT so the admin page's chase list follows.
+ */
+export const PRIORITY_EIGHT: { n: number; what: string; why: string; section: string }[] = [
+  { n: 1, section: "C", what: "Bank statements for the GTB and Access accounts, last 12 months (First Bank is in, thank you)", why: "The only way to confirm that what the record says came in reached the bank" },
+  { n: 2, section: "E", what: "Monthly costs, last 12 months: salaries, rent, power, drugs bought, tests sent out", why: "Without costs nobody can say which services make money" },
+  { n: 3, section: "D", what: "For each HMO and company account: tariff, contract, and what it owes today", why: "Insurers paid under 2% of this year's takings" },
+  { n: 4, section: "F", what: "Fertility: who does the embryology, cycles started this year, and the price of a cycle", why: "Fertility brought in \u20A66m and is not on the price list or the staff list" },
+  { n: 5, section: "F", what: "Laboratory: tests done on site and sent out, to whom, and the cost of each", why: "The largest line in the sales record, at 30%" },
+  { n: 6, section: "F", what: "Maternity this year: women booked, babies delivered here, and those who delivered elsewhere", why: "Two to four packages in nine months, against where the brand is pointed" },
+  { n: 7, section: "B", what: "The facility registration certificate, and the name it is in", why: "Whether it covers what is delivered, and whether it moves to Arabella" },
+  { n: 8, section: "D", what: "Prices for the laparoscopic procedures marked TBD", why: "Surgery cannot be quoted without a price" },
+];
+
+/**
+ * The additional request of 28 October 2026, after the data review. Numbered
+ * as in docs/arabella/arabella-data-review-and-request-cfa.md, section 4. Each
+ * item is its own upload tag (R1 to R21) so the admin page can chase by item.
+ * Wording here is for a page the whole team can open, so it names no amounts.
+ */
+export const ADDITIONAL_REQUEST: { group: string; items: { n: number; what: string; first?: boolean }[] }[] = [
+  {
+    group: "Income and patients",
+    items: [
+      { n: 1, first: true, what: "A billing export from the records system, January to October 2026, both sites, one row per item: patient number, date, service, payer, amount billed, amount paid, payment channel" },
+      { n: 2, first: true, what: "Which sites and bank accounts the sales record covers, and whether Asokoro collections are in it" },
+      { n: 3, first: true, what: "The Access Bank statement, January 2025 to date, and any other account, POS terminal or wallet that receives patient payments" },
+      { n: 4, what: "The cash book, or a note of how cash is recorded and banked" },
+      { n: 5, what: "First Bank merchant settlement reports for 2026, to reconcile POS income" },
+      { n: 6, what: "What the regular monthly receipt of \u20A6395,500 from March to September is" },
+    ],
+  },
+  {
+    group: "Costs and funding",
+    items: [
+      { n: 7, first: true, what: "A complete expense ledger for both entities, January to October 2026, from the line items, with each line marked operating or capital" },
+      { n: 8, first: true, what: "Payroll schedules, January to October 2026, names and amounts, from both accounts" },
+      { n: 9, what: "A register of the funds put into the business in 2025 and 2026, with the terms of each" },
+      { n: 10, what: "Source documents and terms for the large receipts listed in our email of 21 October, and what the payments that followed were for" },
+      { n: 11, what: "The statement for the February investment placement, and invoices or an asset register for the April and June equipment purchases" },
+    ],
+  },
+  {
+    group: "Maternity and clinical services",
+    items: [
+      { n: 12, first: true, what: "The antenatal booking register for 2026: booking date, package, payments, expected date of delivery, place of delivery, and the reason where known" },
+      { n: 13, what: "What the January to March \u201Cpackages\u201D payments of \u20A645,000 to \u20A650,000 were" },
+      { n: 14, what: "Fertility: the partner laboratory agreement, the invoice for the March case, and the number of cases in 2025 and 2026" },
+    ],
+  },
+  {
+    group: "Registration, licensing and people",
+    items: [
+      { n: 15, what: "The 2026 renewal certificate, or the committee\u2019s written status on the Remita payment, and the 2025 certificate" },
+      { n: 16, what: "Any committee approval or inspection report for 37 Nelson Mandela Street, Asokoro, and whether the Jabi site is still open" },
+      { n: 17, what: "Licences and specialist qualifications for the visiting consultants (obstetrics and gynaecology, anaesthesia, surgery), their sessional letters, and the name of the maternity lead" },
+      { n: 18, what: "The pharmacist arrangement and licence, the laboratory scientist\u2019s licence, licences for the locum nurses and nurse anaesthetist, and any midwifery registrations" },
+      { n: 19, what: "The current professional indemnity policy" },
+    ],
+  },
+  {
+    group: "Insurers",
+    items: [
+      { n: 20, what: "A claims list by insurer: submitted, approved, paid and outstanding, January to October 2026" },
+      { n: 21, what: "The countersigned Allianz Partners agreement with its annexes, the Reliance tariff, and the signed agreements or provider letters for Leadway, AXA Mansard, Clearline, Henner and ECOWAS" },
+    ],
+  },
+];
+
+export const ADDITIONAL_ITEMS = ADDITIONAL_REQUEST.flatMap((g) => g.items);
+
 export const REQUEST_SECTIONS: RequestSection[] = [
-  { key: "A", title: "The two entities, and what the succession rests on", hint: "CAC documents for both, any transfer or novation agreement, what moved and what did not, and who holds the patient records" },
-  { key: "B", title: "Ownership, governance and how decisions get made", hint: "Shareholding, directors, bank mandate, who signs off what, loans and director's money in" },
-  { key: "C", title: "Licensing, regulatory standing and insurance", hint: "Facility registration, MDCN and nursing licences, the fertility service and its laboratory, indemnity, waste, data protection" },
-  { key: "D", title: "Money, in and out", hint: "Management accounts, bank statements, trial balance, asset register, the monthly fixed cost run rate" },
-  { key: "E", title: "The service ledger", hint: "One row per episode: service, payer, quoted, invoiced, collected, direct cost, outcome. Maternity, surgery and fertility each have their own counts" },
-  { key: "F", title: "Pricing and the package architecture", hint: "The price list, what a maternity package includes and excludes, how a quote is built, and quotes that did not convert" },
-  { key: "G", title: "Payers: HMO, corporate and self pay", hint: "Panels and tariffs, receivables ageing, rejections and their reasons, the authorisation process, corporate accounts" },
-  { key: "H", title: "The patient database and the right to contact it", hint: "The export and its fields, how it was built, what patients were told, and anyone who asked not to be contacted" },
-  { key: "I", title: "Clinical governance, safety and the patient journey", hint: "Protocols for the emergencies that actually happen, consent forms, incidents, the escalation route, and the journey as it runs" },
-  { key: "J", title: "Pharmacy, stock and the formulary", hint: "Stock list with expiry, purchases, margin, stockouts, cold chain, and when it was last physically counted" },
-  { key: "K", title: "People", hint: "Staff list, organogram, contracts, rota, turnover, training, and how tasks are assigned and checked today" },
-  { key: "L", title: "Technology, records and information security", hint: "Every system and who administers it, backups and the last restore test, access control, devices, the website and ad accounts" },
-  { key: "M", title: "Brand, marketing and what has already been tried", hint: "Brand assets for both names, social accounts, HERcast, marketing spend and what it produced, and who refers patients today" },
+  { key: "A", title: "The company and the change of name", hint: "CAC status report, Tabitha's registration and closure, what still sits in Tabitha's name, governance, loans" },
+  { key: "B", title: "Licences, insurance and compliance", hint: "Facility registration, practising licences, fertility, pharmacy and laboratory registrations, indemnity, waste, data protection" },
+  { key: "C", title: "Money in", hint: "Sales record for October to December 2025, bank statements, the two largest payments, registrations, cash handling" },
+  { key: "D", title: "Prices, packages and who pays", hint: "Missing prices, what packages include, HMO tariffs and contracts, what insurers and companies owe" },
+  { key: "E", title: "Money out", hint: "Monthly costs, payroll, purchases, tests sent out, the cafe, marketing spend, management accounts" },
+  { key: "F", title: "How each service runs", hint: "Maternity, fertility, surgery, laboratory, pharmacy and wellness: activity, staffing and costs" },
+  { key: "G", title: "Clinical safety", hint: "Emergency protocols and drills, consent forms, incidents, sterilisation, infection prevention, complaints" },
+  { key: "H", title: "Patients and where they come from", hint: "Privacy notices and opt-outs, follow-up booking, the patient journey, referrers, enquiries, HERcast" },
+  { key: "I", title: "People", hint: "Contracts, rota, cover, leavers, training, and how tasks are given out and checked" },
+  { key: "J", title: "Systems and records", hint: "Every system and who administers it, backups, access, devices, the website and ad accounts" },
 ];
 
 /** Sections offered in the uploader, priority first and a catch-all last. */
 export const UPLOAD_SECTIONS: RequestSection[] = [
-  { key: "priority", title: "One of the eight priority items", hint: "The eight we need before Friday" },
+  ...ADDITIONAL_ITEMS.map((i) => ({ key: `R${i.n}`, title: `Item ${i.n}: ${i.what.split(/[,:]/)[0]}`, hint: i.what })),
+  { key: "priority", title: "One of the earlier eight", hint: "Bank statements, costs, HMO amounts owed, fertility, laboratory, maternity, registration, missing prices" },
   ...REQUEST_SECTIONS,
   { key: "other", title: "Something else", hint: "Anything you think we should see that we did not ask for" },
 ];
 
 export const sectionLabel = (key: string): string => {
-  if (key === "priority") return "Priority eight";
+  if (key === "priority") return "Priority items";
   if (key === "other") return "Other";
+  const r = /^R(\d+)$/.exec(key);
+  if (r) return `Item ${r[1]} (October request)`;
   const s = REQUEST_SECTIONS.find((x) => x.key === key);
   return s ? `${s.key}. ${s.title}` : key;
 };
@@ -97,7 +170,7 @@ export const DOCUMENTS = [
   {
     href: "/arabella/arabella-audit-information-request-cfa.pdf",
     title: "Information and data request",
-    pages: "10 pages",
-    blurb: "Everything we have asked for, section by section, with the eight that matter before Friday at the front and a week by week view of the first fortnight at the back.",
+    pages: "7 pages",
+    blurb: "What has come in, the eight we need next, and the full list in ten sections. Revised 9 October.",
   },
 ];

@@ -42,18 +42,14 @@ PACK = {
         "MedLYFE  ·  The introduction film", f"Consult for Africa  ·  {TODAY}"),
     "ageless-plan-summary-cfa": (
         "AGELESS  ·  Plan summary", "Consult for Africa  ·  Confidential"),
+    "ageless-mc-pack-cfa": (
+        "AGELESS  ·  MC pack", f"MedLYFE  ·  {EVENING}"),
+    "ageless-closure-note-cfa": (
+        "AGELESS  ·  Closure note", "Consult for Africa  ·  For MedLYFE"),
+    "ageless-thanks-chinwe-cfa": (
+        "AGELESS  ·  Thank you", f"MedLYFE and The Lyfe Place  ·  {TODAY}"),
     "ageless-note-to-chinwe-cfa": (
         "AGELESS  ·  For Dr Kpaduwa", f"Consult for Africa  ·  {EVENING}"),
-    "kakulus-brief-opening-film": (
-        "Medbury  ·  The opening film", f"Medbury Healthcare Group  ·  {TODAY}"),
-    "kakulus-brief-medlyfe-experience": (
-        "MedLYFE  ·  The MedLYFE Experience", f"Medbury Healthcare Group  ·  {TODAY}"),
-    "kakulus-brief-lyfeplace": (
-        "LyfePlace  ·  The LyfePlace film", f"Medbury Healthcare Group  ·  {TODAY}"),
-    "films-one-pager-itunu-cfa": (
-        "Medbury  ·  Your three films", f"Consult for Africa  ·  {TODAY}"),
-    "shoot-replan-session-cfa": (
-        "Medlyfe  ·  The content shoot", f"Consult for Africa  ·  {TODAY}"),
 }
 
 

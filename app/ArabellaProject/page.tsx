@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import DocumentUploader from "@/components/arabella/DocumentUploader";
-import { DOCUMENTS, PRIORITY_EIGHT, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
+import { ADDITIONAL_REQUEST, DOCUMENTS, RECEIVED, REQUEST_SECTIONS, SURVEYS } from "@/lib/arabella-audit";
 
 // One link for Dr Chito and the Arabella team: the request document, the four
 // surveys, and somewhere to put the answers. Deliberately not indexed.
@@ -25,25 +25,25 @@ const card = {
   padding: 20,
 } as const;
 
-const FORTNIGHT: { when: string; what: string }[] = [
+const STAGES: { when: string; what: string }[] = [
   {
-    when: "Friday 2 October",
-    what: "We arrive. We walk the whole building with you, then again with the front desk, theatre, the ward, the laboratory, the pharmacy and the fertility unit. The technology and records review opens the same day.",
+    when: "Records",
+    what: "Revenue rebuilt from the sales record and traced to the bank, and costs put against each service, so we can see what each one makes.",
   },
   {
-    when: "Week one",
-    what: "Records and systems reviewed. Revenue rebuilt from the ledger and traced to the bank. The baseline agreed with you. The payer file assembled and the introduction letter drafted for your signature.",
+    when: "Conversations",
+    what: "Short conversations with staff, individually and confidentially, with the four surveys running alongside. Nothing anybody says is reported back with a name attached.",
   },
   {
-    when: "Week one",
-    what: "Short conversations with staff, individually and confidentially. Nothing anybody says is reported back with a name attached.",
+    when: "On site",
+    what: "The patient journey traced end to end on live cases. Pharmacy and stock counted. The patient database reviewed with you, on your own machine.",
   },
   {
-    when: "Week two",
-    what: "The patient journey traced end to end on live cases. Pharmacy and stock counted. Findings tested with you before anything is written down.",
+    when: "Findings",
+    what: "Findings tested with you before anything is written down.",
   },
   {
-    when: "End of week two",
+    when: "By end November",
     what: "The written diagnostic: what Arabella earns, where it leaks, what the operation can carry, and what to fix in what order. Plus the technology and records report with a prioritised roadmap.",
   },
 ];
@@ -103,7 +103,7 @@ export default function ArabellaProjectPage() {
             have asked for, and answer whichever survey applies to you.
           </p>
           <p style={{ color: "#8FA8BC", fontSize: 13.5, margin: "16px 0 0" }}>
-            On site from Friday 2 October 2026. Written diagnostic at the end of week two.
+            Audit under way. Written diagnostic by the end of November 2026.
           </p>
         </div>
       </header>
@@ -112,7 +112,7 @@ export default function ArabellaProjectPage() {
         {/* A word from Debo, so the page has a person behind it */}
         <section style={{ ...card, background: "#FBF6E6", borderLeft: `4px solid ${GOLD}`, marginTop: 22 }}>
           <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.7 }}>
-            We are not coming to write a view of the Abuja women&rsquo;s health market. We are coming
+            We are not here to write a view of the Abuja women&rsquo;s health market. We want
             to establish what Arabella actually earns today, where the patients and the money leak
             out between the first enquiry and the bank account, and whether the operation can carry
             the premium promise the brand is about to make. Nothing on this page is a test. Where a
@@ -129,7 +129,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Start here"
             title="The request"
-            lead="Everything we have asked for, why each part matters, and what the first fortnight looks like from your side."
+            lead="Everything we have asked for, why each part matters, and how the audit runs from here."
           />
           <div style={{ display: "grid", gap: 10 }}>
             {DOCUMENTS.map((d) => (
@@ -138,34 +138,74 @@ export default function ArabellaProjectPage() {
           </div>
         </section>
 
-        {/* 2. The eight */}
+        {/* 2. What has come in */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
-            eyebrow="Before Friday"
-            title="The eight that matter most"
-            lead="These eight unlock everything else. If the week runs away, send these and let the rest follow over the fortnight after."
+            eyebrow="Thank you"
+            title="What has come in"
+            lead="Twenty four files so far. Where something is only partly in, the note says what is still missing."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-            {PRIORITY_EIGHT.map((p, i) => (
+            {RECEIVED.map((r, i) => (
               <div
-                key={p.n}
-                style={{
-                  display: "flex", gap: 14, padding: "14px 18px",
-                  borderTop: i === 0 ? "none" : `1px solid #F1F5F9`,
-                  background: i % 2 ? "#FBFDFE" : "#fff",
-                }}
+                key={r.what}
+                style={{ display: "flex", gap: 12, alignItems: "baseline", padding: "12px 18px", borderTop: i === 0 ? "none" : `1px solid #F1F5F9` }}
               >
-                <span style={{ color: GOLD, fontWeight: 800, fontSize: 15, minWidth: 18 }}>{p.n}</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 15, color: "#1F2937", lineHeight: 1.5 }}>{p.what}</span>
-                  <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 3 }}>{p.why}</span>
+                <span
+                  style={{
+                    flex: "0 0 auto", fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "3px 9px",
+                    background: r.status === "in" ? "#DCFCE7" : "#FEF3C7", color: r.status === "in" ? "#166534" : "#92400E",
+                  }}
+                >
+                  {r.status === "in" ? "\u2713 In" : "Partly in"}
                 </span>
-                <span style={{ color: TEAL, fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap" }}>
-                  section {p.section}
+                <span style={{ flex: 1 }}>
+                  <span style={{ display: "block", fontSize: 15, color: "#1F2937" }}>{r.what}</span>
+                  {r.note && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2 }}>{r.note}</span>}
                 </span>
               </div>
             ))}
           </div>
+        </section>
+
+        {/* 3. The October request */}
+        <section style={{ marginTop: 40 }}>
+          <SectionHeading
+            eyebrow="Updated 28 October"
+            title="What we need now"
+            lead="We have now reviewed all the additional information you sent. These records settle the questions the files cannot answer on their own. Items marked first matter most. Where something does not exist, a one-line note saying so is just as useful."
+          />
+          <div style={{ display: "grid", gap: 14 }}>
+            {ADDITIONAL_REQUEST.map((g) => (
+              <div key={g.group} style={{ ...card, padding: 0, overflow: "hidden" }}>
+                <div style={{ padding: "11px 18px", background: "#F8FAFC", borderBottom: `1px solid ${LINE}`, color: NAVY, fontWeight: 700, fontSize: 14 }}>
+                  {g.group}
+                </div>
+                {g.items.map((p, i) => (
+                  <div
+                    key={p.n}
+                    style={{ display: "flex", gap: 14, padding: "13px 18px", borderTop: i === 0 ? "none" : `1px solid #F1F5F9` }}
+                  >
+                    <span style={{ color: GOLD, fontWeight: 800, fontSize: 15, minWidth: 22 }}>{p.n}</span>
+                    <span style={{ flex: 1, fontSize: 14.5, color: "#1F2937", lineHeight: 1.55 }}>{p.what}</span>
+                    {p.first && (
+                      <span
+                        style={{
+                          alignSelf: "flex-start", background: "#FEF3C7", color: "#92400E", borderRadius: 20,
+                          padding: "3px 9px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
+                        }}
+                      >
+                        First
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <p style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.6, margin: "12px 2px 0" }}>
+            When you upload, choose the item number so each file lands against the question it answers.
+          </p>
         </section>
 
         {/* 3. Uploads */}
@@ -173,7 +213,7 @@ export default function ArabellaProjectPage() {
           <SectionHeading
             eyebrow="Send it to us"
             title="Upload what you have"
-            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it."
+            lead="Straight from here, as many times as you like. There is no need to wait until you have everything, and no need to set up a shared folder unless you would rather. Send what exists today and add to it. Clinical case notes that name a patient we would rather see with you on site."
           />
           <DocumentUploader />
         </section>
@@ -182,8 +222,8 @@ export default function ArabellaProjectPage() {
         <section style={{ marginTop: 40 }}>
           <SectionHeading
             eyebrow="For reference"
-            title="Everything we have asked for"
-            lead="The full list, with the detail under each heading, is in the request above."
+            title="The original request"
+            lead="The ten sections of the first request, for reference. The list above is what we need now."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
             {REQUEST_SECTIONS.map((s, i) => (
@@ -243,15 +283,15 @@ export default function ArabellaProjectPage() {
           </div>
         </section>
 
-        {/* 6. The fortnight */}
+        {/* 6. How it runs */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading
             eyebrow="What happens when"
-            title="The first fortnight from your side"
+            title="How the audit runs from here"
             lead="So that the team knows what is coming and nobody is surprised by a request."
           />
           <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-            {FORTNIGHT.map((f, i) => (
+            {STAGES.map((f, i) => (
               <div
                 key={i}
                 style={{

@@ -49,14 +49,10 @@ type Letterhead = "lyfe" | "medlyfe";
 /** Why an Ageless mail arrived. The clinic default is wrong for both. */
 const INVITED_FOOTER =
   "You are receiving this because you were invited to Ageless, hosted by Medlyfe. Reply at any time and we will remove your details.";
-/**
- * The printed invitation, six speakers and all, served from the live site. It
- * goes at the head of every guest mail so the email looks like the evening
- * people were shown, not a form letter about it.
- */
-const AGELESS_FLYER_URL = "https://www.consultforafrica.com/lyfe/ageless-invitation.jpg";
-const flyer = () =>
-  `<p style="margin:0 0 20px;"><img src="${AGELESS_FLYER_URL}" width="496" alt="${esc(LYFE_EVENT_THEME)}, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;"></p>`;
+/** The printed invitation, served from the site so the email and the page cannot differ. */
+const FLYER_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.consultforafrica.com") +
+  "/lyfe/ageless-invitation.jpg";
 
 const LIST_FOOTER =
   "You are receiving this because you are on the invitation list for Ageless, hosted by MedLYFE and The Lyfe Place. Reply at any time and we will remove your details.";
@@ -126,6 +122,8 @@ export interface LyfeConfirmationInput {
   surgical: boolean;
   guestCount: number | null;
   slotAt?: Date | null;
+  /** Event registrations once the room is closed: they join the waiting list. */
+  waitlisted?: boolean;
 }
 
 /** "Tuesday 13 October, 11:00 WAT", from an instant, in Lagos time. */
@@ -152,6 +150,7 @@ export async function emailLyfeConfirmation({
   surgical,
   guestCount,
   slotAt,
+  waitlisted = false,
 }: LyfeConfirmationInput): Promise<void> {
   // A request, not a booking. The page stopped taking money at the door, so
   // saying "booked" or "paid" here would both be wrong. What is true is that
@@ -194,7 +193,7 @@ export async function emailLyfeConfirmation({
 
     const html = layout(
       `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by ${esc(LYFE_EVENT.host)}.</p>
+       <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}, the evening hosted by MedLYFE and The Lyfe Place.</p>
        ${plusOne}
        <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
          <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -206,15 +205,23 @@ export async function emailLyfeConfirmation({
            ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
          </td></tr>
        </table>
-       <p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>
+       ${waitlisted
+         ? `<p style="margin:0 0 14px;">The room is full, so we have put you on the waiting list. If a place opens we will write to you straight away with a link of your own, and your place is held the moment you use it. Please do not come to the door without one.</p>`
+         : `<p style="margin:0 0 14px;">It is a small room, ${LYFE_EVENT.places} places, so names are confirmed in advance rather than taken at the door. We will write back with a link of your own, and your place is held the moment you use it.</p>`}
        <p style="margin:0 0 14px;">If you would rather not wait, you can ask for a conversation with the clinical team at any time. Reply to this note and we will arrange it.</p>
        <p style="margin:0 0 6px;">With kind regards,</p>
-       <p style="margin:0;font-weight:600;">The team at ${esc(MEDLYFE_NAME)}</p>`,
-      `Your interest in ${LYFE_EVENT_THEME} is registered.`,
+       <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
+      waitlisted
+        ? `You are on the waiting list for ${LYFE_EVENT_THEME}.`
+        : `Your interest in ${LYFE_EVENT_THEME} is registered.`,
       "medlyfe",
       INVITED_FOOTER,
     );
-    await notifyInternal(to, `Thank you for your interest, ${esc(firstName)}`, html);
+    await notifyInternal(
+      to,
+      waitlisted ? `You are on the waiting list, ${esc(firstName)}` : `Thank you for your interest, ${esc(firstName)}`,
+      html,
+    );
     return;
   }
 
@@ -249,6 +256,8 @@ export interface LyfeInternalInput {
   email: string;
   phone: string;
   intent: Intent;
+  /** An event registration that went straight to the waiting list. */
+  waitlisted?: boolean;
   guestCount: number | null;
   isClinician: boolean | null;
   pathway: PathwayKey;
@@ -267,8 +276,6 @@ export interface LyfeInternalInput {
   source: keyof typeof SOURCE_LABELS;
   sourceDetail: string | null;
   utmCampaign: string | null;
-  /** The ?src= or ?i= on the link they came through. */
-  utmSource?: string | null;
 }
 
 /**
@@ -324,7 +331,6 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
        ${row("Consultation", rsvp ? null : FORMAT_LABELS[input.format])}
        ${row("Found us via", SOURCE_LABELS[input.source])}
        ${row("Specifically", input.sourceDetail)}
-       ${row("Link", input.utmSource ?? null)}
        ${row("Campaign", input.utmCampaign)}
      </table>
 
@@ -335,12 +341,16 @@ export async function emailLyfeInternal(input: LyfeInternalInput): Promise<void>
      <p style="margin:24px 0 0;padding-top:16px;border-top:1px solid ${LYFE_BRAND.line};font-size:12px;color:${LYFE_BRAND.muted};">
        Reference ${esc(input.id)}. Mark her contacted in the queue the moment you speak to her, because the clock on this row is running until you do.
      </p>`,
-    rsvp ? `${input.fullName} is coming to the evening` : `${input.fullName}, ${PATHWAY_LABELS[input.pathway]}`,
+    rsvp
+      ? input.waitlisted
+        ? `${input.fullName} joined the waiting list`
+        : `${input.fullName} is coming to the evening`
+      : `${input.fullName}, ${PATHWAY_LABELS[input.pathway]}`,
   );
 
   await notifyInternal(
     input.to,
-    `${rsvp ? "RSVP: " : input.intent === "CONSULTATION" ? "CONSULTATION: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
+    `${rsvp ? (input.waitlisted ? "WAITLIST: " : "RSVP: ") : input.intent === "CONSULTATION" ? "CONSULTATION: " : urgent ? "Call today: " : "Discovery call: "}${input.fullName}`,
     html,
   );
 }
@@ -409,8 +419,7 @@ export async function emailLyfeInvitation({
   const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
 
   const html = layout(
-    `${flyer()}
-     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
      <p style="margin:0 0 14px;">We would like you to join us for ${esc(LYFE_EVENT_THEME)}, an evening hosted by ${esc(LYFE_EVENT.host)}.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:22px 24px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -441,55 +450,13 @@ export async function emailLyfeInvitation({
 }
 
 /**
- * For somebody invited who has not yet confirmed. Same link as the invitation,
- * so whichever email they act on, the place is the same one.
- */
-export async function emailLyfeInvitationReminder({
-  to,
-  firstName,
-  token,
-  from,
-}: {
-  to: string;
-  firstName: string;
-  token: string;
-  from?: string | null;
-}): Promise<void> {
-  const url = lyfeConfirmUrl(token);
-  const signature = from?.trim() || `The team at ${MEDLYFE_NAME}`;
-
-  const html = layout(
-    `${flyer()}
-     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-     <p style="margin:0 0 14px;">A short note in case our invitation to ${esc(LYFE_EVENT_THEME)} was missed. We are finalising the room on ${esc(LYFE_EVENT.rsvpBy)} and would like to keep a place for you.</p>
-     <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
-       <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
-         <strong style="font-size:17px;">${esc(LYFE_EVENT.date)}</strong><br>
-         Arrival ${esc(LYFE_EVENT.arrival)} &middot; Programme ${esc(LYFE_EVENT.programme)} &middot; Close ${esc(LYFE_EVENT.close)}<br>
-         ${esc(LYFE_EVENT.venueAddress ? LYFE_EVENT.venueName + ", " + LYFE_EVENT.venueAddress : LYFE_EVENT.venueName)}
-       </td></tr>
-     </table>
-     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
-       <tr><td style="background:${MEDLYFE_BRAND.green};">
-         <a href="${url}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Confirm your place</a>
-       </td></tr>
-     </table>
-     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${url}" style="color:${MEDLYFE_BRAND.green};">${esc(url)}</a></p>
-     <p style="margin:0 0 14px;">If you cannot make it, the same link lets you say so, and we will offer the place to somebody else.</p>
-     <p style="margin:0 0 6px;">With kind regards,</p>
-     <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
-    `Please confirm your place at ${LYFE_EVENT_THEME} by ${LYFE_EVENT.rsvpBy}.`,
-    "medlyfe",
-    INVITED_FOOTER,
-  );
-
-  await notifyInternal(to, `A reminder: ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}`, html);
-}
-
-/**
- * The list invitation, as main sends it, with one addition: who introduced
- * us. For a list that came from a partner (Yomi's Medbury corporates), saying
- * so is what makes a letter from a stranger worth opening.
+ * The invitation sent to the event list.
+ *
+ * Different from emailLyfeInvitation, which carries a token and tells somebody
+ * their place is held. Nobody on the list has been chosen yet, so this one
+ * asks them to register an interest and says plainly that the room is curated.
+ * Saying so is the honest version and it is also what stops seventy places
+ * being promised two hundred times.
  */
 export async function emailLyfeListInvite({
   to,
@@ -497,15 +464,21 @@ export async function emailLyfeListInvite({
   link,
   from,
   onBehalfOf,
-  introducedBy,
 }: {
   to: string;
   firstName: string;
   link: string;
   from?: string | null;
+  /**
+   * Set when the address belongs to somebody's office rather than to them.
+   * The letter then greets whoever opens it and asks for the forward, instead
+   * of opening "Dear Andrew" in Marion's inbox, which reads as a mailshot that
+   * did not check who it was writing to.
+   */
   onBehalfOf?: string | null;
-  introducedBy?: string | null;
 }): Promise<void> {
+  // The host signs this, not a person. An invitation from an individual
+  // invites a reply to that individual, and 110 of those is not the plan.
   const signature = from?.trim() || "MedLYFE and The Lyfe Place";
   const where = LYFE_EVENT.venueAddress
     ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
@@ -514,12 +487,11 @@ export async function emailLyfeListInvite({
   const html = layout(
     `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
      ${onBehalfOf ? `<p style="margin:0 0 14px;">We are writing in the hope that ${esc(onBehalfOf)} will join us for an evening on ${esc(LYFE_EVENT.date)}, and would be grateful if you would pass this on.</p>` : ""}
-     ${introducedBy ? `<p style="margin:0 0 14px;">We are writing at the suggestion of ${esc(introducedBy)}.</p>` : ""}
      <p style="margin:0 0 14px;">As we get older, many of us begin to notice changes in our energy, sleep, weight, skin, mood, recovery and overall performance. Sometimes these changes feel gradual; other times, they make us pause and ask what it really means to age well.</p>
      <p style="margin:0 0 14px;">We are hosting an intimate evening to explore how new knowledge, medical advancements and practical lifestyle approaches are changing the way we understand ageing. The conversation will look at how we can maintain vitality, beauty, strength, clarity and confidence for longer: not just by living longer, but by living well.</p>
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td align="center" style="padding:0 0 22px;">
-         <a href="${link}"><img src="${AGELESS_FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
+         <a href="${link}"><img src="${FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;" /></a>
        </td></tr>
      </table>
      <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;width:100%;">
@@ -540,7 +512,7 @@ export async function emailLyfeListInvite({
        </td></tr>
      </table>
      <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
-     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Please register by ${esc(LYFE_EVENT.rsvpBy)}, and our team will follow up with confirmation details.</p>
+     <p style="margin:0 0 14px;">Seats are limited, and we are keeping the evening intimate by design so the conversation feels focused, personal and worthwhile. Once you register your interest, our team will follow up with confirmation details.</p>
      <p style="margin:0 0 6px;">With kind regards,</p>
      <p style="margin:0;font-weight:600;">${esc(signature)}</p>`,
     `An intimate evening on how to look well, feel good and live well as we age. ${LYFE_EVENT.date}.`,
@@ -548,57 +520,11 @@ export async function emailLyfeListInvite({
     LIST_FOOTER,
   );
 
-  await notifyInternal(to, `An Invitation to ${LYFE_EVENT_THEME}: Look, Feel and Live Well`, html);
-}
-
-/**
- * The follow-up to the list invitation, for those who have not registered.
- * Shorter than the first: they have had the argument once, so this carries
- * the date, the deadline and the link, and the flyer is the link too.
- */
-export async function emailLyfeListReminder({
-  to,
-  firstName,
-  link,
-  onBehalfOf,
-}: {
-  to: string;
-  firstName: string;
-  link: string;
-  /** An office inbox written to for a named person. Greets the office, asks for the forward. */
-  onBehalfOf?: string | null;
-}): Promise<void> {
-  const where = LYFE_EVENT.venueAddress
-    ? `${LYFE_EVENT.venueName}, ${LYFE_EVENT.venueAddress}`
-    : LYFE_EVENT.venueName;
-  const opening = onBehalfOf
-    ? `We wrote earlier this week in the hope that ${esc(onBehalfOf)} will join us for ${esc(LYFE_EVENT_THEME)} on ${esc(LYFE_EVENT.date)}, and would be grateful if you would pass this on.`
-    : `A short note in case our invitation to ${esc(LYFE_EVENT_THEME)} on ${esc(LYFE_EVENT.date)} passed you by.`;
-
-  const html = layout(
-    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
-     <p style="margin:0 0 14px;">${opening}</p>
-     <p style="margin:0 0 20px;">We are finalising the room on ${esc(LYFE_EVENT.rsvpBy)} and would love for you to be in it.</p>
-     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;width:100%;">
-       <tr><td align="center">
-         <a href="${link}"><img src="${AGELESS_FLYER_URL}" width="460" alt="Invitation to Ageless, ${esc(LYFE_EVENT.date)}, ${esc(LYFE_EVENT.venueName)}" style="display:block;width:100%;max-width:460px;height:auto;border:0;outline:none;text-decoration:none;"></a>
-       </td></tr>
-     </table>
-     <p style="margin:0 0 20px;"><strong>${esc(LYFE_EVENT.date)}</strong>, ${esc(LYFE_EVENT.arrival)}<br>${esc(where)}</p>
-     <table cellpadding="0" cellspacing="0" style="margin:0 0 22px;">
-       <tr><td style="background:${MEDLYFE_BRAND.green};">
-         <a href="${link}" style="display:inline-block;padding:14px 30px;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;">Register your interest</a>
-       </td></tr>
-     </table>
-     <p style="margin:0 0 14px;font-size:13px;color:#6B7280;">If the button does not work, this is the address: <a href="${link}" style="color:${MEDLYFE_BRAND.green};">${esc(link)}</a></p>
-     <p style="margin:0 0 6px;">With kind regards,</p>
-     <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
-    `Places for ${LYFE_EVENT_THEME} close on ${LYFE_EVENT.rsvpBy}.`,
-    "medlyfe",
-    LIST_FOOTER,
+  await notifyInternal(
+    to,
+    `An Invitation to ${LYFE_EVENT_THEME}: Look, Feel and Live Well`,
+    html,
   );
-
-  await notifyInternal(to, `A reminder: ${LYFE_EVENT_THEME}, ${LYFE_EVENT.date}`, html);
 }
 
 /** Sent the moment somebody confirms, so they have the details in writing. */
@@ -606,35 +532,18 @@ export async function emailLyfeAttendanceConfirmed({
   to,
   firstName,
   guestCount,
-  pass,
 }: {
   to: string;
   firstName: string;
   guestCount: number | null;
-  /**
-   * Their access pass, a PNG built by scripts/build-ageless-passes.py. When it
-   * is given it leads the mail in place of the flyer, which it already
-   * carries the top of, and goes as an attachment they can save.
-   */
-  pass?: { code: string; png: string } | null;
 }): Promise<void> {
   const plusOne = guestCount && guestCount > 0
     ? `<p style="margin:0 0 14px;">We have you down for ${guestCount === 1 ? "one guest" : `${guestCount} guests`} as well. If that changes, reply and tell us.</p>`
     : "";
 
-  const passCid = "ageless-pass";
-  const head = pass
-    ? `<p style="margin:0 0 20px;"><img src="cid:${passCid}" width="496" alt="Your access pass to ${esc(LYFE_EVENT_THEME)}, code ${esc(pass.code)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;"></p>`
-    : flyer();
-  const passNote = pass
-    ? `<p style="margin:0 0 14px;">Your access pass is above and attached. Please show it at the door, on your phone or printed. Your pass code is <strong>${esc(pass.code)}</strong>.</p>`
-    : "";
-
   const html = layout(
-    `${head}
-     <p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
      <p style="margin:0 0 14px;">Your place is held. Thank you, and we look forward to seeing you.</p>
-     ${passNote}
      ${plusOne}
      <table cellpadding="0" cellspacing="0" style="margin:22px 0;width:100%;">
        <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px;font-size:14px;line-height:1.8;color:#FFFFFF;">
@@ -656,15 +565,7 @@ export async function emailLyfeAttendanceConfirmed({
     INVITED_FOOTER,
   );
 
-  const file = pass
-    ? { name: `Ageless access pass ${pass.code}.png`, mimeType: "image/png", content: pass.png }
-    : null;
-  await notifyInternal(
-    to,
-    `Your place is held, ${firstName}`,
-    html,
-    file ? { attachments: [file], inlineImages: [{ ...file, cid: passCid }] } : undefined,
-  );
+  await notifyInternal(to, `Your place is held, ${esc(firstName)}`, html);
 }
 
 /**
@@ -818,4 +719,190 @@ export async function emailLyfeSpeakerConfirm({
   );
 
   await notifyInternal(to, `${LYFE_EVENT_THEME}: please confirm your details`, html);
+}
+
+/**
+ * The day-of note to every confirmed AGELESS guest: questions for the panel
+ * go in from their phone at /live, and the pass is scanned at the door.
+ */
+export async function emailAgelessLiveQuestions({
+  to,
+  firstName,
+  passCode,
+}: {
+  to: string;
+  firstName: string;
+  passCode: string;
+}): Promise<void> {
+  const link = "https://www.consultforafrica.com/live";
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">We look forward to seeing you at ${esc(LYFE_EVENT_THEME)} this evening.</p>
+     <p style="margin:0 0 14px;">The speakers want your questions. From ${esc(LYFE_EVENT.arrival)}, open <a href="${link}" style="color:${MEDLYFE_BRAND.green};font-weight:600;">consultforafrica.com/live</a> on your phone, post a question, and vote for the ones you want answered. The chair takes the most popular first. You can leave your name off if you prefer.</p>
+     <p style="margin:0 0 14px;">Please have your access pass ready on your phone. The door scans it. Your pass code is <strong>${esc(passCode)}</strong>.</p>
+     <p style="margin:0 0 6px;">With kind regards,</p>
+     <p style="margin:0;font-weight:600;">MedLYFE and The Lyfe Place</p>`,
+    `Tonight at ${LYFE_EVENT_THEME}: your questions, from your phone.`,
+    "medlyfe",
+    INVITED_FOOTER,
+  );
+  await notifyInternal(to, `Tonight at ${LYFE_EVENT_THEME}: your questions, from your phone`, html);
+}
+
+/* ─── after AGELESS ─────────────────────────────────────────────────────── */
+
+const AFTER_FOOTER =
+  "You are receiving this because you were invited to Ageless, hosted by MedLYFE and The Lyfe Place. Reply at any time and we will remove your details.";
+const THUMBS = "https://pub-8a22dea573ee4a5dae362925fc14c5f1.r2.dev/marketing/ageless";
+const FIND_US = {
+  address: "25 Admiralty Way, Lekki Phase 1, Lagos",
+  phone: "+234 911 981 9727",
+  whatsapp: "2349119819727",
+  instagram: "@medlyfe_wellness",
+  instagramUrl: "https://www.instagram.com/medlyfe_wellness/",
+  website: "medlyfewellness.com",
+};
+
+function button(href: string, label: string, solid = true): string {
+  return `<a href="${href}" style="display:inline-block;padding:15px 26px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;${
+    solid
+      ? `background:${MEDLYFE_BRAND.green};color:#FFFFFF;`
+      : `background:#FFFFFF;color:${MEDLYFE_BRAND.green};border:1.5px solid ${MEDLYFE_BRAND.green};`
+  }">${esc(label)}</a>`;
+}
+
+function filmCard(href: string, img: string, title: string, line: string): string {
+  return `<a href="${href}" style="text-decoration:none;color:${LYFE_BRAND.ink};display:block;margin:0 0 6px;">
+      <img src="${img}" width="496" alt="${esc(title)}" style="display:block;width:100%;max-width:496px;height:auto;border:0;border-radius:10px;">
+    </a>
+    <p style="margin:0 0 22px;font-size:14px;line-height:1.55;"><strong>${esc(title)}.</strong> ${esc(line)}</p>`;
+}
+
+function findUs(): string {
+  return `<table cellpadding="0" cellspacing="0" style="width:100%;margin:8px 0 22px;border-top:1px solid ${LYFE_BRAND.line};">
+      <tr><td style="padding:16px 0 0;font-size:13.5px;line-height:1.8;color:${LYFE_BRAND.body};">
+        <strong style="color:${LYFE_BRAND.ink};">Find MedLYFE</strong><br>
+        ${esc(FIND_US.address)}<br>
+        Call or WhatsApp <a href="https://wa.me/${FIND_US.whatsapp}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.phone)}</a><br>
+        Instagram <a href="${FIND_US.instagramUrl}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.instagram)}</a> &middot;
+        <a href="https://${FIND_US.website}" style="color:${MEDLYFE_BRAND.green};">${esc(FIND_US.website)}</a>
+      </td></tr>
+    </table>`;
+}
+
+/** To everyone who held a place. Worded to be true whether or not they came. */
+export async function emailAgelessThankYou({
+  to,
+  firstName,
+  pageLink,
+  bookLink,
+  broughtGuests = 0,
+  shareLink,
+}: {
+  to: string;
+  firstName: string;
+  pageLink: string;
+  bookLink: string;
+  /** Guests they brought whose names never reached us. */
+  broughtGuests?: number;
+  shareLink: string;
+}): Promise<void> {
+  const forward = encodeURIComponent(
+    `Thank you for attending AGELESS with me. MedLYFE has shared the event films, the waiting list for The Lyfe Place and details of the voucher here: ${shareLink}`,
+  );
+  const plusOnes = broughtGuests
+    ? `<p style="margin:0 0 20px;">We did not receive your guest's contact details. Please forward this email to them, or <a href="https://wa.me/?text=${forward}" style="color:${MEDLYFE_BRAND.green};font-weight:700;">share it on WhatsApp</a>.</p>`
+    : "";
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 20px;">Thank you for attending ${esc(LYFE_EVENT_THEME)} on Wednesday, 21 October. We hope you found the evening useful.</p>
+     <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;width:100%;">
+       <tr><td style="background:${MEDLYFE_BRAND.green};padding:20px 22px 22px;color:#FFFFFF;">
+         <div style="font-size:17px;font-weight:700;margin:0 0 8px;">Your AGELESS voucher</div>
+         <div style="font-size:14px;line-height:1.65;color:${MEDLYFE_BRAND.mist};margin:0 0 16px;">Your souvenir pack includes a MedLYFE voucher. To use it, book a consultation online or call ${esc(FIND_US.phone)}, and mention the voucher when you book.</div>
+         <a href="${bookLink}" style="display:inline-block;padding:14px 24px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;background:${MEDLYFE_BRAND.lime};color:${MEDLYFE_BRAND.greenDeep};">Book a consultation</a>
+       </td></tr>
+     </table>
+     ${plusOnes}
+     <p style="margin:0 0 14px;font-weight:700;">Event films</p>
+     ${filmCard(pageLink, `${THUMBS}/medlyfe-email.jpg`, "Inside MedLYFE", "A short tour of the centre in Lekki.")}
+     ${filmCard(`${pageLink}#lyfeplace`, `${THUMBS}/lyfeplace-email.jpg`, "The Lyfe Place", "Medbury Healthcare Group's planned wellness park in Lagos.")}
+     <p style="margin:0 0 6px;font-weight:700;">The Lyfe Place waiting list</p>
+     <p style="margin:0 0 14px;">Join the waiting list to receive updates on membership and the opening date.</p>
+     <p style="margin:0 0 24px;">${button(`${pageLink}#lyfeplace`, "Join the waiting list", false)}</p>
+     <p style="margin:0 0 6px;font-weight:700;">Your feedback</p>
+     <p style="margin:0 0 22px;">Please tell us what worked and what we should improve. The form takes about two minutes. <a href="${pageLink}#feedback" style="color:${MEDLYFE_BRAND.green};font-weight:700;">Give feedback</a></p>
+     ${findUs()}
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(MEDLYFE_NAME)}</p>`,
+    "Your voucher, the event films and The Lyfe Place waiting list.",
+    "medlyfe",
+    AFTER_FOOTER,
+  );
+  await notifyInternal(to, `Thank you for attending AGELESS`, html);
+}
+
+/** To the people we could not seat. No voucher: they never had a pack. */
+export async function emailAgelessMissedYou({
+  to,
+  firstName,
+  pageLink,
+  bookLink,
+}: {
+  to: string;
+  firstName: string;
+  pageLink: string;
+  bookLink: string;
+}): Promise<void> {
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for your interest in ${esc(LYFE_EVENT_THEME)}. The event was fully booked and we were unable to offer you a place. We apologise for this.</p>
+     <p style="margin:0 0 22px;">You will be among the first invited to the next edition. In the meantime, the event films are below.</p>
+     ${filmCard(pageLink, `${THUMBS}/medlyfe-email.jpg`, "Inside MedLYFE", "A short tour of the centre in Lekki.")}
+     ${filmCard(`${pageLink}#lyfeplace`, `${THUMBS}/lyfeplace-email.jpg`, "The Lyfe Place", "Medbury Healthcare Group's planned wellness park in Lagos. Join the waiting list for updates on membership and the opening date.")}
+     <p style="margin:0 0 26px;">${button(bookLink, "Book a consultation")}&nbsp;&nbsp;${button(`${pageLink}#lyfeplace`, "Join the waiting list", false)}</p>
+     ${findUs()}
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(MEDLYFE_NAME)}</p>`,
+    "The event films, and an invitation to the next edition.",
+    "medlyfe",
+    AFTER_FOOTER,
+  );
+  await notifyInternal(to, `AGELESS: sorry we could not offer you a place`, html);
+}
+
+/** To each speaker and the host, from Debo. */
+export async function emailAgelessSpeakerThanks({
+  to,
+  firstName,
+  part,
+  pageLink,
+  fromName,
+}: {
+  to: string;
+  firstName: string;
+  /** What they did, in a phrase: "opening the evening". */
+  part: string;
+  pageLink: string;
+  fromName: string;
+}): Promise<void> {
+  const html = layout(
+    `<p style="margin:0 0 14px;">Dear ${esc(firstName)},</p>
+     <p style="margin:0 0 14px;">Thank you for ${esc(part)} at ${esc(LYFE_EVENT_THEME)} on Wednesday. Your contribution was well received by the guests.</p>
+     <p style="margin:0 0 14px;">The event highlights and two short films are on <a href="${pageLink}" style="color:${MEDLYFE_BRAND.green};font-weight:700;">the AGELESS page</a>.</p>
+     <p style="margin:0 0 10px;">We would be grateful if you could:</p>
+     <ul style="margin:0 0 18px;padding-left:20px;font-size:14px;line-height:1.7;color:${LYFE_BRAND.body};">
+       <li style="margin:0 0 6px;">Share the page with your network and tag ${esc(FIND_US.instagram)}</li>
+       <li style="margin:0 0 6px;">Send us a short comment on the evening for our recap</li>
+       <li style="margin:0 0 6px;">Let us know anything we should improve for the next edition</li>
+     </ul>
+     <p style="margin:0 0 14px;">We look forward to working with you again.</p>
+     <p style="margin:0 0 6px;">Kind regards,</p>
+     <p style="margin:0;font-weight:600;">${esc(fromName)}</p>
+     <p style="margin:2px 0 0;font-size:13px;color:#83868F;">On behalf of MedLYFE and The Lyfe Place</p>`,
+    `Thank you for ${part} at ${LYFE_EVENT_THEME}.`,
+    "medlyfe",
+    SPEAKER_FOOTER,
+  );
+  await notifyInternal(to, `AGELESS: thank you`, html);
 }

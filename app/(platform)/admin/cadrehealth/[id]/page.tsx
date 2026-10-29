@@ -13,6 +13,7 @@ import {
 import { ArrowLeft, FileText, Download, Calendar } from "lucide-react";
 import { RecruitmentActions } from "@/components/cadrehealth/RecruitmentActions";
 import CommunicationsTimeline from "@/components/platform/communications/CommunicationsTimeline";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 const ACCOUNT_STATUS_COLORS: Record<string, string> = {
   UNVERIFIED: "bg-gray-100 text-gray-600",
@@ -34,6 +35,7 @@ export default async function ProfessionalDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireCadreAdmin();
   const { id } = await params;
 
   const professional = await prisma.cadreProfessional.findUnique({

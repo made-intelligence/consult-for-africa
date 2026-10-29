@@ -4,9 +4,11 @@ import Link from "next/link";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import { MandateStatusControls } from "@/components/cadrehealth/MandateStatusControls";
 import { FindMatchesButton } from "@/components/cadrehealth/FindMatchesButton";
+import { RequestCvsButton } from "@/components/cadrehealth/RequestCvsButton";
 import { MandateEditForm } from "@/components/cadrehealth/MandateEditForm";
 import { ArrowLeft, MapPin, Clock, Mail, Phone, Pencil } from "lucide-react";
 import MandateTabSwitcher from "./MandateTabSwitcher";
+import { mandateScope, requireMandateViewer } from "@/lib/cadreHealth/mandateAccess";
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-emerald-50 text-emerald-700",
@@ -43,12 +45,15 @@ export default async function MandateDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
+  const session = await requireMandateViewer();
   const { id } = await params;
   const { tab } = await searchParams;
   const isEditMode = tab === "edit";
 
-  const mandate = await prisma.cadreMandate.findUnique({
-    where: { id },
+  // Not found rather than forbidden: a role you cannot see should not confirm
+  // that it exists.
+  const mandate = await prisma.cadreMandate.findFirst({
+    where: { id, ...mandateScope(session.user) },
     include: {
       facility: { select: { name: true, slug: true } },
       matches: {
@@ -68,6 +73,7 @@ export default async function MandateDetailPage({
               yearsOfExperience: true,
               accountStatus: true,
               availability: true,
+              cvFileUrl: true,
             },
           },
         },
@@ -76,6 +82,10 @@ export default async function MandateDetailPage({
   });
 
   if (!mandate) notFound();
+
+  const applicantsWithoutCv = mandate.matches.filter(
+    (m) => m.source === "APPLIED" && !m.professional.cvFileUrl,
+  ).length;
 
   // Serialise for client component
   const editData = {
@@ -201,7 +211,12 @@ export default async function MandateDetailPage({
               <MandateStatusControls mandateId={mandate.id} currentStatus={mandate.status} />
             </Card>
 
-            <Card title={`Matches (${mandate.matches.length})`} action={<FindMatchesButton mandateId={mandate.id} />} />
+            <Card title={`Matches (${mandate.matches.length})`} action={
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <RequestCvsButton mandateId={mandate.id} count={applicantsWithoutCv} />
+                <FindMatchesButton mandateId={mandate.id} />
+              </div>
+            } />
 
             {mandate.matches.length > 0 && (
               <div className="space-y-3">
@@ -222,6 +237,11 @@ export default async function MandateDetailPage({
                           <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${match.matchScore >= 80 ? "bg-emerald-50 text-emerald-700" : match.matchScore >= 60 ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-600"}`}>
                             {match.matchScore}%
                           </span>
+                        )}
+                        {match.professional.cvFileUrl ? (
+                          <a href={match.professional.cvFileUrl} target="_blank" rel="noopener noreferrer" className="rounded-full bg-gray-50 px-2.5 py-1 text-xs font-semibold text-[#0B3C5D] hover:underline">CV</a>
+                        ) : (
+                          <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600">No CV</span>
                         )}
                         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${MATCH_STATUS_COLORS[match.status] || "bg-gray-100 text-gray-600"}`}>
                           {match.status}

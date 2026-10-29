@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCadreEmployerContext } from "@/lib/cadreEmployerAuth";
 import { prisma } from "@/lib/prisma";
+import { pendingFitFor } from "@/lib/cadreHealth/pendingFit";
 import { replyOverdueCutoff } from "@/lib/cadreHealth/matchStages";
 
 /**
@@ -16,6 +17,10 @@ export const dynamic = "force-dynamic";
 export default async function EmployerDashboard() {
   const ctx = await getCadreEmployerContext();
   if (!ctx) redirect("/oncadre/employer/login");
+
+  // While roles wait on the fit request, the banner in the layout is the whole
+  // page. "Nothing is waiting on you, post a role" beneath it would contradict it.
+  if (await pendingFitFor(ctx.org)) return null;
 
   const overdueBefore = replyOverdueCutoff();
   const orgWhere = { mandate: { employerOrgId: ctx.org.id } };
