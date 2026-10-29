@@ -91,6 +91,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <a href="https://mezohealth.com" className="hover:text-white transition-colors">
+                Mezo Health
+              </a>
+            </li>
+            <li>
               <Link href="/contact" className="hover:text-white transition-colors">
                 Partner With Us
               </Link>
