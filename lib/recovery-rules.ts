@@ -1,14 +1,16 @@
 import { Prisma } from "@prisma/client";
+import { ACK_COVERAGE, FUNDABLE_PAYER_TYPES } from "@/lib/claims-recovery";
 
 /**
  * Advance decisioning. Fixed rules, in this order, and the first failure
- * decides. The AI vetting result is one input (verdict and likelihood); it can
- * stop an advance but can never authorise one on its own. A person approves
+ * decides. Only claims the payor has already accepted are funded, only on
+ * private HMOs that have signed the acknowledgment letter, and never while
+ * anything on the hospital's book is overdue. The AI vetting result can stop
+ * an advance but can never authorise one on its own. A person approves
  * every ADVANCE before money moves, and the funder's own credit check sits
  * after that.
  */
 
-export const MIN_LIKELIHOOD = 75;
 const CONCENTRATION_FLOOR = new Prisma.Decimal(5_000_000);
 
 export type DecisionInput = {
@@ -20,7 +22,13 @@ export type DecisionInput = {
   billedAmount: Prisma.Decimal;
   tariffAmount: Prisma.Decimal | null;
   ageDays: number | null;
-  payer: { advanceEligible: boolean; conflict: boolean };
+  /** The payor's accepted amount; null until the payor has accepted the claim. */
+  acceptedAmount: Prisma.Decimal | null;
+  payer: { advanceEligible: boolean; conflict: boolean; type: string; acknowledged: boolean };
+  /** Share of the hospital's HMO billing on payors that have signed the letter, 0 to 1. */
+  ackCoverage: number;
+  /** Advances on the hospital's book past their due date. */
+  overdueCount: number;
   account: {
     status: string;
     advanceRate: Prisma.Decimal;
@@ -47,21 +55,23 @@ export function decide(i: DecisionInput): Decision {
 
   if (!i.fundingLive) return hold("Early payment is not live yet: no funder has signed.");
   if (i.account.status !== "ACTIVE" || !i.account.agreementSigned) return hold("The hospital's agreement is not signed and active.");
+  if (i.overdueCount > 0) return hold(`${i.overdueCount} advance${i.overdueCount > 1 ? "s are" : " is"} overdue on this hospital's book: no new draws until it is current.`);
   if (i.status !== "VETTED") return hold(`Claim is ${i.status}, not freshly vetted.`);
   if (!i.vetVerdict) return hold("Not vetted yet.");
   if (!i.vetConfirmed) return hold("Vetting has not been confirmed by a person.");
   if (i.vetVerdict === "FAIL") return decline("Vetting says the payer is unlikely to pay.");
   if (i.vetVerdict === "REPAIR") return hold("Needs repair before it can be funded.");
-  if ((i.vetLikelihood ?? 0) < MIN_LIKELIHOOD) return hold(`Likelihood ${i.vetLikelihood ?? 0}% is under ${MIN_LIKELIHOOD}%.`);
+  if (!FUNDABLE_PAYER_TYPES.includes(i.payer.type)) return decline(`Private HMOs only: this payor is ${i.payer.type}.`);
   if (i.payer.conflict) return decline("CFA advises this payer, so its claims are never advanced.");
   if (!i.payer.advanceEligible) return decline("This payer is not eligible for advances.");
+  if (!i.acceptedAmount) return hold("The payor has not accepted this claim yet. Only accepted claims are funded.");
+  if (!i.payer.acknowledged) return hold("This payor has not signed the acknowledgment letter for this hospital.");
+  if (i.ackCoverage < ACK_COVERAGE) return hold(`Signed payors cover ${Math.round(i.ackCoverage * 100)}% of this hospital's HMO billing; draws open at ${Math.round(ACK_COVERAGE * 100)}%.`);
   if (i.ageDays == null) return hold("Service or submission date missing, so the claim's age is unknown.");
   if (i.ageDays > i.account.maxClaimAgeDays) return decline(`Claim is ${i.ageDays} days old, over the ${i.account.maxClaimAgeDays} day limit.`);
 
-  // The payer can pay at most the tariff, and the desk's own view of payable.
-  let base = i.billedAmount;
-  if (i.tariffAmount && i.tariffAmount.lt(base)) base = i.tariffAmount;
-  if (i.vetPayable && i.vetPayable.lt(base)) base = i.vetPayable;
+  // The payor's accepted amount, never more than was billed.
+  const base = i.acceptedAmount.lt(i.billedAmount) ? i.acceptedAmount : i.billedAmount;
   const amount = base.mul(i.account.advanceRate).toDecimalPlaces(2, Prisma.Decimal.ROUND_DOWN);
   if (amount.lte(0)) return decline("Nothing payable to advance against.");
 
@@ -79,7 +89,7 @@ export function decide(i: DecisionInput): Decision {
   return {
     decision: "ADVANCE",
     amount,
-    reasons: [`Vetted PASS at ${i.vetLikelihood}% and confirmed`, `Advance ${i.account.advanceRate.mul(100).toFixed(0)}% of ₦${base.toFixed(2)}`, "Within age, facility and payer limits"],
+    reasons: [`Accepted by the payor at ₦${base.toFixed(2)}; our verification confirmed`, `Advance ${i.account.advanceRate.mul(100).toFixed(0)}% of that`, "Payor acknowledged; within age, facility and payer limits"],
   };
 }
 

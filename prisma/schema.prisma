@@ -7905,23 +7905,147 @@ model SalesCampaignSend {
 // every promise a payer made can be traced.
 
 model RecoveryPayer {
-  id              String   @id @default(cuid())
-  name            String   @unique
-  type            String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | OTHER
+  id                String   @id @default(cuid())
+  name              String   @unique
+  type              String   @default("HMO") // HMO | CORPORATE | NHIA | STATE_SCHEME | MILITARY | OTHER
   /// CFA advises this payer. Claims against it are recovered only
   /// with the hospital told in writing, and are never advanced.
-  conflict        Boolean  @default(false)
-  conflictNote    String?
-  advanceEligible Boolean  @default(true)
-  claimsContact   String?
-  claimsEmail     String?
-  claimsPhone     String?
-  notes           String?  @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  conflict          Boolean  @default(false)
+  conflictNote      String?
+  advanceEligible   Boolean  @default(true)
+  claimsContact     String?
+  claimsEmail       String?
+  claimsPhone       String?
+  /// The payor's usual days from acceptance to payment. The minimum interest
+  /// period taken as a discount at disbursement.
+  expectedDaysToPay Int      @default(60)
+  /// Days from disbursement until the hospital owes the advance back, 120 at most.
+  dueDays           Int      @default(120)
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  claims     RecoveryClaim[]
-  activities RecoveryActivity[]
+  claims          RecoveryClaim[]
+  activities      RecoveryActivity[]
+  acknowledgments RecoveryAcknowledgment[]
+  advances        RecoveryAdvance[]
+  receipts        RecoveryReceipt[]
+}
+
+/// The payor's signed letter for one hospital: it confirms accepted amounts,
+/// pays into the collection account at the funder, and will not set off older
+/// balances against funded claims without notice. No letter, no draws.
+model RecoveryAcknowledgment {
+  id          String          @id @default(cuid())
+  accountId   String
+  account     RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId     String
+  payer       RecoveryPayer   @relation(fields: [payerId], references: [id])
+  signedOn    DateTime
+  documentUrl String?
+  notes       String?         @db.Text
+  createdById String?
+  createdAt   DateTime        @default(now())
+
+  @@unique([accountId, payerId])
+}
+
+/// One advance against one accepted claim. The terms are copied at
+/// disbursement so a later change to the rate or the payor never rewrites a
+/// loan already made.
+model RecoveryAdvance {
+  id                String          @id @default(cuid())
+  claimId           String          @unique
+  claim             RecoveryClaim   @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  accountId         String
+  account           RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId           String
+  payer             RecoveryPayer   @relation(fields: [payerId], references: [id])
+  funder            String          @default("Carbon")
+  principal         Decimal         @db.Decimal(14, 2)
+  monthlyRate       Decimal         @db.Decimal(6, 5)
+  minDays           Int
+  /// Interest for minDays, taken at disbursement.
+  discount          Decimal         @db.Decimal(14, 2)
+  feeRate           Decimal         @db.Decimal(6, 5)
+  /// Our fee, withheld at disbursement, released once the funder is repaid
+  /// and nothing on the hospital's book is overdue.
+  fee               Decimal         @db.Decimal(14, 2)
+  /// principal - discount - fee: what reached the hospital.
+  netDisbursed      Decimal         @db.Decimal(14, 2)
+  disbursedAt       DateTime
+  dueAt             DateTime
+  principalRepaid   Decimal         @default(0) @db.Decimal(14, 2)
+  /// Interest beyond the minimum period, accrued up to interestAccruedTo.
+  extraInterest     Decimal         @default(0) @db.Decimal(14, 2)
+  extraInterestPaid Decimal         @default(0) @db.Decimal(14, 2)
+  interestAccruedTo DateTime
+  /// OPEN | REPAID
+  status            String          @default("OPEN")
+  repaidAt          DateTime?
+  /// WITHHELD | RELEASED
+  feeStatus         String          @default("WITHHELD")
+  feeReleasedAt     DateTime?
+  createdById       String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  allocations RecoveryAllocation[]
+
+  @@index([accountId, status])
+  @@index([dueAt])
+}
+
+/// Money into the hospital's collection account at the funder: an HMO
+/// remittance (usually many claims at once) or a recourse payment from the
+/// hospital. The waterfall is stored on the receipt so the split is never
+/// recomputed after the fact.
+model RecoveryReceipt {
+  id             String          @id @default(cuid())
+  accountId      String
+  account        RecoveryAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payerId        String?
+  payer          RecoveryPayer?  @relation(fields: [payerId], references: [id])
+  /// HMO | HOSPITAL
+  source         String          @default("HMO")
+  amount         Decimal         @db.Decimal(14, 2)
+  receivedAt     DateTime
+  reference      String?
+  toFunder       Decimal         @default(0) @db.Decimal(14, 2)
+  /// Our withheld fees released because of this receipt (they come from the
+  /// withheld pool, not from the receipt itself).
+  feesReleased   Decimal         @default(0) @db.Decimal(14, 2)
+  toHospital     Decimal         @default(0) @db.Decimal(14, 2)
+  /// The hospital's share must leave the account within 48 hours.
+  hospitalDueBy  DateTime?
+  hospitalPaidAt DateTime?
+  recordedById   String?
+  createdAt      DateTime        @default(now())
+
+  allocations RecoveryAllocation[]
+
+  @@index([accountId, receivedAt])
+}
+
+/// One line of a receipt: what went to which claim, and how it was applied.
+model RecoveryAllocation {
+  id          String           @id @default(cuid())
+  receiptId   String
+  receipt     RecoveryReceipt  @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  claimId     String?
+  claim       RecoveryClaim?   @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  advanceId   String?
+  advance     RecoveryAdvance? @relation(fields: [advanceId], references: [id])
+  /// CLAIM (payor money against its own claim) | RECOURSE (swept to an overdue advance)
+  kind        String           @default("CLAIM")
+  amount      Decimal          @db.Decimal(14, 2)
+  toInterest  Decimal          @default(0) @db.Decimal(14, 2)
+  toPrincipal Decimal          @default(0) @db.Decimal(14, 2)
+  createdAt   DateTime         @default(now())
+
+  @@index([receiptId])
+  @@index([claimId])
+  @@index([advanceId])
 }
 
 model RecoveryAccount {
@@ -7942,9 +8066,12 @@ model RecoveryAccount {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  batches    RecoveryBatch[]
-  claims     RecoveryClaim[]
-  activities RecoveryActivity[]
+  batches         RecoveryBatch[]
+  claims          RecoveryClaim[]
+  activities      RecoveryActivity[]
+  acknowledgments RecoveryAcknowledgment[]
+  advances        RecoveryAdvance[]
+  receipts        RecoveryReceipt[]
 }
 
 model RecoveryBatch {
@@ -7984,6 +8111,11 @@ model RecoveryClaim {
   tariffAmount   Decimal?        @db.Decimal(14, 2)
   payerResponse  String? // what the payer has said: queried, cut, rejected, silent
 
+  /// The payor has vetted and accepted the claim. Only accepted claims are funded.
+  payerAcceptedAt DateTime?
+  acceptedAmount  Decimal?  @db.Decimal(14, 2)
+  acceptanceRef   String?
+
   /// RECEIVED | VETTED | ADVANCED | IN_RECOVERY | PART_PAID | PAID | WRITTEN_OFF
   status String @default("RECEIVED")
 
@@ -8021,8 +8153,10 @@ model RecoveryClaim {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  activities RecoveryActivity[]
-  payments   RecoveryPayment[]
+  activities  RecoveryActivity[]
+  payments    RecoveryPayment[]
+  advance     RecoveryAdvance?
+  allocations RecoveryAllocation[]
 
   @@unique([accountId, payerId, claimRef])
   @@index([accountId, status])
