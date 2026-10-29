@@ -10,9 +10,10 @@ type Row = {
   message?: string;
 };
 
-const NAVY = "#0B3C5D";
-const TEAL = "#1F7A8C";
-const LINE = "#E2E8F0";
+// Mezo's palette, matching app/DennisAshleyProject/page.tsx.
+const NAVY = "#0e1513";
+const TEAL = "#008d75";
+const LINE = "#e4e7e5";
 
 const prettySize = (bytes: number) =>
   bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -117,7 +118,7 @@ export default function DocumentUploader() {
         ))}
       </select>
       {current && (
-        <p style={{ fontSize: 13, color: "#64748b", margin: "7px 2px 16px" }}>{current.hint}</p>
+        <p style={{ fontSize: 13, color: "#5f6462", margin: "7px 2px 16px" }}>{current.hint}</p>
       )}
 
       <div
@@ -132,7 +133,7 @@ export default function DocumentUploader() {
         }}
       >
         <div style={{ fontSize: 16, fontWeight: 700, color: NAVY }}>Choose files, or drag them here</div>
-        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
+        <div style={{ fontSize: 13, color: "#5f6462", marginTop: 6 }}>
           PDF, Word, Excel, CSV, photographs and zip. Up to 25MB each. Photographs of a paper
           register are perfectly fine.
         </div>
@@ -213,7 +214,7 @@ export default function DocumentUploader() {
       )}
 
       <p style={{ fontSize: 12, color: "#94a3b8", margin: "12px 2px 0", lineHeight: 1.6 }}>
-        Files go straight to Consult for Africa&rsquo;s private storage, not to a public link, and
+        Files go straight to Mezo&rsquo;s private storage, not to a public link, and
         they are used only for this audit. Nothing you upload here is shared with any hospital or
         any third party. Anything over 25MB, or anything you would rather not put through a
         browser, can go to <span style={{ color: TEAL }}>hello@consultforafrica.com</span> instead.

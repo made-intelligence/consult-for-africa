@@ -33,7 +33,8 @@ export const POST = handler(async function POST(req: NextRequest) {
   }
 
   try {
-    const { professionalId, password, subSpecialty } = await req.json();
+    const { professionalId, password, subSpecialty, firstName, lastName } =
+      await req.json();
 
     if (!professionalId || !password) {
       return NextResponse.json(
@@ -92,10 +93,25 @@ export const POST = handler(async function POST(req: NextRequest) {
       }
     }
 
+    // The name on an imported record is frequently not the person's name. The
+    // register import split each row on the first space, so titles ended up in
+    // firstName and middle names in lastName, and 28% of the cohort would be
+    // greeted wrongly. Nobody could correct it: claiming set a password and
+    // nothing else, so a doctor whose own profile called her the wrong thing had
+    // to write in. This takes whatever she types.
+    const nameUpdate: { firstName?: string; lastName?: string } = {};
+    if (typeof firstName === "string" && firstName.trim()) {
+      nameUpdate.firstName = firstName.trim().slice(0, 80);
+    }
+    if (typeof lastName === "string" && lastName.trim()) {
+      nameUpdate.lastName = lastName.trim().slice(0, 80);
+    }
+
     await prisma.cadreProfessional.update({
       where: { id: professionalId },
       data: {
         passwordHash,
+        ...nameUpdate,
         ...specialtyUpdate,
         accountStatus: hasCredentials > 0 ? "PENDING_REVIEW" : "UNVERIFIED",
         // Claim implicitly logs the user in (we set the cadre_token cookie

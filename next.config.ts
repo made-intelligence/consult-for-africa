@@ -31,6 +31,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The Haven staff documents are not in public/ on purpose: anything there is
+  // fetchable by URL with no session, and these carry audit findings. They are
+  // streamed by /api/haven-staff/doc after a session check, so the file has to
+  // be traced into that function or it will not exist at runtime.
+  outputFileTracingIncludes: {
+    "/api/haven-staff/doc/[name]": ["./private-assets/haven/**"],
+  },
   serverExternalPackages: ["@react-pdf/renderer"],
   images: {
     remotePatterns: [
@@ -43,6 +50,43 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      // A link an employer can be given on a phone call. Until now the only way
+      // in was a strip in the footer of the CadreHealth homepage.
+      { source: "/hire", destination: "/oncadre/hire", permanent: false },
+      { source: "/employers", destination: "/oncadre/hire", permanent: false },
+
+      // The employer area was Dashboard, Post Role, Applications, Search, which
+      // was not a set of places. These paths are in people's history and in
+      // emails we have already sent, so they keep working.
+      {
+        source: "/oncadre/employer/search",
+        destination: "/oncadre/employer/candidates",
+        permanent: false,
+      },
+      {
+        source: "/oncadre/employer/post-role",
+        destination: "/oncadre/employer/roles/new",
+        permanent: false,
+      },
+      {
+        source: "/oncadre/employer/applications",
+        destination: "/oncadre/employer/pipeline",
+        permanent: false,
+      },
+      {
+        source: "/oncadre/employer/applications/:id",
+        destination: "/oncadre/employer/pipeline/:id",
+        permanent: false,
+      },
+      {
+        source: "/oncadre/employer/profile/:id",
+        destination: "/oncadre/employer/candidates/:id",
+        permanent: false,
       },
     ];
   },

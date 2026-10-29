@@ -36,6 +36,7 @@ export default function Footer() {
               { label: "Clinical Governance", href: "/services/clinical-governance" },
               { label: "Digital Health", href: "/services/digital-health" },
               { label: "Healthcare Marketing", href: "/services/healthcare-marketing" },
+              { label: "Claims Recovery", href: "/services/claims-recovery" },
               { label: "Healthcare HR (Maarova\u2122)", href: "/maarova" },
               { label: "Fractional Leadership", href: "/services/fractional-leadership" },
               { label: "Health Systems", href: "/services/health-systems" },
@@ -88,6 +89,11 @@ export default function Footer() {
               <Link href="/oncadre" className="hover:text-white transition-colors">
                 CadreHealth
               </Link>
+            </li>
+            <li>
+              <a href="https://mezohealth.com" className="hover:text-white transition-colors">
+                Mezo Health
+              </a>
             </li>
             <li>
               <Link href="/contact" className="hover:text-white transition-colors">

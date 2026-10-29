@@ -9,12 +9,28 @@ interface Props {
   professionalId: string;
   cadre: string;
   subSpecialty: string | null;
+  /** Already cleaned of the title the import welded on; may be empty. */
+  firstName: string;
+  lastName: string;
 }
 
-export default function ClaimForm({ professionalId, cadre, subSpecialty }: Props) {
+export default function ClaimForm({
+  professionalId,
+  cadre,
+  subSpecialty,
+  firstName: initialFirstName,
+  lastName: initialLastName,
+}: Props) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // The name on an imported record is often not the person's name: the import
+  // split each register row on the first space, so titles landed in firstName
+  // and middle names in lastName. Until now claiming set a password and nothing
+  // else, so someone whose own profile called her the wrong thing had no way to
+  // fix it without writing in.
+  const [firstName, setFirstName] = useState(initialFirstName);
+  const [lastName, setLastName] = useState(initialLastName);
   // The specialty came from a register import and is wrong often enough that
   // doctors write in to say so before they will claim at all. Asking here
   // costs one line and catches it before anything publishes it.
@@ -26,7 +42,8 @@ export default function ClaimForm({ professionalId, cadre, subSpecialty }: Props
 
   const passwordValid = password.length >= 8;
   const passwordsMatch = password === confirmPassword;
-  const canSubmit = passwordValid && passwordsMatch && !loading;
+  const nameValid = lastName.trim().length > 0;
+  const canSubmit = passwordValid && passwordsMatch && nameValid && !loading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +60,8 @@ export default function ClaimForm({ professionalId, cadre, subSpecialty }: Props
         body: JSON.stringify({
           professionalId,
           password,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           // Sent whether or not it changed: confirming the register was right
           // is as useful to know as correcting it.
           subSpecialty: specialty || null,
@@ -80,6 +99,45 @@ export default function ClaimForm({ professionalId, cadre, subSpecialty }: Props
           )}
         </div>
       )}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label htmlFor="claim-first-name" className="mb-1.5 block text-sm font-medium text-gray-700">
+            First name
+          </label>
+          <input
+            id="claim-first-name"
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Your first name"
+            autoComplete="given-name"
+            className="w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0B3C5D]/20"
+            style={{ borderColor: "#E8EBF0", minHeight: "44px" }}
+          />
+        </div>
+        <div>
+          <label htmlFor="claim-last-name" className="mb-1.5 block text-sm font-medium text-gray-700">
+            Surname
+          </label>
+          <input
+            id="claim-last-name"
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Your surname"
+            autoComplete="family-name"
+            required
+            className="w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0B3C5D]/20"
+            style={{ borderColor: "#E8EBF0", minHeight: "44px" }}
+          />
+        </div>
+        <p className="text-xs text-gray-500 sm:col-span-2">
+          {initialFirstName
+            ? "We took this from a public register, so it is sometimes wrong. Change it and nothing carries the old one."
+            : "We only have your surname. Add your first name so we address you properly."}
+        </p>
+      </div>
 
       {subSpecialty && (
         <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#E8EBF0", background: "#F9FAFB" }}>

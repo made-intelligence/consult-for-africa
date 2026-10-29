@@ -38,10 +38,12 @@ import {
   X,
   FileText,
   BarChart3,
+  Ticket,
   Stethoscope,
   Banknote,
   MessageSquare,
   Star,
+  Radar,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
@@ -173,6 +175,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Projects",       href: "/projects",       icon: Briefcase },
       { label: "Deliverables",   href: "/deliverables",   icon: FileCheck },
       { label: "Meetings",       href: "/meetings",       icon: Video },
+      { label: "Haven adoption", href: "/admin/haven-adoption", icon: HeartPulse, roles: STAFF_ROLES },
     ],
     roles: STAFF_AND_OFFICE,
   },
@@ -222,6 +225,9 @@ const NAV_SECTIONS: NavSection[] = [
     title: "Marketing",
     items: [
       { label: "Campaigns",      href: "/campaigns",      icon: Megaphone },
+      { label: "Market Watch",   href: "/admin/market-watch", icon: Radar, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
+      { label: "AGELESS",        href: "/admin/lyfe-enquiries", icon: Ticket, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
+      { label: "Invitations",    href: "/admin/lyfe-enquiries/invitations", icon: FileText, roles: ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"] },
     ],
     roles: EM_PLUS_AND_OFFICE,
   },
@@ -280,7 +286,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Founding Circle", href: "/admin/maarova-circle", icon: Star },
       { label: "Partners",       href: "/admin/partners",     icon: Building2 },
       { label: "Satisfaction",   href: "/admin/satisfaction", icon: HeartPulse },
-      { label: "Haven Survey",   href: "/admin/haven-survey", icon: Stethoscope },
+      { label: "Surveys",        href: "/admin/surveys",      icon: Stethoscope },
       { label: "Gig Approvals",  href: "/admin/own-gig-approvals", icon: FileCheck },
       { label: "Gig Fees",       href: "/admin/own-gig-fees", icon: BarChart3 },
     ],

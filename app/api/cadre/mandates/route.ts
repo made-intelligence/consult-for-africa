@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { handler } from "@/lib/api-handler";
+import { canSeeAllMandates, mandateScope, staffUser } from "@/lib/cadreHealth/mandateAccess";
+
+/**
+ * Every method here was open to the internet: no session check of any kind, so
+ * anyone could list every role, edit one, or delete it. Reads and edits are now
+ * scoped by mandateScope; creating and deleting are Partner and Admin only.
+ */
 
 const createMandateSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -34,13 +41,16 @@ const createMandateSchema = z.object({
 
 export const GET = handler(async function GET(req: NextRequest) {
   try {
+    const user = await staffUser();
+    if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
     const url = new URL(req.url);
     const status = url.searchParams.get("status");
     const cadre = url.searchParams.get("cadre");
     const type = url.searchParams.get("type");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {};
+    const where: any = { ...mandateScope(user) };
     if (status) where.status = status;
     if (cadre) where.cadre = cadre;
     if (type) where.type = type;
@@ -63,6 +73,11 @@ export const GET = handler(async function GET(req: NextRequest) {
 
 export const POST = handler(async function POST(req: NextRequest) {
   try {
+    const user = await staffUser();
+    if (!user || !canSeeAllMandates(user)) {
+      return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+    }
+
     const parsed = createMandateSchema.safeParse(await req.json());
     if (!parsed.success) {
       return NextResponse.json(
@@ -119,6 +134,14 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "Mandate ID required" }, { status: 400 });
     }
+
+    const user = await staffUser();
+    if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    const visible = await prisma.cadreMandate.findFirst({
+      where: { id, ...mandateScope(user) },
+      select: { id: true },
+    });
+    if (!visible) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = await req.json();
     const {
@@ -178,6 +201,11 @@ export const DELETE = handler(async function DELETE(req: NextRequest) {
     const id = url.searchParams.get("id");
     if (!id) {
       return NextResponse.json({ error: "Mandate ID required" }, { status: 400 });
+    }
+
+    const user = await staffUser();
+    if (!user || !canSeeAllMandates(user)) {
+      return NextResponse.json({ error: "Not authorised" }, { status: 403 });
     }
 
     await prisma.cadreMandate.delete({ where: { id } });

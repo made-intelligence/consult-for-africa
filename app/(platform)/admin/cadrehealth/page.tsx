@@ -13,6 +13,7 @@ import {
   TrendingUp,
   ArrowRight,
 } from "lucide-react";
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function CadreHealthAdmin({
 }: {
   searchParams: Promise<{ page?: string; status?: string; cadre?: string; q?: string; cv?: string }>;
 }) {
+  await requireCadreAdmin();
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1") || 1);
   const statusFilter = params.status || undefined;

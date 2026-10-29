@@ -39,16 +39,21 @@ export const POST = handler(async function POST(req: NextRequest) {
       );
     }
 
-    // Optionally verify facility exists
+    // Optionally verify facility exists. A facility already claimed by another
+    // org is left unlinked rather than stolen: two hospitals with similar names
+    // picking the same directory entry should not merge into one tenancy.
     let validFacilityId: string | null = null;
     if (facilityId) {
       const facility = await prisma.cadreFacility.findUnique({
         where: { id: facilityId },
-        select: { id: true },
+        select: { id: true, employerOrg: { select: { id: true } } },
       });
-      if (facility) validFacilityId = facility.id;
+      if (facility && !facility.employerOrg) validFacilityId = facility.id;
     }
 
+    // Registering creates the organisation and makes this person its owner. The
+    // org is the tenancy boundary, so roles and shortlists survive the departure
+    // of whoever happened to sign up.
     const employer = await prisma.cadreEmployerAccount.create({
       data: {
         companyName: companyName.trim(),
@@ -56,8 +61,16 @@ export const POST = handler(async function POST(req: NextRequest) {
         contactEmail: contactEmail.toLowerCase().trim(),
         contactPhone: contactPhone?.trim() || null,
         passwordHash: await hashPassword(password),
-        facilityId: validFacilityId,
+        role: "OWNER",
+        acceptedAt: new Date(),
+        org: {
+          create: {
+            name: companyName.trim(),
+            facilityId: validFacilityId,
+          },
+        },
       },
+      include: { org: { select: { id: true, facilityId: true } } },
     });
 
     // Account is now created. If anything below fails (JWT signing, cookie set),
@@ -70,7 +83,7 @@ export const POST = handler(async function POST(req: NextRequest) {
         companyName: employer.companyName,
         contactName: employer.contactName,
         isVerified: employer.isVerified,
-        facilityId: employer.facilityId,
+        facilityId: employer.org.facilityId,
       });
 
       const cookieStore = await cookies();

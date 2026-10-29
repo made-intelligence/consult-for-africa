@@ -1,0 +1,160 @@
+{
+  "source": "Pasted by Debo, 6 October 2026, for the people workstream (WS2: culture, incentives and clinical standards of work).",
+  "headcount": 19,
+  "staff": [
+    {
+      "firstName": "Adegbajo",
+      "lastName": "Odedina",
+      "email": "gbajoodedina@gmail.com",
+      "mobile": "08033350179",
+      "department": "MEDICAL",
+      "position": "Chief Medical Director",
+      "note": "Also a founder and consultant neonatologist"
+    },
+    {
+      "firstName": "Benedict",
+      "lastName": "Ijehon",
+      "email": "ben@havenpractice.com",
+      "mobile": "08034702713",
+      "department": "ADMIN",
+      "position": "Head of Admin/Operations/Business Development"
+    },
+    {
+      "firstName": "Toyin",
+      "lastName": "Asagidingbi",
+      "email": "toyinasagidigbi@gmail.com",
+      "mobile": "07030630060",
+      "department": "ADMIN",
+      "position": "Head of Customer Service"
+    },
+    {
+      "firstName": "Moshood",
+      "lastName": "Saliu",
+      "email": "moshoodsaliu0@gmail.com",
+      "mobile": "08104605853",
+      "department": "ADMIN",
+      "position": "Head of Finance"
+    },
+    {
+      "firstName": "Francis",
+      "lastName": "Kadiri",
+      "email": "kadirifrancis1@gmail.com",
+      "mobile": "08063571978",
+      "department": "ADMIN",
+      "position": "Admin and Billing Officer"
+    },
+    {
+      "firstName": "Chioma",
+      "lastName": "Agomuo",
+      "email": "chiomaagomuo18@gmail.com",
+      "mobile": "09026357930",
+      "department": "NURSING",
+      "position": "Senior Registered Nurse"
+    },
+    {
+      "firstName": "Margaret",
+      "lastName": "Alada",
+      "email": "maggiebitem@gmail.com",
+      "mobile": "09042545853",
+      "department": "NURSING",
+      "position": "Registered Nurse"
+    },
+    {
+      "firstName": "Waliyat",
+      "lastName": "Aloko",
+      "email": "alokoadeyinka@gmail.com",
+      "mobile": "09167391413",
+      "department": "NURSING",
+      "position": "Registered Nurse"
+    },
+    {
+      "firstName": "Anita",
+      "lastName": "Musa",
+      "email": "osedabamhenanita76@gmail.com",
+      "mobile": "09036404776",
+      "department": "NURSING",
+      "position": "Registered Nurse"
+    },
+    {
+      "firstName": "Sandra",
+      "lastName": "Okorie",
+      "email": "koriesandra19@gmail.com",
+      "mobile": "08109756255",
+      "department": "NURSING",
+      "position": "Registered Nurse",
+      "dataIssue": "Listed as OKORIE SANDRA; surname/given order assumed from the email."
+    },
+    {
+      "firstName": "Munachi",
+      "lastName": "Chiamara",
+      "email": "munachimara@gmail.com",
+      "mobile": "08143995806",
+      "department": "NURSING",
+      "position": "Registered Nurse"
+    },
+    {
+      "firstName": "Linda",
+      "lastName": "Nwabuisi",
+      "email": "mlslindahaven@gmail.com",
+      "mobile": "09039077731",
+      "department": "LAB",
+      "position": "Medical Lab Scientist"
+    },
+    {
+      "firstName": "Eniola",
+      "lastName": "Akinnuoye",
+      "email": "eniolaakinnuoye@gmail.com",
+      "mobile": "07018027066",
+      "department": "MEDICAL",
+      "position": "Medical Officer"
+    },
+    {
+      "firstName": "Amarachi",
+      "lastName": "Onwuegbuchulam",
+      "email": "amarachimelody1@gmail.com",
+      "mobile": "08118236875",
+      "department": "MEDICAL",
+      "position": "Medical Officer"
+    },
+    {
+      "firstName": "Juliet",
+      "lastName": "Olajesu",
+      "email": "olajesujuliet@gmail.com",
+      "mobile": "08103856643",
+      "department": "MEDICAL",
+      "position": "Medical Officer"
+    },
+    {
+      "firstName": "Blessing",
+      "lastName": "Onuche",
+      "email": "onucheb91@gmail.com",
+      "mobile": "08035941653",
+      "department": "PHARMACY",
+      "position": "Pharmacy Technician"
+    },
+    {
+      "firstName": "Janet",
+      "lastName": "Ogah",
+      "email": "janetogah236@gmail.com",
+      "mobile": "09039743786",
+      "department": "PHARMACY",
+      "position": "Pharmacy Technician"
+    },
+    {
+      "firstName": "Kosichukwu",
+      "lastName": "Ubanwa",
+      "email": "ubanwakosi53@gmail.com",
+      "mobile": "08074951068",
+      "department": "DOMESTIC",
+      "position": "Attendant"
+    },
+    {
+      "firstName": "Cynthia",
+      "lastName": "Eziwanne",
+      "email": "amazingadora376@gmail.com",
+      "mobile": "09077760718",
+      "department": "DOMESTIC",
+      "position": "Attendant"
+    }
+  ]
+}

@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { greetingFor } from "@/lib/cadreSalutation";
 import { nextCatalystEvent, type DfcCatalystEvent } from "@/lib/cadreHealth/dfcCatalystEvents";
+
+/**
+ * The slot that offered Dr Kpaduwa for referrals carries the AGELESS evening
+ * instead from 8 October 2026, at Debo's instruction: she is no longer part of
+ * it, and ten of its seventy places are kept for physicians who might refer.
+ * It removes itself once the evening has happened.
+ */
+const AGELESS_CLOSE = new Date("2026-10-21T21:30:00+01:00");
 import { randomBytes } from "crypto";
 import type { CadreDigestAsk } from "@prisma/client";
 
@@ -145,6 +153,8 @@ export interface WeekContext {
   showcase: DigestShowcase | null;
   /** The next DFC Catalyst session, or null when there is none to announce. */
   catalyst: DfcCatalystEvent | null;
+  /** True until the AGELESS evening has happened. */
+  referralsOpen: boolean;
   /**
    * Emails that have already answered the Medipark survey, so nobody is asked
    * twice. Only the respondents who opted in on Q16 gave us an email, so a
@@ -167,6 +177,7 @@ export interface CadreDigestContent {
   onlyYou: { kind: string; label: string; headline: string; detail: string; ctaLabel: string; href: string; tone: "URGENT" | "NEUTRAL" | "GOOD" };
   ask: { ask: CadreDigestAsk; label: string; headline: string; detail: string; ctaLabel: string; href: string; done: boolean };
   catalyst: { headline: string; detail: string; ctaLabel: string; href: string } | null;
+  referral: { label: string; headline: string; detail: string; ctaLabel: string; href: string } | null;
   medipark: { headline: string; detail: string; ctaLabel: string; href: string } | null;
   prize: { won: boolean; headline: string; detail: string; ctaLabel: string; href: string };
   showcase: DigestShowcase | null;
@@ -375,7 +386,11 @@ export async function buildWeekContext(
       select: { cadre: true, state: true, totalMonthlyTakeHome: true, baseSalary: true },
     }),
     prisma.cadreMandate.findMany({
-      where: { status: "OPEN" },
+      // isPublished, not just status. The digest names the role and the facility
+      // to thousands of doctors, so it must respect the same gate as the public
+      // job board. Status alone meant any mandate created in admin, including a
+      // search not yet agreed with the client, went out on the next send.
+      where: { status: "OPEN", isPublished: true },
       select: { id: true, title: true, cadre: true, facilityName: true, locationCity: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -462,6 +477,7 @@ export async function buildWeekContext(
     mezoReady,
     showcase,
     catalyst: nextCatalystEvent(now),
+    referralsOpen: now.getTime() < AGELESS_CLOSE.getTime(),
     mediparkAnswered,
     awards,
     awardsIssued: awards.size,
@@ -880,6 +896,26 @@ function buildCatalyst(ctx: WeekContext): CadreDigestContent["catalyst"] {
   };
 }
 
+/**
+ * The AGELESS evening, for the clinicians on the list. Ten of the seventy
+ * places are kept for physicians, so this is a genuine invitation rather than
+ * an advertisement, and it says so.
+ */
+function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
+  // Off, 8 October 2026. Debo: a thousand clinicians cannot be invited to ten
+  // seats. This slot waits for the Medlyfe clinician network to replace it.
+  const OFF = true;
+  if (OFF || !ctx.referralsOpen) return null;
+  return {
+    label: "An evening on ageing well",
+    headline: "AGELESS, Wednesday 21 October, Capital Club Lagos",
+    detail:
+      "MedLYFE Wellness and Longevity Centre hosts an evening on what modern medicine can now do about how we age: metabolism, hormones, weight, energy and skin. It opens with a short film, Dr Adedotun Ajelabi gives the opening address and Dr Debo Odulana chairs the panel, with Dr Timi Adenuga on metabolic and bariatric care. The room holds seventy and ten places are kept for clinicians.",
+    ctaLabel: "Register your interest",
+    href: "https://www.consultforafrica.com/ageless?src=doctor",
+  };
+}
+
 /** Slot 4. Five a week, earned. Scarcity is the point. */
 function buildPrize(p: DigestRecipient, ctx: WeekContext): CadreDigestContent["prize"] {
   const award = ctx.awards.get(p.id);
@@ -914,6 +950,7 @@ export function buildDigestForProfessional(p: DigestRecipient, ctx: WeekContext)
     onlyYou: buildOnlyYou(p, ctx),
     ask: buildAsk(p, ctx),
     catalyst: buildCatalyst(ctx),
+    referral: buildReferral(ctx),
     medipark: buildMedipark(p, ctx),
     prize: buildPrize(p, ctx),
     showcase: ctx.showcase,
@@ -995,6 +1032,9 @@ export function renderDigestHtml(
     ...(d.catalyst
       ? [block(TONES.CATALYST, "DFC Catalyst Series", d.catalyst.headline, d.catalyst.detail, d.catalyst.ctaLabel, abs(baseUrl, d.catalyst.href))]
       : []),
+    ...(d.referral
+      ? [block(TONES.GOOD, d.referral.label, d.referral.headline, d.referral.detail, d.referral.ctaLabel, abs(baseUrl, d.referral.href))]
+      : []),
     block(TONES.PRIZE, d.prize.won ? "Yours this week" : "Five a week", d.prize.headline, d.prize.detail, d.prize.ctaLabel, abs(baseUrl, d.prize.href)),
   ];
 
@@ -1016,6 +1056,7 @@ export function renderDigestHtml(
     `${d.ask.label.toUpperCase()}: ${endSentence(d.ask.headline)} ${d.ask.detail} ${abs(baseUrl, d.ask.href)}`,
     ...(d.medipark ? [`HELP US DESIGN IT: ${d.medipark.headline} ${d.medipark.detail} ${abs(baseUrl, d.medipark.href)}`] : []),
     ...(d.catalyst ? [`DFC CATALYST SERIES: ${d.catalyst.headline}. ${d.catalyst.detail} ${abs(baseUrl, d.catalyst.href)}`] : []),
+    ...(d.referral ? [`${d.referral.label.toUpperCase()}: ${d.referral.headline}. ${d.referral.detail} ${abs(baseUrl, d.referral.href)}`] : []),
     `${d.prize.headline}. ${d.prize.detail} ${abs(baseUrl, d.prize.href)}`,
     ...(d.showcase ? [`${d.showcase.kind === "MEMBER" ? "MEMBER OF THE WEEK" : "SPECIALTY SPOTLIGHT"}: ${d.showcase.headline}. ${d.showcase.detail} ${abs(baseUrl, d.showcase.href)}`] : []),
   ];

@@ -3,6 +3,7 @@ import { getClientPortalSession } from "@/lib/clientPortalAuth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ClientPortalLogoutButton from "@/components/client-portal/LogoutButton";
+import { HAVEN_CLIENT_NAME } from "@/components/haven/AdoptionList";
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   PLANNING:  { bg: "#EFF6FF", color: "#1D4ED8", label: "Planning" },
@@ -160,6 +161,24 @@ export default async function ClientDashboardPage() {
             Welcome to your {client?.name || "project"} dashboard. Here is an overview of your engagements with Consult For Africa.
           </p>
         </div>
+
+        {client?.name === HAVEN_CLIENT_NAME && (
+          <Link
+            href="/client/adoption"
+            className="block bg-white rounded-2xl p-5 mb-8 hover:shadow-sm transition-shadow"
+            style={{ border: "1px solid #e5eaf0" }}
+          >
+            <span className="text-xs font-medium uppercase tracking-wide" style={{ color: "#D4AF37" }}>
+              Staff app
+            </span>
+            <p className="text-base font-semibold mt-1" style={{ color: "#0F2744" }}>
+              Who has started
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Which of your staff have signed in, and who we still need to reach.
+            </p>
+          </Link>
+        )}
 
         {/* Summary Stat Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -556,7 +575,7 @@ export default async function ClientDashboardPage() {
           </div>
         )}
         {/* Quick Links */}
-        <div className="grid md:grid-cols-3 gap-4 mt-8">
+        <div className="grid md:grid-cols-2 gap-4 mt-8">
           <Link
             href="/client/invoices"
             className="group rounded-2xl bg-white p-6 transition-all hover:shadow-md"
@@ -566,6 +585,19 @@ export default async function ClientDashboardPage() {
               <div>
                 <p className="text-sm font-semibold" style={{ color: "#0F2744" }}>Invoices</p>
                 <p className="text-xs text-gray-500 mt-1">View and pay your invoices online</p>
+              </div>
+              <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&rarr;</span>
+            </div>
+          </Link>
+          <Link
+            href="/client/team"
+            className="group rounded-2xl bg-white p-6 transition-all hover:shadow-md"
+            style={{ border: "1px solid #e5eaf0" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold" style={{ color: "#0F2744" }}>Your team</p>
+                <p className="text-xs text-gray-500 mt-1">Invite colleagues to this portal</p>
               </div>
               <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&rarr;</span>
             </div>

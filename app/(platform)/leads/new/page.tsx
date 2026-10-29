@@ -27,6 +27,7 @@ const SERVICE_LINES = [
   "Fractional Leadership & Executive Secondments",
   "Health Systems & Public Sector Advisory",
   "Healthcare HR Management (Maarova)",
+  "Claims Recovery & Early Payment",
 ];
 
 const inputClass = "w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none";

@@ -23,7 +23,7 @@ export const GET = handler(async function GET(
       request: {
         include: {
           subject: {
-            select: { name: true },
+            select: { name: true, track: true },
           },
         },
       },
@@ -57,7 +57,16 @@ export const GET = handler(async function GET(
         orderBy: { order: "asc" },
         include: {
           questions: {
-            where: { isActive: true },
+            // The track follows the person being rated, never the rater. A
+            // finance officer rating a surgeon should still be asked about
+            // clinical competence; a surgeon rating the finance director
+            // should not. Subjects invited before the track existed default
+            // to the clinical form, which is the only one they can have been
+            // assessed on.
+            where: {
+              isActive: true,
+              audience: { in: ["BOTH", invite.request.subject.track ?? "CLINICAL"] },
+            },
             orderBy: { order: "asc" },
             select: {
               id: true,

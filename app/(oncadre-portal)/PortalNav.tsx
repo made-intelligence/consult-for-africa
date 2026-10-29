@@ -26,6 +26,9 @@ const MORE_GROUPS: { title: string; items: (Item & { docs?: boolean })[] }[] = [
     items: [
       { href: "/oncadre/profile", label: "Profile", icon: "user" },
       { href: "/oncadre/my-applications", label: "Applications", icon: "applications" },
+      // Where a member answers a hospital that has asked to contact them. Without
+      // a way in, the consent gate would be a notification email and nothing else.
+      { href: "/oncadre/approaches", label: "Approaches", icon: "applications" },
       { href: "/oncadre/documents", label: "Documents", icon: "documents", docs: true },
       { href: "/oncadre/cv-generator", label: "CV Generator", icon: "cv" },
       { href: "/oncadre/career-report", label: "Assessment", icon: "assessment" },

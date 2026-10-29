@@ -73,11 +73,13 @@ export const POST = handler(async function POST(_req: NextRequest, { params }: R
     );
   }
 
-  // Check minimum responses
+  // Check minimum responses, against the form this session was served. Counting
+  // both twins of every item set the bar above what anyone could answer.
   const totalQuestions = await prisma.maarovaQuestion.count({
     where: {
       group: { moduleId: module.id },
       isActive: true,
+      audience: { in: ["BOTH", session.track] },
     },
   });
 

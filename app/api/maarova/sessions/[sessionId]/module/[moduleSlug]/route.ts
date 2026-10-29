@@ -40,7 +40,10 @@ export const GET = handler(async function GET(_req: NextRequest, { params }: Rou
         orderBy: { order: "asc" },
         include: {
           questions: {
-            where: { isActive: true },
+            // Role neutral items plus the form this session was served. Without
+            // this filter a taker receives both the clinical item and its
+            // non-clinical twin, which is the same question asked twice.
+            where: { isActive: true, audience: { in: ["BOTH", session.track] } },
             orderBy: { order: "asc" },
           },
         },

@@ -35,6 +35,7 @@ export const POST = handler(async function POST(req: NextRequest) {
 
     const employer = await prisma.cadreEmployerAccount.findUnique({
       where: { contactEmail: email.toLowerCase().trim() },
+      include: { org: { select: { id: true, name: true, facilityId: true, isVerified: true } } },
     });
 
     if (!employer || !(await verifyPassword(password, employer.passwordHash))) {
@@ -44,13 +45,20 @@ export const POST = handler(async function POST(req: NextRequest) {
       );
     }
 
+    // Stamped so an admin can tell an account that was invited and never used
+    // from one that is in daily service.
+    await prisma.cadreEmployerAccount.update({
+      where: { id: employer.id },
+      data: { lastLoginAt: new Date() },
+    });
+
     const token = signCadreEmployerJWT({
       sub: employer.id,
       email: employer.contactEmail,
-      companyName: employer.companyName,
+      companyName: employer.org.name,
       contactName: employer.contactName,
-      isVerified: employer.isVerified,
-      facilityId: employer.facilityId,
+      isVerified: employer.org.isVerified,
+      facilityId: employer.org.facilityId,
     });
 
     const cookieStore = await cookies();
@@ -64,7 +72,7 @@ export const POST = handler(async function POST(req: NextRequest) {
 
     return NextResponse.json({
       id: employer.id,
-      companyName: employer.companyName,
+      companyName: employer.org.name,
     });
   } catch (error) {
     console.error("Employer login error:", error);

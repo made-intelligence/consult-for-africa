@@ -40,7 +40,10 @@ export const POST = handler(async function POST(req: Request) {
         heading: `Welcome to CadreHealth, ${p.firstName}`,
         body: `You have been invited to join CadreHealth, Nigeria's healthcare workforce platform. Create your profile to access salary intelligence, hospital reviews, career opportunities, mentorship, and more. Your colleagues are already on the platform.`,
         ctaText: "Claim Your Profile",
-        ctaHref: `${BASE_URL}/oncadre/claim?email=${encodeURIComponent(p.email)}`,
+        // The claim page is /oncadre/claim/<professional id>. There is no bare
+      // /oncadre/claim route and never has been, so the query-string version
+      // here was a 404 on the only link in the invitation.
+      ctaHref: `${BASE_URL}/oncadre/claim/${p.id}`,
         footer: "This invitation was sent by Consult For Africa. If you did not expect this email, you can safely ignore it.",
       });
       sent++;

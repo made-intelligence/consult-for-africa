@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { isCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 
 export const POST = handler(async function POST(req: NextRequest) {
+  if (!(await isCadreAdmin())) {
+    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+  }
   try {
     const { professionalId } = await req.json();
 

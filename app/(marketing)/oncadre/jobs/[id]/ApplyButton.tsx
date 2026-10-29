@@ -2,7 +2,23 @@
 
 import { useState } from "react";
 
-export default function ApplyButton({ jobId }: { jobId: string }) {
+async function uploadCv(action: string, file: File) {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch(action, { method: "POST", body });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "CV upload failed");
+}
+
+export default function ApplyButton({
+  jobId,
+  cvUploadAction,
+}: {
+  jobId: string;
+  /** Present when the member has no CV on file; the CV is then required. */
+  cvUploadAction?: string | null;
+}) {
+  const [cv, setCv] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -10,6 +26,10 @@ export default function ApplyButton({ jobId }: { jobId: string }) {
     setStatus("loading");
     setErrorMsg("");
     try {
+      if (cvUploadAction) {
+        if (!cv) throw new Error("Please attach your CV");
+        await uploadCv(cvUploadAction, cv);
+      }
       const res = await fetch(`/api/cadre/jobs/${jobId}/apply`, {
         method: "POST",
       });
@@ -51,9 +71,20 @@ export default function ApplyButton({ jobId }: { jobId: string }) {
           {errorMsg}
         </div>
       )}
+      {cvUploadAction && (
+        <div className="mb-3">
+          <label className="mb-1 block text-xs font-medium text-gray-700">Your CV (PDF or Word)</label>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={(e) => setCv(e.target.files?.[0] ?? null)}
+            className="block w-full text-xs text-gray-600 file:mr-2 file:rounded-lg file:border-0 file:bg-[#0B3C5D]/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-[#0B3C5D]"
+          />
+        </div>
+      )}
       <button
         onClick={handleApply}
-        disabled={status === "loading"}
+        disabled={status === "loading" || (!!cvUploadAction && !cv)}
         className="w-full rounded-xl py-3 text-sm font-semibold text-white transition hover:opacity-90 hover:scale-[1.01] disabled:opacity-50"
         style={{
           background: "linear-gradient(135deg, #0B3C5D, #0E4D6E)",

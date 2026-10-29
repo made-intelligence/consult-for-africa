@@ -102,6 +102,26 @@ export default function OsteonProjectPage() {
           </p>
         </section>
 
+        {/* The rebuilt website, in preview for him to test */}
+        <section style={{ ...card, marginTop: 22, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
+          <div style={{ flex: "1 1 320px" }}>
+            <div style={{ color: GOLD, fontWeight: 700, fontSize: 11.5, letterSpacing: ".14em", textTransform: "uppercase" }}>
+              New
+            </div>
+            <div style={{ color: NAVY, fontSize: 19, fontWeight: 700, marginTop: 4 }}>Your new website, in preview</div>
+            <p style={{ color: MUTED, fontSize: 14.5, lineHeight: 1.6, margin: "6px 0 0" }}>
+              Click through it, try the second opinion and referral forms, and use the yellow button on any page to
+              tell us what to change. It is not public and nothing you submit goes to a patient.
+            </p>
+          </div>
+          <a
+            href="/drbola"
+            style={{ background: NAVY, color: "#fff", borderRadius: 999, padding: "11px 20px", fontWeight: 700, fontSize: 14.5, textDecoration: "none", whiteSpace: "nowrap" }}
+          >
+            Open the website
+          </a>
+        </section>
+
         {/* 1. The documents */}
         <section style={{ marginTop: 40 }}>
           <SectionHeading

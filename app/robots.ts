@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // The consultation page is listed first because Googlebot resolves the
+        // most specific match: it escapes the brand-wide /lyfe block below
+        // without letting the private event page into the index.
+        allow: ["/lyfe/consult", "/"],
         disallow: [
           "/api/",
           "/studio/",
@@ -25,6 +28,16 @@ export default function robots(): MetadataRoute.Robots {
           // ilé is live for the founders to test but is not launched.
           // Remove this when the waiting list opens publicly.
           "/ile",
+          // Lyfe is a consumer brand that will move to its own domain. Until
+          // it does, keeping it out of the index stops Google tying a plastic
+          // surgery practice to its management consultant's site, and stops
+          // consultforafrica.com/lyfe becoming the URL people share. Paid and
+          // WhatsApp traffic reach it perfectly well without being indexed.
+          // Remove this the day the domain is pointed.
+          "/lyfe",
+          // Dr Bola Akinola's rebuilt site, in preview for him to test. It
+          // moves to bolarinwaakinola.com, so it must never rank here.
+          "/drbola",
         ],
       },
     ],

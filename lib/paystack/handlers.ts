@@ -220,6 +220,31 @@ export const PRO_PRICE_NGN = 1500;
  * Falls back to the list price only when the event carries no usable amount,
  * which is the case for events that are not themselves a charge.
  */
+/**
+ * Whether a charge should move the billing period, and to when.
+ *
+ * The period must not be reset just because the handler ran again. Paystack
+ * retries, and a replay is run on purpose days later to repair something; both
+ * re-deliver the original charge. Resetting then would move a paid-up period
+ * to a month from today, quietly taking time the subscriber has already paid
+ * for, and would zero their usage counter into the bargain.
+ *
+ * So a subscriber whose period is still running keeps it. A new subscriber, or
+ * one whose period has lapsed, gets a fresh month: that is a genuine renewal.
+ */
+export function subscriptionPeriod(
+  prior: { status?: string | null; currentPeriodEnd?: Date | null } | null,
+  now: Date
+): { start: Date; end: Date } | null {
+  const runningUntil = prior?.currentPeriodEnd;
+  if (prior?.status === "ACTIVE" && runningUntil && runningUntil.getTime() > now.getTime()) {
+    return null; // leave the period alone
+  }
+  const end = new Date(now);
+  end.setMonth(end.getMonth() + 1);
+  return { start: now, end };
+}
+
 export function subscriptionAmountNGN(amountKobo: unknown): number {
   if (typeof amountKobo !== "number" || !Number.isFinite(amountKobo) || amountKobo <= 0) {
     return PRO_PRICE_NGN;
@@ -236,18 +261,18 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
     if (!professionalId) return;
 
     const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setMonth(periodEnd.getMonth() + 1);
-
     const chargedNGN = subscriptionAmountNGN(event.data.amount);
 
     // Read before writing so a retry or a deliberate replay does not send a
     // second welcome. The upsert itself is safely repeatable; the email is not.
     const prior = await prisma.cadreSubscription.findUnique({
       where: { professionalId },
-      select: { plan: true, status: true },
+      select: { plan: true, status: true, currentPeriodEnd: true },
     });
     const alreadyPro = prior?.plan === "PRO" && prior.status === "ACTIVE";
+    const period = subscriptionPeriod(prior, now);
+    // A create is always a new subscriber, so it always starts a period.
+    const freshPeriod = period ?? subscriptionPeriod(null, now)!;
 
     await prisma.cadreSubscription.upsert({
       where: { professionalId },
@@ -255,10 +280,16 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
         plan: "PRO",
         status: "ACTIVE",
         amountNGN: chargedNGN,
-        currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
-        aiMessagesThisMonth: 0,
-        aiMessagesResetAt: now,
+        // Only on a real renewal. Re-running for a period already paid for
+        // would shorten it and wipe the usage counter.
+        ...(period
+          ? {
+              currentPeriodStart: period.start,
+              currentPeriodEnd: period.end,
+              aiMessagesThisMonth: 0,
+              aiMessagesResetAt: now,
+            }
+          : {}),
         paystackCustomerCode: customer?.customer_code || undefined,
       },
       create: {
@@ -266,8 +297,8 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
         plan: "PRO",
         status: "ACTIVE",
         amountNGN: chargedNGN,
-        currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
+        currentPeriodStart: freshPeriod.start,
+        currentPeriodEnd: freshPeriod.end,
         paystackCustomerCode: customer?.customer_code || undefined,
       },
     });
@@ -284,8 +315,8 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
           person: professional,
           amountKobo: event.data.amount ?? 0,
           reference: event.data.reference ?? "",
-          periodStart: now,
-          periodEnd,
+          periodStart: freshPeriod.start,
+          periodEnd: freshPeriod.end,
         }).catch((err) => {
           console.error("[paystack] cadre pro welcome email failed:", err);
         });
@@ -397,4 +428,101 @@ export async function handleCoachingSession(event: PaystackEvent): Promise<void>
   }
 
   console.log(`[paystack] coaching session ${coachingSession.id} paid (${data.reference})`);
+}
+
+
+/**
+ * A paid consultation with Dr Kpaduwa.
+ *
+ * The diary is held by `paidAt` and by nothing else, which is why the slot is
+ * only committed here. Two people can get as far as a Paystack page for the
+ * same half hour; only one of them can have the index.
+ */
+export async function handleLyfeConsultation(event: PaystackEvent): Promise<void> {
+  if (event.event !== "charge.success") return;
+  const meta = event.data?.metadata;
+  if (meta?.type !== "lyfe_consultation") return;
+
+  const reference = event.data?.reference;
+  const enquiryId = typeof meta.enquiryId === "string" ? meta.enquiryId : null;
+  if (!reference && !enquiryId) {
+    console.error("[paystack/lyfe] charge carries neither a reference nor an enquiry id");
+    return;
+  }
+
+  const entry = await prisma.lyfeEnquiry.findFirst({
+    where: reference ? { paymentRef: reference } : { id: enquiryId! },
+    select: { id: true, paidAt: true, slotAt: true, fullName: true, email: true, notes: true },
+  });
+  let keptTheSlot = true;
+  if (!entry) {
+    console.error(`[paystack/lyfe] no enquiry for reference ${reference}`);
+    return;
+  }
+  if (entry.paidAt) return; // Paystack retries; booking twice does not.
+
+  const paidAt = new Date();
+  const amountKobo = typeof event.data?.amount === "number" ? event.data.amount : null;
+
+  try {
+    await prisma.lyfeEnquiry.update({
+      where: { id: entry.id },
+      data: {
+        paidAt,
+        status: "BOOKED",
+        amountKobo: amountKobo ?? undefined,
+        nextAction: "Send the video link and the pre-consultation note.",
+        nextActionAt: new Date(paidAt.getTime() + 24 * 60 * 60 * 1000),
+      },
+    });
+  } catch (err) {
+    // The partial unique index on a paid slot has refused it, so somebody else
+    // paid for this half hour first. The money is real and the slot is not, so
+    // the row keeps the money, loses the slot, and lands on the coordinator's
+    // list saying exactly that.
+    const code = (err as { code?: string })?.code;
+    if (code !== "P2002") throw err;
+    keptTheSlot = false;
+    const wanted = entry.slotAt?.toISOString() ?? "unknown";
+    console.error(`[paystack/lyfe] ${entry.id} paid for a slot already sold (${wanted})`);
+    await prisma.lyfeEnquiry.update({
+      where: { id: entry.id },
+      data: {
+        paidAt,
+        slotAt: null,
+        status: "BOOKED",
+        amountKobo: amountKobo ?? undefined,
+        nextAction: "PAID BUT DOUBLE BOOKED. Offer another time today, or refund.",
+        nextActionAt: paidAt,
+        notes: [entry.notes, `Paid for ${wanted}, which had already gone.`].filter(Boolean).join("\n"),
+      },
+    });
+  }
+
+  // The booking is committed either way, so nothing below is allowed to undo
+  // it. A confirmation that fails to send is a telephone call; a throw here is
+  // a payment Paystack retries and a diary that never settles.
+  try {
+    const { emailLyfeConsultationConfirmed } = await import("@/lib/lyfeEmail");
+    await emailLyfeConsultationConfirmed({
+      to: entry.email,
+      firstName: entry.fullName.trim().split(/\s+/)[0] ?? entry.fullName,
+      slotAt: keptTheSlot ? entry.slotAt : null,
+    });
+  } catch (err) {
+    console.error(`[paystack/lyfe] confirmation email failed for ${entry.id}:`, err);
+  }
+
+  try {
+    const { notifyInternal } = await import("@/lib/email");
+    const when = entry.slotAt ? entry.slotAt.toISOString() : "no slot";
+    await notifyInternal(
+      process.env.LYFE_COORDINATOR_EMAILS?.split(",")[0]?.trim() || "hello@consultforafrica.com",
+      keptTheSlot ? `PAID: ${entry.fullName}, ${when}` : `PAID BUT DOUBLE BOOKED: ${entry.fullName}`,
+      `<p>${entry.fullName} (${entry.email}) has paid for a consultation.</p><p>Slot: ${when}</p>` +
+        (keptTheSlot ? "" : "<p><strong>That half hour had already gone. Offer another time today or refund.</strong></p>"),
+    );
+  } catch (err) {
+    console.error(`[paystack/lyfe] coordinator notice failed for ${entry.id}:`, err);
+  }
 }

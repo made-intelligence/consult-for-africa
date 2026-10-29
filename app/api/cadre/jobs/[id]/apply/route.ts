@@ -53,7 +53,12 @@ export const POST = handler(async function POST(
         data: {
           mandateId,
           professionalId: session.sub,
-          status: "APPLIED",
+          // How they arrived is `source`. The stage is where they are in the
+          // employer's process, and a new application has not been looked at.
+          // This wrote status "APPLIED", which appeared in no reader's list, so
+          // every application rendered to the employer as "Matched".
+          source: "APPLIED",
+          status: "NEW",
         },
       }),
       prisma.cadreMandate.update({

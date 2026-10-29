@@ -1,6 +1,8 @@
+import { requireCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
 import { MandateCreateForm } from "@/components/cadrehealth/MandateCreateForm";
 
-export default function CreateMandatePage() {
+export default async function CreateMandatePage() {
+  await requireCadreAdmin();
   return (
     <div className="space-y-6">
       <div>

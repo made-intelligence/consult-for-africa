@@ -69,7 +69,7 @@ export const SURVEYS = [
     href: "/dennis-ashley-staff-survey.html",
     who: "Everyone who works at Dennis Ashley",
     title: "Staff survey",
-    blurb: "How the clinic and the endoscopy suite actually run on a busy day, and whether people can speak up. Anonymous, and the answers come to Consult for Africa rather than to management.",
+    blurb: "How the clinic and the endoscopy suite actually run on a busy day, and whether people can speak up. Anonymous, and the answers come to Mezo rather than to management.",
     minutes: "10 minutes",
     tag: "Anonymous",
   },

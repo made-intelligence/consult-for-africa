@@ -54,6 +54,7 @@ const servicesJsonLd = [
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Health Systems Strengthening", url: "https://consultforafrica.com/services/health-systems" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Diaspora Expertise", url: "https://consultforafrica.com/services/diaspora-expertise" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Healthcare Marketing Agency", url: "https://consultforafrica.com/services/healthcare-marketing" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Claims Recovery", url: "https://consultforafrica.com/services/claims-recovery" } },
       ],
     },
   },

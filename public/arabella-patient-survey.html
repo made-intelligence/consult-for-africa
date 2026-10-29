@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Arabella Women's Health - Patient Survey</title>
+<style>
+  :root{
+    --navy:#0B3C5D; --deep:#081521; --gold:#D4AF37; --teal:#1F7A8C;
+    --body:#1F2937; --muted:#6B7280; --surface:#F1F5F9; --line:#E2E8F0;
+    --cream:#FBF6E6; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--body);background:#eef2f6;line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px 64px}
+  header.top{background:var(--navy);color:#fff;padding:22px 0 20px;border-bottom:3px solid var(--gold)}
+  header.top .wrap{padding-top:0;padding-bottom:0}
+  .eyebrow{color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  header.top h1{font-size:22px;margin:6px 0 2px;line-height:1.2}
+  header.top p{margin:0;color:#C9D6E0;font-size:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:16px 0;
+        box-shadow:0 1px 2px rgba(8,21,33,.04)}
+  .privacy{background:var(--cream);border-left:4px solid var(--gold)}
+  .privacy strong{color:var(--navy)}
+  .scalekey{background:var(--surface);border-left:4px solid var(--teal);font-size:14px}
+  .scalekey b{color:var(--navy)}
+  h2.section{font-size:16px;color:var(--navy);margin:26px 2px 8px;padding-top:6px;
+             border-top:1px solid var(--line)}
+  h2.section .n{color:var(--teal);font-weight:800;margin-right:8px}
+  h2.section .hint{font-weight:400;color:var(--muted);font-size:13px;display:block;margin-top:2px}
+  .q{padding:14px 0;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:0}
+  .q .qt{font-size:15px;margin-bottom:10px}
+  .q .qt .num{color:var(--muted);font-weight:700;margin-right:6px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opts label{flex:1 1 auto;min-width:56px;text-align:center;border:1px solid var(--line);
+     border-radius:9px;padding:9px 6px;font-size:13px;cursor:pointer;background:#fff;user-select:none}
+  .opts.five label{min-width:0}
+  .opts input{position:absolute;opacity:0;width:0;height:0}
+  .opts label:hover{border-color:var(--teal)}
+  .opts label.na{color:var(--muted);flex-basis:100%;min-width:100%;margin-top:2px}
+  .opts label:has(input:checked){background:var(--navy);color:#fff;border-color:var(--navy)}
+  .opts label:has(input:checked) .sub{color:#C9D6E0}
+  .opts .big{display:block;font-weight:800;font-size:15px;line-height:1}
+  .opts .sub{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+  .stack{display:grid;gap:8px}
+  .stack label{border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-size:14px;
+     cursor:pointer;background:#fff;display:flex;gap:10px;align-items:flex-start}
+  .stack label:hover{border-color:var(--teal)}
+  .stack label:has(input:checked){background:#F6FAFB;border-color:var(--teal)}
+  .stack input{margin:2px 0 0}
+  textarea,select,input[type=text],input[type=number]{width:100%;font:inherit;padding:10px 12px;
+     border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--body)}
+  textarea{min-height:74px;resize:vertical}
+  .field{margin:12px 0}
+  .field label.lbl{display:block;font-size:14px;margin-bottom:6px}
+  .two{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  @media (max-width:560px){.two{grid-template-columns:1fr}}
+  .grades{display:flex;flex-wrap:wrap;gap:8px}
+  .grades label{flex:1 1 auto;text-align:center;border:1px solid var(--line);border-radius:9px;
+     padding:10px 6px;font-size:13px;cursor:pointer}
+  .grades label:has(input:checked){background:var(--gold);border-color:var(--gold);color:var(--deep);font-weight:700}
+  .split{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .split .lab{flex:1;font-size:14px}
+  .split input{width:86px;flex:0 0 auto;text-align:center}
+  .splittot{font-weight:800;padding:10px 0 0;font-size:14px}
+  .splittot.good{color:#15803d}
+  .splittot.bad{color:#b3261e}
+  .progress{position:sticky;top:0;z-index:5;background:#eef2f6;padding:10px 0}
+  .bar{height:8px;background:var(--line);border-radius:20px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .25s}
+  .bar-t{font-size:12px;color:var(--muted);margin:6px 2px 0}
+  button.submit{width:100%;background:var(--navy);color:#fff;border:0;border-radius:11px;
+     padding:16px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+  button.submit:disabled{opacity:.6;cursor:not-allowed}
+  .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:22px}
+  .thanks{display:none;text-align:center;padding:40px 10px}
+  .thanks h2{color:var(--navy)}
+  .thanks .check{width:56px;height:56px;border-radius:50%;background:var(--cream);color:var(--gold);
+     display:inline-flex;align-items:center;justify-content:center;font-size:30px;border:2px solid var(--gold)}
+  .err{background:#fdecec;border-left:4px solid #c0392b;color:#7a2f2f;font-size:14px;display:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Consult for Africa &middot; Confidential</div>
+    <h1>Arabella Women&rsquo;s Health &mdash; Your Experience</h1>
+    <p>Anonymous &middot; about 5 minutes &middot; it helps us make the care better</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="form">
+    <div class="card privacy"><strong>This is anonymous.</strong> Your answers go to Consult for Africa, who have been asked to look at how the service runs, and not to the doctors or nurses who cared for you. Nothing you say here can affect your care in any way, now or later. Please be as honest as you would be with a friend.</div>
+    <div class="card scalekey">Choose how much you agree with each statement, from <b>1</b> to <b>5</b>. If something does not apply to you, choose <b>N/A</b>.</div>
+
+    <div class="progress">
+      <div class="bar"><i id="barfill"></i></div>
+      <div class="bar-t"><span id="answered">0</span> of <span id="total">0</span> answered</div>
+    </div>
+
+    <div class="card err" id="err"></div>
+    <form id="survey" novalidate></form>
+
+    <button class="submit" id="submitBtn" type="button">Submit my answers</button>
+    <div class="foot">Consult for Africa &middot; hello@consultforafrica.com &middot; consultforafrica.com</div>
+  </div>
+
+  <div class="thanks card" id="thanks">
+    <div class="check">&#10003;</div>
+    <h2>Thank you.</h2>
+    <p>Your answers are in, and they are anonymous. Thank you for taking the time. It genuinely changes what we recommend. You can close this page.</p>
+  </div>
+</div>
+
+<script>
+const ENDPOINT = "/api/arabella-audit/responses";
+const SLUG = "arabella-patient-experience";
+
+const AGREE = [["1","Strongly disagree"],["2","Disagree"],["3","Neither"],["4","Agree"],["5","Strongly agree"]];
+const FREQ  = [["1","Never"],["2","Rarely"],["3","Sometimes"],["4","Most times"],["5","Always"]];
+
+// [section title, scale ("a" agree | "f" frequency), items, optional hint]
+const SECTIONS = [
+  [
+    "Getting an appointment",
+    "a",
+    [
+      "It was easy to find out how to book.",
+      "Somebody answered when I called or messaged.",
+      "I was offered an appointment soon enough.",
+      "I was told clearly what to bring and what to expect."
+    ]
+  ],
+  [
+    "When you arrived",
+    "a",
+    [
+      "I was seen close to my appointment time.",
+      "The front desk was welcoming and helpful.",
+      "The place was clean and comfortable.",
+      "My privacy was respected while I waited and while I was seen."
+    ]
+  ],
+  [
+    "Your doctor and what you were told",
+    "a",
+    [
+      "My doctor listened to me properly.",
+      "Things were explained in a way I understood.",
+      "I was given time to ask my questions.",
+      "I was told about the options, not just the one being recommended.",
+      "I felt looked after as a person, not processed."
+    ]
+  ],
+  [
+    "Money, and what you were told it would cost",
+    "a",
+    [
+      "I knew what it would cost before I agreed to it.",
+      "The final bill matched what I had been told.",
+      "Paying was straightforward and I was given a receipt.",
+      "If my HMO was involved, it was handled without me having to chase it."
+    ],
+    "Choose N/A for anything that did not apply to you."
+  ],
+  [
+    "The care itself",
+    "a",
+    [
+      "I was confident in the people caring for me.",
+      "The nurses and midwives were kind.",
+      "If I was in pain or worried, someone helped quickly.",
+      "I was treated with dignity throughout."
+    ]
+  ],
+  [
+    "Afterwards",
+    "a",
+    [
+      "I knew what to do and who to call after I left.",
+      "Somebody followed up with me.",
+      "I got my results or my report when I was told I would."
+    ]
+  ]
+];
+
+const form = document.getElementById("survey");
+let idx = 0;
+const scaleItems = [];
+
+SECTIONS.forEach((sec, si) => {
+  const h = document.createElement("h2"); h.className = "section";
+  h.innerHTML = '<span class="n">' + (si + 1) + '</span>' + sec[0] +
+    (sec[3] ? '<span class="hint">' + sec[3] + '</span>' : '');
+  form.appendChild(h);
+  const scale = sec[1] === "f" ? FREQ : AGREE;
+  sec[2].forEach(text => {
+    idx++;
+    const name = "q" + idx;
+    scaleItems.push(name);
+    const q = document.createElement("div"); q.className = "q";
+    let opts = '';
+    scale.forEach(o => {
+      opts += '<label><input type="radio" name="' + name + '" value="' + o[0] + '">'
+            + '<span class="big">' + o[0] + '</span><span class="sub">' + o[1] + '</span></label>';
+    });
+    opts += '<label class="na"><input type="radio" name="' + name + '" value="NA">N/A &middot; Don\'t know</label>';
+    q.innerHTML = '<div class="qt"><span class="num">' + idx + '.</span>' + text + '</div>'
+                + '<div class="opts five">' + opts + '</div>';
+    form.appendChild(q);
+  });
+});
+
+// Helpers the bespoke tail of each instrument uses.
+const scaleRow = (name, scale, naLabel) => '<div class="opts five">' +
+  (scale || AGREE).map(o => '<label><input type="radio" name="' + name + '" value="' + o[0] + '"><span class="big">' +
+    o[0] + '</span><span class="sub">' + o[1] + '</span></label>').join("") +
+  '<label class="na"><input type="radio" name="' + name + '" value="NA">' + (naLabel || "N/A") + '</label></div>';
+
+const radios = (name, list) => '<div class="stack">' +
+  list.map(v => '<label><input type="radio" name="' + name + '" value="' + v + '"><span>' + v + '</span></label>').join("") +
+  '</div>';
+
+const boxes = (name, list) => '<div class="stack">' +
+  list.map((v, i) => '<label><input type="checkbox" name="' + name + '_' + i + '" value="' + v + '"><span>' + v + '</span></label>').join("") +
+  '</div>';
+
+const SECTION_N = SECTIONS.length;
+
+// Declarations the tail's template literal reads while it is being evaluated.
+// They have to be initialised before that line runs, not after it.
+
+
+const tail = document.createElement("div");
+tail.innerHTML = `
+  <h2 class="section"><span class="n">${SECTION_N + 1}</span>Overall</h2>
+  <div class="q"><div class="qt">Overall, how would you rate your experience?</div>
+    <div class="grades">
+      ${["Excellent","Very good","Acceptable","Poor","Very poor"].map(g =>
+        '<label><input type="radio" name="grade" value="' + g + '">' + g + '</label>').join("")}
+    </div>
+  </div>
+  <div class="q field"><label class="lbl">I would send my sister or a close friend here.</label>
+    ${scaleRow("rec")}</div>
+  <div class="q field"><label class="lbl">I would come back here myself.</label>
+    ${scaleRow("return")}</div>
+
+  <h2 class="section"><span class="n">${SECTION_N + 2}</span>A little about your visit
+    <span class="hint">Optional. It helps us group answers, and it cannot identify you.</span></h2>
+  <div class="field"><label class="lbl">What were you mainly seen for?</label>
+    <select name="service"><option value="">Prefer not to say</option>
+      <option>Pregnancy care or delivery</option><option>A gynaecology consultation</option>
+      <option>Gynaecology surgery</option><option>Fertility treatment</option>
+      <option>A scan or a test</option><option>Wellness, aesthetics or nutrition</option>
+      <option>Something else</option></select></div>
+  <div class="field"><label class="lbl">When were you last seen?</label>
+    <select name="recency"><option value="">Prefer not to say</option>
+      <option>In the last month</option><option>One to three months ago</option>
+      <option>Three to six months ago</option><option>Six to twelve months ago</option>
+      <option>More than a year ago</option></select></div>
+  <div class="field"><label class="lbl">How did you pay?</label>
+    <select name="payer"><option value="">Prefer not to say</option>
+      <option>I paid myself</option><option>My HMO</option>
+      <option>My employer</option><option>Family abroad paid</option>
+      <option>A mixture</option></select></div>
+
+  <h2 class="section"><span class="n">${SECTION_N + 3}</span>How you came to us
+    <span class="hint">This one genuinely helps. We are trying to understand how women find this place.</span></h2>
+  <div class="q"><div class="qt">How did you first hear about us?</div>
+    ${radios("source", ["Another doctor sent me","A friend or family member",
+      "I have been coming here for years","Instagram or Facebook",
+      "A Google search","The podcast","A church or a group I belong to",
+      "I passed the building","Somewhere else"])}</div>
+  <div class="field"><label class="lbl">If a doctor, clinic or physiotherapist sent you, please tell us who. A name is very useful to us and it is not shared with anyone.</label>
+    <input type="text" name="referrer_name"></div>
+
+  <h2 class="section"><span class="n">${SECTION_N + 4}</span>Two questions in your own words
+    <span class="hint">Optional, and the most useful part of this form.</span></h2>
+  <div class="field"><label class="lbl">What was the best thing about being cared for here?</label>
+    <textarea name="open_best"></textarea></div>
+  <div class="field"><label class="lbl">What one thing would you change?</label>
+    <textarea name="open_change"></textarea></div>
+`;
+form.appendChild(tail);
+
+document.getElementById("total").textContent = scaleItems.length;
+function updateProgress(){
+  let n = 0;
+  scaleItems.forEach(name => { if (form.querySelector('input[name="' + name + '"]:checked')) n++; });
+  document.getElementById("answered").textContent = n;
+  document.getElementById("barfill").style.width = (n / Math.max(1, scaleItems.length) * 100) + "%";
+}
+form.addEventListener("change", updateProgress);
+
+
+const err = document.getElementById("err");
+function fail(msg){
+  err.style.display = "block";
+  err.textContent = msg;
+  window.scrollTo({top:0,behavior:"smooth"});
+  return false;
+}
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const data = {};
+  new FormData(form).forEach((v, k) => {
+    if (data[k] === undefined) data[k] = v;
+    else data[k] = data[k] + "; " + v;
+  });
+  const answered = scaleItems.filter(n => data[n]).length;
+  err.style.display = "none";
+  if (scaleItems.length && answered < scaleItems.length * 0.6) {
+    return fail("Please answer a few more questions before submitting. Your responses are most useful when the survey is mostly complete, and N/A counts as an answer.");
+  }
+  if (typeof validateTail === "function" && !validateTail(data, fail)) return;
+
+  const payload = { survey:SLUG, respondent:(data.respondent || "").slice(0,120) || undefined,
+                    submittedAt:new Date().toISOString(), responses:data };
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true; btn.textContent = "Submitting...";
+  try {
+    const r = await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    if (!r.ok) throw new Error("bad status");
+    document.getElementById("form").style.display = "none";
+    document.getElementById("thanks").style.display = "block";
+    window.scrollTo({top:0,behavior:"smooth"});
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "Submit my answers";
+    fail("Something went wrong sending your answers. Please try again in a moment.");
+  }
+});
+</script>
+</body>
+</html>

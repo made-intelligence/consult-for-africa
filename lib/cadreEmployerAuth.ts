@@ -54,6 +54,11 @@ export interface CadreEmployerSession {
   email: string;
   companyName: string;
   contactName: string;
+  /**
+   * Cached at sign-in and therefore up to 30 days stale. Never gate anything on
+   * this: an admin verifying an employer would otherwise have no effect until
+   * that employer happened to log out. Read `getCadreEmployerContext().org`.
+   */
   isVerified: boolean;
   facilityId: string | null;
 }
@@ -71,4 +76,76 @@ export async function getCadreEmployerSession(): Promise<CadreEmployerSession | 
   const token = cookieStore.get("cadre_employer_token")?.value;
   if (!token) return null;
   return verifyCadreEmployerToken(token);
+}
+
+// ─── Employer context ───
+
+/**
+ * The authoritative view of who is asking, loaded fresh on every request.
+ *
+ * The token alone is not enough for two reasons. It caches `isVerified` for
+ * thirty days, and verification is what releases a professional's contact
+ * details. And it carries `companyName`, which is what tenancy used to be keyed
+ * on: roles were scoped by comparing that string to the mandate's `facilityName`
+ * text, so two accounts that typed the same hospital name saw each other's
+ * applicants. Scoping now runs on `org.id`.
+ */
+export interface CadreEmployerContext {
+  accountId: string;
+  contactName: string;
+  contactEmail: string;
+  role: "OWNER" | "RECRUITER" | "VIEWER";
+  org: {
+    id: string;
+    name: string;
+    facilityId: string | null;
+    isVerified: boolean;
+  };
+}
+
+export async function getCadreEmployerContext(): Promise<CadreEmployerContext | null> {
+  const session = await getCadreEmployerSession();
+  if (!session) return null;
+
+  // Imported here rather than at module scope: this file is also pulled into
+  // edge-ish paths that only need the token helpers, and Prisma should not be
+  // dragged along with them.
+  const { prisma } = await import("@/lib/prisma");
+
+  const account = await prisma.cadreEmployerAccount.findUnique({
+    where: { id: session.sub },
+    select: {
+      id: true,
+      contactName: true,
+      contactEmail: true,
+      role: true,
+      org: {
+        select: { id: true, name: true, facilityId: true, isVerified: true },
+      },
+    },
+  });
+
+  // A token that outlives its account is not a session. Deleting an employer
+  // should log them out, not leave a signed cookie acting on a missing row.
+  if (!account) return null;
+
+  return {
+    accountId: account.id,
+    contactName: account.contactName,
+    contactEmail: account.contactEmail,
+    role: account.role,
+    org: account.org,
+  };
+}
+
+/** Roles permitted to change the state of a role or a pipeline. */
+const WRITE_ROLES = new Set(["OWNER", "RECRUITER"]);
+
+export function canWrite(ctx: CadreEmployerContext): boolean {
+  return WRITE_ROLES.has(ctx.role);
+}
+
+/** Only an owner can invite, remove, or change a colleague's access. */
+export function canManageTeam(ctx: CadreEmployerContext): boolean {
+  return ctx.role === "OWNER";
 }

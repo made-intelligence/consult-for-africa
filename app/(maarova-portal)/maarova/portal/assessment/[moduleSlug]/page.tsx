@@ -43,20 +43,40 @@ interface ModuleData {
 
 /* ─── Helpers ────────────────────────────────────────────────────────────── */
 
-function useSessionId(): { sessionId: string | null; sessionError: string | null } {
+function useSessionId(): {
+  sessionId: string | null;
+  sessionError: string | null;
+  needsTrack: boolean;
+  chooseTrack: (track: "CLINICAL" | "NON_CLINICAL") => void;
+} {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionError, setSessionError] = useState<string | null>(null);
+  // The assessment comes in two forms and we cannot guess which one this
+  // person should be answering. Asked once, then remembered against the user.
+  const [needsTrack, setNeedsTrack] = useState(false);
+  const [track, setTrack] = useState<"CLINICAL" | "NON_CLINICAL" | null>(null);
+
   useEffect(() => {
-    fetch("/api/maarova/sessions", { method: "POST" })
+    fetch("/api/maarova/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(track ? { track } : {}),
+    })
       .then(async (r) => {
+        const body = await r.json().catch(() => null);
+        if (r.status === 409 && body?.error === "track_required") {
+          setNeedsTrack(true);
+          return null;
+        }
         if (!r.ok) {
-          const body = await r.json().catch(() => null);
           throw new Error(body?.error ?? `Session request failed (${r.status})`);
         }
-        return r.json();
+        return body;
       })
       .then((data) => {
+        if (!data) return;
         if (data.session?.id) {
+          setNeedsTrack(false);
           setSessionId(data.session.id);
         } else {
           setSessionError("Could not create assessment session. Please try again.");
@@ -72,8 +92,58 @@ function useSessionId(): { sessionId: string | null; sessionError: string | null
           detail ? `Could not start session: ${detail}` : "Could not start session. Please try again.",
         );
       });
-  }, []);
-  return { sessionId, sessionError };
+  }, [track]);
+  return { sessionId, sessionError, needsTrack, chooseTrack: setTrack };
+}
+
+/**
+ * One question, asked once, before the first module.
+ *
+ * It decides which form of the assessment someone is served, so it has to be
+ * answerable without hesitation by a pharmacist who now runs compliance. That
+ * is why it asks how they came into leadership rather than whether they are
+ * "clinical", which is exactly the word such a person cannot answer.
+ */
+function TrackChooser({ onChoose }: { onChoose: (t: "CLINICAL" | "NON_CLINICAL") => void }) {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center px-4">
+      <div className="max-w-lg w-full">
+        <h1 className="text-xl font-semibold text-gray-900 mb-3">
+          Before you begin
+        </h1>
+        <p className="text-sm text-gray-600 leading-relaxed mb-6">
+          Some of what follows is written around the work you came from, so we
+          ask this first and only once. There is no better or worse answer, and
+          it does not change how your results are compared.
+        </p>
+        <p className="text-sm font-medium text-gray-900 mb-4">
+          Did you come into leadership from practising a clinical profession?
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={() => onChoose("CLINICAL")}
+            className="w-full text-left px-5 py-4 rounded-xl border border-gray-200 hover:border-gray-400 transition"
+          >
+            <span className="block text-sm font-semibold text-gray-900">Yes</span>
+            <span className="block text-xs text-gray-500 mt-1">
+              Medicine, nursing, pharmacy, dentistry, allied health or another
+              clinical discipline
+            </span>
+          </button>
+          <button
+            onClick={() => onChoose("NON_CLINICAL")}
+            className="w-full text-left px-5 py-4 rounded-xl border border-gray-200 hover:border-gray-400 transition"
+          >
+            <span className="block text-sm font-semibold text-gray-900">No</span>
+            <span className="block text-xs text-gray-500 mt-1">
+              Human resources, finance, operations, compliance, law,
+              administration or another non-clinical discipline
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
@@ -85,7 +155,7 @@ export default function AssessmentModulePage({
 }) {
   const router = useRouter();
   const [moduleSlug, setModuleSlug] = useState<string>("");
-  const { sessionId, sessionError } = useSessionId();
+  const { sessionId, sessionError, needsTrack, chooseTrack } = useSessionId();
   const [data, setData] = useState<ModuleData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -213,6 +283,12 @@ export default function AssessmentModulePage({
   const totalGroups = data?.questionGroups.length ?? 0;
 
   /* ─── Loading / Error ──────────────────────────────────────────────────── */
+
+  // Asked before anything else, because the answer decides which form of the
+  // assessment the rest of this page will show.
+  if (needsTrack) {
+    return <TrackChooser onChoose={chooseTrack} />;
+  }
 
   if (loading) {
     return (

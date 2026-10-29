@@ -58,6 +58,17 @@ export const CAMPAIGN_SEND_ROLES = [...EM_AND_ABOVE, "EXECUTIVE_ASSISTANT"] as c
  */
 export const FINANCE_READ_ROLES = [...EM_AND_ABOVE, "EXECUTIVE_ASSISTANT"] as const;
 
+/**
+ * The published rate card, the product menus and the negotiation doctrine at
+ * /finance/rate-card. Deliberately tighter than FINANCE_READ_ROLES: the office
+ * reads invoice status so it can chase, and sees no rates at all.
+ *
+ * Elevated only, which also means a Director of Business Development cannot
+ * reach it while their account still says CONSULTANT. That is the intended
+ * behaviour rather than an oversight: the role change is the grant.
+ */
+export const RATE_CARD_ROLES = ELEVATED_ROLES;
+
 /** Organiser rights on a meeting: reschedule, cancel, control the bot. */
 export const MEETING_ORGANIZER_ROLES = [...EM_AND_ABOVE, "EXECUTIVE_ASSISTANT"] as const;
 
