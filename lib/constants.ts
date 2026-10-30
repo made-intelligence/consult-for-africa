@@ -86,3 +86,12 @@ export type OfficeRole = typeof OFFICE_ROLES[number];
 export function isOfficeRole(role: string | undefined | null): boolean {
   return OFFICE_ROLES.includes(role as OfficeRole);
 }
+
+/**
+ * Who gets the consultant's view of the delivery surfaces: their own projects,
+ * deliverables and opportunities, the dashboard and the Academy. The office
+ * work as analysts on client engagements, so they see what a consultant sees.
+ */
+export function worksAsConsultant(role: string | undefined | null): boolean {
+  return role === "CONSULTANT" || isOfficeRole(role);
+}

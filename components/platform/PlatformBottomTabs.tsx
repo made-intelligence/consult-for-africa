@@ -19,8 +19,8 @@ export default function PlatformBottomTabs() {
   const openDrawer = useNavStore((s) => s.openDrawer);
   const { data: session } = useSession();
 
-  // The Office of the Founding Partner has no dashboard, projects, deliverables
-  // or timesheets, so the default tabs would be four dead ends on mobile.
+  // The Office of the Founding Partner starts the day on the desk; the
+  // consultant's surfaces are one tap away under More.
   const tabs = isOfficeRole(session?.user?.role)
     ? [
         { label: "Desk", href: "/desk", icon: ListChecks },

@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { worksAsConsultant } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import TopBar from "@/components/platform/TopBar";
@@ -54,7 +55,7 @@ export default async function DeliverablesPage({ searchParams }: { searchParams:
   const { role, id: userId } = session.user;
   const isElevated = ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"].includes(role);
   const isEM = role === "ENGAGEMENT_MANAGER";
-  const isConsultant = role === "CONSULTANT";
+  const isConsultant = worksAsConsultant(role);
   const canManage = isEM || isElevated;
 
   const deliverableWhere = isElevated
