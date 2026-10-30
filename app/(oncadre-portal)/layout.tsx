@@ -18,7 +18,7 @@ export default async function OncadrePortalLayout({
   // Check profile completeness -- redirect to profile page if too low
   const professional = await prisma.cadreProfessional.findUnique({
     where: { id: session.sub },
-    select: { profileCompleteness: true, emailVerified: true, cadre: true, state: true, isDiaspora: true, practiceLocation: true, recruitmentStage: true },
+    select: { profileCompleteness: true, emailVerified: true, cadre: true, state: true, isDiaspora: true, practiceLocation: true, recruitmentStage: true, accountStatus: true, firstName: true, lastName: true },
   });
 
   // Core fields missing. Name them: a member at 90% who is told only that the
@@ -42,9 +42,11 @@ export default async function OncadrePortalLayout({
     <div className="min-h-screen" style={{ background: "#F8F9FB" }}>
       {/* Top nav + mobile tabs (client): primary items with a grouped "More" */}
       <PortalNav
-        firstName={session.firstName}
-        lastName={session.lastName}
-        accountStatus={session.accountStatus}
+        // From the database: the session cookie lasts 30 days, so a member
+        // verified or renamed since signing in would otherwise see stale values.
+        firstName={professional?.firstName ?? session.firstName}
+        lastName={professional?.lastName ?? session.lastName}
+        accountStatus={professional?.accountStatus ?? session.accountStatus}
         showDocuments={showDocuments}
       />
 
@@ -85,7 +87,7 @@ export default async function OncadrePortalLayout({
       )}
 
       {/* Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 sm:pb-8 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 md:pb-8 lg:px-8">
         {children}
       </main>
 

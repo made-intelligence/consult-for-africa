@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import FileUpload from "@/components/shared/FileUpload";
 
 interface CPDEntry {
   id: string;
@@ -30,6 +32,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   SELF_STUDY: "Self Study",
 };
 
+const EMPTY_FORM = {
+  activity: "",
+  category: "CONFERENCE",
+  provider: "",
+  points: "",
+  dateCompleted: "",
+  certificateUrl: "",
+};
+
 const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS).map(
   ([value, label]) => ({ value, label })
 );
@@ -51,20 +62,56 @@ export default function ProfileCPD({
   initialEntries: CPDEntry[];
   initialSummary: CPDSummary;
 }) {
+  const router = useRouter();
   const [entries, setEntries] = useState(initialEntries);
-  const [summary, setSummary] = useState(initialSummary);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    activity: "",
-    category: "CONFERENCE",
-    provider: "",
-    points: "",
-    dateCompleted: "",
-    certificateUrl: "",
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
+
+  // Derived from the entries, so an activity dated in another year does not
+  // count towards this cycle, and edits and removals move the total too.
+  const summary = {
+    ...initialSummary,
+    totalPoints: entries
+      .filter((e) => new Date(e.dateCompleted).getFullYear() === initialSummary.cycleYear)
+      .reduce((sum, e) => sum + Number(e.points), 0),
+  };
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setError("");
+    setForm(EMPTY_FORM);
+  }
+
+  function startEdit(entry: CPDEntry) {
+    setEditingId(entry.id);
+    setForm({
+      activity: entry.activity,
+      category: entry.category,
+      provider: entry.provider || "",
+      points: String(Number(entry.points)),
+      dateCompleted: entry.dateCompleted.slice(0, 10),
+      certificateUrl: entry.certificateUrl || "",
+    });
+    setError("");
+    setShowForm(true);
+  }
+
+  async function handleDelete(entry: CPDEntry) {
+    if (!confirm(`Remove ${entry.activity}?`)) return;
+    const res = await fetch(`/api/cadre/cpd?id=${encodeURIComponent(entry.id)}`, { method: "DELETE" });
+    if (res.ok) {
+      setEntries((prev) => prev.filter((x) => x.id !== entry.id));
+      if (editingId === entry.id) closeForm();
+      router.refresh();
+    } else {
+      setError("Could not remove that activity. Please try again.");
+    }
+  }
 
   const progressPct = Math.min(
     100,
@@ -81,30 +128,21 @@ export default function ProfileCPD({
     setError("");
     try {
       const res = await fetch("/api/cadre/cpd", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "Failed to log CPD activity");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || "Could not save the activity");
         return;
       }
-      const newEntry = await res.json();
-      setEntries([newEntry, ...entries]);
-      setSummary({
-        ...summary,
-        totalPoints: summary.totalPoints + parseFloat(form.points),
-      });
-      setShowForm(false);
-      setForm({
-        activity: "",
-        category: "CONFERENCE",
-        provider: "",
-        points: "",
-        dateCompleted: "",
-        certificateUrl: "",
-      });
+      const saved: CPDEntry = await res.json();
+      setEntries((prev) =>
+        editingId ? prev.map((x) => (x.id === saved.id ? saved : x)) : [saved, ...prev]
+      );
+      closeForm();
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -183,6 +221,10 @@ export default function ProfileCPD({
             </p>
           )}
 
+          {error && !showForm && (
+            <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+          )}
+
           <div className="mt-4 space-y-3">
             {entries.map((entry) => (
               <div
@@ -226,6 +268,20 @@ export default function ProfileCPD({
                       Certificate
                     </a>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => startEdit(entry)}
+                    className="text-sm font-medium text-[#0B3C5D] hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(entry)}
+                    className="text-sm font-medium text-gray-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
             ))}
@@ -317,27 +373,35 @@ export default function ProfileCPD({
                 </div>
                 <div className="sm:col-span-2">
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Certificate URL (optional)
+                    Certificate <span className="font-normal text-gray-400">(optional)</span>
                   </label>
-                  <input
-                    type="url"
-                    value={form.certificateUrl}
-                    onChange={(e) =>
-                      setForm({ ...form, certificateUrl: e.target.value })
-                    }
-                    placeholder="https://..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-[#0B3C5D] focus:outline-none focus:ring-1 focus:ring-[#0B3C5D]"
-                  />
+                  {form.certificateUrl ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 text-sm">
+                      <span className="text-emerald-700">Uploaded</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, certificateUrl: "" })}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        Replace
+                      </button>
+                    </div>
+                  ) : (
+                    <FileUpload
+                      folder="documents"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      maxSizeMB={10}
+                      label="Upload PDF or photo"
+                      onUpload={({ url }) => setForm((f) => ({ ...f, certificateUrl: url }))}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setError("");
-                  }}
+                  onClick={closeForm}
                   className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   Cancel
@@ -347,13 +411,17 @@ export default function ProfileCPD({
                   disabled={saving}
                   className="rounded-lg bg-[#0B3C5D] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0A3350] disabled:opacity-50"
                 >
-                  {saving ? "Logging..." : "Log CPD activity"}
+                  {saving ? "Saving..." : editingId ? "Save changes" : "Log CPD activity"}
                 </button>
               </div>
             </form>
           ) : (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setEditingId(null);
+                setForm(EMPTY_FORM);
+                setShowForm(true);
+              }}
               className="mt-4 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm font-medium text-[#0B3C5D] transition hover:border-[#0B3C5D] hover:bg-[#0B3C5D]/5"
             >
               + Log CPD activity

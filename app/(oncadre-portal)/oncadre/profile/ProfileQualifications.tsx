@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import FileUpload from "@/components/shared/FileUpload";
 
 interface Qualification {
   id: string;
@@ -20,6 +22,16 @@ const TYPE_LABELS: Record<string, string> = {
   FELLOWSHIP: "Fellowship",
   CERTIFICATION: "Certification",
   INTERNATIONAL_EXAM: "International Exam",
+};
+
+const EMPTY_FORM = {
+  type: "PRIMARY_DEGREE",
+  name: "",
+  institution: "",
+  yearObtained: "",
+  score: "",
+  expiryDate: "",
+  documentUrl: "",
 };
 
 const TYPE_OPTIONS = Object.entries(TYPE_LABELS).map(([value, label]) => ({
@@ -49,20 +61,48 @@ export default function ProfileQualifications({
 }: {
   initialQualifications: Qualification[];
 }) {
+  const router = useRouter();
   const [qualifications, setQualifications] = useState(initialQualifications);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    type: "PRIMARY_DEGREE",
-    name: "",
-    institution: "",
-    yearObtained: "",
-    score: "",
-    expiryDate: "",
-    documentUrl: "",
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setError("");
+    setForm(EMPTY_FORM);
+  }
+
+  function startEdit(qual: Qualification) {
+    setEditingId(qual.id);
+    setForm({
+      type: qual.type,
+      name: qual.name,
+      institution: qual.institution || "",
+      yearObtained: qual.yearObtained ? String(qual.yearObtained) : "",
+      score: qual.score || "",
+      expiryDate: qual.expiryDate ? qual.expiryDate.slice(0, 10) : "",
+      documentUrl: qual.documentUrl || "",
+    });
+    setError("");
+    setShowForm(true);
+  }
+
+  async function handleDelete(qual: Qualification) {
+    if (!confirm(`Remove ${qual.name}?`)) return;
+    const res = await fetch(`/api/cadre/qualifications?id=${encodeURIComponent(qual.id)}`, { method: "DELETE" });
+    if (res.ok) {
+      setQualifications((prev) => prev.filter((q) => q.id !== qual.id));
+      if (editingId === qual.id) closeForm();
+      router.refresh();
+    } else {
+      setError("Could not remove that qualification. Please try again.");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -74,27 +114,21 @@ export default function ProfileQualifications({
     setError("");
     try {
       const res = await fetch("/api/cadre/qualifications", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "Failed to add qualification");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || "Could not save the qualification");
         return;
       }
-      const newQual = await res.json();
-      setQualifications([newQual, ...qualifications]);
-      setShowForm(false);
-      setForm({
-        type: "PRIMARY_DEGREE",
-        name: "",
-        institution: "",
-        yearObtained: "",
-        score: "",
-        expiryDate: "",
-        documentUrl: "",
-      });
+      const saved: Qualification = await res.json();
+      setQualifications((prev) =>
+        editingId ? prev.map((q) => (q.id === saved.id ? saved : q)) : [saved, ...prev]
+      );
+      closeForm();
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -143,6 +177,10 @@ export default function ProfileQualifications({
             </p>
           )}
 
+          {error && !showForm && (
+            <div className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+          )}
+
           <div className="mt-2 space-y-3">
             {qualifications.map((qual) => (
               <div
@@ -177,16 +215,32 @@ export default function ProfileQualifications({
                     </p>
                   )}
                 </div>
-                {qual.documentUrl && (
-                  <a
-                    href={qual.documentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 text-sm font-medium text-[#0B3C5D] hover:underline"
+                <div className="flex shrink-0 items-center gap-4 text-sm font-medium">
+                  {qual.documentUrl && (
+                    <a
+                      href={qual.documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#0B3C5D] hover:underline"
+                    >
+                      Document
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => startEdit(qual)}
+                    className="text-[#0B3C5D] hover:underline"
                   >
-                    View document
-                  </a>
-                )}
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(qual)}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -291,27 +345,35 @@ export default function ProfileQualifications({
                 </div>
                 <div className="sm:col-span-2">
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Document URL (optional)
+                    Copy of the certificate <span className="font-normal text-gray-400">(optional)</span>
                   </label>
-                  <input
-                    type="url"
-                    value={form.documentUrl}
-                    onChange={(e) =>
-                      setForm({ ...form, documentUrl: e.target.value })
-                    }
-                    placeholder="https://..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-[#0B3C5D] focus:outline-none focus:ring-1 focus:ring-[#0B3C5D]"
-                  />
+                  {form.documentUrl ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 text-sm">
+                      <span className="text-emerald-700">Uploaded</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, documentUrl: "" })}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        Replace
+                      </button>
+                    </div>
+                  ) : (
+                    <FileUpload
+                      folder="documents"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      maxSizeMB={10}
+                      label="Upload PDF or photo"
+                      onUpload={({ url }) => setForm((f) => ({ ...f, documentUrl: url }))}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setError("");
-                  }}
+                  onClick={closeForm}
                   className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   Cancel
@@ -321,13 +383,17 @@ export default function ProfileQualifications({
                   disabled={saving}
                   className="rounded-lg bg-[#0B3C5D] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0A3350] disabled:opacity-50"
                 >
-                  {saving ? "Adding..." : "Add qualification"}
+                  {saving ? "Saving..." : editingId ? "Save changes" : "Add qualification"}
                 </button>
               </div>
             </form>
           ) : (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setEditingId(null);
+                setForm(EMPTY_FORM);
+                setShowForm(true);
+              }}
               className="mt-4 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm font-medium text-[#0B3C5D] transition hover:border-[#0B3C5D] hover:bg-[#0B3C5D]/5"
             >
               + Add qualification

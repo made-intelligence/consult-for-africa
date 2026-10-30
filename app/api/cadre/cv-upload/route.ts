@@ -311,10 +311,9 @@ export const POST = handler(async function POST(req: NextRequest) {
       data: parsed,
     });
   } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error);
     console.error("CV upload error:", error);
     return NextResponse.json(
-      { error: `Failed to process CV: ${reason}` },
+      { error: "We could not read that CV. Please try again, or upload it as a PDF or DOCX." },
       { status: 500 }
     );
   }

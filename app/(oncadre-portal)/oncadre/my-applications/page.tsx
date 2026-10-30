@@ -3,16 +3,19 @@ import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import Link from "next/link";
+import { stageFor, type CadreMatchStage } from "@/lib/cadreHealth/matchStages";
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string }> = {
-  MATCHED: { label: "Applied", bg: "rgba(107,114,128,0.08)", color: "#6B7280" },
-  CONTACTED: { label: "Contacted", bg: "rgba(59,130,246,0.08)", color: "#2563EB" },
-  INTERESTED: { label: "Interested", bg: "rgba(16,185,129,0.08)", color: "#059669" },
-  INTERVIEWING: { label: "Interviewing", bg: "rgba(245,158,11,0.08)", color: "#D97706" },
-  OFFERED: { label: "Offered", bg: "rgba(16,185,129,0.08)", color: "#059669" },
-  PLACED: { label: "Placed", bg: "rgba(99,102,241,0.08)", color: "#4F46E5" },
-  DECLINED: { label: "Declined", bg: "rgba(239,68,68,0.08)", color: "#DC2626" },
-  WITHDRAWN: { label: "Withdrawn", bg: "rgba(107,114,128,0.08)", color: "#6B7280" },
+// The member's wording for each pipeline stage. Colours come from the shared
+// stage definitions; the labels there are written for the employer.
+const MEMBER_STAGE_LABELS: Record<CadreMatchStage, string> = {
+  NEW: "Sent",
+  REVIEWING: "Being reviewed",
+  SHORTLISTED: "Shortlisted",
+  INTERVIEWING: "Interview",
+  OFFERED: "Offer made",
+  PLACED: "Placed",
+  REJECTED: "Not progressed",
+  WITHDRAWN: "Withdrawn",
 };
 
 const MANDATE_TYPE_LABELS: Record<string, string> = {
@@ -28,11 +31,15 @@ export default async function MyApplicationsPage() {
   if (!session) redirect("/oncadre/login");
 
   const applications = await prisma.cadreMandateMatch.findMany({
-    where: { professionalId: session.sub },
+    // SOURCED means we surfaced them and nobody has approached them yet, so it
+    // is not something the member has done or agreed to.
+    where: { professionalId: session.sub, source: { in: ["APPLIED", "INVITED"] } },
     include: {
       mandate: {
         select: {
           id: true,
+          status: true,
+          isPublished: true,
           title: true,
           cadre: true,
           type: true,
@@ -58,7 +65,7 @@ export default async function MyApplicationsPage() {
           My Applications
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Track the status of roles you have applied to.
+          Roles you have applied to, and roles you agreed to be put forward for.
         </p>
       </div>
 
@@ -96,7 +103,10 @@ export default async function MyApplicationsPage() {
       ) : (
         <div className="space-y-4">
           {applications.map((app) => {
-            const statusConfig = STATUS_CONFIG[app.status] || STATUS_CONFIG.MATCHED;
+            const stage = stageFor(app.status);
+            const statusConfig = { label: MEMBER_STAGE_LABELS[stage.value], bg: stage.bg, color: stage.color };
+            // The job page only serves open, published roles; anything else 404s.
+            const roleOpen = app.mandate.status === "OPEN" && app.mandate.isPublished;
             const facilityName = app.mandate.facility?.name || app.mandate.facilityName || "Confidential";
             const location = [app.mandate.locationCity, app.mandate.locationState]
               .filter(Boolean)
@@ -127,12 +137,19 @@ export default async function MyApplicationsPage() {
                         {MANDATE_TYPE_LABELS[app.mandate.type] || app.mandate.type}
                       </span>
                     </div>
-                    <Link
-                      href={`/oncadre/jobs/${app.mandate.id}`}
-                      className="font-semibold text-gray-900 hover:text-[#0B3C5D] transition-colors"
-                    >
-                      {app.mandate.title}
-                    </Link>
+                    {roleOpen ? (
+                      <Link
+                        href={`/oncadre/jobs/${app.mandate.id}`}
+                        className="font-semibold text-gray-900 hover:text-[#0B3C5D] transition-colors"
+                      >
+                        {app.mandate.title}
+                      </Link>
+                    ) : (
+                      <p className="font-semibold text-gray-900">
+                        {app.mandate.title}
+                        <span className="ml-2 text-xs font-normal text-gray-400">Role closed</span>
+                      </p>
+                    )}
                     <p className="mt-0.5 text-sm text-gray-500">{facilityName}</p>
                     <p className="mt-1 text-xs text-gray-400">
                       {location} &middot; {getCadreLabel(app.mandate.cadre)}
@@ -140,7 +157,7 @@ export default async function MyApplicationsPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-[11px] text-gray-400">
-                      Applied{" "}
+                      {app.source === "INVITED" ? "Put forward" : "Applied"}{" "}
                       {new Date(app.createdAt).toLocaleDateString("en-NG", {
                         day: "numeric",
                         month: "short",

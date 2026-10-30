@@ -3,6 +3,7 @@ import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { getCadreLabel } from "@/lib/cadreHealth/cadres";
 import Link from "next/link";
+import crypto from "crypto";
 import ReferralSharePanel from "./ReferralSharePanel";
 
 export default async function ReferralsPage() {
@@ -39,8 +40,24 @@ export default async function ReferralsPage() {
     (r) => r.accountStatus === "VERIFIED"
   ).length;
 
-  const referralCode = professional.referralCode ?? "N/A";
-  const shareLink = `https://consultforafrica.com/oncadre/register?ref=${referralCode}`;
+  // Imported and claimed members can reach this page without a code, which
+  // used to produce a share link ending ?ref=N/A. Give them one on first visit,
+  // in the same format register uses.
+  let referralCode = professional.referralCode;
+  if (!referralCode) {
+    for (let attempt = 0; attempt < 3 && !referralCode; attempt++) {
+      const candidate = "CH" + crypto.randomBytes(4).toString("hex").toUpperCase();
+      try {
+        await prisma.cadreProfessional.update({ where: { id: professional.id }, data: { referralCode: candidate } });
+        referralCode = candidate;
+      } catch {
+        // unique collision; try another
+      }
+    }
+  }
+  const shareLink = referralCode
+    ? `https://consultforafrica.com/oncadre/register?ref=${referralCode}`
+    : "https://consultforafrica.com/oncadre/register";
 
   return (
     <div className="space-y-8">
@@ -62,7 +79,7 @@ export default async function ReferralsPage() {
 
       {/* Referral Code & Share */}
       <ReferralSharePanel
-        referralCode={referralCode}
+        referralCode={referralCode ?? ""}
         shareLink={shareLink}
         firstName={professional.firstName}
       />
@@ -144,6 +161,7 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; text: string; label: string }> = {
     VERIFIED: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Verified" },
     UNVERIFIED: { bg: "bg-amber-100", text: "text-amber-700", label: "Registered" },
+    PENDING_REVIEW: { bg: "bg-amber-100", text: "text-amber-700", label: "Joined, awaiting check" },
     IMPORTED: { bg: "bg-gray-100", text: "text-gray-600", label: "Invited" },
     SUSPENDED: { bg: "bg-red-100", text: "text-red-700", label: "Suspended" },
   };

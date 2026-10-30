@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CADRE_OPTIONS, NIGERIAN_STATES } from "@/lib/cadreHealth/cadres";
 
 const OPEN_TO_OPTIONS = [
@@ -14,8 +14,19 @@ const OPEN_TO_OPTIONS = [
   { value: "REMOTE", label: "Remote / telemedicine" },
 ];
 
+// useSearchParams needs a Suspense boundary or the page bails out of static rendering.
 export default function RegisterForm() {
+  return (
+    <Suspense>
+      <RegisterFormInner />
+    </Suspense>
+  );
+}
+
+function RegisterFormInner() {
   const router = useRouter();
+  // Referral links are /oncadre/register?ref=CODE; without this the referrer was never credited.
+  const refFromLink = (useSearchParams().get("ref") ?? "").trim().toUpperCase();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(0);
@@ -34,7 +45,7 @@ export default function RegisterForm() {
     isDiaspora: false,
     diasporaCountry: "",
     openTo: [] as string[],
-    referralCode: "",
+    referralCode: refFromLink,
   });
 
   const update = (partial: Partial<typeof form>) =>

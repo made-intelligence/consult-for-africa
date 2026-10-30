@@ -24,7 +24,9 @@ export default async function CadreDashboard({
     where: { id: session.sub },
     include: {
       credentials: { orderBy: { expiryDate: "asc" } },
-      cpdEntries: { take: 5, orderBy: { dateCompleted: "desc" } },
+      // The CPD cycle is the calendar year, not the last five entries.
+      cpdEntries: { where: { dateCompleted: { gte: new Date(new Date().getFullYear(), 0, 1) } }, select: { points: true } },
+      _count: { select: { careerReports: true } },
       qualifications: { take: 5, orderBy: { createdAt: "desc" } },
       mezoInterest: true,
     },
@@ -54,7 +56,9 @@ export default async function CadreDashboard({
     (Date.now() - professional.createdAt.getTime()) / (1000 * 60 * 60 * 24)
   );
   const nbaState = {
-    hasReadiness: !!professional.readinessComputedAt,
+    // The in-portal assessment writes a career report, not readinessComputedAt;
+    // either one means the member has done it.
+    hasReadiness: !!professional.readinessComputedAt || professional._count.careerReports > 0,
     hasCredentials: professional.credentials.length > 0,
     hasSalaryReport: !!professional.salaryReportedAt,
     hasQualifications: professional.qualifications.length > 0,
@@ -157,16 +161,20 @@ export default async function CadreDashboard({
         <DashCard
           title="Career Readiness"
           value={
-            professional.readinessScoreDomestic
+            professional.readinessScoreDomestic != null
               ? `${professional.readinessScoreDomestic}%`
-              : "--"
+              : professional._count.careerReports > 0
+                ? "Done"
+                : "--"
           }
           subtitle={
-            professional.readinessScoreDomestic
+            professional.readinessScoreDomestic != null
               ? "Domestic employability"
-              : "Take the assessment"
+              : professional._count.careerReports > 0
+                ? "See your career report"
+                : "Take the assessment"
           }
-          href="/oncadre/readiness"
+          href="/oncadre/career-report"
           accent="#10B981"
         />
 
@@ -198,7 +206,7 @@ export default async function CadreDashboard({
           value={professional.salaryReportedAt ? "Unlocked" : "Locked"}
           subtitle={
             professional.salaryReportedAt
-              ? "Share your salary to see others"
+              ? "See what colleagues earn"
               : "Share your salary to unlock"
           }
           href="/oncadre/salary-map"
@@ -211,7 +219,7 @@ export default async function CadreDashboard({
           value={professional.profileViews.toString()}
           subtitle={
             professional.lastViewedAt
-              ? `Last viewed ${professional.lastViewedAt.toLocaleDateString()}`
+              ? `Last viewed ${professional.lastViewedAt.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}`
               : "Employers can find you here"
           }
           href="/oncadre/profile"
@@ -223,7 +231,7 @@ export default async function CadreDashboard({
           title="Hospital Reviews"
           value="Explore"
           subtitle="Read and write anonymous reviews"
-          href="/oncadre/hospitals"
+          href="/oncadre/explore"
           accent="#EF4444"
         />
 
@@ -292,9 +300,8 @@ export default async function CadreDashboard({
                 Get CadreHealth Verified
               </h3>
               <p className="mt-1 text-sm text-gray-600">
-                Add your practicing license number to get verified against your
-                regulatory body. Verified professionals get priority in matching
-                and can review hospitals.
+                Add your practising licence number. We check it against your
+                regulatory body, and once it is on file you can review hospitals.
               </p>
               <Link
                 href="/oncadre/profile#credentials"

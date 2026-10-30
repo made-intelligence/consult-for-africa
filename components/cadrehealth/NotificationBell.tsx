@@ -263,7 +263,7 @@ export default function NotificationBell() {
       {/* Dropdown panel */}
       {open && (
         <div
-          className="absolute right-0 top-full z-50 mt-2 w-[340px] overflow-hidden rounded-xl bg-white shadow-lg sm:w-[380px]"
+          className="fixed inset-x-2 top-16 z-50 overflow-hidden rounded-xl bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[380px]"
           style={{ border: "1px solid #E8EBF0" }}
         >
           {/* Header */}

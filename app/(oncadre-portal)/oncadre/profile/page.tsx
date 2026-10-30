@@ -130,8 +130,9 @@ export default async function ProfilePage() {
         </Link>
       </div>
 
-      {/* Quick Setup: CV Upload */}
-      {professional.profileCompleteness < 60 && (
+      {/* Quick Setup: CV Upload. Shown until a CV is on file: the dashboard's
+          "Upload CV" card sends members here at any completeness. */}
+      {!professional.cvFileUrl && (
         <div
           className="rounded-2xl border p-6"
           style={{

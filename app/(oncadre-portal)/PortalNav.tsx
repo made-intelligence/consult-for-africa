@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import NotificationBell from "@/components/cadrehealth/NotificationBell";
 import LogoutButton from "./LogoutButton";
 
@@ -59,9 +59,16 @@ export default function PortalNav({
   showDocuments: boolean;
 }) {
   const pathname = usePathname() || "";
+  const router = useRouter();
   const [moreOpen, setMoreOpen] = useState(false); // desktop dropdown
   const [sheetOpen, setSheetOpen] = useState(false); // mobile sheet
   const moreRef = useRef<HTMLDivElement>(null);
+
+  async function signOut() {
+    setSheetOpen(false);
+    await fetch("/api/cadre/logout", { method: "POST" });
+    router.push("/oncadre/login");
+  }
 
   const groups = MORE_GROUPS.map((g) => ({
     ...g,
@@ -251,6 +258,18 @@ export default function PortalNav({
                 </div>
               </div>
             ))}
+            {/* LogoutButton is desktop-only; members on shared ward phones need this. */}
+            <button
+              type="button"
+              onClick={signOut}
+              className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-600"
+              style={{ background: "#F6F8FB" }}
+            >
+              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign out
+            </button>
           </div>
         </div>
       )}

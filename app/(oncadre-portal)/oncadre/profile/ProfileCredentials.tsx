@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getRegulatoryBody } from "@/lib/cadreHealth/cadres";
 import FileUpload from "@/components/shared/FileUpload";
 
@@ -108,6 +109,7 @@ export default function ProfileCredentials({
   initialCredentials: Credential[];
   cadre: string;
 }) {
+  const router = useRouter();
   const [credentials, setCredentials] = useState(initialCredentials);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -150,6 +152,7 @@ export default function ProfileCredentials({
     if (res.ok) {
       setCredentials((prev) => prev.filter((c) => c.id !== cred.id));
       if (editingId === cred.id) closeForm();
+      router.refresh();
     } else {
       setError("Could not remove that credential. Please try again.");
     }
@@ -179,6 +182,7 @@ export default function ProfileCredentials({
           : [saved, ...prev]
       );
       closeForm();
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {

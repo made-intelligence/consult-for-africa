@@ -312,7 +312,7 @@ export default async function HospitalDetailPage({ params }: Props) {
               <div className="mt-5 flex flex-wrap items-center gap-3">
                 {session ? (
                   <Link
-                    href={`/oncadre/hospitals/${slug}`}
+                    href={`/oncadre/explore/${slug}#write-review`}
                     className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:shadow-lg"
                     style={{ background: "linear-gradient(135deg, #D4AF37, #C4A030)", color: "#0F2744" }}
                   >

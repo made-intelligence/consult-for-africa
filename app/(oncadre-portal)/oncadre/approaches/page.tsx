@@ -38,8 +38,13 @@ export default async function ApproachesPage() {
     },
   });
 
-  const pending = requests.filter((r) => r.status === "PENDING");
-  const answered = requests.filter((r) => r.status !== "PENDING");
+  // A pending request past its expiry can no longer be answered (the API says
+  // "lapsed"), so it must not show Yes/No buttons.
+  const now = new Date();
+  const isOpen = (r: (typeof requests)[number]) =>
+    r.status === "PENDING" && (!r.expiresAt || r.expiresAt > now);
+  const pending = requests.filter(isOpen);
+  const answered = requests.filter((r) => !isOpen(r));
 
   return (
     <div className="space-y-6">
@@ -140,7 +145,7 @@ export default async function ApproachesPage() {
           {answered.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-sm font-semibold text-gray-500">
-                Already answered ({answered.length})
+                Earlier ({answered.length})
               </h2>
               {answered.map((r) => (
                 <div
