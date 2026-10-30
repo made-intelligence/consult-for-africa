@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { worksAsConsultant } from "@/lib/constants";
 import { getConsultantCapacity } from "@/lib/capacity";
 import { redirect } from "next/navigation";
 import { Briefcase, FileCheck, AlertTriangle, Clock, TrendingUp, XCircle, Gauge, Inbox, Sparkles, Shield, DollarSign } from "lucide-react";
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
   const isEM = role === "ENGAGEMENT_MANAGER";
   const isDirector =
     role === "ASSOCIATE_DIRECTOR" || role === "DIRECTOR" || role === "PARTNER" || role === "ADMIN";
-  const isConsultant = role === "CONSULTANT";
+  const isConsultant = worksAsConsultant(role);
 
   // Redirect new consultants to onboarding if not yet completed
   if (isConsultant) {

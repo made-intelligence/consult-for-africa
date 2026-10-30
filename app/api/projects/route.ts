@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { worksAsConsultant } from "@/lib/constants";
 import { NextRequest } from "next/server";
 import type { Prisma, ServiceType, EngagementStatus, RiskLevel, EngagementType, DealStructure, MandateType } from "@prisma/client";
 import { handler } from "@/lib/api-handler";
@@ -17,7 +18,7 @@ export const GET = handler(async function GET() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let where: any = {};
-  if (role === "CONSULTANT") {
+  if (worksAsConsultant(role)) {
     where = { assignments: { some: { consultantId: session.user.id } } };
   } else if (role === "ENGAGEMENT_MANAGER") {
     where = { engagementManagerId: session.user.id };

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
@@ -98,8 +97,7 @@ const EM_PLUS_AND_OFFICE = [...EM_PLUS, ...OFFICE];
  * waiting on other people, waiting on a date, waiting on nobody. Four headings,
  * and every surface lands in exactly one of them.
  *
- * The delivery group is held back until they are actually staffed on something.
- * They keep the access either way; it just stops being noise on day one.
+ * They also work as analysts, so the consultant's surfaces sit underneath.
  */
 const OFFICE_NAV: NavSection[] = [
   {
@@ -144,15 +142,23 @@ const OFFICE_NAV: NavSection[] = [
   },
 ];
 
-/** Shown to the office only once they are staffed on a piece of client work. */
-const OFFICE_DELIVERY_NAV: NavSection[] = [
+/** What any consultant sees, because the office work as analysts too. */
+const OFFICE_CONSULTANT_NAV: NavSection[] = [
   {
     title: "Client work",
     items: [
+      { label: "Dashboard",      href: "/dashboard",      icon: LayoutDashboard },
       { label: "Projects",       href: "/projects",       icon: Briefcase },
       { label: "Deliverables",   href: "/deliverables",   icon: FileCheck },
-      { label: "Time",           href: "/timesheets",     icon: Clock },
+      { label: "Opportunities",  href: "/opportunities",  icon: Radio },
+      { label: "Time & Payments",href: "/timesheets",     icon: Clock },
       { label: "Tools",          href: "/tools",          icon: Wrench },
+    ],
+  },
+  {
+    title: "Learning",
+    items: [
+      { label: "Academy",        href: "/academy",        icon: GraduationCap },
     ],
   },
 ];
@@ -307,23 +313,9 @@ export default function Sidebar() {
   const email = session?.user?.email ?? "";
   const { drawerOpen: mobileOpen, closeDrawer: closeMobile } = useNavStore();
 
-  // The office gets a nav grouped by whose move it is, and the client work
-  // group only once they have actually been staffed on something.
+  // The office gets a nav grouped by whose move it is, then the consultant's.
   const isOffice = isOfficeRole(role);
-  const [deliveryWork, setDeliveryWork] = useState(false);
-  useEffect(() => {
-    if (!isOffice) return;
-    let cancelled = false;
-    fetch("/api/me/surfaces")
-      .then((r) => r.json())
-      .then((d) => { if (!cancelled) setDeliveryWork(!!d.deliveryWork); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [isOffice]);
-
-  const sections = isOffice
-    ? [...OFFICE_NAV, ...(deliveryWork ? OFFICE_DELIVERY_NAV : [])]
-    : NAV_SECTIONS;
+  const sections = isOffice ? [...OFFICE_NAV, ...OFFICE_CONSULTANT_NAV] : NAV_SECTIONS;
 
   function isActive(href: string) {
     if (href === "/dashboard") return pathname === href;

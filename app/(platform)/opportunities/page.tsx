@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { worksAsConsultant } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import TopBar from "@/components/platform/TopBar";
 import OpportunityBoard from "@/components/platform/OpportunityBoard";
@@ -8,7 +9,7 @@ export default async function OpportunitiesPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const isConsultant = session.user.role === "CONSULTANT";
+  const isConsultant = worksAsConsultant(session.user.role);
 
   const requests = await prisma.staffingRequest.findMany({
     where: { status: "OPEN" },

@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { worksAsConsultant } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import TopBar from "@/components/platform/TopBar";
@@ -23,7 +24,7 @@ export default async function ProjectsPage() {
   const { role, id: userId } = session.user;
   const isEM = role === "ENGAGEMENT_MANAGER";
   const isElevated = ["ASSOCIATE_DIRECTOR", "DIRECTOR", "PARTNER", "ADMIN"].includes(role);
-  const isConsultant = role === "CONSULTANT";
+  const isConsultant = worksAsConsultant(role);
 
   const projects = await prisma.engagement.findMany({
     where: isElevated

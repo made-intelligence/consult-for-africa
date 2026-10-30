@@ -43,6 +43,24 @@ DOCS_TO_BUILD = [
         "Growth Pack  /  Director of Business Development and Growth",
         footer("Business Development and Growth"),
     ),
+    (
+        "analysts",
+        "analyst-intern-pack-cfa",
+        "Analyst Pack  /  Office of the Founding Partner",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "supervising",
+        "ezinne-supervising-analysts-cfa",
+        "Supervising the Analysts  /  Office of the Founding Partner",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "development",
+        "office-development-plan-cfa",
+        "Development Plan  /  Office of the Founding Partner",
+        footer("Office of the Founding Partner"),
+    ),
 ]
 
 
