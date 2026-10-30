@@ -57,6 +57,10 @@
       "schedule": "0 6 * * 1-5"
     },
     {
+      "path": "/api/cron/haven-founders-reminder",
+      "schedule": "0 7 * * 5"
+    },
+    {
       "path": "/api/cron/haven-flags",
       "schedule": "0 * * * *"
     },
