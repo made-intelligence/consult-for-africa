@@ -10,6 +10,7 @@ import AskNuruCard from "@/components/cadrehealth/dashboard/AskNuruCard";
 import SalaryMapUnlock from "@/components/cadrehealth/dashboard/SalaryMapUnlock";
 import HospitalReviewUnlock from "@/components/cadrehealth/dashboard/HospitalReviewUnlock";
 import MezoPracticeCard from "@/components/cadrehealth/dashboard/MezoPracticeCard";
+import ApplicationStatusCard from "@/components/cadrehealth/dashboard/ApplicationStatusCard";
 
 export default async function CadreDashboard({
   searchParams,
@@ -119,6 +120,13 @@ export default async function CadreDashboard({
           </p>
         </div>
       </div>
+
+      {/* Recruitment stage: every recruitment email and notification lands here. */}
+      <ApplicationStatusCard
+        stage={professional.recruitmentStage}
+        interviewDate={professional.interviewDate}
+        documentsSubmittedAt={professional.documentsSubmittedAt}
+      />
 
       {/* Private practice with Mezo. Sits above the next-best-action because it
           is the only thing on this page offering a member something they

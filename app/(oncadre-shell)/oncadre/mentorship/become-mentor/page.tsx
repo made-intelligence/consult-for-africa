@@ -18,7 +18,7 @@ export default async function BecomeMentorPage() {
 
   if (existing) {
     return (
-      <div className="mx-auto max-w-2xl py-8">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
         <Link
           href="/oncadre/mentorship"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-gray-500 transition hover:text-gray-700"
@@ -108,7 +108,7 @@ export default async function BecomeMentorPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl py-8">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <Link
         href="/oncadre/mentorship"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-gray-500 transition hover:text-gray-700"

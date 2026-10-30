@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 import { getCadreLabel, getCadreShortLabel } from "@/lib/cadreHealth/cadres";
 import { handler } from "@/lib/api-handler";
+import { computeReadinessScores, readinessInputsFromProfile } from "@/lib/cadreHealth/readinessScore";
 
 const anthropic = new Anthropic();
 
@@ -21,7 +22,7 @@ export const POST = handler(async function POST() {
         credentials: true,
         qualifications: true,
         workHistory: { orderBy: [{ isCurrent: "desc" }, { startDate: "desc" }] },
-        cpdEntries: { orderBy: { dateCompleted: "desc" }, take: 20 },
+        cpdEntries: { orderBy: { dateCompleted: "desc" }, take: 200 },
         readinessAssessments: { orderBy: { createdAt: "desc" }, take: 1 },
       },
     });
@@ -267,6 +268,37 @@ Rules:
         fullReport: report,
       },
     });
+
+    // The dashboard readiness card reads these. Scored with the same function
+    // as the public quiz, from what is on the profile, so the card clears and
+    // shows a number for members who took the report rather than the quiz.
+    if (professional.cadre) {
+      try {
+        const scores = computeReadinessScores(
+          readinessInputsFromProfile({
+            cadre: professional.cadre,
+            yearsOfExperience: professional.yearsOfExperience,
+            credentials: professional.credentials,
+            qualifications: professional.qualifications,
+            cpdEntries: professional.cpdEntries,
+            lastAssessment: professional.readinessAssessments[0] ?? null,
+          })
+        );
+        await prisma.cadreProfessional.update({
+          where: { id: session.sub },
+          data: {
+            readinessScoreDomestic: scores.domestic,
+            readinessScoreUK: scores.uk,
+            readinessScoreUS: scores.us,
+            readinessScoreCanada: scores.canada,
+            readinessScoreGulf: scores.gulf,
+            readinessComputedAt: new Date(),
+          },
+        });
+      } catch (e) {
+        console.error("[career-assessment] readiness scoring failed:", e);
+      }
+    }
 
     return NextResponse.json({
       success: true,

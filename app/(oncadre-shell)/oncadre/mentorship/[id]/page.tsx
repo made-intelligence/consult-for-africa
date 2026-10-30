@@ -59,16 +59,18 @@ export default async function MentorshipChatPage({ params }: PageProps) {
   }));
 
   return (
-    <MentorshipChat
-      mentorshipId={mentorship.id}
-      currentUserId={session.sub}
-      role={isMentor ? "mentor" : "mentee"}
-      status={mentorship.status}
-      initialMessages={serializedMessages}
-      mentorName={`${mentorship.mentorProfile.professional.firstName} ${mentorship.mentorProfile.professional.lastName}`}
-      menteeName={`${mentorship.mentee.firstName} ${mentorship.mentee.lastName}`}
-      topic={mentorship.topic}
-      rating={mentorship.rating}
-    />
+    <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <MentorshipChat
+        mentorshipId={mentorship.id}
+        currentUserId={session.sub}
+        role={isMentor ? "mentor" : "mentee"}
+        status={mentorship.status}
+        initialMessages={serializedMessages}
+        mentorName={`${mentorship.mentorProfile.professional.firstName} ${mentorship.mentorProfile.professional.lastName}`}
+        menteeName={`${mentorship.mentee.firstName} ${mentorship.mentee.lastName}`}
+        topic={mentorship.topic}
+        rating={mentorship.rating}
+      />
+    </div>
   );
 }
