@@ -66,13 +66,13 @@ const STAGE_AUTOMATIONS: Record<string, (ctx: StageContext) => AutomationConfig>
         heading: `Interview Scheduled, ${firstName}`,
         body: `Your interview with the CadreHealth recruitment team has been scheduled for ${dateStr}. Please ensure you are available at the scheduled time. You may be contacted via phone or email with joining details closer to the date. If you need to reschedule, please reply to this email as soon as possible.`,
         ctaText: "View Your Profile",
-        ctaHref: `${BASE_URL}/oncadre/dashboard`,
+        ctaHref: `${BASE_URL}/oncadre/dashboard#application`,
         footer: `Interview date: ${dateStr}. Please keep this time available.`,
       },
       notification: {
         title: "Interview scheduled",
         message: `Your interview has been scheduled for ${dateStr}. Please be available at the scheduled time.`,
-        link: "/oncadre/dashboard",
+        link: "/oncadre/dashboard#application",
       },
     };
   },
@@ -89,7 +89,7 @@ const STAGE_AUTOMATIONS: Record<string, (ctx: StageContext) => AutomationConfig>
     notification: {
       title: "Interview completed",
       message: "Thank you for completing your interview. We will follow up with next steps soon.",
-      link: "/oncadre/dashboard",
+      link: "/oncadre/dashboard#application",
     },
   }),
 
@@ -99,13 +99,13 @@ const STAGE_AUTOMATIONS: Record<string, (ctx: StageContext) => AutomationConfig>
       heading: `Great news, ${firstName}!`,
       body: "We are pleased to inform you that the CadreHealth recruitment team would like to extend an offer to you. Please log in to your CadreHealth portal to review the details and next steps. If you have any questions, do not hesitate to reach out to our recruitment team.",
       ctaText: "Review Your Offer",
-      ctaHref: `${BASE_URL}/oncadre/dashboard`,
+      ctaHref: `${BASE_URL}/oncadre/dashboard#application`,
       footer: "Please respond within 5 working days so we can proceed with your placement.",
     },
     notification: {
       title: "You have received an offer",
       message: "Congratulations! You have received an offer from CadreHealth. Log in to review the details.",
-      link: "/oncadre/dashboard",
+      link: "/oncadre/dashboard#application",
     },
   }),
 
@@ -115,13 +115,13 @@ const STAGE_AUTOMATIONS: Record<string, (ctx: StageContext) => AutomationConfig>
       heading: `Welcome to the team, ${firstName}!`,
       body: "Your placement with CadreHealth is now confirmed. We are delighted to have you on board. Our team will be in touch shortly with onboarding details, including your start date and any documentation required. Please keep your profile and credentials current.",
       ctaText: "Go to Your Dashboard",
-      ctaHref: `${BASE_URL}/oncadre/dashboard`,
+      ctaHref: `${BASE_URL}/oncadre/dashboard#application`,
       footer: "If you have any questions about your placement, please contact the CadreHealth recruitment team.",
     },
     notification: {
       title: "Placement confirmed",
       message: "Your placement has been confirmed. Welcome aboard! Check your dashboard for onboarding details.",
-      link: "/oncadre/dashboard",
+      link: "/oncadre/dashboard#application",
     },
   }),
 
@@ -137,7 +137,7 @@ const STAGE_AUTOMATIONS: Record<string, (ctx: StageContext) => AutomationConfig>
     notification: {
       title: "Application update",
       message: "We have an update regarding your application. Please check your email for details.",
-      link: "/oncadre/dashboard",
+      link: "/oncadre/dashboard#application",
     },
   }),
 };

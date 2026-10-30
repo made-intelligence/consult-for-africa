@@ -6,6 +6,7 @@ import Link from "next/link";
 import EmailVerificationBanner from "./EmailVerificationBanner";
 import CadreHealthAnalytics from "@/components/cadrehealth/Analytics";
 import PortalNav from "./PortalNav";
+import { showsDocuments } from "@/lib/cadreHealth/portalNav";
 
 export default async function OncadrePortalLayout({
   children,
@@ -33,10 +34,7 @@ export default async function OncadrePortalLayout({
   const needsProfileCompletion = missingCore.length > 0;
 
   // Show Documents nav only for shortlisted+ professionals
-  const DOCS_STAGES = ["SHORTLISTED", "INTERVIEW_SCHEDULED", "INTERVIEW_DONE", "OFFER", "PLACED"];
-  const showDocuments = Boolean(
-    professional?.recruitmentStage && DOCS_STAGES.includes(professional.recruitmentStage)
-  );
+  const showDocuments = showsDocuments(professional?.recruitmentStage);
 
   return (
     <div className="min-h-screen" style={{ background: "#F8F9FB" }}>
