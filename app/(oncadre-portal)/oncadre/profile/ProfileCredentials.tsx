@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getRegulatoryBody } from "@/lib/cadreHealth/cadres";
+import FileUpload from "@/components/shared/FileUpload";
 
 interface Credential {
   id: string;
@@ -15,11 +17,11 @@ interface Credential {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  PRACTICING_LICENSE: "Practicing License",
-  FULL_REGISTRATION: "Full Registration",
-  COGS: "Certificate of Good Standing",
-  SPECIALIST_REGISTRATION: "Specialist Registration",
-  ADDITIONAL_LICENSE: "Additional License",
+  PRACTICING_LICENSE: "Practising licence",
+  FULL_REGISTRATION: "Full registration",
+  COGS: "Certificate of good standing",
+  SPECIALIST_REGISTRATION: "Specialist registration",
+  ADDITIONAL_LICENSE: "Additional licence",
 };
 
 const TYPE_OPTIONS = Object.entries(TYPE_LABELS).map(([value, label]) => ({
@@ -41,35 +43,43 @@ const REGULATORY_BODIES = [
   "COREN",
 ];
 
+// What each status means to the member, and who acts next. "Pending" on its
+// own read as "you still owe us something".
+const STATUS: Record<string, { bg: string; text: string; label: string; note: string }> = {
+  VERIFIED: {
+    bg: "bg-green-50 border-green-200",
+    text: "text-green-700",
+    label: "Verified",
+    note: "Checked against the register.",
+  },
+  PENDING: {
+    bg: "bg-amber-50 border-amber-200",
+    text: "text-amber-700",
+    label: "Awaiting our check",
+    note: "Nothing more needed from you. We check every number against the register before marking it verified.",
+  },
+  NOT_SUBMITTED: {
+    bg: "bg-gray-50 border-gray-200",
+    text: "text-gray-500",
+    label: "Number missing",
+    note: "Add the licence number so we can check it.",
+  },
+  FAILED: {
+    bg: "bg-red-50 border-red-200",
+    text: "text-red-700",
+    label: "Could not confirm",
+    note: "We could not match this number on the register. Check it and edit, or write to hello@consultforafrica.com.",
+  },
+  EXPIRED: {
+    bg: "bg-red-50 border-red-200",
+    text: "text-red-600",
+    label: "Expired",
+    note: "Add your renewed licence by editing this entry.",
+  },
+};
+
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { bg: string; text: string; label: string }> = {
-    VERIFIED: {
-      bg: "bg-green-50 border-green-200",
-      text: "text-green-700",
-      label: "Verified",
-    },
-    PENDING: {
-      bg: "bg-amber-50 border-amber-200",
-      text: "text-amber-700",
-      label: "Pending",
-    },
-    NOT_SUBMITTED: {
-      bg: "bg-gray-50 border-gray-200",
-      text: "text-gray-500",
-      label: "Not submitted",
-    },
-    FAILED: {
-      bg: "bg-red-50 border-red-200",
-      text: "text-red-700",
-      label: "Failed",
-    },
-    EXPIRED: {
-      bg: "bg-red-50 border-red-200",
-      text: "text-red-600",
-      label: "Expired",
-    },
-  };
-  const c = config[status] || config.NOT_SUBMITTED;
+  const c = STATUS[status] || STATUS.NOT_SUBMITTED;
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${c.bg} ${c.text}`}
@@ -79,6 +89,19 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+const EMPTY_FORM = {
+  type: "PRACTICING_LICENSE",
+  regulatoryBody: "",
+  licenseNumber: "",
+  issuedDate: "",
+  expiryDate: "",
+  documentUrl: "",
+};
+
+function toDateInput(d: string | null) {
+  return d ? d.slice(0, 10) : "";
+}
+
 export default function ProfileCredentials({
   initialCredentials,
   cadre,
@@ -86,8 +109,10 @@ export default function ProfileCredentials({
   initialCredentials: Credential[];
   cadre: string;
 }) {
+  const router = useRouter();
   const [credentials, setCredentials] = useState(initialCredentials);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -97,14 +122,41 @@ export default function ProfileCredentials({
       (b) => b === getRegulatoryBody(cadre).split(" / ")[0]
     ) || REGULATORY_BODIES[0];
 
-  const [form, setForm] = useState({
-    type: "PRACTICING_LICENSE",
-    regulatoryBody: defaultBody,
-    licenseNumber: "",
-    issuedDate: "",
-    expiryDate: "",
-    documentUrl: "",
-  });
+  const blankForm = { ...EMPTY_FORM, regulatoryBody: defaultBody };
+  const [form, setForm] = useState(blankForm);
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setError("");
+    setForm(blankForm);
+  }
+
+  function startEdit(cred: Credential) {
+    setEditingId(cred.id);
+    setForm({
+      type: cred.type,
+      regulatoryBody: cred.regulatoryBody,
+      licenseNumber: cred.licenseNumber || "",
+      issuedDate: toDateInput(cred.issuedDate),
+      expiryDate: toDateInput(cred.expiryDate),
+      documentUrl: cred.documentUrl || "",
+    });
+    setError("");
+    setShowForm(true);
+  }
+
+  async function handleDelete(cred: Credential) {
+    if (!confirm(`Remove ${TYPE_LABELS[cred.type] || cred.type}${cred.licenseNumber ? ` (${cred.licenseNumber})` : ""}?`)) return;
+    const res = await fetch(`/api/cadre/credentials?id=${encodeURIComponent(cred.id)}`, { method: "DELETE" });
+    if (res.ok) {
+      setCredentials((prev) => prev.filter((c) => c.id !== cred.id));
+      if (editingId === cred.id) closeForm();
+      router.refresh();
+    } else {
+      setError("Could not remove that credential. Please try again.");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -112,26 +164,25 @@ export default function ProfileCredentials({
     setError("");
     try {
       const res = await fetch("/api/cadre/credentials", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "Failed to add credential");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || "Could not save the credential");
         return;
       }
-      const newCred = await res.json();
-      setCredentials([newCred, ...credentials]);
-      setShowForm(false);
-      setForm({
-        type: "PRACTICING_LICENSE",
-        regulatoryBody: defaultBody,
-        licenseNumber: "",
-        issuedDate: "",
-        expiryDate: "",
-        documentUrl: "",
-      });
+      const saved: Credential = await res.json();
+      // The API updates an existing entry rather than adding a duplicate, so
+      // replace by id when it is already on screen.
+      setCredentials((prev) =>
+        prev.some((c) => c.id === saved.id)
+          ? prev.map((c) => (c.id === saved.id ? saved : c))
+          : [saved, ...prev]
+      );
+      closeForm();
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -173,9 +224,13 @@ export default function ProfileCredentials({
         <div className="border-t border-gray-100 px-6 pb-6">
           {credentials.length === 0 && !showForm && (
             <p className="py-4 text-sm text-gray-400">
-              No credentials added yet. Add your practicing license to get
-              verified.
+              No credentials added yet. Add your practising licence first;
+              it is the one employers look for.
             </p>
+          )}
+
+          {error && !showForm && (
+            <div className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
           )}
 
           <div className="mt-2 space-y-3">
@@ -205,17 +260,36 @@ export default function ProfileCredentials({
                       })}
                     </p>
                   )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    {(STATUS[cred.verificationStatus] || STATUS.NOT_SUBMITTED).note}
+                  </p>
                 </div>
-                {cred.documentUrl && (
-                  <a
-                    href={cred.documentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 text-sm font-medium text-[#0B3C5D] hover:underline"
+                <div className="flex shrink-0 items-center gap-4 text-sm font-medium">
+                  {cred.documentUrl && (
+                    <a
+                      href={cred.documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#0B3C5D] hover:underline"
+                    >
+                      Document
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => startEdit(cred)}
+                    className="text-[#0B3C5D] hover:underline"
                   >
-                    View document
-                  </a>
-                )}
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(cred)}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -235,6 +309,7 @@ export default function ProfileCredentials({
                   </label>
                   <select
                     value={form.type}
+                    disabled={!!editingId}
                     onChange={(e) =>
                       setForm({ ...form, type: e.target.value })
                     }
@@ -253,6 +328,7 @@ export default function ProfileCredentials({
                   </label>
                   <select
                     value={form.regulatoryBody}
+                    disabled={!!editingId}
                     onChange={(e) =>
                       setForm({ ...form, regulatoryBody: e.target.value })
                     }
@@ -267,7 +343,7 @@ export default function ProfileCredentials({
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    License number
+                    Licence number
                   </label>
                   <input
                     type="text"
@@ -307,27 +383,35 @@ export default function ProfileCredentials({
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Document URL
+                    Copy of the certificate <span className="font-normal text-gray-400">(optional, helps us check faster)</span>
                   </label>
-                  <input
-                    type="url"
-                    value={form.documentUrl}
-                    onChange={(e) =>
-                      setForm({ ...form, documentUrl: e.target.value })
-                    }
-                    placeholder="https://..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-[#0B3C5D] focus:outline-none focus:ring-1 focus:ring-[#0B3C5D]"
-                  />
+                  {form.documentUrl ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 text-sm">
+                      <span className="text-emerald-700">Uploaded</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, documentUrl: "" })}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        Replace
+                      </button>
+                    </div>
+                  ) : (
+                    <FileUpload
+                      folder="documents"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      maxSizeMB={10}
+                      label="Upload PDF or photo"
+                      onUpload={({ url }) => setForm((f) => ({ ...f, documentUrl: url }))}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setError("");
-                  }}
+                  onClick={closeForm}
                   className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   Cancel
@@ -337,13 +421,17 @@ export default function ProfileCredentials({
                   disabled={saving}
                   className="rounded-lg bg-[#0B3C5D] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0A3350] disabled:opacity-50"
                 >
-                  {saving ? "Adding..." : "Add credential"}
+                  {saving ? "Saving..." : editingId ? "Save changes" : "Add credential"}
                 </button>
               </div>
             </form>
           ) : (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setEditingId(null);
+                setForm(blankForm);
+                setShowForm(true);
+              }}
               className="mt-4 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm font-medium text-[#0B3C5D] transition hover:border-[#0B3C5D] hover:bg-[#0B3C5D]/5"
             >
               + Add credential

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Stethoscope, Plane, BookOpen, ArrowRight } from "lucide-react";
+import { NIGERIAN_STATES } from "@/lib/cadreHealth/cadres";
 
 type Location = "IN_NIGERIA" | "DIASPORA" | "STEPPED_BACK";
 
@@ -41,6 +42,9 @@ const CHOICES: Choice[] = [
 export function WhereClient({ professionalId }: { professionalId: string }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Location | null>(null);
+  // Asked here because nowhere else in the claim flow asks it, and without a
+  // state the portal told 466 members their profile was incomplete.
+  const [state, setState] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,7 +56,7 @@ export function WhereClient({ professionalId }: { professionalId: string }) {
       const res = await fetch("/api/cadre/practice-location", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ professionalId, location: selected }),
+        body: JSON.stringify({ professionalId, location: selected, state: selected === "IN_NIGERIA" ? state : undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -115,10 +119,32 @@ export function WhereClient({ professionalId }: { professionalId: string }) {
         })}
       </div>
 
+      {selected === "IN_NIGERIA" && (
+        <div className="mt-5">
+          <label htmlFor="where-state" className="mb-1.5 block text-sm font-medium text-gray-700">
+            Which state do you practise in?
+          </label>
+          <select
+            id="where-state"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            className="w-full rounded-xl border px-3 py-3 text-base focus:border-[#0B3C5D] focus:outline-none focus:ring-1 focus:ring-[#0B3C5D]"
+            style={{ borderColor: "#E8EBF0" }}
+          >
+            <option value="">Select state</option>
+            {NIGERIAN_STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={handleConfirm}
-        disabled={!selected || submitting}
+        disabled={!selected || submitting || (selected === "IN_NIGERIA" && !state)}
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl py-3 text-base font-semibold text-white transition disabled:opacity-40"
         style={{
           background: "linear-gradient(135deg, #0B3C5D, #0E4D6E)",

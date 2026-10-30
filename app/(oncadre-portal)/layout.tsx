@@ -18,14 +18,19 @@ export default async function OncadrePortalLayout({
   // Check profile completeness -- redirect to profile page if too low
   const professional = await prisma.cadreProfessional.findUnique({
     where: { id: session.sub },
-    select: { profileCompleteness: true, emailVerified: true, cadre: true, state: true, isDiaspora: true, recruitmentStage: true },
+    select: { profileCompleteness: true, emailVerified: true, cadre: true, state: true, isDiaspora: true, practiceLocation: true, recruitmentStage: true, accountStatus: true, firstName: true, lastName: true },
   });
 
-  // Core fields missing: redirect to profile to complete
-  const needsProfileCompletion = professional && (
-    !professional.cadre ||
-    (!professional.state && !professional.isDiaspora)
-  );
+  // Core fields missing. Name them: a member at 90% who is told only that the
+  // profile is "incomplete" has no way to find the one empty field.
+  const abroad = professional?.isDiaspora || professional?.practiceLocation === "DIASPORA";
+  const missingCore = professional
+    ? [
+        !professional.cadre && "your profession",
+        !professional.state && !abroad && "the state you live or practise in (Personal information)",
+      ].filter(Boolean)
+    : [];
+  const needsProfileCompletion = missingCore.length > 0;
 
   // Show Documents nav only for shortlisted+ professionals
   const DOCS_STAGES = ["SHORTLISTED", "INTERVIEW_SCHEDULED", "INTERVIEW_DONE", "OFFER", "PLACED"];
@@ -37,9 +42,11 @@ export default async function OncadrePortalLayout({
     <div className="min-h-screen" style={{ background: "#F8F9FB" }}>
       {/* Top nav + mobile tabs (client): primary items with a grouped "More" */}
       <PortalNav
-        firstName={session.firstName}
-        lastName={session.lastName}
-        accountStatus={session.accountStatus}
+        // From the database: the session cookie lasts 30 days, so a member
+        // verified or renamed since signing in would otherwise see stale values.
+        firstName={professional?.firstName ?? session.firstName}
+        lastName={professional?.lastName ?? session.lastName}
+        accountStatus={professional?.accountStatus ?? session.accountStatus}
         showDocuments={showDocuments}
       />
 
@@ -55,7 +62,7 @@ export default async function OncadrePortalLayout({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <span className="text-sm text-amber-800">
-                Your profile is incomplete. Complete your profile to appear in searches and get matched with opportunities.
+                To finish your profile, add {missingCore.join(" and ")}.
               </span>
             </div>
             <Link href="/oncadre/profile" className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg text-white" style={{ background: "#0B3C5D" }}>
@@ -80,7 +87,7 @@ export default async function OncadrePortalLayout({
       )}
 
       {/* Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 sm:pb-8 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 md:pb-8 lg:px-8">
         {children}
       </main>
 

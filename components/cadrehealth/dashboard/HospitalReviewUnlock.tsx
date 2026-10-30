@@ -67,8 +67,8 @@ export default function HospitalReviewUnlock() {
   // Case 2: User has a current facility on file -- prime hook
   if (myFacility) {
     const reviewLink = myFacility.slug
-      ? `/oncadre/hospitals/${myFacility.slug}#review`
-      : "/oncadre/hospitals";
+      ? `/oncadre/explore/${myFacility.slug}#write-review`
+      : "/oncadre/explore";
     return (
       <Link
         href={reviewLink}
@@ -137,7 +137,7 @@ export default function HospitalReviewUnlock() {
           </h3>
           <p className="mt-1.5 text-sm" style={{ color: "#B45309" }}>
             Tell us where you work and we&apos;ll prompt you to review it (anonymously).
-            {stats.totalReviews > 0 && ` ${stats.totalReviews} review${stats.totalReviews === 1 ? "" : "s"} already on the platform — read them once you contribute.`}
+            {stats.totalReviews > 0 && ` ${stats.totalReviews} review${stats.totalReviews === 1 ? "" : "s"} already on the platform. Read them once you contribute.`}
           </p>
         </div>
         <ArrowRight className="h-5 w-5 shrink-0 mt-1" style={{ color: "#92400E" }} />

@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
-import { isCadreAdmin } from "@/lib/cadreHealth/mandateAccess";
+import { logAudit } from "@/lib/audit";
+
+// Verified means "licence checked against the regulator", so only staff who can
+// make that assertion may set it, and every change is audited.
+const ALLOWED_ROLES = ["PARTNER", "ADMIN", "ASSOCIATE_DIRECTOR", "DIRECTOR"];
 
 export const POST = handler(async function POST(req: NextRequest) {
-  if (!(await isCadreAdmin())) {
-    return NextResponse.json({ error: "Not authorised" }, { status: 403 });
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!ALLOWED_ROLES.includes(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
   try {
     const { professionalId } = await req.json();
 
@@ -17,6 +25,14 @@ export const POST = handler(async function POST(req: NextRequest) {
     const professional = await prisma.cadreProfessional.update({
       where: { id: professionalId },
       data: { accountStatus: "VERIFIED" },
+    });
+
+    await logAudit({
+      userId: session.user.id,
+      action: "STATUS_CHANGE",
+      entityType: "CadreProfessional",
+      entityId: professional.id,
+      entityName: `${professional.firstName} ${professional.lastName} -> VERIFIED`,
     });
 
     return NextResponse.json({

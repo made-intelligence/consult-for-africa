@@ -48,6 +48,7 @@ export default function CVUploadBuilder() {
   const [dragOver, setDragOver] = useState(false);
   const [saveProgress, setSaveProgress] = useState(0);
   const [savedCounts, setSavedCounts] = useState({ credentials: 0, qualifications: 0, workHistory: 0 });
+  const [failedCount, setFailedCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File) => {
@@ -98,12 +99,20 @@ export default function CVUploadBuilder() {
 
   const handleConfirm = async () => {
     if (!data) return;
+    // The profile needs a start date for every role. CVs often leave it out,
+    // and those roles used to be dropped without a word.
+    if (data.workHistory.some((w) => !w.startDate)) {
+      setError("Add a start month for each role marked below, then confirm.");
+      return;
+    }
+    setError("");
     setStep("saving");
     setSaveProgress(0);
 
     try {
       let credCount = 0;
       let qualCount = 0;
+      let failed = 0;
       let workCount = 0;
 
       // Update profile info
@@ -130,8 +139,9 @@ export default function CVUploadBuilder() {
             body: JSON.stringify(cred),
           });
           if (res.ok) credCount++;
+          else failed++;
         } catch {
-          // Continue with other items
+          failed++;
         }
       }
       setSaveProgress(40);
@@ -156,8 +166,9 @@ export default function CVUploadBuilder() {
             body: JSON.stringify(qual),
           });
           if (res.ok) qualCount++;
+          else failed++;
         } catch {
-          // Continue
+          failed++;
         }
       }
       setSaveProgress(70);
@@ -171,13 +182,15 @@ export default function CVUploadBuilder() {
             body: JSON.stringify(work),
           });
           if (res.ok) workCount++;
+          else failed++;
         } catch {
-          // Continue
+          failed++;
         }
       }
       setSaveProgress(100);
 
       setSavedCounts({ credentials: credCount, qualifications: qualCount, workHistory: workCount });
+      setFailedCount(failed);
       setStep("success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save data");
@@ -406,9 +419,32 @@ export default function CVUploadBuilder() {
                           <p className="text-xs text-gray-500">{w.facilityName}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">
-                            {w.startDate?.slice(0, 7) || "?"} - {w.isCurrent ? "Present" : w.endDate?.slice(0, 7) || "?"}
-                          </p>
+                          {w.startDate ? (
+                            <p className="text-xs text-gray-500">
+                              {w.startDate.slice(0, 7)} - {w.isCurrent ? "Present" : w.endDate?.slice(0, 7) || "?"}
+                            </p>
+                          ) : (
+                            <label className="block text-xs font-medium text-amber-700">
+                              Start month
+                              <input
+                                type="month"
+                                onChange={(e) => {
+                                  const value = e.target.value ? `${e.target.value}-01` : null;
+                                  setData((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          workHistory: prev.workHistory.map((x, j) =>
+                                            j === i ? { ...x, startDate: value } : x
+                                          ),
+                                        }
+                                      : prev
+                                  );
+                                }}
+                                className="mt-1 block rounded-md border border-amber-300 px-2 py-1 text-xs text-gray-900"
+                              />
+                            </label>
+                          )}
                           {w.isCurrent && (
                             <span className="inline-block mt-1 rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "#dcfce7", color: "#166534" }}>
                               Current
@@ -490,6 +526,11 @@ export default function CVUploadBuilder() {
         <p className="mt-2 text-sm text-gray-500">
           {total} items added to your profile from your CV
         </p>
+        {failedCount > 0 && (
+          <p className="mt-2 text-sm text-amber-700">
+            {failedCount} {failedCount === 1 ? "item" : "items"} could not be added. You can add {failedCount === 1 ? "it" : "them"} by hand below.
+          </p>
+        )}
         <div className="mx-auto mt-4 flex max-w-sm justify-center gap-4">
           {savedCounts.credentials > 0 && (
             <CountBadge count={savedCounts.credentials} label="Credentials" />

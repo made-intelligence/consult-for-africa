@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCadreShortLabel } from "@/lib/cadreHealth/cadres";
 import { REVIEW_DIMENSIONS, CATEGORY_DIMENSIONS } from "@/lib/cadreHealth/reviewDimensions";
 import HospitalReviewFormWrapper from "./ReviewFormWrapper";
+import { canReview, REVIEW_BLOCKED_MESSAGE } from "@/lib/cadreHealth/reviewEligibility";
 import ShareButtons from "@/components/cadrehealth/ShareButtons";
 
 /* ---- Helpers ---- */
@@ -202,6 +203,7 @@ export default async function HospitalDeepDivePage({
     where: { professionalId: session.sub },
   });
   const hasContributed = myReviewCount > 0;
+  const mayReview = existingReview ? true : await canReview(session.sub);
 
   // Related hospitals (same state or same type, excluding current)
   const relatedHospitals = await prisma.cadreFacility.findMany({
@@ -1170,10 +1172,24 @@ export default async function HospitalDeepDivePage({
               boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
             }}
           >
-            <HospitalReviewFormWrapper
-              facilitySlug={slug}
-              facilityName={facility.name}
-            />
+            {mayReview ? (
+              <HospitalReviewFormWrapper
+                facilitySlug={slug}
+                facilityName={facility.name}
+              />
+            ) : (
+              <div>
+                <h2 className="text-base font-semibold text-gray-900">Review {facility.name}</h2>
+                <p className="mt-1 text-sm text-gray-500">{REVIEW_BLOCKED_MESSAGE}</p>
+                <Link
+                  href="/oncadre/profile#credentials"
+                  className="mt-4 inline-flex rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
+                  style={{ background: "#0B3C5D" }}
+                >
+                  Add licence number
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </section>

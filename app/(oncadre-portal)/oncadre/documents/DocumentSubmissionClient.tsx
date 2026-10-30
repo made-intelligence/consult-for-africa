@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   CheckCircle,
   Circle,
@@ -75,6 +75,8 @@ export default function DocumentSubmissionClient({
   const [data, setData] = useState(professional);
   const [notifying, setNotifying] = useState(false);
   const [notified, setNotified] = useState(!!professional.documentsSubmittedAt);
+  const [notifyFailed, setNotifyFailed] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const regAbbrev = getRegulatoryAbbrev(data.regulatoryBody);
   const needsSpecialist =
@@ -111,22 +113,44 @@ export default function DocumentSubmissionClient({
     if (notified || notifying) return;
     setNotifying(true);
     try {
-      await fetch("/api/cadre/documents/notify-complete", { method: "POST" });
+      const res = await fetch("/api/cadre/documents/notify-complete", { method: "POST" });
+      if (!res.ok) throw new Error("notify failed");
       setNotified(true);
     } catch {
-      // Silently fail
+      setNotifyFailed(true);
     } finally {
       setNotifying(false);
     }
   }, [notified, notifying]);
 
   // Helper: update profile field
-  async function updateProfile(field: string, url: string) {
-    await fetch("/api/cadre/profile", {
-      method: "PATCH",
+  // Every save checks the response: the item is only marked done once the
+  // server has it. Until 30 Oct 2026 a failed save still showed as uploaded.
+  async function send(url: string, method: string, body: unknown) {
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: url }),
+      body: JSON.stringify(body),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Could not save that document. Please try again.");
+    }
+    return res.json();
+  }
+
+  // Runs one upload's save, and shows the error instead of a false tick.
+  async function save(fn: () => Promise<void>) {
+    setSaveError("");
+    try {
+      await fn();
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Could not save that document. Please try again.");
+    }
+  }
+
+  async function updateProfile(field: string, url: string) {
+    await send("/api/cadre/profile", "PATCH", { [field]: url });
   }
 
   // Helper: update or create credential
@@ -134,21 +158,12 @@ export default function DocumentSubmissionClient({
     type: string,
     documentUrl: string,
     existingId?: string,
-    extra?: Record<string, unknown>
-  ) {
-    if (existingId) {
-      await fetch("/api/cadre/credentials", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: existingId, documentUrl }),
-      });
-    } else {
-      await fetch("/api/cadre/credentials", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, regulatoryBody: regAbbrev, documentUrl, ...extra }),
-      });
-    }
+    licenseNumber?: string
+  ): Promise<Credential> {
+    const number = licenseNumber?.trim() || undefined;
+    return existingId
+      ? send("/api/cadre/credentials", "PATCH", { id: existingId, documentUrl, ...(number ? { licenseNumber: number } : {}) })
+      : send("/api/cadre/credentials", "POST", { type, regulatoryBody: regAbbrev, documentUrl, licenseNumber: number });
   }
 
   // Helper: update or create qualification
@@ -157,20 +172,10 @@ export default function DocumentSubmissionClient({
     documentUrl: string,
     existingId?: string,
     extra?: Record<string, unknown>
-  ) {
-    if (existingId) {
-      await fetch("/api/cadre/qualifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: existingId, documentUrl }),
-      });
-    } else {
-      await fetch("/api/cadre/qualifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, documentUrl, ...extra }),
-      });
-    }
+  ): Promise<Qualification> {
+    return existingId
+      ? send("/api/cadre/qualifications", "PATCH", { id: existingId, documentUrl })
+      : send("/api/cadre/qualifications", "POST", { type, documentUrl, ...extra });
   }
 
   // Refresh data after upload
@@ -178,43 +183,27 @@ export default function DocumentSubmissionClient({
     setData((prev) => ({ ...prev, [field]: url }));
   }
 
-  function refreshCredential(type: string, url: string, id?: string) {
+  // Store the record the API returned, so a later "Replace" patches the real
+  // id (a placeholder id used to 404 silently).
+  function refreshCredential(saved: Credential) {
     setData((prev) => {
-      const creds = [...prev.credentials];
-      const idx = creds.findIndex((c) => c.type === type);
-      if (idx >= 0) {
-        creds[idx] = { ...creds[idx], documentUrl: url };
-      } else {
-        creds.push({ id: id || "new", type, regulatoryBody: regAbbrev, licenseNumber: null, documentUrl: url });
-      }
-      return { ...prev, credentials: creds };
+      const others = prev.credentials.filter((c) => c.id !== saved.id);
+      return { ...prev, credentials: [saved, ...others] };
     });
   }
 
-  function refreshQualification(type: string, url: string) {
+  function refreshQualification(saved: Qualification) {
     setData((prev) => {
-      const quals = [...prev.qualifications];
-      const idx = quals.findIndex((q) => q.type === type);
-      if (idx >= 0) {
-        quals[idx] = { ...quals[idx], documentUrl: url };
-      } else {
-        quals.push({ id: "new", type, name: "", institution: null, yearObtained: null, documentUrl: url });
-      }
-      return { ...prev, qualifications: quals };
+      const others = prev.qualifications.filter((q) => q.id !== saved.id);
+      return { ...prev, qualifications: [saved, ...others] };
     });
   }
 
-  // Check completion after state update
-  function checkAndNotify() {
-    // We defer the check since state updates are async
-    setTimeout(async () => {
-      const currentRequired = items.filter((i) => i.required);
-      const currentComplete = currentRequired.filter((i) => i.complete).length;
-      if (currentComplete === currentRequired.length) {
-        await notifyComplete();
-      }
-    }, 500);
-  }
+  // Tell the recruitment team once, when the last required item lands. Read
+  // from render state: the old timer read the items from before the upload.
+  useEffect(() => {
+    if (allRequiredComplete && !notified && !notifying && !notifyFailed) notifyComplete();
+  }, [allRequiredComplete, notified, notifying, notifyFailed, notifyComplete]);
 
   return (
     <div className="p-4 sm:p-8 max-w-3xl mx-auto">
@@ -259,9 +248,17 @@ export default function DocumentSubmissionClient({
             <p className="text-xs text-emerald-600 mt-0.5">
               {notified
                 ? "The CadreHealth recruitment team has been notified and will review your submission."
-                : "Notifying the recruitment team..."}
+                : notifyFailed
+                  ? "Your documents are saved. We could not alert the team automatically, so please write to hello@consultforafrica.com."
+                  : "Notifying the recruitment team..."}
             </p>
           </div>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="mb-6 rounded-xl border p-4 text-sm text-red-700" style={{ background: "#FEF2F2", borderColor: "#FECACA" }}>
+          {saveError}
         </div>
       )}
 
@@ -280,11 +277,12 @@ export default function DocumentSubmissionClient({
             accept=".pdf,.doc,.docx"
             maxSizeMB={10}
             label="Upload your CV"
-            onUpload={async ({ url }) => {
-              await updateProfile("cvFileUrl", url);
-              refreshField("cvFileUrl", url);
-              checkAndNotify();
-            }}
+            onUpload={({ url }) =>
+              save(async () => {
+                await updateProfile("cvFileUrl", url);
+                refreshField("cvFileUrl", url);
+              })
+            }
           />
         </DocumentSection>
 
@@ -300,11 +298,11 @@ export default function DocumentSubmissionClient({
             type="PRACTICING_LICENSE"
             regAbbrev={regAbbrev}
             existingRecord={licenseRecord}
-            onUpload={async (url) => {
-              await upsertCredential("PRACTICING_LICENSE", url, licenseRecord?.id);
-              refreshCredential("PRACTICING_LICENSE", url);
-              checkAndNotify();
-            }}
+            onUpload={(url, licenseNumber) =>
+              save(async () => {
+                refreshCredential(await upsertCredential("PRACTICING_LICENSE", url, licenseRecord?.id, licenseNumber));
+              })
+            }
           />
         </DocumentSection>
 
@@ -320,11 +318,11 @@ export default function DocumentSubmissionClient({
             type="FULL_REGISTRATION"
             regAbbrev={regAbbrev}
             existingRecord={registrationRecord}
-            onUpload={async (url) => {
-              await upsertCredential("FULL_REGISTRATION", url, registrationRecord?.id);
-              refreshCredential("FULL_REGISTRATION", url);
-              checkAndNotify();
-            }}
+            onUpload={(url, licenseNumber) =>
+              save(async () => {
+                refreshCredential(await upsertCredential("FULL_REGISTRATION", url, registrationRecord?.id, licenseNumber));
+              })
+            }
           />
         </DocumentSection>
 
@@ -340,11 +338,11 @@ export default function DocumentSubmissionClient({
           <QualificationUploadSection
             type="PRIMARY_DEGREE"
             existingRecord={degreeRecord}
-            onUpload={async (url) => {
-              await upsertQualification("PRIMARY_DEGREE", url, degreeRecord?.id, { name: "Primary Degree" });
-              refreshQualification("PRIMARY_DEGREE", url);
-              checkAndNotify();
-            }}
+            onUpload={(url) =>
+              save(async () => {
+                refreshQualification(await upsertQualification("PRIMARY_DEGREE", url, degreeRecord?.id, { name: "Primary Degree" }));
+              })
+            }
           />
         </DocumentSection>
 
@@ -362,11 +360,12 @@ export default function DocumentSubmissionClient({
             accept=".pdf,.jpg,.jpeg,.png"
             maxSizeMB={10}
             label="Upload certificate"
-            onUpload={async ({ url }) => {
-              const existing = data.qualifications.find((q) => q.type === "POSTGRADUATE" || q.type === "FELLOWSHIP");
-              await upsertQualification("POSTGRADUATE", url, existing?.id, { name: "Postgraduate Qualification" });
-              refreshQualification("POSTGRADUATE", url);
-            }}
+            onUpload={({ url }) =>
+              save(async () => {
+                const existing = data.qualifications.find((q) => q.type === "POSTGRADUATE" || q.type === "FELLOWSHIP");
+                refreshQualification(await upsertQualification("POSTGRADUATE", url, existing?.id, { name: "Postgraduate Qualification" }));
+              })
+            }
           />
         </DocumentSection>
 
@@ -383,11 +382,11 @@ export default function DocumentSubmissionClient({
               type="SPECIALIST_REGISTRATION"
               regAbbrev={regAbbrev}
               existingRecord={specialistRecord}
-              onUpload={async (url) => {
-                await upsertCredential("SPECIALIST_REGISTRATION", url, specialistRecord?.id);
-                refreshCredential("SPECIALIST_REGISTRATION", url);
-                checkAndNotify();
-              }}
+              onUpload={(url, licenseNumber) =>
+                save(async () => {
+                  refreshCredential(await upsertCredential("SPECIALIST_REGISTRATION", url, specialistRecord?.id, licenseNumber));
+                })
+              }
             />
           </DocumentSection>
         )}
@@ -406,11 +405,12 @@ export default function DocumentSubmissionClient({
             accept=".pdf,.jpg,.jpeg,.png"
             maxSizeMB={5}
             label="Upload ID document"
-            onUpload={async ({ url }) => {
-              await updateProfile("governmentIdUrl", url);
-              refreshField("governmentIdUrl", url);
-              checkAndNotify();
-            }}
+            onUpload={({ url }) =>
+              save(async () => {
+                await updateProfile("governmentIdUrl", url);
+                refreshField("governmentIdUrl", url);
+              })
+            }
           />
         </DocumentSection>
 
@@ -428,11 +428,12 @@ export default function DocumentSubmissionClient({
             accept=".jpg,.jpeg,.png"
             maxSizeMB={3}
             label="Upload passport photo"
-            onUpload={async ({ url }) => {
-              await updateProfile("passportPhotoUrl", url);
-              refreshField("passportPhotoUrl", url);
-              checkAndNotify();
-            }}
+            onUpload={({ url }) =>
+              save(async () => {
+                await updateProfile("passportPhotoUrl", url);
+                refreshField("passportPhotoUrl", url);
+              })
+            }
           />
         </DocumentSection>
       </div>
@@ -548,13 +549,13 @@ function CredentialUploadSection({
   type: string;
   regAbbrev: string;
   existingRecord?: Credential;
-  onUpload: (url: string) => Promise<void>;
+  onUpload: (url: string, licenseNumber: string) => Promise<void>;
 }) {
   const [licenseNumber, setLicenseNumber] = useState(existingRecord?.licenseNumber || "");
 
   return (
     <div className="space-y-3">
-      {!existingRecord && (
+      {!existingRecord?.licenseNumber && (
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">
             License / Registration Number
@@ -579,7 +580,7 @@ function CredentialUploadSection({
         maxSizeMB={5}
         label={`Upload ${type.replace(/_/g, " ").toLowerCase()} document`}
         onUpload={async ({ url }) => {
-          await onUpload(url);
+          await onUpload(url, licenseNumber);
         }}
       />
     </div>

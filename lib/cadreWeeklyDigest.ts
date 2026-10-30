@@ -597,7 +597,7 @@ async function pickShowcase(
       ]
         .filter(Boolean)
         .join(" · "),
-      href: `/oncadre/members/${member.id}`,
+      href: "/oncadre/dashboard", // there is no member directory page
     };
   }
 
@@ -734,7 +734,7 @@ function buildOnlyYou(p: DigestRecipient, ctx: WeekContext): CadreDigestContent[
         : `${mandate.title} role is open`,
       detail: [mandate.facility, mandate.city].filter(Boolean).join(", ") || "Details inside.",
       ctaLabel: "See the brief",
-      href: `/oncadre/mandates/${mandate.id}`,
+      href: `/oncadre/jobs/${mandate.id}`,
       tone: "NEUTRAL",
     };
   }
@@ -793,7 +793,7 @@ function buildAskInner(p: DigestRecipient, ctx: WeekContext): CadreDigestContent
           ? `${countdown} Yours is part of it, which is why we can quote a figure at all.`
           : `Anonymous, 60 seconds, and it is the only reason anyone can tell you what a job is worth before they take it. ${countdown}`,
         ctaLabel: done ? "Update my figure" : "Report my salary",
-        href: "/oncadre/salary/report",
+        href: "/oncadre/salary-map",
         done,
       };
     case "FACILITY_REVIEW":
@@ -841,7 +841,7 @@ function buildAskInner(p: DigestRecipient, ctx: WeekContext): CadreDigestContent
           ? `${countdown} The people you brought are here because of you.`
           : `Everything here is worth more with more of your colleagues in it: the salary map, the reviews, the mandates. One person is enough. ${countdown}`,
         ctaLabel: done ? "Invite another" : "Send my invite link",
-        href: p.referralCode ? `/oncadre/refer?code=${p.referralCode}` : "/oncadre/refer",
+        href: "/oncadre/referrals",
         done,
       };
     case "SHOWCASE_CONSENT":

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCadreLabel, getRegulatoryBody } from "@/lib/cadreHealth/cadres";
 import { VerifyButton } from "@/components/cadrehealth/VerifyButton";
+import { CredentialVerdict } from "@/components/cadrehealth/CredentialVerdict";
 import {
   InviteProfessionalButton,
   InviteMentorButton,
@@ -286,6 +287,14 @@ export default async function ProfessionalDetailPage({
                     {c.expiryDate && (
                       <span>Expires: {c.expiryDate.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span>
                     )}
+                    {c.documentUrl && (
+                      <a href={c.documentUrl} target="_blank" rel="noopener noreferrer" className="text-[#0B3C5D] hover:underline">
+                        Document
+                      </a>
+                    )}
+                  </div>
+                  <div className="mt-3">
+                    <CredentialVerdict credentialId={c.id} status={c.verificationStatus} hasNumber={!!c.licenseNumber} />
                   </div>
                 </div>
               ))}

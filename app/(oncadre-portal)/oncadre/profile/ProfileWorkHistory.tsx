@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 interface WorkHistoryEntry {
   id: string;
@@ -14,6 +15,16 @@ interface WorkHistoryEntry {
   confirmedByFacility: boolean;
 }
 
+const EMPTY_FORM = {
+  facilityName: "",
+  facilityId: "",
+  role: "",
+  department: "",
+  startDate: "",
+  endDate: "",
+  isCurrent: false,
+};
+
 interface HospitalSuggestion {
   id: string;
   name: string;
@@ -26,22 +37,50 @@ export default function ProfileWorkHistory({
 }: {
   initialHistory: WorkHistoryEntry[];
 }) {
+  const router = useRouter();
   const [history, setHistory] = useState(initialHistory);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<HospitalSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [form, setForm] = useState({
-    facilityName: "",
-    facilityId: "",
-    role: "",
-    department: "",
-    startDate: "",
-    endDate: "",
-    isCurrent: false,
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setError("");
+    setForm(EMPTY_FORM);
+  }
+
+  function startEdit(entry: WorkHistoryEntry) {
+    setEditingId(entry.id);
+    setForm({
+      facilityName: entry.facilityName,
+      facilityId: entry.facilityId || "",
+      role: entry.role,
+      department: entry.department || "",
+      startDate: entry.startDate.slice(0, 10),
+      endDate: entry.endDate ? entry.endDate.slice(0, 10) : "",
+      isCurrent: entry.isCurrent,
+    });
+    setError("");
+    setShowForm(true);
+  }
+
+  async function handleDelete(entry: WorkHistoryEntry) {
+    if (!confirm(`Remove ${entry.role} at ${entry.facilityName}?`)) return;
+    const res = await fetch(`/api/cadre/work-history?id=${encodeURIComponent(entry.id)}`, { method: "DELETE" });
+    if (res.ok) {
+      setHistory((prev) => prev.filter((h) => h.id !== entry.id));
+      if (editingId === entry.id) closeForm();
+      router.refresh();
+    } else {
+      setError("Could not remove that position. Please try again.");
+    }
+  }
 
   const searchHospitals = useCallback(async (query: string) => {
     if (query.length < 2) {
@@ -82,32 +121,27 @@ export default function ProfileWorkHistory({
     setError("");
     try {
       const res = await fetch("/api/cadre/work-history", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "Failed to add position");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || "Could not save the position");
         return;
       }
-      const newEntry = await res.json();
-      // If new entry is current, unmark others locally
-      let updated = history;
-      if (newEntry.isCurrent) {
-        updated = history.map((h) => ({ ...h, isCurrent: false }));
-      }
-      setHistory([newEntry, ...updated]);
-      setShowForm(false);
-      setForm({
-        facilityName: "",
-        facilityId: "",
-        role: "",
-        department: "",
-        startDate: "",
-        endDate: "",
-        isCurrent: false,
+      const saved: WorkHistoryEntry = await res.json();
+      setHistory((prev) => {
+        // A current position unmarks the others, as the API does.
+        const others = prev.map((h) =>
+          saved.isCurrent && h.id !== saved.id ? { ...h, isCurrent: false } : h
+        );
+        return editingId
+          ? others.map((h) => (h.id === saved.id ? saved : h))
+          : [saved, ...others];
       });
+      closeForm();
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -161,6 +195,10 @@ export default function ProfileWorkHistory({
             </p>
           )}
 
+          {error && !showForm && (
+            <div className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+          )}
+
           <div className="mt-2 space-y-3">
             {history.map((entry) => (
               <div
@@ -188,13 +226,29 @@ export default function ProfileWorkHistory({
                   </p>
                   <p className="mt-0.5 text-sm text-gray-500">
                     {entry.department ? `${entry.department} - ` : ""}
-                    {formatDate(entry.startDate)} -{" "}
+                    {formatDate(entry.startDate)}
                     {entry.isCurrent
-                      ? "Present"
+                      ? " - Present"
                       : entry.endDate
-                        ? formatDate(entry.endDate)
+                        ? ` - ${formatDate(entry.endDate)}`
                         : ""}
                   </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-4 text-sm font-medium">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(entry)}
+                    className="text-[#0B3C5D] hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(entry)}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
             ))}
@@ -328,10 +382,7 @@ export default function ProfileWorkHistory({
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setError("");
-                  }}
+                  onClick={closeForm}
                   className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   Cancel
@@ -341,13 +392,17 @@ export default function ProfileWorkHistory({
                   disabled={saving}
                   className="rounded-lg bg-[#0B3C5D] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0A3350] disabled:opacity-50"
                 >
-                  {saving ? "Adding..." : "Add position"}
+                  {saving ? "Saving..." : editingId ? "Save changes" : "Add position"}
                 </button>
               </div>
             </form>
           ) : (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setEditingId(null);
+                setForm(EMPTY_FORM);
+                setShowForm(true);
+              }}
               className="mt-4 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm font-medium text-[#0B3C5D] transition hover:border-[#0B3C5D] hover:bg-[#0B3C5D]/5"
             >
               + Add position

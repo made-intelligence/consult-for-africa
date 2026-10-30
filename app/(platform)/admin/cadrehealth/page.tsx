@@ -127,6 +127,7 @@ export default async function CadreHealthAdmin({
               <HeroLink href="/admin/cadrehealth/import">Import Professionals</HeroLink>
               <HeroLink href="/admin/cadre-internships">Nurse Internships</HeroLink>
               <HeroLink href="/admin/cadre-employers">Employer Accounts</HeroLink>
+              <HeroLink href="/admin/cadrehealth/credentials">Credentials to check</HeroLink>
               <HeroLink href="/admin/cadrehealth/duplicates">Duplicates</HeroLink>
             </HeroGroup>
             <HeroGroup label="Outreach">

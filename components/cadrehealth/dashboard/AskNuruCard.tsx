@@ -3,7 +3,7 @@ import { Sparkles, MessageCircle } from "lucide-react";
 
 const STARTER_PROMPTS = [
   "What's a realistic salary for my grade in Lagos vs Abuja?",
-  "I'm thinking about UK licensing — where do I start?",
+  "I'm thinking about UK licensing. Where do I start?",
   "How do I move from clinical to consulting?",
   "Help me negotiate my new contract.",
 ];

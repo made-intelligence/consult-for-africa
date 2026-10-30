@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CADRE_OPTIONS,
   NIGERIAN_STATES,
@@ -29,6 +30,7 @@ export default function ProfilePersonalInfo({
 }: {
   professional: Professional;
 }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +48,14 @@ export default function ProfilePersonalInfo({
     diasporaCountry: professional.diasporaCountry || "",
   });
 
-  const subSpecialties = getSubSpecialties(form.cadre);
+  // Saving this form stamps the specialty as confirmed (see the profile API),
+  // which is only fair if the member can see it. An imported value missing
+  // from the list used to render as "Select sub-specialty" and be saved anyway.
+  const listed = getSubSpecialties(form.cadre);
+  const subSpecialties =
+    form.subSpecialty && !listed.includes(form.subSpecialty)
+      ? [form.subSpecialty, ...listed]
+      : listed;
 
   async function handleSave() {
     setSaving(true);
@@ -78,6 +87,8 @@ export default function ProfilePersonalInfo({
         diasporaCountry: form.diasporaCountry || null,
       });
       setEditing(false);
+      // The portal banner and completeness bar are rendered on the server.
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {

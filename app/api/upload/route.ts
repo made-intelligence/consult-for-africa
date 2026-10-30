@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { NextRequest } from "next/server";
 import { generateUploadUrl, generateDownloadUrl, buildKey, getPublicUrl } from "@/lib/r2";
 import { handler } from "@/lib/api-handler";
+import { getCadreSession } from "@/lib/cadreAuth";
 
 const ALLOWED_CONTENT_TYPES: Record<string, string> = {
   "application/pdf": "pdf",
@@ -31,12 +32,18 @@ type Folder = (typeof ALLOWED_FOLDERS)[number];
 
 const MAX_FILE_SIZE_MB = 50;
 
+// CadreHealth members sign in with their own cookie, not a staff session. They
+// may upload their CV and their certificates, nothing else. Without this every
+// upload on /oncadre/documents returned 401.
+const MEMBER_FOLDERS: Folder[] = ["cvs", "documents"];
+
 /**
  * POST: Generate a presigned upload URL for authenticated users.
  */
 export const POST = handler(async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user) {
+  const member = session?.user ? null : await getCadreSession();
+  if (!session?.user && !member) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -68,6 +75,10 @@ export const POST = handler(async function POST(req: NextRequest) {
       { error: `Invalid folder. Allowed: ${ALLOWED_FOLDERS.join(", ")}` },
       { status: 400 }
     );
+  }
+
+  if (member && !MEMBER_FOLDERS.includes(folder as Folder)) {
+    return Response.json({ error: "Invalid folder" }, { status: 403 });
   }
 
   if (!ALLOWED_CONTENT_TYPES[contentType]) {

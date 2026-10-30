@@ -4,6 +4,7 @@ import { getCadreSession } from "@/lib/cadreAuth";
 import { notifyNewReview } from "@/lib/cadreHealth/notifications";
 import { notifyAdmins } from "@/lib/admin-notify";
 import { handler } from "@/lib/api-handler";
+import { canReview, REVIEW_BLOCKED_MESSAGE } from "@/lib/cadreHealth/reviewEligibility";
 
 // POST: Submit a facility review
 export const POST = handler(async function POST(
@@ -16,12 +17,9 @@ export const POST = handler(async function POST(
       return NextResponse.json({ error: "Please sign in to submit a review" }, { status: 401 });
     }
 
-    // Only verified professionals can review
-    if (session.accountStatus !== "VERIFIED") {
-      return NextResponse.json(
-        { error: "You must be CadreHealth Verified to submit reviews. Add your license details to get verified." },
-        { status: 403 }
-      );
+    // Read from the database, not the 30-day session cookie.
+    if (!(await canReview(session.sub))) {
+      return NextResponse.json({ error: REVIEW_BLOCKED_MESSAGE }, { status: 403 });
     }
 
     const { slug } = await params;

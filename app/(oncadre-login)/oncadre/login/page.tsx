@@ -5,6 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PasswordInput from "@/components/cadrehealth/PasswordInput";
 
+/**
+ * Where to send the member after signing in. Claim, mentorship and email links
+ * pass ?next or ?redirect; only a path inside the member portal is honoured, so
+ * the parameter cannot bounce someone to another site.
+ */
+function safeNext(raw: string | null): string {
+  if (!raw) return "/oncadre/dashboard";
+  if (!raw.startsWith("/oncadre/") || raw.startsWith("//") || raw.includes("\\")) {
+    return "/oncadre/dashboard";
+  }
+  return raw;
+}
+
 export default function LoginPage() {
   return (
     <Suspense>
@@ -17,6 +30,7 @@ function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activated = searchParams.get("activated");
+  const next = safeNext(searchParams.get("next") ?? searchParams.get("redirect"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +49,7 @@ function LoginPageInner() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
-      router.push("/oncadre/dashboard");
+      router.push(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

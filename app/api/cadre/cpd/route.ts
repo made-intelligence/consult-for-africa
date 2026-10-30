@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 
 const VALID_CATEGORIES = [
   "CONFERENCE",
@@ -120,32 +121,69 @@ export const POST = handler(async function POST(req: NextRequest) {
   }
 });
 
-async function recomputeCompleteness(professionalId: string) {
-  const prof = await prisma.cadreProfessional.findUnique({
-    where: { id: professionalId },
-    include: {
-      credentials: true,
-      qualifications: true,
-      cpdEntries: true,
-      workHistory: true,
+export const PATCH = handler(async function PATCH(req: NextRequest) {
+  const session = await getCadreSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id, activity, category, provider, points, dateCompleted, certificateUrl } = await req.json();
+  if (!id) {
+    return NextResponse.json({ error: "Entry ID is required" }, { status: 400 });
+  }
+  if (!activity?.trim() || !category || !points || !dateCompleted) {
+    return NextResponse.json(
+      { error: "Activity, category, points, and date are required" },
+      { status: 400 }
+    );
+  }
+  if (!VALID_CATEGORIES.includes(category)) {
+    return NextResponse.json({ error: "Invalid CPD category" }, { status: 400 });
+  }
+  if (isNaN(parseFloat(points)) || parseFloat(points) <= 0) {
+    return NextResponse.json({ error: "Points must be a positive number" }, { status: 400 });
+  }
+
+  const existing = await prisma.cadreCPDEntry.findFirst({
+    where: { id, professionalId: session.sub },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+  }
+
+  const updated = await prisma.cadreCPDEntry.update({
+    where: { id },
+    data: {
+      activity: activity.trim(),
+      category,
+      provider: provider?.trim() || null,
+      points: parseFloat(points),
+      dateCompleted: new Date(dateCompleted),
+      certificateUrl: certificateUrl || null,
     },
   });
-  if (!prof) return;
 
-  let completeness = 20;
-  if (prof.phone) completeness += 5;
-  if (prof.cadre) completeness += 5;
-  if (prof.subSpecialty) completeness += 5;
-  if (prof.yearsOfExperience) completeness += 5;
-  if (prof.state || prof.isDiaspora) completeness += 5;
-  if (prof.credentials.length > 0) completeness += 15;
-  if (prof.qualifications.length > 0) completeness += 15;
-  if (prof.cpdEntries.length > 0) completeness += 10;
-  if (prof.workHistory.length > 0) completeness += 10;
-  if (prof.salaryReportedAt) completeness += 5;
+  return NextResponse.json(updated);
+});
 
-  await prisma.cadreProfessional.update({
-    where: { id: professionalId },
-    data: { profileCompleteness: Math.min(completeness, 100) },
+export const DELETE = handler(async function DELETE(req: NextRequest) {
+  const session = await getCadreSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "Entry ID is required" }, { status: 400 });
+  }
+
+  const deleted = await prisma.cadreCPDEntry.deleteMany({
+    where: { id, professionalId: session.sub },
   });
-}
+  if (deleted.count === 0) {
+    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+  }
+
+  await recomputeCompleteness(session.sub);
+  return NextResponse.json({ ok: true });
+});

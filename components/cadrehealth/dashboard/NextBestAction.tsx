@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Award, BarChart3, FileText, Star } from "lucide-react";
+import ResendVerificationButton from "./ResendVerificationButton";
 
 interface ProfessionalState {
   hasReadiness: boolean;
@@ -50,9 +51,9 @@ function pickAction(s: ProfessionalState) {
     return {
       key: "credentials",
       icon: Award,
-      title: "Add your practising license",
-      body: "Get verified against your regulatory body (MDCN, NMCN, PCN, etc.). Verified professionals appear higher in matches and can write hospital reviews.",
-      cta: "Add license details",
+      title: "Add your practising licence",
+      body: "We check it against your regulatory body (MDCN, NMCN, PCN and others). Once your licence number is on file you can write hospital reviews.",
+      cta: "Add licence details",
       href: "/oncadre/profile#credentials",
       bg: "linear-gradient(135deg, #EDE9FE, #DDD6FE)",
       accent: "#5B21B6",
@@ -102,7 +103,7 @@ function pickAction(s: ProfessionalState) {
     };
   }
 
-  // Profile is solid — point them at the career advisor.
+  // Profile is solid, point them at the career advisor.
   return {
     key: "advisor",
     icon: Sparkles,
@@ -119,6 +120,41 @@ function pickAction(s: ProfessionalState) {
 export default function NextBestAction({ state }: { state: ProfessionalState }) {
   const action = pickAction(state);
   const Icon = action.icon;
+
+  // The email step needs a button that resends, not a link to another page.
+  if (action.key === "verify-email") {
+    return (
+      <div
+        className="rounded-2xl p-6 sm:p-7"
+        style={{
+          background: action.bg,
+          border: `1px solid ${action.accent}22`,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04)",
+        }}
+      >
+        <div className="flex items-start gap-4">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: action.accent, color: "#fff" }}
+          >
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: action.accent }}>
+              Next best step
+            </p>
+            <h2 className="mt-1.5 text-lg sm:text-xl font-bold" style={{ color: action.accent }}>
+              {action.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed" style={{ color: `${action.accent}cc` }}>
+              {action.body}
+            </p>
+            <ResendVerificationButton accent={action.accent} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Link
