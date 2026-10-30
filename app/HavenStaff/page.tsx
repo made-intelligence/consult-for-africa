@@ -8,10 +8,12 @@ import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
 import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
 import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
 import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
+import { SafetyRegister, WhatChanged, type SafetyRow, type ChangeRow } from "@/components/haven/SafetyRegister";
+import { lateness } from "@/lib/havenSafety";
 import { periodKey, ON_TODAY, type Cadence } from "@/lib/havenTaskPeriod";
 import { DIRECTORY, staffWhere } from "@/lib/havenAudience";
 import { prisma } from "@/lib/prisma";
-import { getStaffSession, atLeast, greetingName } from "@/lib/staffAuth";
+import { getStaffSession, atLeast, can, greetingName } from "@/lib/staffAuth";
 
 // The temporary staff page for Haven Paediatric Centre, standing in for the
 // staff app until that exists. Unindexed and unlisted: the link is the control,
@@ -118,6 +120,9 @@ export default async function HavenStaffPage() {
   const period = isoWeek();
   let waiting: WaitingItem[] = [];
   let todayTasks: TodayTask[] = [];
+  let changes: ChangeRow[] = [];
+  let openCases: SafetyRow[] = [];
+  let closedCount = 0;
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -235,6 +240,39 @@ export default async function HavenStaffPage() {
       endDate: l.endDate.toISOString().slice(0, 10),
       decisionNote: l.decisionNote,
     }));
+
+    // What changed because somebody spoke up. Everyone signed in sees it, with
+    // no names, because a report that visibly changes something is the only
+    // argument for filing the next one.
+    const closed = await prisma.safetyReport.findMany({
+      where: { clientId: session.clientId, status: "CLOSED", NOT: { teamNote: null } },
+      select: { kind: true, teamNote: true, closedAt: true },
+      orderBy: { closedAt: "desc" },
+      take: 10,
+    });
+    changes = closed.map((c) => ({ kind: c.kind, teamNote: c.teamNote!, closedAt: c.closedAt!.toISOString() }));
+
+    if (can(session, "VIEW_NEAR_MISS_DETAIL")) {
+      const [rows, count] = await Promise.all([
+        prisma.safetyReport.findMany({
+          where: { clientId: session.clientId, NOT: { status: "CLOSED" } },
+          include: { investigator: { select: { name: true } } },
+          orderBy: { reportedAt: "asc" },
+        }),
+        prisma.safetyReport.count({ where: { clientId: session.clientId, status: "CLOSED" } }),
+      ]);
+      closedCount = count;
+      openCases = rows
+        .map((r) => ({
+          id: r.id, kind: r.kind, what: r.what, why: r.why, reachedPatient: r.reachedPatient,
+          reportedBy: r.reportedBy, reportedAt: r.reportedAt.toISOString(), status: r.status,
+          severity: r.severity, investigator: r.investigator?.name ?? null, findings: r.findings,
+          action: r.action, actionOwner: r.actionOwner, actionDueAt: r.actionDueAt?.toISOString() ?? null,
+          late: lateness(r),
+        }))
+        // Late first, then the serious ones, then oldest.
+        .sort((a, b) => Number(!!b.late) - Number(!!a.late) || Number(b.severity === "HIGH") - Number(a.severity === "HIGH"));
+    }
 
     if (atLeast(session, "SUPERVISOR")) {
       const waiting = await prisma.staffLeaveRequest.findMany({
@@ -372,6 +410,26 @@ export default async function HavenStaffPage() {
               </Section>
             )}
 
+            {can(session, "VIEW_NEAR_MISS_DETAIL") && (
+              <Section
+                id="safety"
+                eyebrow="For leadership"
+                title="Reports to investigate"
+                lead="Every near miss and every what-is-broken. Take each one within two days and close it within fourteen. We look for what made it possible, never who was involved, and every closed case tells the team what changed."
+              >
+                <SafetyRegister open={openCases} closedCount={closedCount} />
+              </Section>
+            )}
+
+            <Section
+              id="changed"
+              eyebrow="Because you spoke up"
+              title="What changed"
+              lead="Every report is looked into. This is what changed as a result, with no names."
+            >
+              <WhatChanged changes={changes} />
+            </Section>
+
             <Section
               id="pulse"
               eyebrow="Once a week"
@@ -451,7 +509,6 @@ export default async function HavenStaffPage() {
               ["The scoreboard", "Six things, updated weekly, so you never have to guess whether it is working."],
               ["The standards of work", "Published for each area as that team writes and signs off its own."],
               ["The rota", "Published four weeks ahead."],
-              ["What changed because you wrote in", "Short notes on what people reported and what we did about it."],
             ].map(([t, b]) => (
               <div key={t} style={{ borderLeft: `3px solid ${TEAL}`, paddingLeft: 14 }}>
                 <div style={{ color: NAVY, fontWeight: 700, fontSize: 15.5 }}>{t}</div>

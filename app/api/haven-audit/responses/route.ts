@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { notifyInternal } from "@/lib/email";
 import { FOUNDER_ROSTER } from "@/lib/haven-founders";
+import { raiseFromForm, HAVEN_CLIENT_NAME } from "@/lib/havenSafety";
 
 // Public, unauthenticated endpoint: anonymous survey submissions from the
 // Haven diagnostic-audit forms (public/haven-audit.html, public/haven-patient-survey.html).
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
     if (JSON.stringify(parsed.data.responses).length > 20_000) {
       return NextResponse.json({ error: "Payload too large" }, { status: 413 });
     }
-    await prisma.auditSurveyResponse.create({
+    const saved = await prisma.auditSurveyResponse.create({
       data: {
         survey: parsed.data.survey,
         engagementId: HAVEN_ENGAGEMENT_ID,
@@ -87,6 +88,26 @@ export async function POST(req: NextRequest) {
         userAgent: req.headers.get("user-agent")?.slice(0, 300) ?? null,
       },
     });
+
+    // Every near miss and what-is-broken becomes a case on the safety register,
+    // which is what gives it an owner. Never fail the reporter's submission
+    // over it: the response is saved, and the backfill can raise it later.
+    if (parsed.data.survey === "haven-near-miss" || parsed.data.survey === "haven-whats-broken") {
+      try {
+        const client = await prisma.client.findFirst({ where: { name: HAVEN_CLIENT_NAME }, select: { id: true } });
+        if (client) {
+          await raiseFromForm({
+            clientId: client.id,
+            survey: parsed.data.survey,
+            responseId: saved.id,
+            payload: parsed.data.responses as Record<string, unknown>,
+            at: saved.createdAt,
+          });
+        }
+      } catch (err) {
+        console.error("[haven-audit] safety register raise failed:", err);
+      }
+    }
 
     // A near miss is a safety signal, not a survey response, so it pings the
     // moment it lands whatever the hour. Never let the notification failing

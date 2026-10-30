@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { can, type StaffSession } from "@/lib/staffAuth";
 import { isoWeek } from "@/lib/havenScoreboard";
+import { lateness } from "@/lib/havenSafety";
 
 /**
  * What is waiting on one person, right now.
@@ -18,7 +19,7 @@ import { isoWeek } from "@/lib/havenScoreboard";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -160,6 +161,29 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
   // So this is a prompt, not a chase, and it only appears late in the week.
   if (pulsed === 0 && new Date().getUTCDay() >= 4) {
     items.push({ kind: "PULSE", title: "This week's pulse", detail: "One tap", urgency: "THIS_WEEK", href: "/HavenStaff#pulse" });
+  }
+
+  // Reports waiting on leadership. A caught overdose sat uninvestigated for
+  // twelve days because nothing put it in front of anyone; this does.
+  if (can(session, "VIEW_NEAR_MISS_DETAIL")) {
+    const open = await prisma.safetyReport.findMany({
+      where: { clientId: session.clientId, NOT: { status: "CLOSED" } },
+      select: { status: true, reportedAt: true, takenAt: true, actionDueAt: true, severity: true, investigatorId: true },
+    });
+    // Unclaimed cases are everybody's in leadership; claimed ones are the
+    // investigator's alone, so one case does not nag four people.
+    const mine = open.filter((r) => r.status === "NEW" || r.investigatorId === me.id);
+    if (mine.length > 0) {
+      const late = mine.filter((r) => lateness(r)).length;
+      const high = mine.some((r) => r.severity === "HIGH");
+      items.push({
+        kind: "SAFETY",
+        title: `${mine.length} report${mine.length === 1 ? "" : "s"} to investigate`,
+        detail: late > 0 ? `${late} past the deadline` : "Take each within two days",
+        urgency: late > 0 || high ? "NOW" : "TODAY",
+        href: "/HavenStaff#safety",
+      });
+    }
   }
 
   if (numbers === 0) {

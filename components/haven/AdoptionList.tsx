@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
 import { COUNTED, staffWhere } from "@/lib/havenAudience";
+import { lateness } from "@/lib/havenSafety";
 
 // The chase list. Rendered on the admin page and in Haven's client portal.
 //
@@ -64,6 +65,15 @@ export default async function AdoptionList({ clientId }: { clientId: string }) {
     (s) => s.lastLoginAt && Date.now() - s.lastLoginAt.getTime() < 7 * 864e5
   );
 
+  // Counts only. This list is also in the client portal, and the board sees
+  // that reports are being handled, never what they say or who filed them.
+  const reports = await prisma.safetyReport.findMany({
+    where: { clientId },
+    select: { status: true, reportedAt: true, takenAt: true, actionDueAt: true },
+  });
+  const openReports = reports.filter((r) => r.status !== "CLOSED");
+  const lateReports = openReports.filter((r) => lateness(r));
+
   const card: React.CSSProperties = {
     background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14, padding: 20,
   };
@@ -91,6 +101,26 @@ export default async function AdoptionList({ clientId }: { clientId: string }) {
             </div>
           ))}
         </div>
+
+        <section style={{ marginTop: 32 }}>
+          <h2 style={{ color: NAVY, fontSize: 20, margin: 0 }}>Reports to investigate</h2>
+          <p style={{ color: MUTED, fontSize: 14.5, lineHeight: 1.6, margin: "6px 0 14px" }}>
+            Near misses and what-is-broken. Each is taken within two days and closed within fourteen, on the staff
+            page under Reports to investigate. Late ones are the chase.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            {[
+              ["Open", String(openReports.length), NAVY],
+              ["Late", String(lateReports.length), lateReports.length > 0 ? "#B0392B" : GOOD],
+              ["Closed, team told", String(reports.length - openReports.length), GOOD],
+            ].map(([label, value, colour]) => (
+              <div key={label} style={{ ...card, flex: "1 1 180px" }}>
+                <div style={{ color: GOLD, fontSize: 10.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase" }}>{label}</div>
+                <div style={{ color: colour as string, fontSize: 30, fontWeight: 700, lineHeight: 1.2, marginTop: 4 }}>{value}</div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {never.length > 0 && (
           <section style={{ marginTop: 32 }}>

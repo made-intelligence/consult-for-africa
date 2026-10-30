@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getStaffSession } from "@/lib/staffAuth";
 import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
 import { checkAnswer } from "@/lib/havenTaskPrompts";
+import { raiseFromTaskNote } from "@/lib/havenSafety";
 
 // Tick a task, or untick it.
 //
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
   const missing = checkAnswer(task.code, parsed.data.note);
   if (missing) return NextResponse.json({ error: missing }, { status: 422 });
 
-  await prisma.staffTaskCompletion.upsert({
+  const completion = await prisma.staffTaskCompletion.upsert({
     where: { taskId_staffId_forDate: { taskId: task.id, staffId: session.sub, forDate } },
     update: { note: parsed.data.note?.trim() || null },
     create: {
@@ -61,6 +62,21 @@ export async function POST(req: NextRequest) {
       note: parsed.data.note?.trim() || null,
     },
   });
+
+  // A near miss written into the weekly task is still a near miss. One came in
+  // this way, two look-alike medicines nearly mixed up, and sat in a task note
+  // where no one investigating would ever look.
+  try {
+    await raiseFromTaskNote({
+      clientId: session.clientId,
+      taskCode: task.code,
+      completionId: completion.id,
+      note: parsed.data.note,
+      at: completion.completedAt,
+    });
+  } catch (err) {
+    console.error("[haven-staff/tasks] safety register raise failed:", err);
+  }
 
   // Ticking it late still clears the chase. The flag stays on the record as
   // history, because deleting it would hide that the system worked.
