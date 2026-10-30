@@ -18,6 +18,8 @@ import { prisma } from "@/lib/prisma";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { handler } from "@/lib/api-handler";
 import type { CadrePracticeLocation, CadreOutreachStatus } from "@prisma/client";
+import { NIGERIAN_STATES } from "@/lib/cadreHealth/cadres";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 
 const VALID_LOCATIONS: CadrePracticeLocation[] = ["IN_NIGERIA", "DIASPORA", "STEPPED_BACK"];
 
@@ -44,6 +46,7 @@ export const POST = handler(async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const professionalId = body.professionalId as string | undefined;
   const location = body.location as CadrePracticeLocation | undefined;
+  const state = typeof body.state === "string" && (NIGERIAN_STATES as readonly string[]).includes(body.state) ? body.state : null;
 
   if (!professionalId || professionalId !== session.sub) {
     return NextResponse.json({ error: "Mismatched professional" }, { status: 403 });
@@ -59,8 +62,12 @@ export const POST = handler(async function POST(req: NextRequest) {
     data: {
       practiceLocation: location,
       practiceLocationSetAt: now,
+      // Search and the profile banner read isDiaspora, not practiceLocation.
+      isDiaspora: location === "DIASPORA",
+      ...(state ? { state } : {}),
     },
   });
+  await recomputeCompleteness(professionalId);
 
   // Move the outreach record into the matching engagement track if applicable.
   const newStatus = statusForLocation(location);

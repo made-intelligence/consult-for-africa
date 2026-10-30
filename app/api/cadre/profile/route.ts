@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 
 const AVAILABILITY_VALUES = [
   "ACTIVELY_LOOKING",
@@ -154,44 +155,3 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
     );
   }
 });
-
-async function recomputeCompleteness(professionalId: string) {
-  const prof = await prisma.cadreProfessional.findUnique({
-    where: { id: professionalId },
-    select: {
-      phone: true,
-      cadre: true,
-      subSpecialty: true,
-      yearsOfExperience: true,
-      state: true,
-      isDiaspora: true,
-      openTo: true,
-      availability: true,
-      salaryReportedAt: true,
-      credentials: { select: { id: true } },
-      qualifications: { select: { id: true } },
-      cpdEntries: { select: { id: true } },
-      workHistory: { select: { id: true } },
-    },
-  });
-  if (!prof) return;
-
-  let completeness = 20; // base for registering
-  if (prof.phone) completeness += 5;
-  if (prof.cadre) completeness += 5;
-  if (prof.subSpecialty) completeness += 5;
-  if (prof.yearsOfExperience != null && prof.yearsOfExperience >= 0) completeness += 5;
-  if (prof.state || prof.isDiaspora) completeness += 5;
-  if (prof.openTo && prof.openTo.length > 0) completeness += 3;
-  if (prof.availability) completeness += 2;
-  if (prof.credentials.length > 0) completeness += 15;
-  if (prof.qualifications.length > 0) completeness += 10;
-  if (prof.cpdEntries.length > 0) completeness += 10;
-  if (prof.workHistory.length > 0) completeness += 10;
-  if (prof.salaryReportedAt) completeness += 5;
-
-  await prisma.cadreProfessional.update({
-    where: { id: professionalId },
-    data: { profileCompleteness: Math.min(completeness, 100) },
-  });
-}

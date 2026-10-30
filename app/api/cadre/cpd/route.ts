@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 
 const VALID_CATEGORIES = [
   "CONFERENCE",
@@ -119,33 +120,3 @@ export const POST = handler(async function POST(req: NextRequest) {
     );
   }
 });
-
-async function recomputeCompleteness(professionalId: string) {
-  const prof = await prisma.cadreProfessional.findUnique({
-    where: { id: professionalId },
-    include: {
-      credentials: true,
-      qualifications: true,
-      cpdEntries: true,
-      workHistory: true,
-    },
-  });
-  if (!prof) return;
-
-  let completeness = 20;
-  if (prof.phone) completeness += 5;
-  if (prof.cadre) completeness += 5;
-  if (prof.subSpecialty) completeness += 5;
-  if (prof.yearsOfExperience) completeness += 5;
-  if (prof.state || prof.isDiaspora) completeness += 5;
-  if (prof.credentials.length > 0) completeness += 15;
-  if (prof.qualifications.length > 0) completeness += 15;
-  if (prof.cpdEntries.length > 0) completeness += 10;
-  if (prof.workHistory.length > 0) completeness += 10;
-  if (prof.salaryReportedAt) completeness += 5;
-
-  await prisma.cadreProfessional.update({
-    where: { id: professionalId },
-    data: { profileCompleteness: Math.min(completeness, 100) },
-  });
-}

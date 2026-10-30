@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { handler } from "@/lib/api-handler";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 import { notifyAdmins } from "@/lib/admin-notify";
 
 // POST: Submit salary report (give)
@@ -47,9 +48,9 @@ export const POST = handler(async function POST(req: NextRequest) {
       where: { id: session.sub },
       data: {
         salaryReportedAt: new Date(),
-        profileCompleteness: { increment: 10 },
       },
     });
+    await recomputeCompleteness(session.sub);
 
     // Notify admins. Detect "first ever real member" (excluding seed contributors
     // whose emails contain "system@" or "noreply@") so we can fire the high-

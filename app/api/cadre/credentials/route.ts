@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCadreSession } from "@/lib/cadreAuth";
 import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
+import { recomputeCompleteness } from "@/lib/cadreHealth/completeness";
 
 const VALID_TYPES = [
   "PRACTICING_LICENSE",
@@ -79,23 +80,48 @@ export const POST = handler(async function POST(req: NextRequest) {
       );
     }
 
-    const credential = await prisma.cadreCredential.create({
-      data: {
+    // One record per credential. Members re-enter a licence when they cannot see
+    // that it was saved, so a second entry with the same type and number (or a
+    // second blank one) updates the first instead of adding a duplicate.
+    const number = licenseNumber?.trim() || null;
+    const existing = await prisma.cadreCredential.findFirst({
+      where: {
         professionalId: session.sub,
         type,
-        regulatoryBody,
-        licenseNumber: licenseNumber?.trim() || null,
-        issuedDate: issuedDate ? new Date(issuedDate) : null,
-        expiryDate: expiryDate ? new Date(expiryDate) : null,
-        documentUrl: documentUrl || null,
-        verificationStatus: licenseNumber ? "PENDING" : "NOT_SUBMITTED",
+        OR: number
+          ? [{ licenseNumber: { equals: number, mode: "insensitive" } }, { licenseNumber: null }]
+          : [{ licenseNumber: null }],
       },
+      orderBy: { createdAt: "asc" },
     });
+
+    const data = {
+      regulatoryBody,
+      licenseNumber: number ?? existing?.licenseNumber ?? null,
+      issuedDate: issuedDate ? new Date(issuedDate) : existing?.issuedDate ?? null,
+      expiryDate: expiryDate ? new Date(expiryDate) : existing?.expiryDate ?? null,
+      documentUrl: documentUrl || existing?.documentUrl || null,
+    };
+    const status =
+      existing?.verificationStatus === "VERIFIED" && data.licenseNumber === existing.licenseNumber
+        ? "VERIFIED"
+        : data.licenseNumber
+          ? "PENDING"
+          : "NOT_SUBMITTED";
+
+    const credential = existing
+      ? await prisma.cadreCredential.update({
+          where: { id: existing.id },
+          data: { ...data, verificationStatus: status },
+        })
+      : await prisma.cadreCredential.create({
+          data: { professionalId: session.sub, type, ...data, verificationStatus: status },
+        });
 
     // Recompute completeness
     await recomputeCompleteness(session.sub);
 
-    return NextResponse.json(credential, { status: 201 });
+    return NextResponse.json(credential, { status: existing ? 200 : 201 });
   } catch (error) {
     console.error("Credential creation error:", error);
     return NextResponse.json(
@@ -111,7 +137,8 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id, documentUrl } = await req.json();
+  const body = await req.json();
+  const { id } = body;
   if (!id) {
     return NextResponse.json({ error: "Credential ID is required" }, { status: 400 });
   }
@@ -121,40 +148,47 @@ export const PATCH = handler(async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Credential not found" }, { status: 404 });
   }
 
-  const updated = await prisma.cadreCredential.update({
-    where: { id },
-    data: { documentUrl: documentUrl || null },
-  });
+  // Only the fields sent are changed: the documents page sends documentUrl alone.
+  const data: Record<string, unknown> = {};
+  if ("documentUrl" in body) data.documentUrl = body.documentUrl || null;
+  if ("issuedDate" in body) data.issuedDate = body.issuedDate ? new Date(body.issuedDate) : null;
+  if ("expiryDate" in body) data.expiryDate = body.expiryDate ? new Date(body.expiryDate) : null;
+  if ("licenseNumber" in body) {
+    const number = body.licenseNumber?.trim() || null;
+    data.licenseNumber = number;
+    // A changed number has not been checked, whatever the old one was.
+    if (number !== existing.licenseNumber) {
+      data.verificationStatus = number ? "PENDING" : "NOT_SUBMITTED";
+      data.verifiedAt = null;
+      data.verifiedBy = null;
+    }
+  }
+  if (data.documentUrl && existing.verificationStatus === "NOT_SUBMITTED" && (data.licenseNumber ?? existing.licenseNumber)) {
+    data.verificationStatus = "PENDING";
+  }
 
+  const updated = await prisma.cadreCredential.update({ where: { id }, data });
   return NextResponse.json(updated);
 });
 
-async function recomputeCompleteness(professionalId: string) {
-  const prof = await prisma.cadreProfessional.findUnique({
-    where: { id: professionalId },
-    include: {
-      credentials: true,
-      qualifications: true,
-      cpdEntries: true,
-      workHistory: true,
-    },
-  });
-  if (!prof) return;
+export const DELETE = handler(async function DELETE(req: NextRequest) {
+  const session = await getCadreSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  let completeness = 20;
-  if (prof.phone) completeness += 5;
-  if (prof.cadre) completeness += 5;
-  if (prof.subSpecialty) completeness += 5;
-  if (prof.yearsOfExperience) completeness += 5;
-  if (prof.state || prof.isDiaspora) completeness += 5;
-  if (prof.credentials.length > 0) completeness += 15;
-  if (prof.qualifications.length > 0) completeness += 15;
-  if (prof.cpdEntries.length > 0) completeness += 10;
-  if (prof.workHistory.length > 0) completeness += 10;
-  if (prof.salaryReportedAt) completeness += 5;
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "Credential ID is required" }, { status: 400 });
+  }
 
-  await prisma.cadreProfessional.update({
-    where: { id: professionalId },
-    data: { profileCompleteness: Math.min(completeness, 100) },
+  const deleted = await prisma.cadreCredential.deleteMany({
+    where: { id, professionalId: session.sub },
   });
-}
+  if (deleted.count === 0) {
+    return NextResponse.json({ error: "Credential not found" }, { status: 404 });
+  }
+
+  await recomputeCompleteness(session.sub);
+  return NextResponse.json({ ok: true });
+});
