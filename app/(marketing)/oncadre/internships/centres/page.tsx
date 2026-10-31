@@ -89,6 +89,9 @@ export default async function CentresPage() {
                 <span key={b} className="flex-1 rounded-lg px-2 py-1.5 text-center text-[11px] font-semibold" style={i === 0 ? { background: NAVY, color: "#fff" } : { border: "1px solid #E8EBF0", color: "#4B5563" }}>{b}</span>
               ))}
             </div>
+            <Link href="/oncadre/internships/demo" className="mt-3 block text-center text-xs font-semibold underline" style={{ color: NAVY }}>
+              Try the full list with sample candidates
+            </Link>
           </div>
         </div>
       </section>
