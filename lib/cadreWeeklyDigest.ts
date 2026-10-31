@@ -155,6 +155,8 @@ export interface WeekContext {
   catalyst: DfcCatalystEvent | null;
   /** True until the AGELESS evening has happened. */
   referralsOpen: boolean;
+  /** True until the network referral block has had its one issue. */
+  networkOpen: boolean;
   /**
    * Emails that have already answered the Medipark survey, so nobody is asked
    * twice. Only the respondents who opted in on Q16 gave us an email, so a
@@ -179,6 +181,7 @@ export interface CadreDigestContent {
   catalyst: { headline: string; detail: string; ctaLabel: string; href: string } | null;
   referral: { label: string; headline: string; detail: string; ctaLabel: string; href: string } | null;
   medipark: { headline: string; detail: string; ctaLabel: string; href: string } | null;
+  network: Array<{ headline: string; detail: string; ctaLabel: string; href: string }>;
   prize: { won: boolean; headline: string; detail: string; ctaLabel: string; href: string };
   showcase: DigestShowcase | null;
 }
@@ -478,6 +481,7 @@ export async function buildWeekContext(
     showcase,
     catalyst: nextCatalystEvent(now),
     referralsOpen: now.getTime() < AGELESS_CLOSE.getTime(),
+    networkOpen: now.getTime() < NETWORK_CLOSE.getTime(),
     mediparkAnswered,
     awards,
     awardsIssued: awards.size,
@@ -916,6 +920,45 @@ function buildReferral(ctx: WeekContext): CadreDigestContent["referral"] {
   };
 }
 
+/**
+ * Where to send your patients: specialists and a diagnostics partner now on
+ * Mezo, written for the 31 October follow-on email that missed its window and
+ * carried here instead, at Debo's call. Dr Bola leads. It runs for the 6
+ * November issue and removes itself after.
+ *
+ * GetSlim's own Mezo practice page is still empty, so its link is the
+ * weight-loss surgery page. Dr Bola's /drbola site is a preview, so his link is
+ * his live Mezo profile. Swap both once the pages exist.
+ */
+const NETWORK_CLOSE = new Date("2026-11-07T00:00:00+01:00");
+
+function buildNetwork(ctx: WeekContext): CadreDigestContent["network"] {
+  if (!ctx.networkOpen) return [];
+  return [
+    {
+      headline: "Revision hip and knee: Dr Bola Akinola, Osteon Clinics",
+      detail:
+        "A revision arthroplasty specialist: failed, infected and complex joint replacements, and the primaries that need more than a routine operation. He treats what you send and hands the patient back to you with a letter.",
+      ctaLabel: "Refer to Dr Bola",
+      href: "https://mezohealth.com/dr/bolarinwa-akinola-orthopaedic-surgery-nigeria",
+    },
+    {
+      headline: "Bariatric and metabolic surgery: GetSlim is now on Mezo",
+      detail:
+        "Dr Timi Adenuga, its lead bariatric and laparoscopic surgeon, has performed more than 1,000 bariatric procedures and treats obesity with the diabetes, hypertension and sleep apnoea that come with it. He consults in Lagos and Abuja.",
+      ctaLabel: "Refer a patient",
+      href: "https://mezohealth.com/specialties/weight-loss-surgery",
+    },
+    {
+      headline: "Imaging and laboratory: BeaconHealth Diagnostics",
+      detail:
+        "Now Mezo's imaging and laboratory partner, with sites in Lekki, Ikeja and Sangotedo, and results go back to the doctor who ordered them.",
+      ctaLabel: "See the centres",
+      href: "https://mezohealth.com/centres/beacon-diagnostics",
+    },
+  ];
+}
+
 /** Slot 4. Five a week, earned. Scarcity is the point. */
 function buildPrize(p: DigestRecipient, ctx: WeekContext): CadreDigestContent["prize"] {
   const award = ctx.awards.get(p.id);
@@ -952,6 +995,7 @@ export function buildDigestForProfessional(p: DigestRecipient, ctx: WeekContext)
     catalyst: buildCatalyst(ctx),
     referral: buildReferral(ctx),
     medipark: buildMedipark(p, ctx),
+    network: buildNetwork(ctx),
     prize: buildPrize(p, ctx),
     showcase: ctx.showcase,
   };
@@ -1035,6 +1079,7 @@ export function renderDigestHtml(
     ...(d.referral
       ? [block(TONES.GOOD, d.referral.label, d.referral.headline, d.referral.detail, d.referral.ctaLabel, abs(baseUrl, d.referral.href))]
       : []),
+    ...d.network.map((n) => block(TONES.GOOD, "Where to send your patients", n.headline, n.detail, n.ctaLabel, abs(baseUrl, n.href))),
     block(TONES.PRIZE, d.prize.won ? "Yours this week" : "Five a week", d.prize.headline, d.prize.detail, d.prize.ctaLabel, abs(baseUrl, d.prize.href)),
   ];
 
@@ -1057,6 +1102,7 @@ export function renderDigestHtml(
     ...(d.medipark ? [`HELP US DESIGN IT: ${d.medipark.headline} ${d.medipark.detail} ${abs(baseUrl, d.medipark.href)}`] : []),
     ...(d.catalyst ? [`DFC CATALYST SERIES: ${d.catalyst.headline}. ${d.catalyst.detail} ${abs(baseUrl, d.catalyst.href)}`] : []),
     ...(d.referral ? [`${d.referral.label.toUpperCase()}: ${d.referral.headline}. ${d.referral.detail} ${abs(baseUrl, d.referral.href)}`] : []),
+    ...d.network.map((n) => `WHERE TO SEND YOUR PATIENTS: ${n.headline}. ${n.detail} ${abs(baseUrl, n.href)}`),
     `${d.prize.headline}. ${d.prize.detail} ${abs(baseUrl, d.prize.href)}`,
     ...(d.showcase ? [`${d.showcase.kind === "MEMBER" ? "MEMBER OF THE WEEK" : "SPECIALTY SPOTLIGHT"}: ${d.showcase.headline}. ${d.showcase.detail} ${abs(baseUrl, d.showcase.href)}`] : []),
   ];
