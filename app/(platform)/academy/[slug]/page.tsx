@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ModuleViewer from "@/components/platform/academy/ModuleViewer";
+import { publicQuestion } from "@/lib/academyQuiz";
 
 export default async function ModulePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -33,7 +34,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
 
   return (
     <ModuleViewer
-      module={mod}
+      module={{ ...mod, questions: mod.questions.map(publicQuestion) }}
       track={mod.track}
       progress={progress}
       isEnrolled={!!enrollment}

@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
 import { handler } from "@/lib/api-handler";
+import { parseOptions, publicQuestion } from "@/lib/academyQuiz";
 
 // GET: Fetch module content + progress for a specific module
 export const GET = handler(async function GET(req: NextRequest) {
@@ -29,7 +30,11 @@ export const GET = handler(async function GET(req: NextRequest) {
     },
   });
 
-  return Response.json({ module: mod, enrollment, progress: enrollment?.moduleProgress[0] ?? null });
+  return Response.json({
+    module: { ...mod, questions: mod.questions.map(publicQuestion) },
+    enrollment,
+    progress: enrollment?.moduleProgress[0] ?? null,
+  });
 });
 
 // POST: Submit quiz answers and update progress
@@ -61,24 +66,30 @@ export const POST = handler(async function POST(req: NextRequest) {
 
   const progress = enrollment.moduleProgress.find((p) => p.moduleId === moduleId);
   if (!progress) return Response.json({ error: "Module not in enrollment" }, { status: 400 });
+  if (progress.status === "LOCKED") {
+    return Response.json({ error: "Pass the module before this one first" }, { status: 400 });
+  }
 
   // Grade answers
   let totalPoints = 0;
   let earnedPoints = 0;
   const answerRecords: { questionId: string; answer: string; isCorrect: boolean; pointsEarned: number }[] = [];
+  // Returned after grading: the right answers and explanations never reach the
+  // browser before the learner submits.
+  const review: Record<string, { correct: boolean; correctOptionIds: string[]; explanation: string | null }> = {};
 
   for (const q of mod.questions) {
     totalPoints += q.points;
+    const parsedOpts = parseOptions(q.options);
     const userAnswer = answers[q.id];
+    review[q.id] = {
+      correct: false,
+      correctOptionIds: parsedOpts?.filter((o) => o.isCorrect).map((o) => o.id) ?? [],
+      explanation: q.explanation,
+    };
     if (!userAnswer) continue;
 
     let isCorrect = false;
-    const rawOpts = q.options;
-    const parsedOpts: { id: string; isCorrect: boolean }[] | null =
-      rawOpts == null ? null
-      : typeof rawOpts === "string" ? JSON.parse(rawOpts)
-      : Array.isArray(rawOpts) ? rawOpts as { id: string; isCorrect: boolean }[]
-      : null;
     if (q.type === "MULTIPLE_CHOICE" && parsedOpts) {
       const correctOpt = parsedOpts.find((o) => o.isCorrect);
       isCorrect = correctOpt?.id === userAnswer;
@@ -91,6 +102,7 @@ export const POST = handler(async function POST(req: NextRequest) {
       isCorrect = true;
     }
 
+    review[q.id].correct = isCorrect;
     const pts = isCorrect ? q.points : 0;
     earnedPoints += pts;
     answerRecords.push({ questionId: q.id, answer: String(userAnswer), isCorrect, pointsEarned: pts });
@@ -120,7 +132,8 @@ export const POST = handler(async function POST(req: NextRequest) {
         status: passed ? "COMPLETED" : "IN_PROGRESS",
         score,
         attempts: { increment: 1 },
-        timeSpentMinutes: { increment: timeSpentMinutes || 0 },
+        // Minutes on the page since it opened, capped so a tab left open overnight does not count.
+        timeSpentMinutes: { increment: Math.min(240, Math.max(0, Math.round(Number(timeSpentMinutes) || 0))) },
         completedAt: passed ? new Date() : undefined,
         lastAccessedAt: new Date(),
       },
@@ -161,5 +174,5 @@ export const POST = handler(async function POST(req: NextRequest) {
     }
   });
 
-  return Response.json({ score, passed, totalPoints, earnedPoints });
+  return Response.json({ score, passed, totalPoints, earnedPoints, review });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -74,7 +74,9 @@ export default function ModuleViewer({
     passed: boolean;
     totalPoints: number;
     earnedPoints: number;
+    review?: Record<string, { correct: boolean; correctOptionIds: string[]; explanation: string | null }>;
   } | null>(null);
+  const openedAt = useRef(Date.now());
   const [submitting, setSubmitting] = useState(false);
   const [showExplanations, setShowExplanations] = useState(false);
 
@@ -99,7 +101,7 @@ export default function ModuleViewer({
       const res = await fetch("/api/training/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ moduleId: mod.id, answers, timeSpentMinutes: 0 }),
+        body: JSON.stringify({ moduleId: mod.id, answers, timeSpentMinutes: (Date.now() - openedAt.current) / 60000 }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -460,12 +462,23 @@ export default function ModuleViewer({
                       </div>
                     ) : null}
 
-                    {showExplanations && q.explanation && (
-                      <div className="mt-4 p-3 rounded-lg text-xs" style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
-                        <p className="font-medium text-blue-700 mb-1">Explanation</p>
-                        <p className="text-blue-600">{q.explanation}</p>
-                      </div>
-                    )}
+                    {showExplanations && quizResult?.review?.[q.id] && (() => {
+                      const r = quizResult.review[q.id];
+                      const right = opts?.filter((o) => r.correctOptionIds.includes(o.id)).map((o) => `${o.id.toUpperCase()}. ${o.text}`) ?? [];
+                      return (
+                        <div
+                          className="mt-4 p-3 rounded-lg text-xs"
+                          style={r.correct
+                            ? { background: "#F0FDF4", border: "1px solid #BBF7D0" }
+                            : { background: "#FEF2F2", border: "1px solid #FECACA" }}
+                        >
+                          <p className={`font-medium mb-1 ${r.correct ? "text-green-700" : "text-red-700"}`}>
+                            {r.correct ? "Correct" : `Not quite. The answer: ${right.join("; ")}`}
+                          </p>
+                          {r.explanation && <p className="text-gray-700">{r.explanation}</p>}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}

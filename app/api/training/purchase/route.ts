@@ -57,6 +57,16 @@ export const POST = handler(async function POST(req: Request) {
     return Response.json({ error: "Already enrolled in this track" }, { status: 400 });
   }
 
+  // Take no money for a track the enrol step would then refuse.
+  if (track.prerequisites.length > 0) {
+    const certified = await prisma.trainingEnrollment.count({
+      where: { userId: session.user.id, status: "CERTIFIED", track: { slug: { in: track.prerequisites } } },
+    });
+    if (certified < track.prerequisites.length) {
+      return Response.json({ error: "Complete the foundation track first" }, { status: 400 });
+    }
+  }
+
   const secretKey = process.env.PAYSTACK_SECRET_KEY;
   if (!secretKey) {
     return Response.json({ error: "Payment processing not configured" }, { status: 503 });
