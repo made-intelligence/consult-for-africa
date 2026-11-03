@@ -61,6 +61,36 @@ DOCS_TO_BUILD = [
         "Development Plan  /  Office of the Founding Partner",
         footer("Office of the Founding Partner"),
     ),
+    (
+        "mba",
+        "cfa-mba-programme-cfa",
+        "The CFA MBA  /  Office of the Founding Partner",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "safety",
+        "mezo-care-coordinator-safety-card-cfa",
+        "The CFA MBA  /  Care Coordinator Safety Card",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "c1",
+        "mba-c1-medicine-and-the-hospital-cfa",
+        "The CFA MBA  /  C1 Medicine and the Hospital",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "c1-key",
+        "mba-c1-marking-key-cfa",
+        "The CFA MBA  /  C1 Marking Key",
+        footer("Office of the Founding Partner"),
+    ),
+    (
+        "c2",
+        "mba-c2-managing-through-others-cfa",
+        "The CFA MBA  /  C2 Managing Through Others",
+        footer("Office of the Founding Partner"),
+    ),
 ]
 
 
