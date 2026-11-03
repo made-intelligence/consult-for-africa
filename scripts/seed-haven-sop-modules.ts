@@ -1,5 +1,6 @@
 /**
  * Seed Haven's SOP and core training modules (lib/haven-sop-modules.ts) into
+ * (and the Direction and Teamwork strands, lib/haven-direction-modules.ts) into
  * the Protocol library, with their questions.
  *
  * Nothing reaches staff from this script. New modules land with approvedAt
@@ -24,6 +25,10 @@
 import { randomBytes } from "crypto";
 import { PrismaClient } from "@prisma/client";
 import { SOP_MODULES, type SopModule, type SopQuestion } from "../lib/haven-sop-modules";
+import { DIRECTION_MODULES } from "../lib/haven-direction-modules";
+
+// SOP and core modules, plus the Direction and Teamwork strands (phase 1).
+const ALL_MODULES: SopModule[] = [...SOP_MODULES, ...DIRECTION_MODULES];
 
 const prisma = new PrismaClient();
 const APPLY = process.argv.includes("--apply");
@@ -77,7 +82,7 @@ async function replaceQuestions(protocolId: string, qs: SopQuestion[]) {
 
 async function main() {
   const codes = new Set<string>();
-  for (const m of SOP_MODULES) {
+  for (const m of ALL_MODULES) {
     validate(m);
     if (codes.has(m.code)) throw new Error(`Duplicate code ${m.code}`);
     codes.add(m.code);
@@ -90,7 +95,7 @@ async function main() {
 
   const tally = { created: 0, unchanged: 0, revised: 0, approvalCleared: 0 };
 
-  for (const m of SOP_MODULES) {
+  for (const m of ALL_MODULES) {
     const found = await prisma.$queryRaw<ExistingProtocol[]>`
       SELECT "id","title","summary","body","version","approvedAt"
       FROM "Protocol" WHERE "clientId" = ${clientId} AND "code" = ${m.code} LIMIT 1`;
@@ -146,9 +151,9 @@ async function main() {
     }
   }
 
-  const totalQuestions = SOP_MODULES.reduce((n, m) => n + m.questions.length, 0);
+  const totalQuestions = ALL_MODULES.reduce((n, m) => n + m.questions.length, 0);
   console.log(
-    `\n  ${SOP_MODULES.length} modules, ${totalQuestions} questions. ` +
+    `\n  ${ALL_MODULES.length} modules, ${totalQuestions} questions. ` +
       `${tally.created} new, ${tally.revised} revised (${tally.approvalCleared} lose approval), ${tally.unchanged} unchanged.`,
   );
   console.log(APPLY ? "  Written. Every new or revised module waits for clinical approval." : "  DRY RUN. Re-run with --apply.");

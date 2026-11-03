@@ -539,6 +539,8 @@ model Client {
   trainingSessions   TrainingSession[]
   staffTasks         StaffTask[]
   staffRotas         StaffRota[]
+  staffTeams         StaffTeam[]
+  objectives         Objective[]
   safetyReports      SafetyReport[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
@@ -8275,6 +8277,12 @@ model StaffMember {
   trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
   safetyInvestigations SafetyReport[]    @relation("SafetyInvestigator")
   shifts            StaffShift[]          @relation("StaffShifts")
+  teamId            String?
+  team              StaffTeam?            @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  teamsLed          StaffTeam[]           @relation("TeamLead")
+  huddlesLed        TeamHuddle[]          @relation("HuddleLead")
+  objectivesAgreed  Objective[]           @relation("ObjectiveAgreed")
+  krCheckIns        KeyResultCheckIn[]    @relation("KrCheckIns")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
@@ -8538,11 +8546,143 @@ model ProtocolProgress {
   againstVersion Int       @default(1)
   nextDueAt      DateTime?
 
+  /// Spaced re-testing after a pass: 1 is due at two days, 2 at two weeks,
+  /// 3 at two months, 4 is retained. A miss keeps the stage and comes back in
+  /// two days. Testing beats rereading; testing again later beats both.
+  reviewStage  Int       @default(0)
+  nextReviewAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([protocolId, staffId])
   @@index([staffId])
+}
+
+/// A team: the unit that huddles, owns key results and has a lead. One team
+/// per person (StaffMember.teamId), so the cut is mutually exclusive by
+/// construction; nobody is in two and the sum of teams is the hospital.
+model StaffTeam {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  key      String
+  name     String
+  purpose  String? @db.Text
+  leadId   String?
+  lead     StaffMember? @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
+  sortOrder Int @default(0)
+
+  members    StaffMember[] @relation("TeamMembers")
+  huddles    TeamHuddle[]
+  objectives Objective[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, key])
+}
+
+/// One team's ten-minute huddle on one day: who was there, one safety
+/// concern, today's focus, one blocker.
+model TeamHuddle {
+  id        String      @id @default(cuid())
+  teamId    String
+  team      StaffTeam   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  date      DateTime
+  ledById   String?
+  ledBy     StaffMember? @relation("HuddleLead", fields: [ledById], references: [id], onDelete: SetNull)
+  attendees String[]
+  safety    String? @db.Text
+  focus     String? @db.Text
+  blocker   String? @db.Text
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, date])
+}
+
+enum ObjectiveLevel {
+  BOARD
+  TEAM
+}
+
+/// DRAFT is being written. PROPOSED is sent up for agreement (catchball).
+/// AGREED is the quarter's commitment. CLOSED is scored at quarter end.
+enum ObjectiveStatus {
+  DRAFT
+  PROPOSED
+  AGREED
+  CLOSED
+}
+
+/// An objective for a quarter, at board or team level. Team objectives ladder
+/// to a board one through parentId. Never tied to pay: see the research memo.
+model Objective {
+  id         String          @id @default(cuid())
+  clientId   String
+  client     Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  level      ObjectiveLevel
+  teamId     String?
+  team       StaffTeam?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  parentId   String?
+  parent     Objective?      @relation("ObjectiveTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children   Objective[]     @relation("ObjectiveTree")
+  quarter    String
+  title      String
+  why        String?         @db.Text
+  status     ObjectiveStatus @default(DRAFT)
+  proposalNote String?       @db.Text
+  agreedById String?
+  agreedBy   StaffMember?    @relation("ObjectiveAgreed", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt   DateTime?
+  sortOrder  Int             @default(0)
+
+  keyResults KeyResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, quarter])
+}
+
+/// RESULT is what we are trying to move. GUARD is what must not get worse
+/// while we move it: every objective needs one before it can be agreed.
+enum KeyResultKind {
+  RESULT
+  GUARD
+}
+
+model KeyResult {
+  id          String        @id @default(cuid())
+  objectiveId String
+  objective   Objective     @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  kind        KeyResultKind @default(RESULT)
+  title       String
+  baseline    String?
+  target      String?
+  current     String?
+  /// 1 to 10: how sure the owner is it will be hit by quarter end.
+  confidence  Int?
+  sortOrder   Int           @default(0)
+  checkIns    KeyResultCheckIn[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([objectiveId])
+}
+
+model KeyResultCheckIn {
+  id          String       @id @default(cuid())
+  keyResultId String
+  keyResult   KeyResult    @relation(fields: [keyResultId], references: [id], onDelete: Cascade)
+  value       String
+  confidence  Int?
+  note        String?      @db.Text
+  byId        String?
+  by          StaffMember? @relation("KrCheckIns", fields: [byId], references: [id], onDelete: SetNull)
+  createdAt   DateTime     @default(now())
+
+  @@index([keyResultId, createdAt])
 }
 
 /// A department's rota for one month is in the system.

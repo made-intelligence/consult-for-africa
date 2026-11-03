@@ -133,7 +133,11 @@ export type Capability =
   | "VIEW_COMPETENCY_AGGREGATE"
   | "VIEW_NEAR_MISS_DETAIL"
   | "ENTER_ROTA"
-  | "VIEW_TEAM_NAMED";
+  | "VIEW_TEAM_NAMED"
+  | "MANAGE_TEAMS"
+  | "SIGN_OFF_SKILL"
+  | "AGREE_BOARD_OBJECTIVES"
+  | "AGREE_TEAM_OBJECTIVES";
 
 const GRANTS: Record<Capability, Tier[]> = {
   READ_DIRECTORY: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP", "BOARD"],
@@ -179,6 +183,18 @@ const GRANTS: Record<Capability, Tier[]> = {
   // score, a ward note or who filed a report: those stay where BOARD_BLIND put
   // them, because they are the things people stop doing once owners read them.
   VIEW_TEAM_NAMED: ["LEADERSHIP", "BOARD"],
+
+  // Who is in which team, and who leads it. Operational, so not BOARD.
+  MANAGE_TEAMS: ["LEADERSHIP"],
+
+  // Watching somebody do a skill on shift and signing it. A quiz cannot
+  // certify that a nurse can resuscitate a baby; a supervisor watching can.
+  SIGN_OFF_SKILL: ["SUPERVISOR", "LEADERSHIP"],
+
+  // Catchball. Leadership proposes the board's objectives with the board, the
+  // board agrees them; teams propose theirs, leadership or the board agrees.
+  AGREE_BOARD_OBJECTIVES: ["BOARD"],
+  AGREE_TEAM_OBJECTIVES: ["LEADERSHIP", "BOARD"],
 };
 
 export function can(session: StaffSession | null, capability: Capability) {

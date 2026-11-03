@@ -57,8 +57,8 @@ export default async function TeamPage() {
 
   const people = await prisma.staffMember.findMany({
     where: staffWhere(session.clientId, ONBOARDED),
-    select: { id: true, name: true, position: true, department: true, lastLoginAt: true },
-    orderBy: [{ department: "asc" }, { name: "asc" }],
+    select: { id: true, name: true, position: true, department: true, lastLoginAt: true, team: { select: { name: true, sortOrder: true } } },
+    orderBy: [{ team: { sortOrder: "asc" } }, { department: "asc" }, { name: "asc" }],
   });
   const ids = people.map((p) => p.id);
 
@@ -157,7 +157,7 @@ export default async function TeamPage() {
                   <tr key={r.p.id} style={{ borderTop: `1px solid ${LINE}` }}>
                     <td style={{ padding: "7px 12px", position: "sticky", left: 0, background: "#fff" }}>
                       <a href={`#p-${r.p.id}`} style={{ color: NAVY, fontWeight: 650, textDecoration: "none" }}>{r.p.name}</a>
-                      <div style={{ color: MUTED, fontSize: 11.5 }}>{r.p.position} · {deptLabel(r.p.department)}</div>
+                      <div style={{ color: MUTED, fontSize: 11.5 }}>{r.p.position} · {r.p.team?.name ?? deptLabel(r.p.department)}</div>
                     </td>
                     {r.cells.map((c, i) => {
                       const k = colour(c);

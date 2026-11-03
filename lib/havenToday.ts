@@ -21,7 +21,7 @@ import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -150,14 +150,59 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     items.push({ kind: "PROTOCOL", title: p.title, detail: next, urgency: "THIS_WEEK", href: `/HavenStaff/learn/${p.code}` });
   }
 
+  // Spaced re-tests that have come due: two questions from a passed module.
+  const due = await prisma.protocolProgress.findFirst({
+    where: { staffId: me.id, passed: true, nextReviewAt: { lte: new Date() }, protocol: { isActive: true, NOT: { approvedAt: null } } },
+    select: { protocol: { select: { code: true, title: true } } },
+    orderBy: { nextReviewAt: "asc" },
+  });
+  if (due) {
+    items.push({ kind: "REVIEW", title: `Two quick questions: ${due.protocol.title}`, detail: "A minute. Answering again later is what makes it stick.", urgency: "THIS_WEEK", href: `/HavenStaff/learn/${due.protocol.code}?review=1` });
+  }
+
   // A day off on the rota. Nothing is owed and nothing is chased. One module is
   // offered, because it is the one piece of work that needs no building, and
   // it counts towards recognition rather than against anybody.
   if (duty === "OFF") {
-    const learn = items.find((i) => i.kind === "PROTOCOL");
+    const learn = items.find((i) => i.kind === "REVIEW") ?? items.find((i) => i.kind === "PROTOCOL");
     return learn
       ? [{ kind: "DAY_OFF", title: learn.title, detail: "About fifteen minutes, from anywhere. Optional, and it counts.", urgency: "THIS_WEEK", href: learn.href }]
       : [];
+  }
+
+  // The huddle, for a team lead on a working day.
+  const led = await prisma.staffTeam.findMany({
+    where: { clientId: session.clientId, leadId: me.id },
+    select: { id: true, name: true, huddles: { where: { date: dutyDay() }, select: { id: true } } },
+  });
+  for (const t of led) {
+    if (t.huddles.length === 0) {
+      items.push({ kind: "HUDDLE", title: `Today's huddle: ${t.name}`, detail: "Ten minutes, standing. Safety, focus, one blocker.", urgency: "TODAY", href: "/HavenStaff/teams" });
+    }
+  }
+
+  // Objectives. Proposals waiting on whoever agrees them; and a weekly
+  // check-in for a lead whose agreed results have not been updated.
+  const agreeLevels = [
+    ...(can(session, "AGREE_BOARD_OBJECTIVES") ? (["BOARD"] as const) : []),
+    ...(can(session, "AGREE_TEAM_OBJECTIVES") ? (["TEAM"] as const) : []),
+  ];
+  if (agreeLevels.length > 0) {
+    const waiting = await prisma.objective.count({ where: { clientId: session.clientId, status: "PROPOSED", level: { in: [...agreeLevels] } } });
+    if (waiting > 0) {
+      items.push({ kind: "OBJECTIVES", title: `${waiting} objective${waiting === 1 ? "" : "s"} waiting for you to agree`, detail: "Agree them, or send back with a note.", urgency: "TODAY", href: "/HavenStaff/objectives" });
+    }
+  }
+  if (led.length > 0) {
+    const stale = await prisma.keyResult.count({
+      where: {
+        objective: { status: "AGREED", teamId: { in: led.map((t) => t.id) } },
+        NOT: { checkIns: { some: { createdAt: { gte: new Date(Date.now() - 7 * 864e5) } } } },
+      },
+    });
+    if (stale > 0) {
+      items.push({ kind: "OBJECTIVES", title: "This week's check-in on your team's results", detail: `${stale} not updated this week. Where it is now, and how sure you are.`, urgency: "THIS_WEEK", href: "/HavenStaff/objectives" });
+    }
   }
 
   // The rota. Whoever can enter it is told, every day, while it is missing,
