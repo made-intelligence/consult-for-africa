@@ -53,12 +53,16 @@ export async function dutyBook(
   const end = dayKey(to);
   const months = Array.from(new Set(daysBetween(start, end).map(monthKey)));
 
+  // If the rota tables are not there yet (code deployed before the
+  // migration), everybody reads UNKNOWN, which is exactly the old behaviour,
+  // rather than the staff page and the flag job falling over.
+  const soft = <T,>(p: Promise<T[]>) => p.catch((err) => { console.error("[havenDuty]", err); return [] as T[]; });
   const [rotas, shifts, leave] = await Promise.all([
-    prisma.staffRota.findMany({ where: { clientId, month: { in: months } }, select: { department: true, month: true } }),
-    prisma.staffShift.findMany({
+    soft(prisma.staffRota.findMany({ where: { clientId, month: { in: months } }, select: { department: true, month: true } })),
+    soft(prisma.staffShift.findMany({
       where: { staffId: { in: ids }, date: { gte: start, lte: end } },
       select: { staffId: true, date: true, code: true },
-    }),
+    })),
     prisma.staffLeaveRequest.findMany({
       where: { staffId: { in: ids }, status: "APPROVED", startDate: { lte: end }, endDate: { gte: start } },
       select: { staffId: true, startDate: true, endDate: true },
