@@ -75,6 +75,10 @@
     {
       "path": "/api/cron/haven-founder-note",
       "schedule": "0 6 * * 1,5"
+    },
+    {
+      "path": "/api/cron/signing-chase",
+      "schedule": "0 8 * * 1-5"
     }
   ]
 }

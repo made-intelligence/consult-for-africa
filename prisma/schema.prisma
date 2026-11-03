@@ -451,6 +451,8 @@ model User {
   estateRateChanges        EstateRateChange[]       @relation("EstateRateChanger")
   estateServicesRecorded   EstateGeneratorService[] @relation("EstateServiceRecorder")
   lyfeEnquiries            LyfeEnquiry[]            @relation("LyfeEnquiryOwner")
+  providerSigningsOwned    ProviderSigning[]        @relation("ProviderSigningOwner")
+  providerSigningEvents    ProviderSigningEvent[]   @relation("ProviderSigningActor")
 }
 
 model ConsultantProfile {
@@ -674,6 +676,7 @@ model Engagement {
   billingSchedules   BillingSchedule[]
   creditNotes        CreditNote[]
   agentOpportunities AgentOpportunity[]
+  signingProgrammes  SigningProgramme[]
 
   @@index([clientId])
   @@index([engagementManagerId])
@@ -9331,4 +9334,135 @@ model WatchRun {
 
   @@index([watchId, startedAt])
   @@index([pendingRef, collectedAt])
+}
+
+// ─── Provider signings ──────────────────────────────────────────────────────
+//
+// A network-building sprint where the work is getting contracts signed and
+// back: Aman HMO's Lagos SLAs first. Most of the time goes on chasing
+// agreements the provider already holds, so the record is built around who
+// signs, when it went out, and what the next move is.
+
+enum ProviderSigningStage {
+  TARGET
+  CONTACTED
+  INTERESTED
+  SLA_SENT
+  SIGNED
+  DOCS_COMPLETE
+  WITH_CLIENT
+  PARKED
+}
+
+model SigningProgramme {
+  id             String     @id @default(cuid())
+  engagementId   String
+  engagement     Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  name           String
+  /// Signed before the programme started, so the total reads against the target.
+  baselineSigned Int        @default(0)
+  target         Int        @default(0)
+  deadline       DateTime?
+  /// [{ "start": "2026-11-02", "target": 20 }, ...], Mondays in Lagos time.
+  weeklyTargets  Json?
+
+  /// The name a provider sees on every email.
+  senderName         String
+  slaFileKey         String?
+  slaFileName        String?
+  /// The documents a provider returns with the signed agreement, one per line.
+  documentsChecklist String? @db.Text
+
+  /// Off until the lead has sent the chase to themselves and approved it.
+  chaseEnabled      Boolean   @default(false)
+  /// Days after the SLA went out on which the automatic reminder goes.
+  chaseDays         Int[]     @default([2, 5, 9, 14])
+  chaseSubject      String
+  chaseBody         String    @db.Text
+  chaseApprovedById String?
+  chaseApprovedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  providers ProviderSigning[]
+
+  @@index([engagementId])
+}
+
+model ProviderSigning {
+  id          String           @id @default(cuid())
+  programmeId String
+  programme   SigningProgramme @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+
+  facility       String
+  groupName      String?
+  facilityType   String?
+  lga            String?
+  area           String?
+  contactName    String?
+  contactRole    String?
+  phone          String?
+  email          String?
+  /// The person who actually signs, usually the MD or owner, not the admin
+  /// officer who received the agreement.
+  signatoryName  String?
+  signatoryPhone String?
+  signatoryEmail String?
+  source         String?
+
+  ownerId String?
+  owner   User?   @relation("ProviderSigningOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  stage          ProviderSigningStage @default(TARGET)
+  firstContactAt DateTime?
+  lastContactAt  DateTime?
+  slaSentAt      DateTime?
+  signedAt       DateTime?
+  docsCompleteAt DateTime?
+  sentToClientAt DateTime?
+
+  /// Where the person is in the chase cadence after the SLA went out.
+  cadenceStep  Int       @default(0)
+  nextAction   String?
+  nextActionAt DateTime?
+  objection    String?   @db.Text
+  notes        String?   @db.Text
+
+  chaseCount   Int       @default(0)
+  lastChasedAt DateTime?
+  chasePaused  Boolean   @default(false)
+
+  /// The provider's own link for returning the signed agreement. Unguessable,
+  /// and the only thing the public upload page accepts.
+  returnToken    String   @unique
+  signedFileKey  String?
+  signedFileName String?
+  documentKeys   String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events ProviderSigningEvent[]
+
+  @@index([programmeId, stage])
+  @@index([programmeId, ownerId])
+  @@index([nextActionAt])
+}
+
+model ProviderSigningEvent {
+  id        String                @id @default(cuid())
+  signingId String
+  signing   ProviderSigning       @relation(fields: [signingId], references: [id], onDelete: Cascade)
+  /// CALL, EMAIL, WHATSAPP, VISIT, BULK_EMAIL, AUTO_CHASE, STAGE, UPLOAD, NOTE
+  kind      String
+  note      String?               @db.Text
+  /// For STAGE, the stage moved to.
+  stage     ProviderSigningStage?
+  actorId   String?
+  actor     User?                 @relation("ProviderSigningActor", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt DateTime              @default(now())
+
+  @@index([signingId, createdAt])
+  @@index([actorId, createdAt])
 }

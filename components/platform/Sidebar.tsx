@@ -44,6 +44,7 @@ import {
   MessageSquare,
   Star,
   Radar,
+  FileSignature,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
@@ -110,6 +111,7 @@ const OFFICE_NAV: NavSection[] = [
     title: "Mine",
     items: [
       { label: "Tasks",          href: "/tasks",          icon: ClipboardList },
+      { label: "Provider signings", href: "/admin/signings", icon: FileSignature },
       { label: "Campaigns",      href: "/campaigns",      icon: Megaphone },
       { label: "Nurse internships", href: "/admin/cadre-internships", icon: GraduationCap },
     ],
@@ -182,6 +184,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Dashboard",      href: "/dashboard",      icon: LayoutDashboard },
       { label: "Projects",       href: "/projects",       icon: Briefcase },
       { label: "Deliverables",   href: "/deliverables",   icon: FileCheck },
+      { label: "Provider signings", href: "/admin/signings", icon: FileSignature },
       { label: "Meetings",       href: "/meetings",       icon: Video },
       { label: "Haven adoption", href: "/admin/haven-adoption", icon: HeartPulse, roles: STAFF_ROLES },
     ],
