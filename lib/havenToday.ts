@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { can, type StaffSession } from "@/lib/staffAuth";
 import { isoWeek } from "@/lib/havenScoreboard";
 import { lateness } from "@/lib/havenSafety";
+import { dutyBook, dayKey as dutyDay, monthKey, deptLabel, type Duty } from "@/lib/havenDuty";
+import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 
 /**
  * What is waiting on one person, right now.
@@ -19,7 +21,7 @@ import { lateness } from "@/lib/havenSafety";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -44,12 +46,24 @@ function matches(roles: string[], position: string, department: string) {
   });
 }
 
+/** Today's duty for one person. Shared by the page, the email and the flags. */
+export async function todayDuty(session: StaffSession): Promise<Duty> {
+  const me = await prisma.staffMember.findUnique({ where: { id: session.sub }, select: { id: true, department: true } });
+  if (!me) return "UNKNOWN";
+  const book = await dutyBook(session.clientId, [me], dutyDay(), dutyDay());
+  return book.duty(me.id, dutyDay());
+}
+
 export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]> {
   const me = await prisma.staffMember.findUnique({
     where: { id: session.sub },
     select: { id: true, position: true, department: true, lastLoginAt: true, createdAt: true },
   });
   if (!me) return [];
+
+  const duty = await todayDuty(session);
+  // On leave is rest. Nothing at all, not even the module.
+  if (duty === "LEAVE") return [];
 
   // Somebody on their first day sees today and nothing before it. Arriving to
   // a fortnight of things you were never told about is how a person decides
@@ -133,7 +147,52 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     const pr = byProtocol.get(p.id);
     if (pr?.passed) continue;
     const next = !pr?.acknowledgedAt ? "Acknowledge it" : !pr?.studiedAt ? "Read it" : "Take the test";
-    items.push({ kind: "PROTOCOL", title: p.title, detail: next, urgency: "THIS_WEEK", href: `/HavenStaff/protocols/${p.code}` });
+    items.push({ kind: "PROTOCOL", title: p.title, detail: next, urgency: "THIS_WEEK", href: `/HavenStaff/learn/${p.code}` });
+  }
+
+  // A day off on the rota. Nothing is owed and nothing is chased. One module is
+  // offered, because it is the one piece of work that needs no building, and
+  // it counts towards recognition rather than against anybody.
+  if (duty === "OFF") {
+    const learn = items.find((i) => i.kind === "PROTOCOL");
+    return learn
+      ? [{ kind: "DAY_OFF", title: learn.title, detail: "About fifteen minutes, from anywhere. Optional, and it counts.", urgency: "THIS_WEEK", href: learn.href }]
+      : [];
+  }
+
+  // The rota. Whoever can enter it is told, every day, while it is missing,
+  // that their department is being chased on its days off because of it.
+  if (can(session, "ENTER_ROTA")) {
+    const now = new Date();
+    const people = await prisma.staffMember.findMany({
+      where: staffWhere(session.clientId, ONBOARDED),
+      select: { id: true, department: true },
+    });
+    const lateMonth = now.getUTCDate() >= 20;
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+    const book = await dutyBook(session.clientId, people, dutyDay(now), lateMonth ? next : dutyDay(now));
+    const leads = session.tiers.includes("LEADERSHIP");
+    const scope = (deps: string[]) => (leads ? deps : deps.filter((d) => d === me.department));
+    const missingNow = scope(book.missingRota(now));
+    const missingNext = lateMonth ? scope(book.missingRota(next)) : [];
+    const monthName = (d: Date) => d.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
+    if (missingNow.length > 0) {
+      items.push({
+        kind: "ROTA",
+        title: `Put in the ${monthName(now)} rota: ${missingNow.map(deptLabel).join(", ")}`,
+        detail: "Until it is in, everyone there is chased on their days off.",
+        urgency: "NOW",
+        href: `/HavenStaff/rota?month=${monthKey(now)}`,
+      });
+    } else if (missingNext.length > 0) {
+      items.push({
+        kind: "ROTA",
+        title: `Put in the ${monthName(next)} rota: ${missingNext.map(deptLabel).join(", ")}`,
+        detail: "Before the 1st, so nobody is chased on a day off.",
+        urgency: "TODAY",
+        href: `/HavenStaff/rota?month=${monthKey(next)}`,
+      });
+    }
   }
 
   for (const s of presenting) {

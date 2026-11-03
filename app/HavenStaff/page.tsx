@@ -6,7 +6,8 @@ import { MyLeave, LeaveToDecide, type LeaveRow } from "@/components/haven/StaffL
 import StaffNotes, { type NoteRow } from "@/components/haven/StaffNotes";
 import Scoreboard, { type ScoreRow } from "@/components/haven/Scoreboard";
 import { isoWeek, previousWeek } from "@/lib/havenScoreboard";
-import { whatsWaiting, type WaitingItem } from "@/lib/havenToday";
+import { whatsWaiting, todayDuty, type WaitingItem } from "@/lib/havenToday";
+import type { Duty } from "@/lib/havenDuty";
 import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
 import { SafetyRegister, WhatChanged, type SafetyRow, type ChangeRow } from "@/components/haven/SafetyRegister";
 import { lateness } from "@/lib/havenSafety";
@@ -123,6 +124,7 @@ export default async function HavenStaffPage() {
   let changes: ChangeRow[] = [];
   let openCases: SafetyRow[] = [];
   let closedCount = 0;
+  let duty: Duty = "UNKNOWN";
 
   if (session) {
     const [dir, me, leave] = await Promise.all([
@@ -143,6 +145,7 @@ export default async function HavenStaffPage() {
     ]);
     people = dir;
     waiting = await whatsWaiting(session);
+    duty = await todayDuty(session);
 
     // Today's tickable tasks. Separate from the waiting list because these are
     // things you do here rather than somewhere else, and a link to a checkbox
@@ -185,6 +188,8 @@ export default async function HavenStaffPage() {
         return hay.includes(n) || n.includes("everybody") || n.includes("all ");
       }))
       .map((x) => ({ id: x.id, code: x.code, title: x.title, why: x.why, cadence: x.cadence as Cadence, done: doneIds.has(x.id), flagged: flaggedIds.has(x.id) }));
+    // Off on the rota, or on leave: nothing to tick today.
+    if (duty === "OFF" || duty === "LEAVE") todayTasks = [];
     entitlement = me?.annualLeaveDays ?? 20;
     myDepartment = me?.department ?? "";
 
@@ -317,7 +322,11 @@ export default async function HavenStaffPage() {
             <section id="today" style={{ marginTop: 40 }}>
               <Eyebrow>{`Hello ${greetingName(session.name)}`}</Eyebrow>
               <h2 style={{ color: NAVY, fontSize: 25, lineHeight: 1.2, margin: "8px 0 0", letterSpacing: "-0.01em" }}>
-                {waiting.length === 0 && todayTasks.every((x) => x.done)
+                {duty === "LEAVE"
+                  ? "You are on leave today"
+                  : duty === "OFF"
+                  ? "You are off today"
+                  : waiting.length === 0 && todayTasks.every((x) => x.done)
                   ? "Nothing is waiting on you"
                   : todayTasks.length > 0 && todayTasks.every((x) => x.cadence === "WEEKLY")
                     ? "This week"
@@ -360,6 +369,19 @@ export default async function HavenStaffPage() {
                 </div>
               )}
             </section>
+
+            <nav style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginTop: 28 }}>
+              {[
+                { href: "/HavenStaff/learn", t: "Training", b: "Haven's procedures, fifteen minutes at a time" },
+                { href: "/HavenStaff/rota", t: "The rota", b: can(session, "ENTER_ROTA") ? "Put in or correct your department's month" : "Your shifts and days off" },
+                ...(can(session, "VIEW_TEAM_NAMED") ? [{ href: "/HavenStaff/team", t: "The team, day by day", b: "Who has done what, every day" }] : []),
+              ].map((l) => (
+                <Link key={l.href} href={l.href} style={{ ...card, padding: 16, textDecoration: "none", borderLeft: `4px solid ${TEAL}` }}>
+                  <div style={{ color: NAVY, fontWeight: 700, fontSize: 15.5 }}>{l.t}</div>
+                  <div style={{ color: MUTED, fontSize: 13.5, marginTop: 2 }}>{l.b}</div>
+                </Link>
+              ))}
+            </nav>
 
             <Section
               eyebrow="The team"
@@ -508,7 +530,6 @@ export default async function HavenStaffPage() {
             {[
               ["The scoreboard", "Six things, updated weekly, so you never have to guess whether it is working."],
               ["The standards of work", "Published for each area as that team writes and signs off its own."],
-              ["The rota", "Published four weeks ahead."],
             ].map(([t, b]) => (
               <div key={t} style={{ borderLeft: `3px solid ${TEAL}`, paddingLeft: 14 }}>
                 <div style={{ color: NAVY, fontWeight: 700, fontSize: 15.5 }}>{t}</div>

@@ -35,6 +35,36 @@ const URGENCY_LABEL: Record<WaitingItem["urgency"], string> = {
   THIS_WEEK: "This week",
 };
 
+/**
+ * A rota day off. Nothing is owed, so it does not say "waiting on you": it
+ * offers one module and says plainly that skipping it costs nothing.
+ */
+function dayOffText(firstName: string, item: WaitingItem) {
+  return `Good morning ${firstName},
+
+You are off today on the rota, so there is nothing to do at Haven.
+
+If you have fifteen minutes and feel like it, one module is open for you:
+
+  ${item.title}
+  ${SITE}${item.href}
+
+It is optional. Nobody is chased for it, and every module you pass counts towards recognition.
+
+Consult for Africa`;
+}
+
+function dayOffHtml(firstName: string, item: WaitingItem) {
+  return `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.6;color:#1F2937;max-width:520px">
+<p>Good morning ${firstName},</p>
+<p>You are off today on the rota, so there is nothing to do at Haven.</p>
+<p>If you have fifteen minutes and feel like it, one module is open for you:</p>
+<p style="margin:18px 0"><a href="${SITE}${item.href}" style="background:#0B3C5D;color:#fff;text-decoration:none;padding:13px 24px;border-radius:10px;font-weight:600;display:inline-block">${item.title}</a></p>
+<p style="color:#64748b;font-size:14px">It is optional. Nobody is chased for it, and every module you pass counts towards recognition.</p>
+<p style="color:#64748b;font-size:14px">Consult for Africa</p>
+</div>`;
+}
+
 function body(firstName: string, items: WaitingItem[]) {
   const lines = items
     .map((i) => `  ${URGENCY_LABEL[i.urgency]}: ${i.title}${i.detail ? ` (${i.detail})` : ""}\n  ${SITE}${i.href}`)
@@ -166,6 +196,19 @@ export async function GET(req: NextRequest) {
         continue;
       }
       const firstName = s.name.replace(/^(Dr|Mr|Mrs|Ms)\s+/i, "").split(" ")[0];
+      if (items.length === 1 && items[0].kind === "DAY_OFF") {
+        await sendTransactionalEmail({
+          from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
+          replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
+          to: s.email!,
+          subject: "Your day off: one optional module",
+          text: dayOffText(firstName, items[0]),
+          html: dayOffHtml(firstName, items[0]),
+        });
+        sent++;
+        await new Promise((r) => setTimeout(r, 250));
+        continue;
+      }
       await sendTransactionalEmail({
         from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
         replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",

@@ -538,6 +538,7 @@ model Client {
   scoreboard         ScoreboardEntry[]
   trainingSessions   TrainingSession[]
   staffTasks         StaffTask[]
+  staffRotas         StaffRota[]
   safetyReports      SafetyReport[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
@@ -8273,6 +8274,8 @@ model StaffMember {
   presenting        TrainingSession[]     @relation("TrainingPresenter")
   trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
   safetyInvestigations SafetyReport[]    @relation("SafetyInvestigator")
+  shifts            StaffShift[]          @relation("StaffShifts")
+  rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8540,6 +8543,46 @@ model ProtocolProgress {
 
   @@unique([protocolId, staffId])
   @@index([staffId])
+}
+
+/// A department's rota for one month is in the system.
+///
+/// The row is what turns "no shift recorded" from unknown into OFF. Without it
+/// the system cannot tell a day off from a day nobody wrote down, so everybody
+/// in a department with no rota is treated as on duty and chased. That is the
+/// incentive: the people being chased on their days off push for the rota.
+model StaffRota {
+  id         String @id @default(cuid())
+  clientId   String
+  client     Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  department String
+  /// "2026-11"
+  month      String
+
+  enteredById String?
+  enteredBy   StaffMember? @relation("RotasEntered", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, department, month])
+}
+
+/// One person on duty on one day. Days off are the absence of a row, inside a
+/// month whose StaffRota exists. `code` is the hospital's own shift letter
+/// (D, N, M, A, C...), kept as typed so the rota reads as theirs.
+model StaffShift {
+  id      String      @id @default(cuid())
+  staffId String
+  staff   StaffMember @relation("StaffShifts", fields: [staffId], references: [id], onDelete: Cascade)
+  /// Midnight UTC of the day, the same keying as task completions.
+  date    DateTime
+  code    String
+
+  createdAt DateTime @default(now())
+
+  @@unique([staffId, date])
+  @@index([date])
 }
 
 /// One measure, one week, one number, and what moved it.
