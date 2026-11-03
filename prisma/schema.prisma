@@ -541,6 +541,7 @@ model Client {
   staffRotas         StaffRota[]
   staffTeams         StaffTeam[]
   objectives         Objective[]
+  tariffFixes        TariffFix[]
   safetyReports      SafetyReport[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
@@ -8283,6 +8284,7 @@ model StaffMember {
   huddlesLed        TeamHuddle[]          @relation("HuddleLead")
   objectivesAgreed  Objective[]           @relation("ObjectiveAgreed")
   krCheckIns        KeyResultCheckIn[]    @relation("KrCheckIns")
+  tariffFixesDone   TariffFix[]           @relation("TariffFixDone")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
@@ -8683,6 +8685,26 @@ model KeyResultCheckIn {
   createdAt   DateTime     @default(now())
 
   @@index([keyResultId, createdAt])
+}
+
+/// One fix the tariff needs before it is used (lib/haven-tariff.ts). Open
+/// until somebody in leadership or finance marks it done; while open it sits
+/// in their morning list and in the founders' Friday note.
+model TariffFix {
+  id         String       @id @default(cuid())
+  clientId   String
+  client     Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  code       String
+  title      String
+  detail     String       @db.Text
+  doneAt     DateTime?
+  doneById   String?
+  doneBy     StaffMember? @relation("TariffFixDone", fields: [doneById], references: [id], onDelete: SetNull)
+  doneNote   String?      @db.Text
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([clientId, code])
 }
 
 /// A department's rota for one month is in the system.

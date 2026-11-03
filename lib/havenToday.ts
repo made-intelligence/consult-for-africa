@@ -4,6 +4,7 @@ import { isoWeek } from "@/lib/havenScoreboard";
 import { lateness } from "@/lib/havenSafety";
 import { dutyBook, dayKey as dutyDay, monthKey, deptLabel, type Duty } from "@/lib/havenDuty";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
+import { ownsTariffFixes } from "@/lib/haven-tariff";
 
 /**
  * What is waiting on one person, right now.
@@ -21,7 +22,7 @@ import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES" | "TARIFF";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -202,6 +203,14 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     });
     if (stale > 0) {
       items.push({ kind: "OBJECTIVES", title: "This week's check-in on your team's results", detail: `${stale} not updated this week. Where it is now, and how sure you are.`, urgency: "THIS_WEEK", href: "/HavenStaff/objectives" });
+    }
+  }
+
+  // Tariff fixes, every working day until they are done, for whoever owns them.
+  if (ownsTariffFixes(session.tiers, me.position)) {
+    const open = await prisma.tariffFix.count({ where: { clientId: session.clientId, doneAt: null } });
+    if (open > 0) {
+      items.push({ kind: "TARIFF", title: `${open} tariff fix${open === 1 ? "" : "es"} open`, detail: "Swapped prices, typos and the NICU day rate against Evercare.", urgency: "TODAY", href: "/HavenStaff/tariff" });
     }
   }
 

@@ -39,7 +39,8 @@ async function liveAsks(clientId: string, now: Date) {
   const book = await dutyBook(clientId, people, now, now);
   const missing = book.missingRota(now);
   const awaiting = await prisma.protocol.count({ where: { clientId, isActive: true, approvedAt: null } });
-  return { missing, awaiting };
+  const tariffOpen = await prisma.tariffFix.count({ where: { clientId, doneAt: null } }).catch(() => 0);
+  return { missing, awaiting, tariffOpen };
 }
 
 export async function mondayNote(now = new Date()): Promise<string> {
@@ -52,7 +53,7 @@ export async function mondayNote(now = new Date()): Promise<string> {
   const nextMonth = daysLeft <= 7 && mi + 1 < PLAN.length ? PLAN[mi + 1] : null;
   const starting = nextMonth ? nextMonth.tasks.filter((t) => ours(t.owner) && SAY_IN_GROUP(t.what)).map((t) => t.what) : [];
 
-  const { missing, awaiting } = await liveAsks(clientId, now);
+  const { missing, awaiting, tariffOpen } = await liveAsks(clientId, now);
 
   const lines: string[] = [
     `*Haven: what we are working on this week (${fmt(now)} to ${fmt(sunday)})*`,
@@ -67,6 +68,7 @@ export async function mondayNote(now = new Date()): Promise<string> {
   const asks: string[] = [];
   if (awaiting > 0) asks.push(`Dr Odedina: ${awaiting} training modules are ready for clinical approval on the staff page.`);
   if (missing.length > 0) asks.push(`Rotas for ${missing.map(deptLabel).join(", ")} are not in yet. Until they are, staff there are chased on days off.`);
+  if (tariffOpen > 0) asks.push(`Tariff: ${tariffOpen} fixes open, including the NICU day rate against Evercare. On the staff page under Tariff.`);
   if (asks.length) lines.push("", "*From you*", ...asks.map((a) => `- ${a}`));
   lines.push("", "On Friday you get what got done.");
   return lines.join("\n");
@@ -80,13 +82,14 @@ export async function fridayNote(now = new Date()): Promise<string> {
     prisma.protocolProgress.count({ where: { passed: true, testedAt: { gte: weekAgo }, protocol: { clientId } } }),
     prisma.staffRota.count({ where: { clientId, updatedAt: { gte: weekAgo } } }),
   ]);
-  const { missing, awaiting } = await liveAsks(clientId, now);
+  const { missing, awaiting, tariffOpen } = await liveAsks(clientId, now);
 
   const lines: string[] = [
     `*Haven: what got done this week (to ${fmt(now)})*`,
     "",
     ...u.auto.map((a) => `- ${a}`),
     `- Training: ${passed} module ${passed === 1 ? "pass" : "passes"} this week. ${awaiting} modules awaiting clinical approval.`,
+    `- Tariff: ${tariffOpen === 0 ? "every fix done." : `${tariffOpen} fixes still open.`}`,
     `- Rotas: ${rotasIn} saved this week.${missing.length ? ` Still missing: ${missing.map(deptLabel).join(", ")}.` : " Every department is in."}`,
   ];
   if (u.asks.length) lines.push("", "*From you*", ...u.asks.map((a) => `- ${a}`));

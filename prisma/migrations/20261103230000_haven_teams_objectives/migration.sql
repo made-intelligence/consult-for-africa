@@ -153,3 +153,23 @@ ALTER TABLE public."TeamHuddle" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."Objective" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."KeyResult" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."KeyResultCheckIn" ENABLE ROW LEVEL SECURITY;
+
+-- CreateTable
+CREATE TABLE "TariffFix" (
+    "id" TEXT NOT NULL,
+    "clientId" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "detail" TEXT NOT NULL,
+    "doneAt" TIMESTAMP(3),
+    "doneById" TEXT,
+    "doneNote" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "TariffFix_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "TariffFix_clientId_code_key" ON "TariffFix"("clientId", "code");
+ALTER TABLE "TariffFix" ADD CONSTRAINT "TariffFix_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TariffFix" ADD CONSTRAINT "TariffFix_doneById_fkey" FOREIGN KEY ("doneById") REFERENCES "StaffMember"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE public."TariffFix" ENABLE ROW LEVEL SECURITY;

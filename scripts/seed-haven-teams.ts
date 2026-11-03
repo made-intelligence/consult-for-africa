@@ -14,6 +14,7 @@
  *   npx tsx --env-file=.env scripts/seed-haven-teams.ts --apply
  */
 import { PrismaClient } from "@prisma/client";
+import { TARIFF_FIXES } from "../lib/haven-tariff";
 
 const prisma = new PrismaClient();
 const APPLY = process.argv.includes("--apply");
@@ -105,6 +106,12 @@ async function main() {
       });
     }
   }
+  // Tariff fixes: created if missing, never reopened by a re-run.
+  const haveFixes = await prisma.tariffFix.findMany({ where: { clientId: client.id }, select: { code: true } });
+  const newFixes = TARIFF_FIXES.filter((f) => !haveFixes.some((h) => h.code === f.code));
+  console.log(`\nTariff fixes: ${haveFixes.length} already, ${newFixes.length} to add.`);
+  if (APPLY) for (const f of newFixes) await prisma.tariffFix.create({ data: { clientId: client.id, ...f } });
+
   console.log(APPLY ? "\nApplied." : "\nDRY RUN. Re-run with --apply.");
   await prisma.$disconnect();
 }
