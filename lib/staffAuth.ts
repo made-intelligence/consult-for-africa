@@ -131,7 +131,9 @@ export type Capability =
   | "SCHEDULE_TRAINING"
   | "VIEW_COMPETENCY_NAMED"
   | "VIEW_COMPETENCY_AGGREGATE"
-  | "VIEW_NEAR_MISS_DETAIL";
+  | "VIEW_NEAR_MISS_DETAIL"
+  | "ENTER_ROTA"
+  | "VIEW_TEAM_NAMED";
 
 const GRANTS: Record<Capability, Tier[]> = {
   READ_DIRECTORY: ["ALL_STAFF", "SUPERVISOR", "LEADERSHIP", "BOARD"],
@@ -164,6 +166,19 @@ const GRANTS: Record<Capability, Tier[]> = {
   // Detail stops at leadership. The board sees that reports are rising, which
   // is the number that matters to them, and not who filed what.
   VIEW_NEAR_MISS_DETAIL: ["LEADERSHIP"],
+
+  // Whoever runs a shift pattern can put it in. Twenty people do not need a
+  // per-department permission, and a rota nobody is allowed to enter is the
+  // failure this exists to fix.
+  ENTER_ROTA: ["SUPERVISOR", "LEADERSHIP"],
+
+  // Who did what, person by person and day by day. The founders asked for it
+  // (3 Nov 2026: "show founders visibility into what the staff are doing or
+  // not doing, as granular as possible"), so BOARD holds it. What it shows is
+  // the record (ticked, not ticked, off, on leave, module passed), never a test
+  // score, a ward note or who filed a report: those stay where BOARD_BLIND put
+  // them, because they are the things people stop doing once owners read them.
+  VIEW_TEAM_NAMED: ["LEADERSHIP", "BOARD"],
 };
 
 export function can(session: StaffSession | null, capability: Capability) {

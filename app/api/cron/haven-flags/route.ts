@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { periodKey } from "@/lib/havenTaskPeriod";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
+import { dutyBook, daysBetween, EXCUSED } from "@/lib/havenDuty";
 
 /**
  * Raise flags on tasks that were not recorded in time.
@@ -104,6 +105,17 @@ export async function GET(req: NextRequest) {
   // 14:00 is how a system loses credibility on its first day.
   const target = dayKey(new Date(now.getTime() - 24 * 3600 * 1000));
 
+  // Nobody is flagged for a day they were off or on leave. Weekly tasks are
+  // owed only by somebody who was on (or not known to be off) at least one day
+  // of that week. A department with no rota is UNKNOWN and still owes, which is
+  // the point: see lib/havenDuty.ts.
+  const weekStart = periodKey("WEEKLY", new Date(now.getTime() - 7 * 24 * 3600 * 1000));
+  const book = await dutyBook(client.id, staff, weekStart, target);
+  const excused = (staffId: string, period: Date, weekly: boolean) =>
+    weekly
+      ? daysBetween(period, new Date(period.getTime() + 6 * 864e5)).every((d) => EXCUSED.includes(book.duty(staffId, d)))
+      : EXCUSED.includes(book.duty(staffId, period));
+
   let raised = 0;
   for (const t of tasks) {
     // A weekly task is only late once its week has closed. Chasing somebody on
@@ -118,7 +130,12 @@ export async function GET(req: NextRequest) {
     // Only people who were signed up before the period began owe it.
     const owed = staff.filter((s: { id: string; position: string; department: string }) => {
       const first = firstIn.get(s.id);
-      return first !== undefined && first <= period && appliesTo(t.roles, s.position, s.department);
+      return (
+        first !== undefined &&
+        first <= period &&
+        appliesTo(t.roles, s.position, s.department) &&
+        !excused(s.id, period, t.cadence === "WEEKLY")
+      );
     });
     if (owed.length === 0) continue;
 
