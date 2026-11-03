@@ -17,6 +17,7 @@ import {
   MonitorSmartphone,
   Trophy,
 } from "lucide-react";
+import { ACADEMY_DOMAINS } from "@/lib/academyDomains";
 
 type ModuleProgress = {
   moduleId: string;
@@ -113,20 +114,15 @@ export default function AcademyClient({
   const filtered =
     activeLevel === "ALL" ? tracks : tracks.filter((t) => t.level === activeLevel);
 
-  const grouped = filtered.reduce(
-    (acc, track) => {
-      const level = track.level;
-      if (!acc[level]) acc[level] = [];
-      acc[level].push(track);
-      return acc;
-    },
-    {} as Record<string, Track[]>
-  );
+  // Grouped by domain: each opens with its free foundation, then the paid depth.
+  const domainGroups = [
+    ...ACADEMY_DOMAINS.map((d) => ({ key: d.key, label: d.label, scope: d.scope, tracks: filtered.filter((t) => t.category === d.key) })),
+    { key: "other", label: "Other", scope: "", tracks: filtered.filter((t) => !ACADEMY_DOMAINS.some((d) => d.key === t.category)) },
+  ].filter((g) => g.tracks.length > 0);
 
-  const sortedLevels = Object.keys(grouped).sort(
-    (a, b) =>
-      LEVEL_CONFIG[a as keyof typeof LEVEL_CONFIG].order -
-      LEVEL_CONFIG[b as keyof typeof LEVEL_CONFIG].order
+  const trackName = new Map(tracks.map((t) => [t.slug, t.name]));
+  const certifiedSlugs = new Set(
+    tracks.filter((t) => t.enrollments[0]?.status === "CERTIFIED").map((t) => t.slug)
   );
 
   async function handleEnroll(trackId: string) {
@@ -271,23 +267,22 @@ export default function AcademyClient({
       {/* Track cards */}
       <div className="px-8 py-8">
         <div className="max-w-6xl mx-auto space-y-10">
-          {sortedLevels.map((level) => {
-            const config = LEVEL_CONFIG[level as keyof typeof LEVEL_CONFIG];
+          {domainGroups.map((group) => {
             return (
-              <div key={level}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider"
-                    style={{ background: config.bg, color: config.color }}
-                  >
-                    {config.label}
+              <div key={group.key}>
+                <div className="mb-4">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-sm font-semibold text-gray-900">{group.label}</h2>
+                    <div className="flex-1 h-px" style={{ background: "#E2E8F0" }} />
                   </div>
-                  <div className="flex-1 h-px" style={{ background: "#E2E8F0" }} />
+                  {group.scope && <p className="text-xs text-gray-500 mt-1">{group.scope}</p>}
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {grouped[level].map((track) => {
+                  {group.tracks.map((track) => {
                     const Icon = ICON_MAP[track.iconName ?? "brain"] ?? BookOpen;
+                    const config = LEVEL_CONFIG[track.level];
+                    const missingPrereqs = track.prerequisites.filter((slug) => !certifiedSlugs.has(slug));
                     const progress = getTrackProgress(track);
                     const isExpanded = expandedTrack === track.id;
                     const completedModuleIds = new Set(
@@ -313,6 +308,9 @@ export default function AcademyClient({
                               <Icon size={18} className="text-white" />
                             </div>
                             <div className="flex items-center gap-1.5">
+                              <div className="px-2 py-1 rounded-full text-[10px] font-semibold" style={{ background: config.bg, color: config.color }}>
+                                {config.label}
+                              </div>
                               {track.pricingType === "PAID" && track.priceNGN && !progress && (
                                 <div className="px-2 py-1 rounded-full text-[10px] font-semibold" style={{ background: "#FEF3C7", color: "#92400E" }}>
                                   {formatPrice(track.priceNGN)}
@@ -370,10 +368,10 @@ export default function AcademyClient({
                           )}
 
                           {/* Prerequisites */}
-                          {track.prerequisites.length > 0 && !progress && (
+                          {missingPrereqs.length > 0 && !progress && (
                             <div className="mt-3 flex items-center gap-1 text-xs text-amber-600">
                               <Lock size={10} />
-                              <span>Requires: {track.prerequisites.join(", ")}</span>
+                              <span>Finish {missingPrereqs.map((slug) => trackName.get(slug) ?? slug).join(", ")} first</span>
                             </div>
                           )}
                         </div>
@@ -453,6 +451,13 @@ export default function AcademyClient({
                                 Continue Learning
                               </a>
                             )
+                          ) : missingPrereqs.length > 0 ? (
+                            <div
+                              className="w-full py-2.5 rounded-lg text-xs font-semibold text-center"
+                              style={{ background: "#F1F5F9", color: "#64748B" }}
+                            >
+                              Opens when the foundation is certified
+                            </div>
                           ) : track.pricingType === "PAID" && track.priceNGN ? (
                             <button
                               onClick={() => handlePurchase(track.id)}
