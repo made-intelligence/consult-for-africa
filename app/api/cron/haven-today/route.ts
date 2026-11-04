@@ -149,8 +149,9 @@ export async function GET(req: NextRequest) {
   if (!client) return NextResponse.json({ error: "No client" }, { status: 404 });
 
   const staff = await prisma.staffMember.findMany({
-    where: { ...staffWhere(client.id, ONBOARDED), NOT: { email: null } },
-    select: { id: true, name: true, email: true, tiers: true, lastLoginAt: true },
+    // Founders are on it too (Debo, 4 Nov 2026), with the founders' list only.
+    where: { ...staffWhere(client.id, [...ONBOARDED, "FOUNDER"]), NOT: { email: null } },
+    select: { id: true, name: true, email: true, tiers: true, lastLoginAt: true, kind: true },
   });
 
   let sent = 0;
@@ -167,7 +168,7 @@ export async function GET(req: NextRequest) {
       // as a place they are already behind. They get an invitation instead,
       // twice a week rather than daily, and it says plainly that nothing has
       // been missed.
-      if (!s.lastLoginAt) {
+      if (!s.lastLoginAt && s.kind !== "FOUNDER") {
         const day = new Date().getUTCDay();
         if (day !== 1 && day !== 4) { skipped++; continue; }
         await sendTransactionalEmail({

@@ -5,6 +5,7 @@ import { lateness } from "@/lib/havenSafety";
 import { dutyBook, dayKey as dutyDay, monthKey, deptLabel, type Duty } from "@/lib/havenDuty";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 import { ownsTariffFixes } from "@/lib/haven-tariff";
+import { WORKSTREAMS } from "@/lib/haven-workstreams";
 
 /**
  * What is waiting on one person, right now.
@@ -22,7 +23,7 @@ import { ownsTariffFixes } from "@/lib/haven-tariff";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES" | "TARIFF";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES" | "TARIFF" | "DECISION";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -58,9 +59,12 @@ export async function todayDuty(session: StaffSession): Promise<Duty> {
 export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]> {
   const me = await prisma.staffMember.findUnique({
     where: { id: session.sub },
-    select: { id: true, position: true, department: true, lastLoginAt: true, createdAt: true },
+    select: { id: true, position: true, department: true, lastLoginAt: true, createdAt: true, kind: true },
   });
   if (!me) return [];
+
+  // Founders get the founders' list: what waits on them, never shift tasks.
+  if (me.kind === "FOUNDER") return founderItems(session);
 
   const duty = await todayDuty(session);
   // On leave is rest. Nothing at all, not even the module.
@@ -312,4 +316,22 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
   return items
     .sort((a, b) => RANK[a.urgency] - RANK[b.urgency])
     .slice(0, MAX_ITEMS);
+}
+
+/** What waits on a founder: objectives to agree, decisions, and the tariff. */
+async function founderItems(session: StaffSession): Promise<WaitingItem[]> {
+  const items: WaitingItem[] = [];
+  const toAgree = await prisma.objective.count({ where: { clientId: session.clientId, status: "PROPOSED", level: "BOARD" } });
+  if (toAgree > 0) {
+    items.push({ kind: "OBJECTIVES", title: `${toAgree} board objective${toAgree === 1 ? "" : "s"} waiting for you to agree`, detail: "Agree, or send back with a note.", urgency: "TODAY", href: "/HavenStaff/objectives" });
+  }
+  const decisions = WORKSTREAMS.flatMap((w) => w.items).filter((i) => i.owner === "Founders" && i.state === "open");
+  if (decisions.length > 0) {
+    items.push({ kind: "DECISION", title: `${decisions.length} decision${decisions.length === 1 ? "" : "s"} for the founders`, detail: decisions.map((d) => d.title).join("; "), urgency: "THIS_WEEK", href: "/HavenStaff/founders" });
+  }
+  const fixesOpen = await prisma.tariffFix.count({ where: { clientId: session.clientId, doneAt: null } });
+  if (fixesOpen > 0) {
+    items.push({ kind: "TARIFF", title: `Tariff: ${fixesOpen} fix${fixesOpen === 1 ? "" : "es"} still open`, detail: "Including the NICU day rate against Evercare.", urgency: "THIS_WEEK", href: "/HavenStaff/tariff" });
+  }
+  return items;
 }
