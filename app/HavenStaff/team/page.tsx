@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getStaffSession, can } from "@/lib/staffAuth";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 import { dutyBook, dayKey, daysBetween, deptLabel, type Duty } from "@/lib/havenDuty";
-import { appliesTo, myModules } from "@/lib/havenLearn";
+import { appliesTo } from "@/lib/havenLearn";
 import { periodKey } from "@/lib/havenTaskPeriod";
 
 /**
@@ -62,6 +62,21 @@ export default async function TeamPage() {
   });
   const ids = people.map((p) => p.id);
 
+  // Training for everyone in two queries, not two per person: a grid of
+  // twenty people opening forty connections at once exhausts the pool.
+  const [protocols, allProgress] = await Promise.all([
+    prisma.protocol.findMany({
+      where: { clientId: session.clientId, isActive: true, NOT: { approvedAt: null } },
+      select: { id: true, title: true, roles: true, departments: true, version: true },
+      orderBy: [{ domain: "asc" }, { code: "asc" }],
+    }),
+    prisma.protocolProgress.findMany({
+      where: { staffId: { in: ids } },
+      select: { staffId: true, protocolId: true, passed: true, studiedAt: true, againstVersion: true },
+    }),
+  ]);
+  const progressOf = new Map(allProgress.map((p) => [`${p.staffId}|${p.protocolId}`, p]));
+
   const [tasks, completions, flags, firstUse, book] = await Promise.all([
     prisma.staffTask.findMany({
       where: { clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
@@ -84,6 +99,13 @@ export default async function TeamPage() {
 
   const rows = await Promise.all(
     people.map(async (p) => {
+      const modules = protocols
+        .filter((m) => appliesTo(m.roles, m.departments, p.position, p.department))
+        .map((m) => {
+          const pr = progressOf.get(`${p.id}|${m.id}`);
+          const current = pr && pr.againstVersion === m.version;
+          return { id: m.id, title: m.title, status: current && pr?.passed ? "PASSED" : current && pr?.studiedAt ? "READ" : "NEW" };
+        });
       const mine = tasks.filter((t) => appliesTo(t.roles, [], p.position, p.department));
       const daily = mine.filter((t) => t.cadence !== "WEEKLY");
       const weekly = mine.filter((t) => t.cadence === "WEEKLY");
@@ -100,7 +122,6 @@ export default async function TeamPage() {
         done: weekly.filter((t) => doneKey.has(`${p.id}|${t.id}|${w}`)).length,
         owed: weekly.length,
       }));
-      const modules = (await myModules(session.clientId, p.id)).filter((m) => m.approved);
       const owedAll = cells.reduce((a, c) => a + c.owed, 0);
       const doneAll = cells.reduce((a, c) => a + Math.min(c.done, c.owed), 0);
       return { p, daily, weekly, cells, weeks, modules, first, owedAll, doneAll, flags: openFlags.get(p.id) ?? 0 };
