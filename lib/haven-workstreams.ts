@@ -16,7 +16,7 @@ export const WORKSTREAMS: { key: string; title: string; summary: string; items: 
       { title: "Appraisal template", owner: "Mrs Alli with Dr Tanwa", status: "Head Nurse template shared. Being joined with the job description KPIs into one Haven template.", state: "review" },
       { title: "Nursing structure: Head Nurse or rotating nurse in charge", owner: "Founders", status: "Decision needed before nursing job descriptions are issued.", state: "open" },
       { title: "Teams, leads and daily huddles", owner: "CFA", status: "Four teams set up with leads; huddles recorded on the staff page.", state: "done", href: "/HavenStaff/teams" },
-      { title: "Training from Haven's own procedures", owner: "Dr Odedina to approve", status: "34 modules written; staff see each one once it is approved.", state: "open", href: "/HavenStaff/learn" },
+      { title: "Training from Haven's own procedures", owner: "Dr Odedina to approve", status: "Haven's procedures, the core set, objectives and teamwork: every module waits for clinical approval before staff see it.", state: "open", href: "/HavenStaff/learn" },
     ],
   },
   {
