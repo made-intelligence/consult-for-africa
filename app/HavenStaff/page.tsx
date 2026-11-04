@@ -374,7 +374,10 @@ export default async function HavenStaffPage() {
               {[
                 { href: "/HavenStaff/learn", t: "Training", b: "Haven's procedures, fifteen minutes at a time" },
                 { href: "/HavenStaff/rota", t: "The rota", b: can(session, "ENTER_ROTA") ? "Put in or correct your department's month" : "Your shifts and days off" },
+                { href: "/HavenStaff/objectives", t: "Objectives", b: "What your team is moving this quarter" },
+                { href: "/HavenStaff/teams", t: "Teams and huddles", b: "Your team, its lead and the daily huddle" },
                 ...(can(session, "VIEW_TEAM_NAMED") ? [{ href: "/HavenStaff/team", t: "The team, day by day", b: "Who has done what, every day" }] : []),
+                ...(can(session, "VIEW_FINANCIALS") ? [{ href: "/HavenStaff/tariff", t: "Tariff", b: "Our prices against Evercare and the market" }] : []),
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{ ...card, padding: 16, textDecoration: "none", borderLeft: `4px solid ${TEAL}` }}>
                   <div style={{ color: NAVY, fontWeight: 700, fontSize: 15.5 }}>{l.t}</div>

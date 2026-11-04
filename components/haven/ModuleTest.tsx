@@ -154,3 +154,54 @@ export function ApproveModule({ protocolId }: { protocolId: string }) {
     </div>
   );
 }
+
+/** Two questions from a passed module, days or weeks later. */
+export function ReviewTest({ protocolId, questions }: { protocolId: string; questions: (TestQuestion & { id: string })[] }) {
+  const router = useRouter();
+  const [answers, setAnswers] = useState<number[]>(questions.map(() => -1));
+  const [results, setResults] = useState<Result[] | null>(null);
+  const [allRight, setAllRight] = useState<boolean | null>(null);
+  return (
+    <div style={{ display: "grid", gap: 16 }}>
+      {questions.map((q, i) => (
+        <div key={q.id} style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14, padding: 18 }}>
+          <div style={{ color: NAVY, fontWeight: 650, fontSize: 15.5 }}>{q.question}</div>
+          <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+            {q.options.map((o, j) => {
+              const r = results?.[i];
+              const picked = answers[i] === j;
+              const border = r ? (j === r.correct ? TEAL : picked ? RED : LINE) : picked ? NAVY : LINE;
+              return (
+                <label key={j} style={{ display: "flex", gap: 10, border: `1.5px solid ${border}`, borderRadius: 10, padding: "10px 12px" }}>
+                  <input type="radio" name={`r${i}`} checked={picked} disabled={!!results} onChange={() => setAnswers((a) => a.map((x, k) => (k === i ? j : x)))} />
+                  <span style={{ fontSize: 14.5 }}>{o}</span>
+                </label>
+              );
+            })}
+          </div>
+          {results?.[i] && <p style={{ margin: "10px 0 0", fontSize: 14, color: results[i].right ? TEAL : RED }}>{results[i].right ? "Right." : "Not quite."} {results[i].because ?? ""}</p>}
+        </div>
+      ))}
+      {allRight === null ? (
+        <button
+          disabled={answers.some((a) => a < 0)}
+          onClick={async () => {
+            const res = await fetch("/api/haven-staff/learn", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "review", protocolId, questionIds: questions.map((q) => q.id), answers }) });
+            if (!res.ok) return;
+            const d = await res.json();
+            setResults(d.results);
+            setAllRight(d.allRight);
+            router.refresh();
+          }}
+          style={{ justifySelf: "start", background: NAVY, color: "#fff", border: 0, borderRadius: 10, padding: "13px 22px", fontWeight: 700, opacity: answers.some((a) => a < 0) ? 0.5 : 1 }}
+        >
+          Check
+        </button>
+      ) : (
+        <p style={{ color: NAVY, fontWeight: 600, margin: 0 }}>
+          {allRight ? "Both right. This comes back later, further apart each time." : "Read the reasons above. These two come back in two days."}
+        </p>
+      )}
+    </div>
+  );
+}

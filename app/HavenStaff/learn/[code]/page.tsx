@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession } from "@/lib/staffAuth";
-import { MarkRead, ModuleTest, ApproveModule } from "@/components/haven/ModuleTest";
+import { MarkRead, ModuleTest, ApproveModule, ReviewTest } from "@/components/haven/ModuleTest";
 
 export const metadata: Metadata = { title: "Haven Paediatric Centre: training", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -33,7 +33,7 @@ function Body({ text }: { text: string }) {
   );
 }
 
-export default async function ModulePage({ params }: { params: Promise<{ code: string }> }) {
+export default async function ModulePage({ params, searchParams }: { params: Promise<{ code: string }>; searchParams: Promise<{ review?: string }> }) {
   const session = await getStaffSession();
   if (!session) redirect("/HavenStaff/login");
   const { code } = await params;
@@ -43,7 +43,7 @@ export default async function ModulePage({ params }: { params: Promise<{ code: s
     select: {
       id: true, code: true, domain: true, title: true, summary: true, body: true, version: true, approvedAt: true, isActive: true,
       approvedBy: { select: { name: true } },
-      questions: { orderBy: { sortOrder: "asc" }, select: { question: true, options: true } },
+      questions: { orderBy: { sortOrder: "asc" }, select: { id: true, question: true, options: true } },
     },
   });
   if (!protocol || !protocol.isActive) notFound();
@@ -52,8 +52,9 @@ export default async function ModulePage({ params }: { params: Promise<{ code: s
 
   const progress = await prisma.protocolProgress.findUnique({
     where: { protocolId_staffId: { protocolId: protocol.id, staffId: session.sub } },
-    select: { studiedAt: true, passed: true, againstVersion: true },
+    select: { studiedAt: true, passed: true, againstVersion: true, reviewStage: true },
   });
+  const reviewing = (await searchParams).review === "1";
   const current = progress && progress.againstVersion === protocol.version;
   const read = !!(current && progress?.studiedAt);
   const passed = !!(current && progress?.passed);
@@ -72,6 +73,17 @@ export default async function ModulePage({ params }: { params: Promise<{ code: s
       </div>
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "28px 20px 72px", display: "grid", gap: 24 }}>
+        {reviewing && passed && protocol.questions.length > 0 && (
+          <section>
+            <h2 style={{ color: NAVY, fontSize: 21, margin: "0 0 6px" }}>Two quick questions</h2>
+            <p style={{ color: MUTED, margin: "0 0 14px" }}>From a module you passed. Answering again later is what makes it stick.</p>
+            <ReviewTest
+              protocolId={protocol.id}
+              // A different pair at each stage, so a re-test is not the same two questions.
+              questions={[0, 1].map((i) => protocol.questions[((progress?.reviewStage ?? 0) * 2 + i) % protocol.questions.length]).filter((q, i, a) => a.indexOf(q) === i)}
+            />
+          </section>
+        )}
         {!protocol.approvedAt && <ApproveModule protocolId={protocol.id} />}
         {protocol.approvedAt && protocol.approvedBy && (
           <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>Approved by {protocol.approvedBy.name}.</p>
@@ -87,7 +99,7 @@ export default async function ModulePage({ params }: { params: Promise<{ code: s
           <section>
             <h2 style={{ color: NAVY, fontSize: 21, margin: "0 0 14px" }}>The questions</h2>
             {protocol.approvedAt ? (
-              <ModuleTest protocolId={protocol.id} questions={protocol.questions} passedAlready={passed} />
+              <ModuleTest protocolId={protocol.id} questions={protocol.questions.map((q) => ({ question: q.question, options: q.options }))} passedAlready={passed} />
             ) : (
               // The approver sees the questions and the answers, to check them.
               <ApproverPreview protocolId={protocol.id} />
