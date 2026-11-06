@@ -139,3 +139,67 @@ export function SignOff({ people, skills }: { people: { id: string; name: string
     </div>
   );
 }
+
+/** The rotating Nursing Lead: who holds it, until when, and who is next. */
+export function LeadRotation({ teamId, members, current, history, canAppoint, isLead }: {
+  teamId: string;
+  members: { id: string; name: string }[];
+  current: { name: string; startsOn: string; endsOn: string; handoverNote: string | null } | null;
+  history: { name: string; startsOn: string; endsOn: string; handoverNote: string | null }[];
+  canAppoint: boolean;
+  isLead: boolean;
+}) {
+  const router = useRouter();
+  const [who, setWho] = useState("");
+  const [from, setFrom] = useState(new Date().toISOString().slice(0, 10));
+  const [note, setNote] = useState(current?.handoverNote ?? "");
+  const [msg, setMsg] = useState<string | null>(null);
+  const d = (s: string) => new Date(s).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  async function call(body: unknown, ok: string) {
+    const res = await fetch("/api/haven-staff/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const j = await res.json().catch(() => ({}));
+    setMsg(res.ok ? ok : j.error ?? "That did not save.");
+    if (res.ok) router.refresh();
+  }
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14, padding: 18, marginTop: 14, display: "grid", gap: 10 }}>
+      <div style={{ color: NAVY, fontWeight: 700 }}>Nursing Lead, one quarter at a time</div>
+      {current ? (
+        <div style={{ fontSize: 14.5 }}>
+          <b>{current.name}</b> until {d(current.endsOn)}. Leads the team and line-manages the registered nurses for the quarter.
+        </div>
+      ) : (
+        <div style={{ fontSize: 14.5, color: RED }}>No Nursing Lead appointed yet. Until one is, the nurses report to the Head of Clinical Services.</div>
+      )}
+      {isLead && current && (
+        <div style={{ display: "grid", gap: 6 }}>
+          <textarea rows={3} style={input} placeholder="Your handover note for the next Nursing Lead: what is going well, what is unfinished, who needs support" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Handover note" />
+          <button style={{ ...primary, justifySelf: "start" }} onClick={() => call({ action: "handover", teamId, note }, "Handover note saved.")}>Save handover note</button>
+        </div>
+      )}
+      {canAppoint && (
+        <div style={{ display: "grid", gap: 6, gridTemplateColumns: "1fr 160px auto", alignItems: "center" }}>
+          <select style={input} value={who} onChange={(e) => setWho(e.target.value)} aria-label="Next Nursing Lead">
+            <option value="">{current ? "Appoint the next Nursing Lead" : "Appoint the first Nursing Lead"}</option>
+            {members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </select>
+          <input type="date" style={input} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="Starts on" />
+          <button style={{ ...primary, opacity: who ? 1 : 0.5 }} disabled={!who} onClick={() => call({ action: "appoint", teamId, staffId: who, startsOn: from }, "Appointed. The nurses now report to the new lead.")}>Appoint</button>
+        </div>
+      )}
+      {history.length > 0 && (
+        <details>
+          <summary style={{ color: TEAL, fontWeight: 600, cursor: "pointer" }}>Previous leads and handover notes</summary>
+          {history.map((h) => (
+            <div key={h.startsOn} style={{ fontSize: 14, borderTop: `1px solid ${LINE}`, padding: "8px 0" }}>
+              <b>{h.name}</b>, {d(h.startsOn)} to {d(h.endsOn)}
+              {h.handoverNote && <div style={{ color: MUTED }}>{h.handoverNote}</div>}
+            </div>
+          ))}
+        </details>
+      )}
+      <p style={{ color: MUTED, fontSize: 12.5, margin: 0 }}>The role carries an admin allowance, paid through payroll.</p>
+      {msg && <p style={{ color: msg.startsWith("App") || msg.startsWith("Hand") ? TEAL : RED, fontSize: 14, margin: 0 }}>{msg}</p>}
+    </div>
+  );
+}

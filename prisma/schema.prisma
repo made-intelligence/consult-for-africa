@@ -8298,6 +8298,7 @@ model StaffMember {
   oneToOnesHeld     OneToOne[]            @relation("OneToOneManager")
   appraisals        Appraisal[]           @relation("AppraisalStaff")
   appraisalsDone    Appraisal[]           @relation("AppraisalManager")
+  leadTerms         LeadTerm[]            @relation("LeadTermHolder")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
@@ -8591,11 +8592,35 @@ model StaffTeam {
   members    StaffMember[] @relation("TeamMembers")
   huddles    TeamHuddle[]
   objectives Objective[]
+  leadTerms  LeadTerm[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([clientId, key])
+}
+
+/// One person's turn as a team's rotating lead, e.g. Nursing Lead for a
+/// quarter. While the term runs they are the team lead and line-manage the
+/// team; when the next term starts, both move to the next person. The admin
+/// allowance that goes with it is payroll and is not recorded here.
+model LeadTerm {
+  id           String      @id @default(cuid())
+  teamId       String
+  team         StaffTeam   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  staffId      String
+  staff        StaffMember @relation("LeadTermHolder", fields: [staffId], references: [id], onDelete: Cascade)
+  startsOn     DateTime
+  endsOn       DateTime
+  /// The lead's own note to the next lead at the end of the term.
+  handoverNote String?     @db.Text
+  /// True if this term gave the person the SUPERVISOR tier, so it is taken
+  /// back when the term ends and not otherwise.
+  grantedSupervisor Boolean @default(false)
+  endedAt      DateTime?
+  createdAt    DateTime    @default(now())
+
+  @@index([teamId, startsOn])
 }
 
 /// One team's ten-minute huddle on one day: who was there, one safety

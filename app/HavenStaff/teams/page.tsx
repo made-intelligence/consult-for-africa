@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { getStaffSession, can } from "@/lib/staffAuth";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 import { dayKey } from "@/lib/havenDuty";
-import { HuddleForm, TeamAssign, SignOff } from "@/components/haven/TeamTools";
+import { HuddleForm, TeamAssign, SignOff, LeadRotation } from "@/components/haven/TeamTools";
+import { NURSING_TEAM_KEY } from "@/lib/havenLeadTerm";
 
 export const metadata: Metadata = { title: "Haven Paediatric Centre: teams", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -34,6 +35,7 @@ export default async function TeamsPage() {
         lead: { select: { id: true, name: true } },
         members: { where: { isActive: true }, select: { id: true, name: true, position: true }, orderBy: { name: "asc" } },
         huddles: { where: { date: { gte: since } }, orderBy: { date: "desc" }, include: { ledBy: { select: { name: true } } } },
+        leadTerms: { orderBy: { startsOn: "desc" }, take: 8, include: { staff: { select: { name: true } } } },
       },
     }),
     prisma.staffMember.findMany({
@@ -46,6 +48,8 @@ export default async function TeamsPage() {
       : Promise.resolve([] as { id: string; title: string }[]),
   ]);
   const leadIds = new Set(teams.map((t) => t.leadId).filter(Boolean) as string[]);
+  const me = await prisma.staffMember.findUnique({ where: { id: session.sub }, select: { roleCode: true } });
+  const canAppoint = session.tiers.includes("LEADERSHIP") || me?.roleCode === "HCS";
   const fmt = (d: Date) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
   return (
@@ -80,6 +84,20 @@ export default async function TeamsPage() {
                   </span>
                 ))}
               </div>
+
+              {t.key === NURSING_TEAM_KEY && (() => {
+                const cur = t.leadTerms.find((x) => !x.endedAt && x.startsOn <= today);
+                return (
+                  <LeadRotation
+                    teamId={t.id}
+                    members={t.members.filter((m) => /registered nurse/i.test(m.position)).map((m) => ({ id: m.id, name: m.name }))}
+                    current={cur ? { name: cur.staff.name, startsOn: cur.startsOn.toISOString(), endsOn: cur.endsOn.toISOString(), handoverNote: cur.handoverNote } : null}
+                    history={t.leadTerms.filter((x) => x !== cur).map((x) => ({ name: x.staff.name, startsOn: x.startsOn.toISOString(), endsOn: x.endsOn.toISOString(), handoverNote: x.handoverNote }))}
+                    canAppoint={canAppoint}
+                    isLead={cur?.staffId === session.sub}
+                  />
+                );
+              })()}
 
               {isLead && (
                 <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14, padding: 18, marginTop: 14 }}>
