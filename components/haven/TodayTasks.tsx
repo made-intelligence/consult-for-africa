@@ -128,6 +128,17 @@ export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
                   {WHEN[t.cadence]}
                 </div>
                 {!done && <div style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.5, marginTop: 3 }}>{t.why}</div>}
+                {/* Said before the tap: a task that needs an answer opens a box
+                    instead of ticking, and without this it reads as a tick
+                    that did not work. */}
+                {!done && TASK_PROMPTS[t.code] && open !== t.id && (
+                  <button
+                    onClick={() => tap(t)}
+                    style={{ marginTop: 8, background: "#EEF6F8", color: NAVY, border: 0, borderRadius: 8, padding: "7px 12px", fontSize: 13.5, fontWeight: 650, cursor: "pointer" }}
+                  >
+                    Needs one line from you: tap to answer
+                  </button>
+                )}
                 {t.flagged && !done && (
                   <div style={{ color: "#B0392B", fontSize: 13, fontWeight: 650, marginTop: 4 }}>
                     Not recorded yet
