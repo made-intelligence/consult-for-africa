@@ -48,8 +48,7 @@ export default async function TeamsPage() {
       : Promise.resolve([] as { id: string; title: string }[]),
   ]);
   const leadIds = new Set(teams.map((t) => t.leadId).filter(Boolean) as string[]);
-  const me = await prisma.staffMember.findUnique({ where: { id: session.sub }, select: { roleCode: true } });
-  const canAppoint = session.tiers.includes("LEADERSHIP") || me?.roleCode === "HCS";
+  const canAppoint = session.tiers.includes("BOARD");
   const fmt = (d: Date) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
   return (

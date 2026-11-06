@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
   const b = parsed.data;
 
   if (b.action === "appoint") {
-    const me = await prisma.staffMember.findUnique({ where: { id: session.sub }, select: { roleCode: true } });
-    if (!session.tiers.includes("LEADERSHIP") && me?.roleCode !== "HCS") return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+    // The founders choose the Nursing Lead each quarter (Debo, 6 Nov 2026).
+    if (!session.tiers.includes("BOARD")) return NextResponse.json({ error: "The founders appoint the Nursing Lead" }, { status: 403 });
     try {
       const { endsOn } = await appointLead({ clientId: session.clientId, teamId: b.teamId, staffId: b.staffId, startsOn: new Date(`${b.startsOn}T00:00:00Z`) });
       return NextResponse.json({ ok: true, endsOn });
