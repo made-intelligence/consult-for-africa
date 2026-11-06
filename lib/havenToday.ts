@@ -251,6 +251,20 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     }
   }
 
+  // The rotating Nursing Lead: appoint one if there is none, choose the next
+  // two weeks before the quarter ends, and the lead's own handover note.
+  {
+    const nursing = await prisma.staffTeam.findFirst({ where: { clientId: session.clientId, key: "nursing" }, select: { id: true } });
+    if (nursing) {
+      const term = await prisma.leadTerm.findFirst({ where: { teamId: nursing.id, endedAt: null, startsOn: { lte: new Date() } }, orderBy: { startsOn: "desc" } });
+      const appointer = session.tiers.includes("LEADERSHIP") || (await prisma.staffMember.findUnique({ where: { id: me.id }, select: { roleCode: true } }))?.roleCode === "HCS";
+      const soon = term && term.endsOn.getTime() - Date.now() < 14 * 864e5;
+      if (appointer && !term) items.push({ kind: "PERFORMANCE", title: "Appoint this quarter's Nursing Lead", detail: "They lead the nurses and line-manage them for the quarter.", urgency: "TODAY", href: "/HavenStaff/teams" });
+      if (appointer && soon) items.push({ kind: "PERFORMANCE", title: "Choose next quarter's Nursing Lead", detail: `The current term ends ${term!.endsOn.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`, urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
+      if (term && term.staffId === me.id && soon && !term.handoverNote) items.push({ kind: "PERFORMANCE", title: "Write your handover note for the next Nursing Lead", detail: "What is going well, what is unfinished, who needs support.", urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
+    }
+  }
+
   // The rota. Whoever can enter it is told, every day, while it is missing,
   // that their department is being chased on its days off because of it.
   if (can(session, "ENTER_ROTA")) {

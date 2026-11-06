@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getStaffSession, can } from "@/lib/staffAuth";
-import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
+import { staffWhere } from "@/lib/havenAudience";
 import { HAVEN_ROLES } from "@/lib/haven-roles";
 import { currentCycle, isLeadership, monthKey, RAG_BG, RAG_COLOUR } from "@/lib/havenPerformance";
 import { PeopleSetup, StageAction } from "@/components/haven/Performance";
@@ -31,7 +31,8 @@ export default async function PeoplePage() {
   const m = monthKey();
 
   const people = await prisma.staffMember.findMany({
-    where: { ...staffWhere(session.clientId, ONBOARDED), ...(leads || board ? {} : { lineManagerId: session.sub }) },
+    // Haven's own employees only: CFA on site is not appraised by Haven.
+    where: { ...staffWhere(session.clientId, ["EMPLOYEE"]), ...(leads || board ? {} : { lineManagerId: session.sub }) },
     select: {
       id: true, name: true, position: true, roleCode: true, lineManagerId: true,
       lineManager: { select: { name: true } },

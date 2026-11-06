@@ -4,11 +4,11 @@
  * Source: Dr Tanwa's job descriptions and OKRs (version 1, 2 November 2026).
  * Twelve roles held by 23 staff, each with a purpose, responsibilities,
  * qualifications, key skills and five KPIs tagged H1 to H5 (the hospital
- * objective each one moves). The lead Medical Officer and the nurse in charge
+ * objective each one moves). The lead Medical Officer and the Nursing Lead
  * are rotating duties on top of a role, not posts.
  *
  * The appraisal joins these KPIs (80%) with a short conduct section (20%) on
- * the 0 to 5 scale from Mrs Alli's Head Nurse template.
+ * the 0 to 5 scale from Mrs Alli's appraisal template.
  *
  * No clinician's KPIs depend on admissions, length of stay or tests ordered.
  */
@@ -91,7 +91,7 @@ export const HAVEN_ROLES: RoleDef[] = [
     purpose:
       "Run day-to-day clinical services so that every patient gets timely, safe and well-coordinated care across consulting, nursing, laboratory and pharmacy.",
     responsibilities: [
-      "Choose the lead Medical Officer and the nurse in charge for each 3-month rotation, make sure each one hands over in writing to the next, and approve their clinical and nursing rosters so every shift has cover.",
+      "Choose the lead Medical Officer for each 3-month rotation and the Nursing Lead for each quarter, make sure each one hands over in writing to the next, and approve their clinical and nursing rosters so every shift has cover.",
       "Make sure a pharmacist is present on every dispensing day and three registered nurses are on every shift, one each for the NICU, the ward and ER/triage.",
       "Coordinate the work of nursing, lab and pharmacy so patient flow is smooth.",
       "Put clinical policies and protocols into practice, and make sure staff are trained on them before they are audited.",
@@ -199,22 +199,23 @@ export const HAVEN_ROLES: RoleDef[] = [
       { code: "RN-5", title: "Incidents and near misses reported the same shift", target: "100%", objective: ["H1"], weight: 0.2, kind: "PERCENT" },
     ],
     rotatingDuty: {
-      title: "Nurse in charge (3 months at a time)",
+      title: "Nursing Lead (one quarter at a time, with an admin allowance)",
       responsibilities: [
+        "Line-manage the registered nurses for the quarter: agree each nurse's objectives, hold a monthly conversation with each, and do the first appraisal.",
         "Prepare the nursing duty roster 4 weeks ahead, including nights and weekends, with three registered nurses on every shift: one in the NICU, one on the ward and one at ER/triage.",
         "Never roster non-nursing staff as nursing cover.",
         "Run the structured handover at every shift change, and check drug charts and point-of-care billing entries.",
         "Check the emergency trolley, oxygen and nursing equipment every day.",
         "Supervise attendants on ward tasks, and lead infection prevention and control.",
         "Keep track of nurses' BLS and NMCN licence renewals.",
-        "Write a handover note for the next nurse in charge at the end of the 3 months.",
+        "Write a handover note for the next Nursing Lead at the end of the quarter.",
       ],
       kpis: [
         { code: "NIC-1", title: "Three registered nurses on every shift (NICU, ward, ER/triage), roster published 4 weeks ahead", target: "100% of shifts", objective: ["H1"], weight: 0.25, kind: "PERCENT" },
         { code: "NIC-2", title: "Handovers that meet the structured standard (audited after training)", target: "90% or more", objective: ["H1"], weight: 0.2, kind: "PERCENT" },
         { code: "NIC-3", title: "Emergency trolley checked", target: "Every day", objective: ["H1"], weight: 0.2, kind: "PERCENT" },
         { code: "NIC-4", title: "Point-of-care billing entries checked each shift", target: "95% on the bill the same shift", objective: ["H3"], weight: 0.2, kind: "PERCENT" },
-        { code: "NIC-5", title: "Written handover note to the next nurse in charge", target: "At every rotation", objective: ["H4"], weight: 0.15, kind: "YES_NO" },
+        { code: "NIC-5", title: "A monthly conversation with every nurse, and a written handover note at the end of the quarter", target: "Every month; every rotation", objective: ["H4"], weight: 0.15, kind: "YES_NO" },
       ],
     },
     positionMatch: ["registered nurse", "senior registered nurse"],
