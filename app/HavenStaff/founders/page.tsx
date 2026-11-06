@@ -38,6 +38,16 @@ export default async function FoundersPage() {
   const day = Math.max(1, Math.floor((now.getTime() - new Date(`${HAVEN_START}T00:00:00Z`).getTime()) / 864e5) + 1);
   const weekAgo = new Date(now.getTime() - 7 * 864e5);
 
+  const cycle = await prisma.reviewCycle.findFirst({ where: { clientId: session.clientId, closedAt: null, startsOn: { lte: now } }, orderBy: { startsOn: "desc" } });
+  const perf = cycle
+    ? await prisma.staffMember.findMany({
+        where: staffWhere(session.clientId, COUNTED),
+        select: { personalObjectives: { where: { cycleId: cycle.id }, select: { status: true } }, oneToOnes: { where: { heldOn: { gte: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)) } }, select: { id: true } } },
+      })
+    : [];
+  const objAgreed = perf.filter((p) => p.personalObjectives.length > 0 && p.personalObjectives.every((o) => o.status === "AGREED")).length;
+  const talkedMonth = perf.filter((p) => p.oneToOnes.length > 0).length;
+
   const [staff, doneWeek, approved, totalModules, passes, fixes, objectives, huddles, teams] = await Promise.all([
     prisma.staffMember.findMany({ where: staffWhere(session.clientId, COUNTED), select: { id: true, lastLoginAt: true } }),
     prisma.staffTaskCompletion.count({ where: { completedAt: { gte: weekAgo }, staff: { clientId: session.clientId } } }),
@@ -61,6 +71,8 @@ export default async function FoundersPage() {
     [`${huddles}`, `team huddles this week, across ${teams} teams`, TEAL, "/HavenStaff/teams"],
     [`${approved} of ${totalModules}`, `training modules approved; ${passes} passes so far`, approved === 0 ? RED : TEAL, "/HavenStaff/learn"],
     [`${agreed} agreed`, `objectives this quarter${waiting ? `, ${waiting} waiting for you` : ""}`, waiting ? AMBER : NAVY, "/HavenStaff/objectives"],
+    [`${objAgreed} of ${perf.length || staff.length}`, "staff with agreed personal objectives", objAgreed ? TEAL : AMBER, "/HavenStaff/people"],
+    [`${talkedMonth} of ${perf.length || staff.length}`, "monthly conversations held this month", talkedMonth ? TEAL : AMBER, "/HavenStaff/people"],
     [`${fixesOpen} of ${fixes.length}`, "tariff fixes still open", fixesOpen ? RED : TEAL, "/HavenStaff/tariff"],
     [`N${Math.round(NICU_DAY.haven / 1000)}k`, `NICU day on CPAP, against N${Math.round(NICU_DAY.evercare / 1000)}k at Evercare`, RED, "/HavenStaff/tariff"],
   ];
@@ -119,7 +131,7 @@ export default async function FoundersPage() {
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {[["/HavenStaff/team", "The team, day by day"], ["/HavenStaff/objectives", "Objectives"], ["/HavenStaff/tariff", "Tariff"], ["/HavenStaff/teams", "Teams and huddles"]].map(([h, t]) => (
+          {[["/HavenStaff/team", "The team, day by day"], ["/HavenStaff/people", "People and performance"], ["/HavenStaff/objectives", "Objectives"], ["/HavenStaff/tariff", "Tariff"], ["/HavenStaff/teams", "Teams and huddles"]].map(([h, t]) => (
             <Link key={h} href={h} style={{ background: NAVY, color: "#fff", borderRadius: 10, padding: "11px 18px", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>{t}</Link>
           ))}
         </div>

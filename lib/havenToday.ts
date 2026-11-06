@@ -23,7 +23,7 @@ import { WORKSTREAMS } from "@/lib/haven-workstreams";
 export type Urgency = "NOW" | "TODAY" | "THIS_WEEK";
 
 export interface WaitingItem {
-  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES" | "TARIFF" | "DECISION";
+  kind: "FLAG" | "SAFETY" | "TASK" | "PROTOCOL" | "TRAINING" | "LEAVE" | "PULSE" | "NUMBERS" | "ROTA" | "DAY_OFF" | "REVIEW" | "HUDDLE" | "OBJECTIVES" | "TARIFF" | "DECISION" | "PERFORMANCE";
   title: string;
   detail?: string;
   urgency: Urgency;
@@ -215,6 +215,39 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     const open = await prisma.tariffFix.count({ where: { clientId: session.clientId, doneAt: null } });
     if (open > 0) {
       items.push({ kind: "TARIFF", title: `${open} tariff fix${open === 1 ? "" : "es"} open`, detail: "Swapped prices, typos and the NICU day rate against Evercare.", urgency: "TODAY", href: "/HavenStaff/tariff" });
+    }
+  }
+
+  // Performance: objectives to set or agree, the month's update, the monthly
+  // conversation with each direct report, and an open self-appraisal.
+  {
+    const cycle = await prisma.reviewCycle.findFirst({ where: { clientId: session.clientId, closedAt: null, startsOn: { lte: new Date() } }, orderBy: { startsOn: "desc" } });
+    if (cycle) {
+      const day = new Date().getUTCDate();
+      const month = `${new Date().getUTCFullYear()}-${String(new Date().getUTCMonth() + 1).padStart(2, "0")}`;
+      const mine = await prisma.personalObjective.findMany({ where: { staffId: me.id, cycleId: cycle.id }, select: { status: true, updates: { where: { month }, select: { id: true } } } });
+      if (mine.some((o) => o.status === "DRAFT")) {
+        items.push({ kind: "PERFORMANCE", title: "Your objectives are waiting for you", detail: "Read them, change what is wrong, and send them to your manager.", urgency: "THIS_WEEK", href: "/HavenStaff/me" });
+      }
+      if (day >= 25 && mine.length > 0 && mine.every((o) => o.status === "AGREED") && mine.some((o) => o.updates.length === 0)) {
+        items.push({ kind: "PERFORMANCE", title: "This month's update on your objectives", detail: "On track, at risk or off track, one line each.", urgency: "THIS_WEEK", href: "/HavenStaff/me" });
+      }
+      if (cycle.appraisalOpenedAt) {
+        const a = await prisma.appraisal.findUnique({ where: { staffId_cycleId: { staffId: me.id, cycleId: cycle.id } }, select: { stage: true } });
+        if (!a || a.stage === "SELF") items.push({ kind: "PERFORMANCE", title: "Your self-appraisal is open", detail: "Score each objective 0 to 5, then send it to your manager.", urgency: "THIS_WEEK", href: "/HavenStaff/me" });
+      }
+      const reports = await prisma.staffMember.findMany({
+        where: { lineManagerId: me.id, isActive: true },
+        select: { id: true, personalObjectives: { where: { cycleId: cycle.id }, select: { status: true } }, oneToOnes: { where: { heldOn: { gte: new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)) } }, select: { id: true } }, appraisals: { where: { cycleId: cycle.id }, select: { stage: true } } },
+      });
+      if (reports.length > 0) {
+        const toSet = reports.filter((r) => r.personalObjectives.length === 0 || r.personalObjectives.some((o) => o.status !== "AGREED")).length;
+        const toTalk = reports.filter((r) => r.oneToOnes.length === 0).length;
+        const toAppraise = reports.filter((r) => r.appraisals.some((a) => a.stage === "MANAGER")).length;
+        if (toSet > 0) items.push({ kind: "PERFORMANCE", title: `Objectives to set or agree: ${toSet} of your people`, detail: "Start from their role's five KPIs, then agree them together.", urgency: "THIS_WEEK", href: "/HavenStaff/people" });
+        if (toTalk > 0 && day >= 15) items.push({ kind: "PERFORMANCE", title: `Monthly conversations still to hold: ${toTalk}`, detail: "Ten minutes each: what went well, what is in the way, what they need.", urgency: "THIS_WEEK", href: "/HavenStaff/people" });
+        if (toAppraise > 0) items.push({ kind: "PERFORMANCE", title: `Appraisals waiting for your scores: ${toAppraise}`, detail: "They have scored themselves; now it is your turn.", urgency: "TODAY", href: "/HavenStaff/people" });
+      }
     }
   }
 

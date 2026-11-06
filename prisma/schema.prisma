@@ -542,6 +542,7 @@ model Client {
   staffTeams         StaffTeam[]
   objectives         Objective[]
   tariffFixes        TariffFix[]
+  reviewCycles       ReviewCycle[]
   safetyReports      SafetyReport[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
@@ -8285,6 +8286,18 @@ model StaffMember {
   objectivesAgreed  Objective[]           @relation("ObjectiveAgreed")
   krCheckIns        KeyResultCheckIn[]    @relation("KrCheckIns")
   tariffFixesDone   TariffFix[]           @relation("TariffFixDone")
+  /// The role code in lib/haven-roles.ts this person holds (their job description).
+  roleCode          String?
+  lineManagerId     String?
+  lineManager       StaffMember?          @relation("LineManager", fields: [lineManagerId], references: [id], onDelete: SetNull)
+  directReports     StaffMember[]         @relation("LineManager")
+  personalObjectives PersonalObjective[]  @relation("ObjectiveOwner")
+  objectivesAgreedFor PersonalObjective[] @relation("ObjectiveAgreer")
+  objectiveUpdates  ObjectiveUpdate[]     @relation("ObjectiveUpdateBy")
+  oneToOnes         OneToOne[]            @relation("OneToOneStaff")
+  oneToOnesHeld     OneToOne[]            @relation("OneToOneManager")
+  appraisals        Appraisal[]           @relation("AppraisalStaff")
+  appraisalsDone    Appraisal[]           @relation("AppraisalManager")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
@@ -8685,6 +8698,143 @@ model KeyResultCheckIn {
   createdAt   DateTime     @default(now())
 
   @@index([keyResultId, createdAt])
+}
+
+/// A performance period, e.g. November 2026 to February 2027. Objectives are
+/// set for it, tracked monthly inside it and appraised at its end.
+model ReviewCycle {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name       String
+  startsOn   DateTime
+  endsOn     DateTime
+  /// Self-appraisal opens once this is set.
+  appraisalOpenedAt DateTime?
+  closedAt   DateTime?
+
+  objectives PersonalObjective[]
+  appraisals Appraisal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+}
+
+enum PersonalObjectiveStatus {
+  DRAFT
+  PROPOSED
+  AGREED
+}
+
+/// One of a person's objectives for a cycle. Starts from their role's KPIs,
+/// is agreed with their line manager, tracked monthly and scored at appraisal.
+/// Never tied to pay.
+model PersonalObjective {
+  id          String       @id @default(cuid())
+  staffId     String
+  staff       StaffMember  @relation("ObjectiveOwner", fields: [staffId], references: [id], onDelete: Cascade)
+  cycleId     String
+  cycle       ReviewCycle  @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  /// The role KPI it came from (lib/haven-roles.ts), or null if written fresh.
+  kpiCode     String?
+  title       String
+  target      String
+  /// H1 to H5: the hospital objectives it moves.
+  tags        String[]
+  weight      Float        @default(0.2)
+  status      PersonalObjectiveStatus @default(DRAFT)
+  agreedById  String?
+  agreedBy    StaffMember? @relation("ObjectiveAgreer", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt    DateTime?
+  sortOrder   Int          @default(0)
+
+  updates     ObjectiveUpdate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([staffId, cycleId])
+}
+
+enum Rag {
+  GREEN
+  AMBER
+  RED
+}
+
+/// Where one objective stands at the end of one month.
+model ObjectiveUpdate {
+  id          String            @id @default(cuid())
+  objectiveId String
+  objective   PersonalObjective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  /// "2026-11"
+  month       String
+  actual      String
+  rag         Rag
+  note        String?           @db.Text
+  byId        String?
+  by          StaffMember?      @relation("ObjectiveUpdateBy", fields: [byId], references: [id], onDelete: SetNull)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([objectiveId, month])
+}
+
+/// A documented conversation between a person and their line manager.
+model OneToOne {
+  id        String      @id @default(cuid())
+  staffId   String
+  staff     StaffMember @relation("OneToOneStaff", fields: [staffId], references: [id], onDelete: Cascade)
+  managerId String?
+  manager   StaffMember? @relation("OneToOneManager", fields: [managerId], references: [id], onDelete: SetNull)
+  heldOn    DateTime
+  wentWell  String?     @db.Text
+  inTheWay  String?     @db.Text
+  support   String?     @db.Text
+  actions   String?     @db.Text
+  createdAt DateTime    @default(now())
+
+  @@index([staffId, heldOn])
+}
+
+enum AppraisalStage {
+  SELF
+  MANAGER
+  MODERATION
+  SIGN_OFF
+  DONE
+}
+
+/// The end-of-cycle appraisal, on Mrs Alli's template: objectives 80%,
+/// conduct 20%, each scored 0 to 5. Self first, then the line manager, then
+/// moderation, then both sign. Not tied to pay.
+model Appraisal {
+  id              String         @id @default(cuid())
+  staffId         String
+  staff           StaffMember    @relation("AppraisalStaff", fields: [staffId], references: [id], onDelete: Cascade)
+  cycleId         String
+  cycle           ReviewCycle    @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  stage           AppraisalStage @default(SELF)
+  /// { objectiveId: score 0..5 }
+  selfScores      Json?
+  managerScores   Json?
+  /// { conductCode: score 0..5 }
+  conductSelf     Json?
+  conductManager  Json?
+  selfComment     String?        @db.Text
+  managerComment  String?        @db.Text
+  managerId       String?
+  manager         StaffMember?   @relation("AppraisalManager", fields: [managerId], references: [id], onDelete: SetNull)
+  moderationNote  String?        @db.Text
+  overall         Float?
+  staffSignedAt   DateTime?
+  managerSignedAt DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([staffId, cycleId])
 }
 
 /// One fix the tariff needs before it is used (lib/haven-tariff.ts). Open
