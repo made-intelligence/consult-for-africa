@@ -257,7 +257,7 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     const nursing = await prisma.staffTeam.findFirst({ where: { clientId: session.clientId, key: "nursing" }, select: { id: true } });
     if (nursing) {
       const term = await prisma.leadTerm.findFirst({ where: { teamId: nursing.id, endedAt: null, startsOn: { lte: new Date() } }, orderBy: { startsOn: "desc" } });
-      const appointer = session.tiers.includes("LEADERSHIP") || (await prisma.staffMember.findUnique({ where: { id: me.id }, select: { roleCode: true } }))?.roleCode === "HCS";
+      const appointer = session.tiers.includes("BOARD");
       const soon = term && term.endsOn.getTime() - Date.now() < 14 * 864e5;
       if (appointer && !term) items.push({ kind: "PERFORMANCE", title: "Appoint this quarter's Nursing Lead", detail: "They lead the nurses and line-manage them for the quarter.", urgency: "TODAY", href: "/HavenStaff/teams" });
       if (appointer && soon) items.push({ kind: "PERFORMANCE", title: "Choose next quarter's Nursing Lead", detail: `The current term ends ${term!.endsOn.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`, urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
@@ -375,6 +375,13 @@ async function founderItems(session: StaffSession): Promise<WaitingItem[]> {
   const decisions = WORKSTREAMS.flatMap((w) => w.items).filter((i) => i.owner === "Founders" && i.state === "open");
   if (decisions.length > 0) {
     items.push({ kind: "DECISION", title: `${decisions.length} decision${decisions.length === 1 ? "" : "s"} for the founders`, detail: decisions.map((d) => d.title).join("; "), urgency: "THIS_WEEK", href: "/HavenStaff/founders" });
+  }
+  const nursing = await prisma.staffTeam.findFirst({ where: { clientId: session.clientId, key: "nursing" }, select: { id: true } });
+  if (nursing) {
+    const term = await prisma.leadTerm.findFirst({ where: { teamId: nursing.id, endedAt: null, startsOn: { lte: new Date() } }, orderBy: { startsOn: "desc" } });
+    if (!term || term.endsOn.getTime() - Date.now() < 14 * 864e5) {
+      items.push({ kind: "DECISION", title: term ? "Choose next quarter's Nursing Lead" : "Choose this quarter's Nursing Lead", detail: "The founders appoint one Registered Nurse each quarter.", urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
+    }
   }
   const fixesOpen = await prisma.tariffFix.count({ where: { clientId: session.clientId, doneAt: null } });
   if (fixesOpen > 0) {
