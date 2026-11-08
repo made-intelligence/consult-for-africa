@@ -4,6 +4,8 @@ import { HAVEN_START } from "@/lib/haven-delivery";
 import { composeUpdate, havenFounders } from "@/lib/havenFounderUpdate";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 import { dutyBook, dayKey, deptLabel } from "@/lib/havenDuty";
+import { THIS_WEEK } from "@/lib/haven-week";
+import { WORKSTREAMS } from "@/lib/haven-workstreams";
 
 /**
  * The two WhatsApp notes a week for the Haven founders' group.
@@ -65,7 +67,17 @@ export async function mondayNote(now = new Date()): Promise<string> {
   if (starting.length) {
     lines.push("", `*Starting for ${nextMonth!.title.replace(/ - .*/, "")}*`, ...starting.slice(0, 4).map((t, i) => `${i + 1}. ${t}`));
   }
+  // This week's plan, when CFA has written it for this week.
+  const weekStart = dayKey(now).getTime() - ((now.getUTCDay() + 6) % 7) * DAY;
+  if (Math.abs(new Date(`${THIS_WEEK.weekOf}T00:00:00Z`).getTime() - weekStart) < 3 * DAY) {
+    lines.push("", "*The plan this week*", ...THIS_WEEK.items.map((i, n) => `${n + 1}. ${i.what} (${i.who}, ${i.by})`));
+  }
+
   const asks: string[] = [];
+  // Every decision waiting on the founders, from their dashboard.
+  for (const d of WORKSTREAMS.flatMap((w) => w.items).filter((i) => i.owner === "Founders" && i.state === "open")) {
+    asks.push(`${d.title}. ${d.status}`);
+  }
   if (awaiting > 0) asks.push(`Dr Odedina: ${awaiting} training modules are ready for clinical approval on the staff page.`);
   if (missing.length > 0) asks.push(`Rotas for ${missing.map(deptLabel).join(", ")} are not in yet. Until they are, staff there are chased on days off.`);
   if (tariffOpen > 0) asks.push(`Tariff: ${tariffOpen} fixes open, including the NICU day rate against Evercare. On the staff page under Tariff.`);
