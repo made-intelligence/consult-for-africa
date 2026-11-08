@@ -16,6 +16,7 @@ const createSchema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   days: z.number().int().min(1).max(90),
   reason: z.string().max(1000).optional(),
+  coverId: z.string().optional(),
 });
 
 const decideSchema = z.object({
@@ -35,6 +36,13 @@ export async function POST(req: NextRequest) {
   const end = new Date(`${parsed.data.endDate}T00:00:00Z`);
   if (end < start) return NextResponse.json({ error: "The end date is before the start date." }, { status: 400 });
 
+  let coverId: string | null = null;
+  if (parsed.data.coverId) {
+    const c = await prisma.staffMember.findFirst({ where: { id: parsed.data.coverId, clientId: session.clientId, isActive: true }, select: { id: true } });
+    if (!c || c.id === session.sub) return NextResponse.json({ error: "Pick a colleague to cover you." }, { status: 400 });
+    coverId = c.id;
+  }
+
   await prisma.staffLeaveRequest.create({
     data: {
       staffId: session.sub,
@@ -43,6 +51,7 @@ export async function POST(req: NextRequest) {
       endDate: end,
       days: parsed.data.days,
       reason: parsed.data.reason?.trim() || null,
+      coverId,
     },
   });
 
@@ -69,6 +78,11 @@ export async function PATCH(req: NextRequest) {
   }
   if (target.staffId === session!.sub) {
     return NextResponse.json({ error: "You cannot decide your own leave." }, { status: 403 });
+  }
+  // The person's own line manager decides; leadership can when they are away.
+  const requester = await prisma.staffMember.findUnique({ where: { id: target.staffId }, select: { lineManagerId: true } });
+  if (requester?.lineManagerId && requester.lineManagerId !== session!.sub && !session!.tiers.includes("LEADERSHIP")) {
+    return NextResponse.json({ error: "Their own line manager decides this one." }, { status: 403 });
   }
   if (target.status !== "REQUESTED") {
     return NextResponse.json({ error: "That request has already been decided." }, { status: 409 });
@@ -141,4 +155,18 @@ export async function GET(req: NextRequest) {
       to: c.endDate.toISOString().slice(0, 10),
     })),
   });
+}
+
+/** Cancel your own request, before it starts. */
+export async function DELETE(req: NextRequest) {
+  const session = await getStaffSession();
+  if (!session) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  const id = new URL(req.url).searchParams.get("id");
+  const r = id ? await prisma.staffLeaveRequest.findUnique({ where: { id } }) : null;
+  if (!r || r.staffId !== session.sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (r.status === "DECLINED" || r.status === "CANCELLED" || r.startDate <= new Date()) {
+    return NextResponse.json({ error: "Only leave that has not started can be cancelled." }, { status: 409 });
+  }
+  await prisma.staffLeaveRequest.update({ where: { id: r.id }, data: { status: "CANCELLED" } });
+  return NextResponse.json({ ok: true });
 }

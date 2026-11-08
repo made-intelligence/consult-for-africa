@@ -113,7 +113,8 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
       }),
       can(session, "DECIDE_LEAVE")
         ? prisma.staffLeaveRequest.count({
-            where: { status: "REQUESTED", NOT: { staffId: me.id }, staff: { clientId: session.clientId, isActive: true } },
+            // Your own direct reports; leadership sees them all.
+            where: { status: "REQUESTED", NOT: { staffId: me.id }, staff: { clientId: session.clientId, isActive: true, ...(session.tiers.includes("LEADERSHIP") ? {} : { lineManagerId: me.id }) } },
           })
         : Promise.resolve(0),
       prisma.auditSurveyResponse.count({
@@ -263,6 +264,17 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
       if (appointer && soon) items.push({ kind: "PERFORMANCE", title: "Choose next quarter's Nursing Lead", detail: `The current term ends ${term!.endsOn.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`, urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
       if (term && term.staffId === me.id && soon && !term.handoverNote) items.push({ kind: "PERFORMANCE", title: "Write your handover note for the next Nursing Lead", detail: "What is going well, what is unfinished, who needs support.", urgency: "THIS_WEEK", href: "/HavenStaff/teams" });
     }
+  }
+
+  // Covering a colleague's leave in the coming week.
+  const covering = await prisma.staffLeaveRequest.findFirst({
+    where: { coverId: me.id, status: "APPROVED", startDate: { lte: new Date(Date.now() + 7 * 864e5) }, endDate: { gte: new Date() } },
+    select: { startDate: true, endDate: true, staff: { select: { name: true } } },
+    orderBy: { startDate: "asc" },
+  });
+  if (covering) {
+    const f = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+    items.push({ kind: "LEAVE", title: `You are covering ${covering.staff.name}`, detail: `${f(covering.startDate)} to ${f(covering.endDate)}.`, urgency: "THIS_WEEK", href: "/HavenStaff/leave" });
   }
 
   // The rota. Whoever can enter it is told, every day, while it is missing,
