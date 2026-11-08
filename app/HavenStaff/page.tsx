@@ -112,6 +112,7 @@ export default async function HavenStaffPage() {
   // anybody with the link can open.
   let people: DirectoryEntry[] = [];
   let mine: LeaveRow[] = [];
+  let colleagues: { id: string; name: string }[] = [];
   let toDecide: LeaveRow[] = [];
   let entitlement = 20;
   let notes: NoteRow[] = [];
@@ -141,6 +142,7 @@ export default async function HavenStaffPage() {
         where: { staffId: session.sub },
         orderBy: { startDate: "desc" },
         take: 12,
+        include: { cover: { select: { name: true } } },
       }),
     ]);
     people = dir;
@@ -239,7 +241,13 @@ export default async function HavenStaffPage() {
         id: r.id, body: r.body, author: r.author.name, createdAt: r.createdAt.toISOString(),
       })),
     }));
+    colleagues = await prisma.staffMember.findMany({
+      where: { ...staffWhere(session.clientId, ["EMPLOYEE"]), department: myDepartment, NOT: { id: session.sub } },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    });
     mine = leave.map((l) => ({
+      coverName: l.cover?.name ?? null,
       id: l.id, type: l.type, days: l.days, status: l.status,
       startDate: l.startDate.toISOString().slice(0, 10),
       endDate: l.endDate.toISOString().slice(0, 10),
@@ -283,17 +291,18 @@ export default async function HavenStaffPage() {
       const waiting = await prisma.staffLeaveRequest.findMany({
         where: {
           status: "REQUESTED",
-          staff: { clientId: session.clientId, isActive: true },
+          // Your own direct reports; leadership sees every request.
+          staff: { clientId: session.clientId, isActive: true, ...(session.tiers.includes("LEADERSHIP") ? {} : { lineManagerId: session.sub }) },
           NOT: { staffId: session.sub },
         },
-        include: { staff: { select: { name: true } } },
+        include: { staff: { select: { name: true } }, cover: { select: { name: true } } },
         orderBy: { startDate: "asc" },
       });
       toDecide = waiting.map((l) => ({
         id: l.id, type: l.type, days: l.days, status: l.status,
         startDate: l.startDate.toISOString().slice(0, 10),
         endDate: l.endDate.toISOString().slice(0, 10),
-        decisionNote: l.decisionNote, reason: l.reason, staffName: l.staff.name,
+        decisionNote: l.decisionNote, reason: l.reason, staffName: l.staff.name, coverName: l.cover?.name ?? null,
       }));
     }
   }
@@ -425,7 +434,8 @@ export default async function HavenStaffPage() {
               title="Time off"
               lead="Ask from here rather than chasing somebody down a corridor. You will see who else in your area is already off before you pick your dates."
             >
-              <MyLeave mine={mine} entitlement={entitlement} />
+              <MyLeave mine={mine} entitlement={entitlement} colleagues={colleagues} />
+              <a href="/HavenStaff/leave" style={{ display: "inline-block", marginTop: 12, color: TEAL, fontWeight: 600, fontSize: 14.5 }}>Who is off: the team calendar</a>
             </Section>
 
             {atLeast(session, "SUPERVISOR") && (

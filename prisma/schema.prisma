@@ -8299,6 +8299,7 @@ model StaffMember {
   appraisals        Appraisal[]           @relation("AppraisalStaff")
   appraisalsDone    Appraisal[]           @relation("AppraisalManager")
   leadTerms         LeadTerm[]            @relation("LeadTermHolder")
+  leaveCovering     StaffLeaveRequest[]   @relation("LeaveCover")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
 
   createdAt DateTime @default(now())
@@ -8381,6 +8382,10 @@ model StaffLeaveRequest {
   /// a hospital rota is not a Monday to Friday week.
   days      Int
   reason    String?        @db.Text
+  /// The colleague who covers the shifts. Named by the person asking, so the
+  /// manager decides on a covered gap, not an open one.
+  coverId   String?
+  cover     StaffMember?   @relation("LeaveCover", fields: [coverId], references: [id], onDelete: SetNull)
 
   status       StaffLeaveStatus @default(REQUESTED)
   decidedById  String?

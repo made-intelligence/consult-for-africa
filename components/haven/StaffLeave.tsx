@@ -57,6 +57,7 @@ export interface LeaveRow {
   decisionNote: string | null;
   staffName?: string;
   reason?: string | null;
+  coverName?: string | null;
 }
 
 function fmt(d: string) {
@@ -75,7 +76,7 @@ function Pill({ status }: { status: string }) {
 }
 
 /** What the person sees about their own leave, and how they ask for more. */
-export function MyLeave({ mine, entitlement }: { mine: LeaveRow[]; entitlement: number }) {
+export function MyLeave({ mine, entitlement, colleagues = [] }: { mine: LeaveRow[]; entitlement: number; colleagues?: { id: string; name: string }[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("ANNUAL");
@@ -83,6 +84,7 @@ export function MyLeave({ mine, entitlement }: { mine: LeaveRow[]; entitlement: 
   const [end, setEnd] = useState("");
   const [days, setDays] = useState("");
   const [reason, setReason] = useState("");
+  const [cover, setCover] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clash, setClash] = useState<{ headcount: number; alreadyOff: { name: string; from: string; to: string }[] } | null>(null);
@@ -112,10 +114,10 @@ export function MyLeave({ mine, entitlement }: { mine: LeaveRow[]; entitlement: 
       const res = await fetch("/api/haven-staff/leave", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, startDate: start, endDate: end, days: Number(days), reason }),
+        body: JSON.stringify({ type, startDate: start, endDate: end, days: Number(days), reason, coverId: cover || undefined }),
       });
       if (res.ok) {
-        setOpen(false); setStart(""); setEnd(""); setDays(""); setReason(""); setClash(null);
+        setOpen(false); setStart(""); setEnd(""); setDays(""); setReason(""); setCover(""); setClash(null);
         router.refresh();
       } else {
         setError((await res.json().catch(() => null))?.error ?? "That did not send.");
@@ -150,6 +152,15 @@ export function MyLeave({ mine, entitlement }: { mine: LeaveRow[]; entitlement: 
                 </div>
                 <Pill status={l.status} />
               </div>
+              {l.coverName && <p style={{ color: MUTED, fontSize: 13.5, margin: "6px 0 0" }}>Covered by {l.coverName}</p>}
+              {(l.status === "REQUESTED" || l.status === "APPROVED") && new Date(l.startDate + "T00:00:00Z") > new Date() && (
+                <button
+                  onClick={async () => { await fetch(`/api/haven-staff/leave?id=${l.id}`, { method: "DELETE" }); router.refresh(); }}
+                  style={{ marginTop: 8, background: "#fff", color: NAVY, border: `1px solid ${LINE}`, borderRadius: 8, padding: "5px 10px", fontSize: 13, cursor: "pointer" }}
+                >
+                  Cancel this request
+                </button>
+              )}
               {l.decisionNote && (
                 <p style={{ color: MUTED, fontSize: 13.5, lineHeight: 1.55, margin: "8px 0 0" }}>{l.decisionNote}</p>
               )}
@@ -213,6 +224,12 @@ export function MyLeave({ mine, entitlement }: { mine: LeaveRow[]; entitlement: 
               <span style={{ display: "block", fontSize: 13, color: MUTED, fontWeight: 400 }}>Optional.</span>
             </label>
             <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} style={{ ...field, resize: "vertical" }} />
+            {colleagues.length > 0 && (
+              <select value={cover} onChange={(e) => setCover(e.target.value)} style={{ ...field, marginTop: 10 }} aria-label="Who covers your shifts">
+                <option value="">Who covers your shifts? (optional, but it helps)</option>
+                {colleagues.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            )}
           </div>
 
           {error && <p style={{ color: WARN, fontSize: 14, margin: 0 }}>{error}</p>}
@@ -264,6 +281,7 @@ export function LeaveToDecide({ pending }: { pending: LeaveRow[] }) {
             {LABELS[l.type] ?? l.type} · {fmt(l.startDate)} to {fmt(l.endDate)} · {l.days} day{l.days === 1 ? "" : "s"}
           </div>
           {l.reason && <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.55, margin: "8px 0 0" }}>{l.reason}</p>}
+          <p style={{ color: l.coverName ? MUTED : "#B0392B", fontSize: 13.5, margin: "6px 0 0" }}>{l.coverName ? `Cover: ${l.coverName}` : "No cover named"}</p>
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
             <button disabled={busyId === l.id} onClick={() => decide(l.id, "APPROVED")}
               style={{ ...primary, width: "auto", padding: "10px 18px", background: TEAL, opacity: busyId === l.id ? 0.6 : 1 }}>
