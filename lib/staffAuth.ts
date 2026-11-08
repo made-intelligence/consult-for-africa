@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { HAVEN, type StaffSite } from "@/lib/staffSites";
 
 /**
  * Sign-in for a client's own staff. No passwords.
@@ -22,7 +23,7 @@ const SECRET = () => {
   return s;
 };
 
-export const STAFF_COOKIE = "haven_staff_session";
+export const STAFF_COOKIE = HAVEN.cookie;
 const SESSION_DAYS = 30;
 export const TOKEN_TTL_MINUTES = 30;
 
@@ -71,6 +72,31 @@ export async function getStaffSession(): Promise<StaffSession | null> {
   const jar = await cookies();
   const raw = jar.get(STAFF_COOKIE)?.value;
   return raw ? verifyStaffToken(raw) : null;
+}
+
+/**
+ * The client a site belongs to. Fixed in lib/staffSites.ts where we know it;
+ * Haven is still found by name, which is how its routes always found it.
+ */
+export async function siteClientId(site: StaffSite): Promise<string | null> {
+  if (site.clientId) return site.clientId;
+  const client = await prisma.client.findFirst({ where: { name: site.clientName }, select: { id: true } });
+  return client?.id ?? null;
+}
+
+/**
+ * The session for one site, read from that site's own cookie, and refused if
+ * it belongs to any other client. The separate cookie already keeps them
+ * apart; the clientId check is there so that stays true if a cookie is ever
+ * shared again.
+ */
+export async function getSiteSession(site: StaffSite): Promise<StaffSession | null> {
+  const jar = await cookies();
+  const raw = jar.get(site.cookie)?.value;
+  const session = raw ? verifyStaffToken(raw) : null;
+  if (!session) return null;
+  if (site.clientId && session.clientId !== site.clientId) return null;
+  return session;
 }
 
 /**

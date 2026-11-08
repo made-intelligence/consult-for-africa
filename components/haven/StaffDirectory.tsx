@@ -14,9 +14,9 @@ import { useMemo, useState } from "react";
  * not on the page at all for somebody who has only followed the link.
  */
 
-const NAVY = "#0B3C5D";
-const GOLD = "#D4AF37";
-const TEAL = "#1F7A8C";
+const NAVY = "var(--staff-ink, #0B3C5D)";
+const GOLD = "var(--staff-accent, #D4AF37)";
+const TEAL = "var(--staff-second, #1F7A8C)";
 const LINE = "#E2E8F0";
 const MUTED = "#64748b";
 
