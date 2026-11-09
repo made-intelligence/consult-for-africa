@@ -64,7 +64,9 @@ export default async function TeamView({ site, session }: { site: StaffSite; ses
   // twenty people opening forty connections at once exhausts the pool.
   const [protocols, allProgress] = await Promise.all([
     prisma.protocol.findMany({
-      where: { clientId: session.clientId, isActive: true, NOT: { approvedAt: null } },
+      // Only modules that have reached staff: a trickled module before its week
+      // is not owed by anybody. Null startsOn (every Haven module) is live now.
+      where: { ...released(), clientId: session.clientId, isActive: true, NOT: { approvedAt: null } },
       select: { id: true, title: true, roles: true, departments: true, version: true },
       orderBy: [{ domain: "asc" }, { code: "asc" }],
     }),
