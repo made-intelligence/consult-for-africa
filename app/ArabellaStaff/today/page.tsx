@@ -78,6 +78,16 @@ export default async function ArabellaToday() {
 
   return (
     <StaffShell site={site} title="Today at the practice" lead={fmtDay(view.today)} back width={980}>
+      {live.length === 0 && (
+        <div style={{ ...card, marginBottom: 14, borderLeft: `4px solid ${SECOND}` }}>
+          <div style={{ color: INK, fontWeight: 700, fontSize: 16 }}>This is a preview. The numbers start with the team.</div>
+          <p style={{ color: MUTED, fontSize: 14.5, lineHeight: 1.6, margin: "6px 0 0" }}>
+            From the team&apos;s first week, each area below is filled in once a day by the person who does that work, at the step where it happens.
+            You will see today against yesterday, anything not in, and 7 and 30 day trends. Areas switch on a few at a time, on the dates in the plan.
+            Every morning at 7:30 you also get yesterday in one email.
+          </p>
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
         {[
           ["Areas in today", `${inToday} of ${live.length}`],

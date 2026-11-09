@@ -5,6 +5,8 @@ import { getSiteSession } from "@/lib/staffAuth";
 import { ARABELLA } from "@/lib/staffSites";
 import StaffShell from "@/components/staff/StaffShell";
 import PeopleManager, { type PersonRow } from "@/components/arabella/PeopleManager";
+import { ARABELLA_DAILY } from "@/lib/arabella-daily";
+import { ownersFor } from "@/lib/dailyReturn";
 
 export const metadata: Metadata = { title: "Arabella Women's Health: the people", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -35,10 +37,17 @@ export default async function ArabellaPeople() {
     isActive: r.isActive,
     signedIn: !!r.lastLoginAt,
     isMe: r.id === session.sub,
+    owns: r.isActive ? ARABELLA_DAILY.sections.filter((sec) => ownersFor(sec, [r]).length > 0).map((sec) => sec.title) : [],
   }));
+  const unowned = ARABELLA_DAILY.sections.filter((sec) => ownersFor(sec, rows.filter((r) => r.isActive)).length === 0);
 
   return (
     <StaffShell site={ARABELLA} title="The people" lead="Add the team, give each person a mobile number to sign in with, and set what they can see." back>
+      {unowned.length > 0 && (
+        <p style={{ background: "#FFF8E1", borderRadius: 10, padding: "10px 14px", fontSize: 14.5, lineHeight: 1.55, margin: "0 0 14px" }}>
+          No one fills in: {unowned.map((u) => `${u.title} (${u.ownerRoles.join(" or ")})`).join("; ")}. Give someone that job title, or add the person who does it.
+        </p>
+      )}
       <PeopleManager people={people} isPrincipal={session.tiers.includes("BOARD")} />
     </StaffShell>
   );

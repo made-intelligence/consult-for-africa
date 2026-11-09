@@ -16,6 +16,8 @@ import TodayTasks, { type TodayTask } from "@/components/haven/TodayTasks";
 import { SafetyRegister, type SafetyRow } from "@/components/haven/SafetyRegister";
 import { RaiseDecision } from "@/components/arabella/Decisions";
 import ReportIssue from "@/components/arabella/ReportIssue";
+import GettingStarted from "@/components/arabella/GettingStarted";
+import { arabellaOnboarding } from "@/lib/arabellaOnboarding";
 
 export const dynamic = "force-dynamic";
 
@@ -135,10 +137,12 @@ export default async function ArabellaStaffHome() {
   }
 
   const directory: DirectoryEntry[] = people;
+  const onboarding = leadership ? await arabellaOnboarding(session.clientId, session.sub, site.pathPrefix) : null;
   const links = [
     ...(leadership ? [{ href: `${site.pathPrefix}/today`, t: "Today at the practice", b: "Every area, today and yesterday, and what is missing" }] : []),
     { href: `${site.pathPrefix}/daily`, t: "Daily numbers", b: "Put in your area's numbers for the day" },
     { href: `${site.pathPrefix}/rota`, t: "The rota", b: can(session, "ENTER_ROTA") ? "Put in or correct your department's month" : "Your shifts and days off" },
+    ...(leadership ? [{ href: `${site.pathPrefix}/plan`, t: "The plan, week by week", b: "What reaches the team, and when" }] : []),
     { href: `${site.pathPrefix}/learn`, t: "Training", b: "Arabella's procedures, one short module at a time" },
     ...(can(session, "VIEW_TEAM_NAMED") ? [{ href: `${site.pathPrefix}/team`, t: "The team, day by day", b: "Who has done what, every day" }] : []),
     ...(leadership ? [{ href: `${site.pathPrefix}/people`, t: "The people", b: "Add the team, their mobile numbers, and what each can see" }] : []),
@@ -146,6 +150,14 @@ export default async function ArabellaStaffHome() {
 
   return (
     <StaffShell site={site} title="The staff page">
+      {onboarding && !onboarding.allDone && (
+        <GettingStarted
+          data={onboarding}
+          firstName={greetingName(session.name)}
+          prefix={site.pathPrefix}
+          principal={session.tiers.includes("BOARD")}
+        />
+      )}
       <section style={{ marginTop: 16 }}>
         <div style={{ color: SECOND, fontWeight: 700, fontSize: 11.5, letterSpacing: ".14em", textTransform: "uppercase" }}>
           Hello {greetingName(session.name)}

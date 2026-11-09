@@ -15,6 +15,8 @@ export interface PersonRow {
   isActive: boolean;
   signedIn: boolean;
   isMe: boolean;
+  /** Daily view areas this person fills in, from their job title. */
+  owns: string[];
 }
 
 const TIER_LABEL: Record<PersonRow["tier"], string> = {
@@ -138,6 +140,7 @@ export default function PeopleManager({ people, isPrincipal }: { people: PersonR
               <div>
                 <div style={{ fontWeight: 650, color: "var(--staff-ink)" }}>{p.name}{p.isMe ? " (you)" : ""}</div>
                 <div style={{ color: MUTED, fontSize: 13.5 }}>{p.position} · {p.department}</div>
+                {p.owns.length > 0 && <div style={{ color: "var(--staff-second)", fontSize: 12.5, marginTop: 2 }}>Fills in: {p.owns.join(", ")}</div>}
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13 }}>
                 <span style={{ color: MUTED }}>{p.isPrincipal ? "Principal" : TIER_LABEL[p.tier]}</span>

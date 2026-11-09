@@ -114,6 +114,13 @@ export async function GET(req: NextRequest) {
     const clientId = await siteClientId(site);
     if (!clientId) continue;
     const view = await loadDailyView(clientId, config, { canSeeFinancials: true });
+    // Nothing was live yesterday (before the team's first week): no email. A
+    // morning note that says "0 of 0 areas" teaches her to ignore it.
+    const yk = isoDay(view.yesterday);
+    if (view.rows.every((r) => r.days[yk].status === "NOT_STARTED")) {
+      report.push({ site: site.slug, to: [], sent: 0, preview: "skipped: nothing live yesterday" });
+      continue;
+    }
     const principals = await prisma.staffMember.findMany({
       where: { clientId, isActive: true, tiers: { has: "BOARD" }, NOT: [{ email: null }, { kind: "TEST" }] },
       select: { name: true, email: true },
