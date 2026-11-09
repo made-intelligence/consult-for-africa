@@ -5,6 +5,7 @@ import { composeUpdate, havenFounders } from "@/lib/havenFounderUpdate";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
 import { dutyBook, dayKey, deptLabel } from "@/lib/havenDuty";
 import { THIS_WEEK } from "@/lib/haven-week";
+import { criticalChecks } from "@/lib/havenCriticalChecks";
 import { WORKSTREAMS } from "@/lib/haven-workstreams";
 
 /**
@@ -102,6 +103,7 @@ export async function fridayNote(now = new Date()): Promise<string> {
     ...u.auto.map((a) => `- ${a}`),
     `- Training: ${passed} module ${passed === 1 ? "pass" : "passes"} this week. ${awaiting} modules awaiting clinical approval.`,
     `- Tariff: ${tariffOpen === 0 ? "every fix done." : `${tariffOpen} fixes still open.`}`,
+    ...(await criticalChecks(clientId)).map((c) => `- ${c.title}: recorded on ${c.doneDays} of the last 14 days${c.missedRecent.length ? `, missed ${c.missedRecent.join(", ")}` : ""}.`),
     `- Rotas: ${rotasIn} saved this week.${missing.length ? ` Still missing: ${missing.map(deptLabel).join(", ")}.` : " Every department is in."}`,
   ];
   if (u.asks.length) lines.push("", "*From you*", ...u.asks.map((a) => `- ${a}`));

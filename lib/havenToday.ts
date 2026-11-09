@@ -349,7 +349,8 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
     });
     // Unclaimed cases are everybody's in leadership; claimed ones are the
     // investigator's alone, so one case does not nag four people.
-    const mine = open.filter((r) => r.status === "NEW" || r.investigatorId === me.id);
+    // Assigned cases go to their reviewer alone; unassigned new ones to all of leadership.
+    const mine = open.filter((r) => (r.investigatorId ? r.investigatorId === me.id : r.status === "NEW"));
     if (mine.length > 0) {
       const late = mine.filter((r) => lateness(r)).length;
       const high = mine.some((r) => r.severity === "HIGH");

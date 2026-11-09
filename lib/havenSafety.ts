@@ -72,7 +72,8 @@ export async function raiseFromForm(input: {
     : [str(p.where) && `Where: ${str(p.where)}`, str(p.fix) && `Suggested fix: ${str(p.fix)}`].filter(Boolean).join("\n");
   const reached = kind === "NEAR_MISS" ? str(p.reachedPatient) || null : null;
 
-  return prisma.safetyReport.upsert({
+  const isNew = !(await prisma.safetyReport.findUnique({ where: { sourceId: input.responseId }, select: { id: true } }));
+  const report = await prisma.safetyReport.upsert({
     where: { sourceId: input.responseId },
     update: {},
     create: {
@@ -87,6 +88,8 @@ export async function raiseFromForm(input: {
       severity: reachedAPatient(reached) ? "HIGH" : null,
     },
   });
+  if (isNew) await routeToReviewer(report).catch((e) => console.error("[havenSafety] route", e));
+  return report;
 }
 
 /** Raise a case from the written answer to a reporting task. */
@@ -101,7 +104,8 @@ export async function raiseFromTaskNote(input: {
   if (!kind || isNothing(input.note)) return null;
   // Not named: the task is ticked under a login, but the form promises
   // anonymity and the two routes to the same register must not differ on it.
-  return prisma.safetyReport.upsert({
+  const isNew = !(await prisma.safetyReport.findUnique({ where: { sourceId: input.completionId }, select: { id: true } }));
+  const report = await prisma.safetyReport.upsert({
     where: { sourceId: input.completionId },
     update: { what: input.note!.trim().slice(0, 4000) },
     create: {
@@ -111,6 +115,40 @@ export async function raiseFromTaskNote(input: {
       what: input.note!.trim().slice(0, 4000),
       reportedAt: input.at,
     },
+  });
+  if (isNew) await routeToReviewer(report).catch((e) => console.error("[havenSafety] route", e));
+  return report;
+}
+
+/**
+ * Every incident goes to one reviewer, who owns it to resolution: Dr Tanwa
+ * (Debo, 9 Nov 2026). Assigned on arrival and emailed at once. The email never
+ * carries the reporter's name, whatever they gave, because the form promises
+ * anonymity and an inbox is a place things get forwarded from.
+ */
+const REVIEWER_EMAIL = process.env.HAVEN_INCIDENT_REVIEWER_EMAIL ?? "adebusayogbadebo@gmail.com";
+
+async function routeToReviewer(r: { id: string; clientId: string; kind: string; what: string; why: string | null; reachedPatient: string | null; severity: string | null }) {
+  const reviewer = await prisma.staffMember.findFirst({ where: { clientId: r.clientId, email: REVIEWER_EMAIL, isActive: true }, select: { id: true, name: true, email: true } });
+  if (!reviewer?.email) return;
+  await prisma.safetyReport.update({ where: { id: r.id }, data: { investigatorId: reviewer.id } });
+  const site = (process.env.NEXTAUTH_URL ?? "https://www.consultforafrica.com").replace(/\/$/, "");
+  const label = r.kind === "NEAR_MISS" ? "near miss" : "report of something broken";
+  const text = `A new ${label} has come in at Haven and is yours to review and resolve.
+
+What happened: ${r.what}
+${r.why ? `Context: ${r.why}\n` : ""}${r.reachedPatient ? `Reached a patient: ${r.reachedPatient}\n` : ""}${r.severity === "HIGH" ? "Marked HIGH because it reached a patient.\n" : ""}
+Take it within two days and close it within fourteen: ${site}/HavenStaff#safety
+
+We look for what made it possible, never who was involved.`;
+  const { sendTransactionalEmail } = await import("@/lib/zeptomail");
+  await sendTransactionalEmail({
+    from: process.env.SMTP_FROM ?? "Consult for Africa <hello@consultforafrica.com>",
+    replyTo: process.env.REPLY_TO_EMAIL ?? "hello@consultforafrica.com",
+    to: reviewer.email,
+    subject: r.severity === "HIGH" ? `Haven: urgent ${label} to review` : `Haven: new ${label} to review`,
+    text,
+    html: text.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c]!).replace(/\n/g, "<br>"),
   });
 }
 
