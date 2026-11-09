@@ -59,30 +59,30 @@ describe("section status and missing sections", () => {
   const safety = findSection(cfg, "safety")!;
 
   it("is due during the day and missing after 20:00 Lagos", () => {
-    const d = day("2026-11-10");
-    expect(sectionStatus(cfg, money, d, false, at("2026-11-10T17:00:00Z"))).toBe("DUE"); // 18:00 Lagos
-    expect(sectionStatus(cfg, money, d, false, at("2026-11-10T19:00:00Z"))).toBe("MISSING"); // 20:00 Lagos
-    expect(sectionStatus(cfg, money, d, true, at("2026-11-10T19:00:00Z"))).toBe("IN");
+    const d = day("2026-11-17");
+    expect(sectionStatus(cfg, money, d, false, at("2026-11-17T17:00:00Z"))).toBe("DUE"); // 18:00 Lagos
+    expect(sectionStatus(cfg, money, d, false, at("2026-11-17T19:00:00Z"))).toBe("MISSING"); // 20:00 Lagos
+    expect(sectionStatus(cfg, money, d, true, at("2026-11-17T19:00:00Z"))).toBe("IN");
   });
 
   it("a past day with no return is missing", () => {
-    expect(sectionStatus(cfg, money, day("2026-11-09"), false, at("2026-11-10T08:00:00Z"))).toBe("MISSING");
+    expect(sectionStatus(cfg, money, day("2026-11-16"), false, at("2026-11-17T08:00:00Z"))).toBe("MISSING");
   });
 
   it("an area whose phase has not started is not started, never missing", () => {
-    const d = day("2026-11-10");
-    expect(sectionStatus(cfg, lab, d, false, at("2026-11-11T08:00:00Z"))).toBe("NOT_STARTED"); // phase 2 starts 16 Nov
-    expect(sectionStatus(cfg, lab, day("2026-11-16"), false, at("2026-11-17T08:00:00Z"))).toBe("MISSING");
-    expect(sectionStatus(cfg, safety, day("2026-12-01"), false, at("2026-12-02T08:00:00Z"))).toBe("NOT_STARTED"); // phase 3 has no date
+    const d = day("2026-11-17");
+    expect(sectionStatus(cfg, lab, d, false, at("2026-11-18T08:00:00Z"))).toBe("NOT_STARTED"); // phase 2 starts 30 Nov
+    expect(sectionStatus(cfg, lab, day("2026-11-30"), false, at("2026-12-01T08:00:00Z"))).toBe("MISSING");
+    expect(sectionStatus(cfg, safety, day("2026-12-04"), false, at("2026-12-05T08:00:00Z"))).toBe("NOT_STARTED"); // phase 3 starts 7 Dec
   });
 
   it("lists only live sections with no return", () => {
-    const missing = missingSections(cfg, day("2026-11-10"), ["on_duty", "patients"], at("2026-11-10T19:30:00Z"));
+    const missing = missingSections(cfg, day("2026-11-17"), ["on_duty", "patients"], at("2026-11-17T19:30:00Z"));
     expect(missing.map((s) => s.code)).toEqual(["opening", "wait", "money"]);
   });
 
   it("lists nothing before the first phase starts", () => {
-    expect(missingSections(cfg, day("2026-11-08"), [], at("2026-11-08T20:00:00Z"))).toEqual([]);
+    expect(missingSections(cfg, day("2026-11-15"), [], at("2026-11-15T20:00:00Z"))).toEqual([]);
   });
 });
 

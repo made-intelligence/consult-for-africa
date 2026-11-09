@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { released } from "@/lib/staffTaskRelease";
 import { NextRequest, NextResponse } from "next/server";
 import { periodKey } from "@/lib/havenTaskPeriod";
 import { ONBOARDED, staffWhere } from "@/lib/havenAudience";
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
 
   const [tasks, staff] = await Promise.all([
     prisma.staffTask.findMany({
-      where: { clientId: client.id, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
+      where: { ...released(), clientId: client.id, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
       select: { id: true, roles: true, graceHours: true, flagLevel: true, cadence: true },
     }),
     prisma.staffMember.findMany({

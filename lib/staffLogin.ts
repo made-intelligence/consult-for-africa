@@ -48,7 +48,7 @@ const askSchema = z.object({ email: z.string().trim().min(3).max(200) });
  * sendSMS returns false rather than throwing when TERMII_API_KEY is absent, so
  * with no key this quietly becomes email-only and nobody is stranded.
  */
-async function deliver(site: StaffSite, to: string, phone: string | null, firstName: string, code: string): Promise<DeliveryChannel> {
+async function deliver(site: StaffSite, to: string | null, phone: string | null, firstName: string, code: string): Promise<DeliveryChannel> {
   if (phone) {
     const sent = await sendSMS(
       phone,
@@ -57,6 +57,9 @@ async function deliver(site: StaffSite, to: string, phone: string | null, firstN
     );
     if (sent) return "SMS";
   }
+  // Someone held by phone alone (Arabella loads most staff that way) has no
+  // email to fall back to; surface the failure rather than claim a send.
+  if (!to) throw new Error("SMS not sent and no email on file");
   await sendCodeEmail(site, to, firstName, code);
   return "EMAIL";
 }
@@ -100,7 +103,7 @@ export async function requestStaffCode(req: NextRequest, site: StaffSite) {
     if (!clientId) return NextResponse.json({ ok: false, found: false });
 
     const staff = await findStaffByIdentifier(clientId, typed);
-    if (!staff || !staff.email) {
+    if (!staff || (!staff.email && !staff.phone)) {
       // Logged so the next "I am not getting the code" can be answered from
       // the logs: what they typed, against a list we can check.
       console.warn(tag, "no match for", typed);
@@ -130,7 +133,7 @@ export async function requestStaffCode(req: NextRequest, site: StaffSite) {
 
     // Masked, so the person knows which inbox to open without the page reading
     // anybody's address out to whoever typed their number.
-    return NextResponse.json({ ok: true, found: true, sentTo: via === "SMS" ? "your phone" : maskEmail(staff.email) });
+    return NextResponse.json({ ok: true, found: true, sentTo: via === "SMS" || !staff.email ? "your phone" : maskEmail(staff.email) });
   } catch (err) {
     console.error(tag, err);
     return NextResponse.json({ ok: false, found: true, error: "We could not send the code just now. Please try again in a minute." });

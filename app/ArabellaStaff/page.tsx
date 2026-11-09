@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { released } from "@/lib/staffTaskRelease";
 import { prisma } from "@/lib/prisma";
 import { getSiteSession, can, greetingName } from "@/lib/staffAuth";
 import { ARABELLA } from "@/lib/staffSites";
@@ -59,7 +60,7 @@ export default async function ArabellaStaffHome() {
       select: { day: true, section: true },
     }),
     prisma.staffTask.findMany({
-      where: { clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
+      where: { ...released(), clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
       select: { id: true, code: true, title: true, why: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     }),
@@ -140,6 +141,7 @@ export default async function ArabellaStaffHome() {
     { href: `${site.pathPrefix}/rota`, t: "The rota", b: can(session, "ENTER_ROTA") ? "Put in or correct your department's month" : "Your shifts and days off" },
     { href: `${site.pathPrefix}/learn`, t: "Training", b: "Arabella's procedures, one short module at a time" },
     ...(can(session, "VIEW_TEAM_NAMED") ? [{ href: `${site.pathPrefix}/team`, t: "The team, day by day", b: "Who has done what, every day" }] : []),
+    ...(leadership ? [{ href: `${site.pathPrefix}/people`, t: "The people", b: "Add the team, their mobile numbers, and what each can see" }] : []),
   ];
 
   return (

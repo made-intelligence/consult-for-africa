@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { released } from "@/lib/staffTaskRelease";
 import { periodKey, type Cadence } from "@/lib/havenTaskPeriod";
 import { COUNTED, staffWhere } from "@/lib/havenAudience";
 import { lateness } from "@/lib/havenSafety";
@@ -39,7 +40,7 @@ export default async function AdoptionList({ clientId }: { clientId: string }) {
   });
 
   const tasks = await prisma.staffTask.findMany({
-    where: { clientId: client.id, isActive: true },
+    where: { ...released(), clientId: client.id, isActive: true },
     select: { id: true, cadence: true },
   });
   const periods: string[] = Array.from(

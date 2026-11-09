@@ -29,9 +29,9 @@ export function tasksPOST(getSession: () => Promise<StaffSession | null>) {
 
     const task = await prisma.staffTask.findUnique({
       where: { id: parsed.data.taskId },
-      select: { id: true, clientId: true, isActive: true, cadence: true, code: true },
+      select: { id: true, clientId: true, isActive: true, cadence: true, code: true, startsOn: true },
     });
-    if (!task || task.clientId !== session.clientId || !task.isActive) {
+    if (!task || task.clientId !== session.clientId || !task.isActive || (task.startsOn && task.startsOn > new Date())) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

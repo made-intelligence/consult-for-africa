@@ -62,5 +62,8 @@ ALTER TABLE "DecisionRequest" ADD CONSTRAINT "DecisionRequest_raisedById_fkey" F
 -- AddForeignKey
 ALTER TABLE "DecisionRequest" ADD CONSTRAINT "DecisionRequest_decidedById_fkey" FOREIGN KEY ("decidedById") REFERENCES "StaffMember"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- A task can be scheduled to go live later (the plan in trickles). Null = live now.
+ALTER TABLE "StaffTask" ADD COLUMN "startsOn" TIMESTAMP(3);
+
 ALTER TABLE public."DailyReturn" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."DecisionRequest" ENABLE ROW LEVEL SECURITY;

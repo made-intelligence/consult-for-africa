@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { released } from "@/lib/staffTaskRelease";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { can, type StaffSession } from "@/lib/staffAuth";
@@ -76,7 +77,7 @@ export default async function TeamView({ site, session }: { site: StaffSite; ses
 
   const [tasks, completions, flags, firstUse, book] = await Promise.all([
     prisma.staffTask.findMany({
-      where: { clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
+      where: { ...released(), clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
       select: { id: true, title: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     }),

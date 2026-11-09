@@ -9097,6 +9097,10 @@ model StaffTask {
   /// because the postholder changes and the escalation does not.
   escalatesTo String?
 
+  /// When the task reaches staff. Null means it is live now. Lets a plan arrive
+  /// in trickles, a few things a week, instead of the whole toolkit on day one.
+  startsOn DateTime?
+
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
 

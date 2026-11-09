@@ -266,9 +266,10 @@ export const ARABELLA_SECTIONS: DailySection[] = [
 
 export const ARABELLA_DAILY: DailyConfig = {
   phaseStarts: {
-    1: "2026-11-09",
-    2: "2026-11-16",
-    3: null,
+    // Matches the plan's trickle in lib/arabella-plan.ts (GO_LIVE 16 Nov).
+    1: "2026-11-16",
+    2: "2026-11-30",
+    3: "2026-12-07",
   },
   closeHour: 20,
   utcOffsetHours: 1,
