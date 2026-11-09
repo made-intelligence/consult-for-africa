@@ -544,6 +544,8 @@ model Client {
   tariffFixes        TariffFix[]
   reviewCycles       ReviewCycle[]
   safetyReports      SafetyReport[]
+  dailyReturns       DailyReturn[]
+  decisionRequests   DecisionRequest[]
   expansionRequests  ClientExpansionRequest[]
   proposals          Proposal[]
   discoveryCalls     DiscoveryCall[]
@@ -8301,6 +8303,9 @@ model StaffMember {
   leadTerms         LeadTerm[]            @relation("LeadTermHolder")
   leaveCovering     StaffLeaveRequest[]   @relation("LeaveCover")
   rotasEntered      StaffRota[]           @relation("RotasEntered")
+  dailyReturns      DailyReturn[]         @relation("DailyReturnsEntered")
+  decisionsRaised   DecisionRequest[]     @relation("DecisionsRaised")
+  decisionsMade     DecisionRequest[]     @relation("DecisionsMade")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9092,6 +9097,10 @@ model StaffTask {
   /// because the postholder changes and the escalation does not.
   escalatesTo String?
 
+  /// When the task reaches staff. Null means it is live now. Lets a plan arrive
+  /// in trickles, a few things a week, instead of the whole toolkit on day one.
+  startsOn DateTime?
+
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
 
@@ -9225,6 +9234,74 @@ enum SafetySeverity {
   LOW
   MEDIUM
   HIGH
+}
+
+/// One area's numbers for one day, entered once at the end of the day by the
+/// person who runs that area. Which areas exist and what each one counts are
+/// in code (lib/arabella-daily.ts), not here, so the principal can change her
+/// questions without a migration. `values` is keyed by the metric code.
+///
+/// A missing row is the signal. The principal view shows an area with no
+/// return as a gap, and the evening chase goes to its owner.
+model DailyReturn {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// The practice's own calendar day (Lagos), not the UTC one.
+  day     DateTime @db.Date
+  /// The section code in the client's daily config, e.g. "money".
+  section String
+
+  enteredById String?
+  enteredBy   StaffMember? @relation("DailyReturnsEntered", fields: [enteredById], references: [id], onDelete: SetNull)
+
+  values Json
+  note   String? @db.Text
+
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([clientId, day, section])
+  @@index([clientId, day])
+}
+
+/// Something waiting on the principal: a decision or an approval, raised by
+/// whoever needs it, with its age on show until she answers. The point is that
+/// nothing waits on her silently in a WhatsApp thread.
+model DecisionRequest {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  title  String
+  detail String? @db.Text
+
+  raisedById String?
+  raisedBy   StaffMember? @relation("DecisionsRaised", fields: [raisedById], references: [id], onDelete: SetNull)
+  raisedAt   DateTime     @default(now())
+  /// When the person raising it needs an answer by, if there is a date.
+  neededBy   DateTime?
+
+  status DecisionRequestStatus @default(OPEN)
+
+  decidedById String?
+  decidedBy   StaffMember? @relation("DecisionsMade", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt   DateTime?
+  /// What she decided, in her words, for the person who asked.
+  decision    String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, status])
+}
+
+enum DecisionRequestStatus {
+  OPEN
+  DECIDED
+  DECLINED
+  WITHDRAWN
 }
 
 /// A question from the room at an AGELESS evening, posted from a guest's phone

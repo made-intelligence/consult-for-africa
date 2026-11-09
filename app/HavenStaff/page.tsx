@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { released } from "@/lib/staffTaskRelease";
 import Link from "next/link";
 import { NearMissForm, WhatsBrokenForm, WeeklyPulse } from "@/components/haven/StaffForms";
 import StaffDirectory, { type DirectoryEntry } from "@/components/haven/StaffDirectory";
@@ -158,7 +159,7 @@ export default async function HavenStaffPage() {
       select: { position: true, department: true },
     });
     const allTasks = await prisma.staffTask.findMany({
-      where: { clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
+      where: { ...released(), clientId: session.clientId, isActive: true, cadence: { in: ON_TODAY } },
       select: { id: true, code: true, title: true, why: true, roles: true, cadence: true },
       orderBy: { sortOrder: "asc" },
     });

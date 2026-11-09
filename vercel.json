@@ -75,6 +75,14 @@
     {
       "path": "/api/cron/haven-founder-note",
       "schedule": "0 6 * * 1,5"
+    },
+    {
+      "path": "/api/cron/staff-daily-chase",
+      "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/staff-daily-summary",
+      "schedule": "30 6 * * *"
     }
   ]
 }

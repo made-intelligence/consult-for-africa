@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const NAVY = "#0B3C5D";
-const TEAL = "#1F7A8C";
+const NAVY = "var(--staff-ink, #0B3C5D)";
+const TEAL = "var(--staff-second, #1F7A8C)";
 const LINE = "#E2E8F0";
 const MUTED = "#64748b";
 
@@ -30,6 +30,7 @@ export default function RotaGrid({
   weekdays,
   people,
   alreadyIn,
+  endpoint = "/api/haven-staff/rota",
 }: {
   department: string;
   month: string;
@@ -37,6 +38,7 @@ export default function RotaGrid({
   weekdays: string[];
   people: RotaPerson[];
   alreadyIn: boolean;
+  endpoint?: string;
 }) {
   const router = useRouter();
   const [grid, setGrid] = useState<Record<string, string[]>>(
@@ -74,7 +76,7 @@ export default function RotaGrid({
   async function save() {
     setSaving(true);
     setMsg(null);
-    const res = await fetch("/api/haven-staff/rota", {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ department, month, rows: people.map((p) => ({ staffId: p.id, codes: grid[p.id] })) }),
