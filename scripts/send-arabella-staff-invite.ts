@@ -18,26 +18,30 @@ const LOGIN = `${SITE}${ARABELLA.pathPrefix}/login`;
 const DEBO = "dodulana@gmail.com";
 const CHITO = "fumenyi@hotmail.com";
 
-const SUBJECT = "Your practice, every day: the Arabella staff app";
+const SUBJECT = "Arabella Women's Health: your staff app is ready";
 const TEXT = `Dear Dr Chito,
 
-The staff app for Arabella is ready for you to see first, before the team.
+Further to the operating plan, the Arabella staff app is ready for you. You are the first to have access; the team follows once you are content with it.
 
 Sign in: ${LOGIN}
-Use this email address or your mobile number. A six-digit code comes to you.
+Method: enter this email address or your mobile number. A six-digit code will be sent to you. There is no password.
 
-What you will find:
-1. Today at the practice: every area, today and yesterday, what is missing, and 7 and 30 day trends.
-2. Decisions: everything waiting on you, with how long it has waited.
-3. The people: add the team's mobile numbers and set what each person can see. Only leadership sees the money and the daily view.
-4. The rota, learning and issue reporting for the whole team.
+What you will see first: a short setup list of six steps. Each step marks itself complete once it is done, and the list disappears when all six are finished.
+1. Bring Tolu in, so the setup is shared.
+2. Add the team's mobile numbers. No one is contacted until their number is entered.
+3. Confirm who completes each area of the daily view.
+4. Enter the rota for the first week.
+5. Raise a test decision, to see how items waiting on you are shown.
+6. Approve the first training modules. No clinical content reaches staff without your approval.
 
-The plan reaches the team a few tasks a week from Monday 16 November, starting with opening, the huddle, patients and the day's money. Nothing goes to staff until their numbers are in.
+Timing: the team's first tasks begin on Monday 16 November, a few at a time. The page "The plan, week by week" shows what reaches each person and when.
 
-When you have had a look, tell us anything you want changed. The daily view is set to your standard, not ours.
+Next step: I would be glad to take you through it on a short call. Please let me know a convenient time.
 
-Debo
-Consult for Africa`;
+Kind regards,
+
+Dr Debo Odulana
+Founding Partner, Consult for Africa`;
 
 async function main() {
   const key = (process.env.ZEPTOMAIL_API_KEY ?? "").replace(/^Zoho-enczapikey\s*/i, "").trim();
