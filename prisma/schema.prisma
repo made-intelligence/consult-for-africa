@@ -8498,6 +8498,13 @@ model Protocol {
   approvedBy   StaffMember? @relation("ProtocolApprovals", fields: [approvedById], references: [id], onDelete: SetNull)
   approvedAt   DateTime?
   approvalNote String?      @db.Text
+  /// The approver read it and sent it back with a note (approvalNote) instead
+  /// of approving. Cleared when the content is revised or it is approved.
+  sentBackAt   DateTime?
+
+  /// Training arrives in trickles: a module reaches staff once this date has
+  /// passed and it is approved. Null means live now, which is every Haven module.
+  startsOn DateTime?
 
   /// Who this is relevant to. Matched loosely against position and department:
   /// nineteen people do not need a role taxonomy.

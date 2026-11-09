@@ -20,6 +20,7 @@ export default function StaffShell({
   title,
   lead,
   back,
+  backTo,
   width = 760,
   children,
 }: {
@@ -28,6 +29,8 @@ export default function StaffShell({
   lead?: string;
   /** Show a link back to the site's front page. */
   back?: boolean;
+  /** A back link somewhere other than the front page. */
+  backTo?: { href: string; label: string };
   width?: number;
   children: React.ReactNode;
 }) {
@@ -36,7 +39,9 @@ export default function StaffShell({
       <div style={{ background: "var(--staff-deep)", padding: "40px 16px 44px" }}>
         <div style={{ maxWidth: width, margin: "0 auto" }}>
           <div style={{ width: 44, height: 3, background: ACCENT, marginBottom: 16 }} />
-          {back ? (
+          {backTo ? (
+            <Link href={backTo.href} style={{ color: "var(--staff-head-label)", fontSize: 13.5, textDecoration: "none" }}>&lsaquo; {backTo.label}</Link>
+          ) : back ? (
             <Link href={site.pathPrefix} style={{ color: "var(--staff-head-label)", fontSize: 13.5, textDecoration: "none" }}>&lsaquo; The staff page</Link>
           ) : (
             <div style={{ color: "var(--staff-head-label)", fontWeight: 700, fontSize: 11.5, letterSpacing: ".16em", textTransform: "uppercase" }}>{site.clientName}</div>

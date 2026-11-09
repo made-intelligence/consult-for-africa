@@ -28,6 +28,8 @@ export interface LearnRow {
   summary: string;
   approved: boolean;
   status: LearnStatus;
+  /** When it reaches staff. Null (every Haven module) means live now. */
+  startsOn?: Date | null;
 }
 
 /** Every module that applies to one person, with where they are on it. */
@@ -37,7 +39,7 @@ export async function myModules(clientId: string, staffId: string): Promise<Lear
   const [protocols, progress] = await Promise.all([
     prisma.protocol.findMany({
       where: { clientId, isActive: true },
-      select: { id: true, code: true, domain: true, title: true, summary: true, roles: true, departments: true, approvedAt: true, version: true },
+      select: { id: true, code: true, domain: true, title: true, summary: true, roles: true, departments: true, approvedAt: true, version: true, startsOn: true },
       orderBy: [{ domain: "asc" }, { code: "asc" }],
     }),
     prisma.protocolProgress.findMany({
@@ -52,6 +54,6 @@ export async function myModules(clientId: string, staffId: string): Promise<Lear
       const pr = by.get(p.id);
       const current = pr && pr.againstVersion === p.version;
       const status: LearnStatus = !pr || !current ? "NEW" : pr.passed ? "PASSED" : pr.passed === false ? "RETAKE" : pr.studiedAt ? "READ" : "NEW";
-      return { id: p.id, code: p.code, domain: p.domain, title: p.title, summary: p.summary, approved: !!p.approvedAt, status };
+      return { id: p.id, code: p.code, domain: p.domain, title: p.title, summary: p.summary, approved: !!p.approvedAt, status, startsOn: p.startsOn };
     });
 }
