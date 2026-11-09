@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TASK_PROMPTS, NOTHING_THIS_WEEK } from "@/lib/havenTaskPrompts";
 
-const NAVY = "#0B3C5D";
-const GOLD = "#D4AF37";
-const TEAL = "#1F7A8C";
+const NAVY = "var(--staff-ink, #0B3C5D)";
+const GOLD = "var(--staff-accent, #D4AF37)";
+const TEAL = "var(--staff-second, #1F7A8C)";
 const LINE = "#E2E8F0";
 const MUTED = "#64748b";
 
@@ -39,7 +39,7 @@ const WHEN: Record<TodayTask["cadence"], string> = {
   MONTHLY: "This month",
 };
 
-export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
+export default function TodayTasks({ tasks, endpoint = "/api/haven-staff/tasks" }: { tasks: TodayTask[]; endpoint?: string }) {
   const router = useRouter();
   const [local, setLocal] = useState<Record<string, boolean>>({});
   const [failed, setFailed] = useState<Record<string, string | false>>({});
@@ -63,7 +63,7 @@ export default function TodayTasks({ tasks }: { tasks: TodayTask[] }) {
     setLocal((s) => ({ ...s, [t.id]: next }));
     setFailed((s) => ({ ...s, [t.id]: false }));
     try {
-      const res = await fetch("/api/haven-staff/tasks", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ taskId: t.id, done: next, note }),

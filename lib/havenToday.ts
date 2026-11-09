@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { released } from "@/lib/staffTaskRelease";
 import { can, type StaffSession } from "@/lib/staffAuth";
 import { isoWeek } from "@/lib/havenScoreboard";
 import { lateness } from "@/lib/havenSafety";
@@ -84,7 +85,7 @@ export async function whatsWaiting(session: StaffSession): Promise<WaitingItem[]
   const [tasks, doneToday, openFlags, protocols, progress, presenting, leaveWaiting, pulsed, numbers] =
     await Promise.all([
       prisma.staffTask.findMany({
-        where: { clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY"] } },
+        where: { ...released(), clientId: session.clientId, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY"] } },
         select: { id: true, code: true, title: true, roles: true, why: true },
       }),
       prisma.staffTaskCompletion.findMany({

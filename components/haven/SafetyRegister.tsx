@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const NAVY = "#0B3C5D";
-const GOLD = "#D4AF37";
-const TEAL = "#1F7A8C";
+const NAVY = "var(--staff-ink, #0B3C5D)";
+const GOLD = "var(--staff-accent, #D4AF37)";
+const TEAL = "var(--staff-second, #1F7A8C)";
 const LINE = "#E2E8F0";
 const MUTED = "#64748b";
 const WARN = "#B0392B";
@@ -68,9 +68,9 @@ const STATUS: Record<SafetyRow["status"], string> = {
   CLOSED: "Closed",
 };
 
-async function send(body: object): Promise<string | null> {
+async function send(body: object, endpoint: string): Promise<string | null> {
   try {
-    const res = await fetch("/api/haven-staff/safety", {
+    const res = await fetch(endpoint, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -82,7 +82,7 @@ async function send(body: object): Promise<string | null> {
   }
 }
 
-function Case({ r }: { r: SafetyRow }) {
+function Case({ r, endpoint }: { r: SafetyRow; endpoint: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +95,7 @@ function Case({ r }: { r: SafetyRow }) {
 
   async function go(body: object) {
     setBusy(true); setError(null);
-    const err = await send({ id: r.id, ...body });
+    const err = await send({ id: r.id, ...body }, endpoint);
     setBusy(false);
     if (err) setError(err);
     else { setOpen(false); router.refresh(); }
@@ -196,7 +196,7 @@ function Case({ r }: { r: SafetyRow }) {
 }
 
 /** Leadership's view: every open case, late ones first. */
-export function SafetyRegister({ open, closedCount }: { open: SafetyRow[]; closedCount: number }) {
+export function SafetyRegister({ open, closedCount, endpoint = "/api/haven-staff/safety" }: { open: SafetyRow[]; closedCount: number; endpoint?: string }) {
   const late = open.filter((r) => r.late).length;
   return (
     <div>
@@ -212,7 +212,7 @@ export function SafetyRegister({ open, closedCount }: { open: SafetyRow[]; close
         <p style={{ color: MUTED, fontSize: 15, margin: 0 }}>Nothing open. Every report has been closed and the team told.</p>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
-          {open.map((r) => <Case key={r.id} r={r} />)}
+          {open.map((r) => <Case key={r.id} r={r} endpoint={endpoint} />)}
         </div>
       )}
     </div>
