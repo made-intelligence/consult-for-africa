@@ -22,7 +22,19 @@ import { dutyBook, daysBetween, EXCUSED } from "@/lib/havenDuty";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const CLIENT_NAME = "Haven Paediatric Centre";
+/**
+ * Every practice whose staff tasks are chased. Haven first, as it always was;
+ * Arabella from its first week. Each runs independently, so one practice's
+ * failure never stops the other's.
+ */
+const CLIENT_NAMES = ["Haven Paediatric Centre", "Arabella Women's Health"];
+
+/**
+ * A task is not flagged in the week it first reaches people. The first week is
+ * for learning it; a miss on day one is a question, not a lapse. Haven's tasks
+ * have no start date, so this never applies to them.
+ */
+const LEARNING_DAYS = 7;
 
 function dayKey(d: Date) {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
@@ -43,13 +55,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const client = await prisma.client.findFirst({ where: { name: CLIENT_NAME }, select: { id: true } });
-  if (!client) return NextResponse.json({ error: "No client" }, { status: 404 });
+  const results: Record<string, unknown> = {};
+  for (const name of CLIENT_NAMES) {
+    const client = await prisma.client.findFirst({ where: { name }, select: { id: true } });
+    if (!client) { results[name] = "no client"; continue; }
+    try {
+      results[name] = await flagsFor(client.id);
+    } catch (err) {
+      console.error("[haven-flags]", name, err);
+      results[name] = "failed";
+    }
+  }
+  return NextResponse.json({ ok: true, results });
+}
 
+async function flagsFor(clientId: string) {
+  const client = { id: clientId };
   const [tasks, staff] = await Promise.all([
     prisma.staffTask.findMany({
       where: { ...released(), clientId: client.id, isActive: true, cadence: { in: ["EVERY_SHIFT", "DAILY", "WEEKLY"] } },
-      select: { id: true, roles: true, graceHours: true, flagLevel: true, cadence: true },
+      select: { id: true, roles: true, graceHours: true, flagLevel: true, cadence: true, startsOn: true },
     }),
     prisma.staffMember.findMany({
       // Nobody who has never signed in. You cannot fail to record something you
@@ -127,6 +152,7 @@ export async function GET(req: NextRequest) {
       : target;
     const hoursSince = (now.getTime() - period.getTime()) / 3600000;
     if (hoursSince < t.graceHours) continue;
+    if (t.startsOn && period.getTime() < t.startsOn.getTime() + LEARNING_DAYS * 864e5) continue;
 
     // Only people who were signed up before the period began owe it.
     const owed = staff.filter((s: { id: string; position: string; department: string }) => {
@@ -158,6 +184,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  console.log(`[haven-flags] raised=${raised} lapsed=${lapsed.count} for ${target.toISOString().slice(0, 10)}`);
-  return NextResponse.json({ ok: true, raised, lapsed: lapsed.count, forDate: target.toISOString().slice(0, 10) });
+  console.log(`[haven-flags] ${clientId} raised=${raised} lapsed=${lapsed.count} for ${target.toISOString().slice(0, 10)}`);
+  return { raised, lapsed: lapsed.count, forDate: target.toISOString().slice(0, 10) };
 }
