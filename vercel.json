@@ -83,6 +83,10 @@
     {
       "path": "/api/cron/staff-daily-summary",
       "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/arabella-today",
+      "schedule": "0 6 * * *"
     }
   ]
 }
