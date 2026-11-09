@@ -8,6 +8,7 @@ import { HAVEN_START } from "@/lib/haven-delivery";
 import { WORKSTREAMS } from "@/lib/haven-workstreams";
 import { NICU_DAY } from "@/lib/haven-tariff";
 import { quarterOf } from "@/lib/havenObjectives";
+import { criticalChecks } from "@/lib/havenCriticalChecks";
 
 /**
  * The founders' home: the two workstreams they follow, and the handful of live
@@ -59,6 +60,7 @@ export default async function FoundersPage() {
     prisma.teamHuddle.count({ where: { date: { gte: weekAgo }, team: { clientId: session.clientId } } }),
     prisma.staffTeam.count({ where: { clientId: session.clientId } }),
   ]);
+  const checks = await criticalChecks(session.clientId);
   const active = staff.filter((s) => s.lastLoginAt && s.lastLoginAt >= weekAgo).length;
   const fixesOpen = fixes.filter((f) => !f.doneAt).length;
   const agreed = objectives.filter((o) => o.status === "AGREED").length;
@@ -103,6 +105,35 @@ export default async function FoundersPage() {
             return href ? <Link key={small} href={href} style={box}>{inner}</Link> : <div key={small} style={box}>{inner}</div>;
           })}
         </div>
+
+        {checks.length > 0 && (
+          <section style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 16, padding: 20 }}>
+            <div style={{ color: GOLD, fontWeight: 700, fontSize: 11.5, letterSpacing: ".14em", textTransform: "uppercase" }}>Patient safety</div>
+            <h2 style={{ color: NAVY, fontSize: 21, margin: "4px 0 2px" }}>Critical checks</h2>
+            <p style={{ color: MUTED, fontSize: 14, margin: "0 0 14px" }}>Recorded by anyone on shift, today and on each of the last fourteen days.</p>
+            <div style={{ display: "grid", gap: 14 }}>
+              {checks.map((c) => (
+                <div key={c.code} style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) auto", gap: 10, alignItems: "center" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ color: NAVY, fontWeight: 650, fontSize: 14.5 }}>{c.title}</div>
+                    <div style={{ fontSize: 13, color: c.today.done ? TEAL : RED, fontWeight: 600 }}>
+                      Today: {c.today.done ? `done by ${c.today.by.join(", ")}` : "not recorded yet"}
+                    </div>
+                    <div style={{ fontSize: 12.5, color: MUTED }}>
+                      {c.doneDays} of 14 days · last done {c.lastDone ?? "never"}
+                      {c.missedRecent.length ? ` · missed ${c.missedRecent.join(", ")}` : ""}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 3 }} aria-label={`${c.doneDays} of 14 days recorded`}>
+                    {c.days.map((d) => (
+                      <span key={d.date} title={d.date} style={{ width: 13, height: 22, borderRadius: 3, background: d.done ? TEAL : "#FEE2E2", border: d.done ? "none" : `1px solid #FCA5A5` }} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 16 }}>
           {WORKSTREAMS.map((w) => (
