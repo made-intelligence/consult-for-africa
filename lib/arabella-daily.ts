@@ -23,6 +23,16 @@ import type { DailyConfig, DailySection, Metric } from "@/lib/dailyReturn";
 
 export const PRINCIPAL = "Dr Chito";
 
+/** Who answers a decision raised for the principal: whoever holds BOARD. */
+export function canDecide(tiers: readonly string[]) {
+  return tiers.includes("BOARD");
+}
+
+/** Who sees the principal's daily view and the money: LEADERSHIP or BOARD. */
+export function seesDailyView(tiers: readonly string[] | null | undefined) {
+  return !!tiers && tiers.some((t) => t === "LEADERSHIP" || t === "BOARD");
+}
+
 /** Rename these to the practice's own accounts. Codes must stay stable once used. */
 export const BANK_ACCOUNTS: { code: string; label: string }[] = [
   { code: "transfer_a", label: "Transfer, first bank account" },
