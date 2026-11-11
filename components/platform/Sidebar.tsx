@@ -44,6 +44,7 @@ import {
   MessageSquare,
   Star,
   Radar,
+  PhoneCall,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
@@ -104,6 +105,7 @@ const OFFICE_NAV: NavSection[] = [
     title: "",
     items: [
       { label: "My desk",        href: "/desk",           icon: ListChecks },
+      { label: "Sprints",        href: "/sprints",        icon: PhoneCall },
     ],
   },
   {
@@ -183,6 +185,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Projects",       href: "/projects",       icon: Briefcase },
       { label: "Deliverables",   href: "/deliverables",   icon: FileCheck },
       { label: "Meetings",       href: "/meetings",       icon: Video },
+      { label: "Sprints",        href: "/sprints",        icon: PhoneCall },
       { label: "Haven adoption", href: "/admin/haven-adoption", icon: HeartPulse, roles: STAFF_ROLES },
     ],
     roles: STAFF_AND_OFFICE,

@@ -65,12 +65,17 @@ export function normalisePhone(raw: string): string | null {
   if (/^\+234\d{10}$/.test(d)) return d;
   if (/^234\d{10}$/.test(d)) return `+${d}`;
   if (/^0\d{10}$/.test(d)) return `+234${d.slice(1)}`;
+  // Mobile with the leading 0 dropped, or shifted to the end by a spreadsheet.
+  if (/^[789]\d{9}$/.test(d)) return `+234${d}`;
+  if (/^[789]\d{9}0$/.test(d)) return `+234${d.slice(0, 10)}`;
+  // Lagos landline: 01 plus seven digits.
+  if (/^01\d{7}$/.test(d)) return `+234${d.slice(1)}`;
   return null;
 }
 
 export function splitPhones(raw: string | null | undefined): string[] {
   if (!raw) return [];
-  return [...new Set(String(raw).split(/[,;/]| or /i).map((p) => normalisePhone(p.trim())).filter((p): p is string => !!p))];
+  return [...new Set(String(raw).split(/[,;/|]| or /i).map((p) => normalisePhone(p.trim())).filter((p): p is string => !!p))];
 }
 
 export function splitEmails(raw: string | null | undefined): string[] {

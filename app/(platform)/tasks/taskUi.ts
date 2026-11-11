@@ -112,6 +112,8 @@ const LINKED_SECTIONS: Record<string, { label: string; path: string; itemPath?: 
   // programme. Without this entry the task said what to do and offered no way
   // to go and do it.
   INTERN_ROTATION: { label: "the evaluation", path: "/admin/interns", itemPath: () => "/admin/interns" },
+  // Linked by slug, so the task opens the caller's queue on that sprint.
+  SPRINT: { label: "the signing desk", path: "/sprints", itemPath: (slug) => `/sprints/${slug}` },
 };
 
 export function linkedSection(
