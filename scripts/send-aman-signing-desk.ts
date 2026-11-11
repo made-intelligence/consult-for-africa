@@ -34,10 +34,12 @@ What is on it
 
 How to work it
 1. Open My queue. It shows what is due today, then fresh providers. Work down it.
-2. Tap a provider. Call or WhatsApp from the page; the WhatsApp message is written for you.
+2. Tap a provider. Call or WhatsApp from the page; the WhatsApp message is written for you and carries the hospital's own link.
 3. Tap what happened. The desk sets the next step and its date, including each step of the SLA chase in the brief.
 4. Save who signs, and write down what they said in their own words. Tick anything they mentioned, such as HMOs paying late.
 5. At 5pm, copy your check-in from the bottom of My queue into the day's check-in task.
+
+Every provider has its own page, with no login. From it the hospital says yes and names who signs, downloads the agreement, and sends back the signed copy and the documents from a phone. Each of those shows on the desk the moment it happens, and the owner gets an email. Send the link by WhatsApp or email from the provider's page.
 
 The Board shows the team's numbers, each week against its target, anything escalated to Gidado, and what providers are saying. Gidado copies the 6pm roll-up from it.
 
@@ -87,7 +89,7 @@ async function main() {
       textbody: send.text,
     }),
   });
-  const data = (await res.json().catch(() => null)) as any;
+  const data = (await res.json().catch(() => null)) as { request_id?: string; message?: string; error?: { details?: { message?: string }[] } } | null;
   if (!res.ok) throw new Error(`ZeptoMail send failed: ${data?.error?.details?.[0]?.message ?? data?.message ?? `HTTP ${res.status}`}`);
   console.log(`sent, request_id=${data?.request_id ?? "?"}`);
 }

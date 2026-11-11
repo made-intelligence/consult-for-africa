@@ -41,7 +41,7 @@ export default async function SprintBoardPage({ params }: { params: Promise<{ sl
     <div className="flex h-full flex-col">
       <TopBar title={a.sprint.name} subtitle="The team, the week and what providers are saying." />
       <div className="flex-1 space-y-8 overflow-y-auto p-6">
-        <SprintHeader slug={slug} tab="board" total={s.total} target={s.target} week={s.week} signedThisWeek={s.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} />
+        <SprintHeader slug={slug} tab="board" total={s.total} target={s.target} week={s.week} signedThisWeek={s.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} steer={a.steer} />
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {[
@@ -179,7 +179,7 @@ export default async function SprintBoardPage({ params }: { params: Promise<{ sl
                   {h.said && <p className="text-sm italic text-slate-700">&ldquo;{h.said}&rdquo;</p>}
                   <p className="mt-1 text-xs text-slate-500">
                     {h.target.hospital.name}
-                    {h.target.hospital.lga ? `, ${h.target.hospital.lga}` : ""} · {h.user.name} · {fmtDay(h.createdAt)}
+                    {h.target.hospital.lga ? `, ${h.target.hospital.lga}` : ""} · {h.user?.name ?? "on their page"} · {fmtDay(h.createdAt)}
                     {h.needs.length ? ` · ${h.needs.map(needLabel).join(", ")}` : ""}
                   </p>
                 </Link>

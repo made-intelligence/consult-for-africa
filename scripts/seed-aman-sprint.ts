@@ -11,6 +11,9 @@
  * The assignments come from scripts/load-aman-providers.py:
  *   python3 scripts/load-aman-providers.py ~/Downloads/400_providers_with_contact_and_email.xlsx <assignments.json>
  *
+ * Every target gets its private page link (/sign/<token>) at once, so the
+ * first WhatsApp or email already carries it.
+ *
  * Idempotent: the sprint and members are upserted, a target already on the
  * sprint keeps its owner, stage and history.
  *
@@ -21,6 +24,7 @@
 import { readFileSync } from "node:fs";
 import { prisma } from "@/lib/prisma";
 import { importKey } from "@/lib/hospital-sales";
+import { newToken } from "@/lib/outreach-hospital";
 
 const APPLY = process.argv.includes("--apply");
 const FILE = process.argv.slice(2).find((a) => !a.startsWith("--"));
@@ -98,6 +102,8 @@ async function main() {
       source: "Aman provider list",
       notes: r.notes,
       priority: PRIORITY[r.type] ?? 0,
+      // Each hospital's own page, ready for the first message.
+      token: newToken(),
     })),
     skipDuplicates: true,
   });

@@ -6,7 +6,8 @@ import TopBar from "@/components/platform/TopBar";
 import { normalisePhone, whatsappLink } from "@/lib/hospital-sales";
 import { CHASE, endOfLagosDay, fmtDay, fmtTime, needLabel, outcome, slaEmail, startOfLagosDay, todayInLagos, whatsappOpener, workingDaysBetween } from "@/lib/outreach";
 import { canWork, queueFor, sprintAccess } from "@/lib/outreach-server";
-import { LogTouch, SignatoryForm, SteerPanel } from "../../SprintClient";
+import { emailsFor, ensureToken, hospitalLink, isTested, recipientFor, HOSPITAL_OUTCOMES } from "@/lib/outreach-hospital";
+import { FileRow, HospitalLinkPanel, LogTouch, SignatoryForm, SteerPanel } from "../../SprintClient";
 import { DueLabel, StagePill, card, h2 } from "../../parts";
 
 export const dynamic = "force-dynamic";
@@ -24,9 +25,11 @@ export default async function SprintTargetPage({ params }: { params: Promise<{ s
       hospital: { include: { contacts: { orderBy: { isPrimary: "desc" } } } },
       owner: { select: { id: true, name: true } },
       touches: { orderBy: { createdAt: "desc" }, include: { user: { select: { name: true } } } },
+      files: { orderBy: { createdAt: "asc" } },
     },
   });
   if (!t) notFound();
+  const link = hospitalLink(t.token ?? (await ensureToken(t.id)));
 
   const mayWork = canWork(a, t, session.user.id);
   const client = a.sprint.clientName ?? "";
@@ -52,7 +55,11 @@ export default async function SprintTargetPage({ params }: { params: Promise<{ s
     ...t.hospital.contacts.filter((c) => c.phone).map((c) => ({ phone: c.phone!, who: c.name ?? "Main line" })),
   ];
   const emails = [...(t.signatoryEmail ? [t.signatoryEmail] : []), ...t.hospital.contacts.filter((c) => c.email).map((c) => c.email!)];
-  const opener = whatsappOpener({ clientName: client, caller, signatory: t.signatoryName, hospital: t.hospital.name });
+  const opener = `${whatsappOpener({ clientName: client, caller, signatory: t.signatoryName, hospital: t.hospital.name })}\n\nEverything is on one page for ${t.hospital.name}, including the agreement: ${link}`;
+  const wording = emailsFor(a.sprint);
+  const tested = { intro: isTested(a.sprint, wording.intro), sla: isTested(a.sprint, wording.sla), chase: isTested(a.sprint, wording.chase) };
+  const recipient = recipientFor(t)?.email ?? null;
+  const waPhone = phones.find((p) => p.phone.startsWith("+"))?.phone ?? null;
   const mail = slaEmail({ clientName: client, caller, signatory: t.signatoryName, hospital: t.hospital.name });
   const mailto = emails[0] ? `mailto:${emails[0]}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}` : null;
   const daysOut = t.sentAt ? workingDaysBetween(t.sentAt, new Date()) : null;
@@ -78,6 +85,8 @@ export default async function SprintTargetPage({ params }: { params: Promise<{ s
               <div className="flex flex-wrap items-center gap-2">
                 <StagePill stage={t.stage} client={client} />
                 {t.escalatedAt && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700">With the runner</span>}
+                {t.linkOpenedAt && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">Opened their page {fmtDay(t.linkOpenedAt)}</span>}
+                {t.packReadyAt && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">Pack ready for review</span>}
                 {daysOut != null && t.stage === "SENT" && <span className="text-xs text-slate-500">SLA out {daysOut} working day{daysOut === 1 ? "" : "s"}</span>}
               </div>
               <p className="mt-2 text-base text-slate-800">
@@ -108,10 +117,10 @@ export default async function SprintTargetPage({ params }: { params: Promise<{ s
                   {t.touches.map((x) => (
                     <li key={x.id} className={card}>
                       <p className="text-sm">
-                        <span className="font-semibold text-slate-800">{outcome(x.outcome)?.label ?? x.outcome.toLowerCase()}</span>
+                        <span className="font-semibold text-slate-800">{outcome(x.outcome)?.label ?? HOSPITAL_OUTCOMES[x.outcome] ?? x.outcome.toLowerCase()}</span>
                         <span className="text-slate-500">
                           {" "}
-                          · {x.channel.toLowerCase()} · {x.user.name} · {fmtDay(x.createdAt)} {fmtTime(x.createdAt)}
+                          · {x.channel.toLowerCase()} · {x.user?.name ?? (x.actor === "HOSPITAL" ? "the hospital" : "automatic")} · {fmtDay(x.createdAt)} {fmtTime(x.createdAt)}
                         </span>
                       </p>
                       {x.spokeTo && <p className="text-xs text-slate-500">Spoke to {x.spokeTo}</p>}
@@ -134,6 +143,27 @@ export default async function SprintTargetPage({ params }: { params: Promise<{ s
           </div>
 
           <div className="space-y-6">
+            {mayWork && (
+              <section>
+                <h2 className={h2}>The hospital&apos;s page</h2>
+                <div className={card}>
+                  <HospitalLinkPanel slug={slug} targetId={t.id} link={link} whatsappHref={waPhone ? whatsappLink(waPhone, opener) : null} recipient={recipient} tested={tested} hasAgreement={!!a.sprint.agreementKey} />
+                </div>
+              </section>
+            )}
+
+            {t.files.length > 0 && (
+              <section>
+                <h2 className={h2}>What they returned</h2>
+                <div className={`${card} divide-y divide-slate-100`}>
+                  {t.files.map((f) => (
+                    <FileRow key={f.id} slug={slug} file={f} mayReject={mayWork} />
+                  ))}
+                </div>
+                {mayWork && ["SIGNED"].includes(t.stage) && <p className="mt-2 text-xs text-slate-500">When the copy and documents are right, log Docs complete, then Handed over once they are with {client}.</p>}
+              </section>
+            )}
+
             <section>
               <h2 className={h2}>Reach them</h2>
               <div className={`${card} space-y-2`}>

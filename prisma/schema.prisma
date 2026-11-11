@@ -9788,9 +9788,26 @@ model OutreachSprint {
   weeklyTargets Json?
   /// Where the brief lives, shown on the desk.
   briefUrl      String?
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  // The hospital's side: what its private page shows and what it can return.
+  /// The agreement hospitals download, in private storage (never a public link).
+  agreementKey  String?
+  agreementName String?
+  /// One document per line, shown on the hospital's page.
+  checklist     String?  @db.Text
+  /// Two or three lines on why to join, confirmed with the client.
+  pitch         String?  @db.Text
+  /// { intro | sla | chase: { subject, body } }. Defaults live in lib/outreach-hospital.ts.
+  emails        Json?
+  /// Hashes of wording a sender has test-sent to themselves. Nothing goes to a
+  /// hospital in wording that is not in here.
+  testedHashes  String[] @default([])
+  /// The day 2/5/9/14 reminder emails. Off until the lead switches it on.
+  autoChaseOn   Boolean  @default(false)
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   members SprintMember[]
   targets SprintTarget[]
@@ -9851,10 +9868,21 @@ model SprintTarget {
 
   lastTouchAt DateTime?
   touchCount  Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  /// The hospital's private page, /sign/<token>. 32 random bytes: the only credential.
+  token           String?   @unique
+  linkSentAt      DateTime?
+  linkOpenedAt    DateTime?
+  /// The hospital pressed "That is everything" on its page.
+  packReadyAt     DateTime?
+  autoChases      Int       @default(0)
+  lastAutoChaseAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   touches SprintTouch[]
+  files   SprintFile[]
 
   @@unique([sprintId, hospitalId])
   @@index([sprintId, ownerId, stage])
@@ -9869,8 +9897,10 @@ model SprintTouch {
   id        String       @id @default(cuid())
   targetId  String
   target    SprintTarget @relation(fields: [targetId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Null when the hospital did it on its page, or the system sent it.
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actor     String       @default("STAFF") // STAFF | HOSPITAL | SYSTEM
   channel   String // CALL | WHATSAPP | EMAIL | VISIT | NOTE
   outcome   String // key from lib/outreach.ts OUTCOMES
   spokeTo   String?
@@ -9884,4 +9914,25 @@ model SprintTouch {
 
   @@index([targetId, createdAt])
   @@index([userId, createdAt])
+}
+
+/// A file a hospital returned on its page: the signed agreement or a document.
+/// Stored under a random key with no filename in it, read back only through a
+/// short-lived signed link behind sign-in.
+model SprintFile {
+  id          String       @id @default(cuid())
+  targetId    String
+  target      SprintTarget @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  kind        String // AGREEMENT | DOCUMENT
+  key         String       @unique
+  fileName    String
+  contentType String
+  size        Int
+  signedBy    String?
+  /// Set when a lead or runner rejects it (unreadable, unsigned page, wrong document).
+  rejectedAt  DateTime?
+  rejectNote  String?
+  createdAt   DateTime     @default(now())
+
+  @@index([targetId, createdAt])
 }

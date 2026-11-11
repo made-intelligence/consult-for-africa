@@ -6,7 +6,8 @@ import TopBar from "@/components/platform/TopBar";
 import { ALL_STAGES, endOfLagosDay, startOfLagosDay, stageLabel, todayInLagos } from "@/lib/outreach";
 import { sprintAccess } from "@/lib/outreach-server";
 import { sprintStats } from "@/lib/outreach-stats";
-import { AddProvider } from "../SprintClient";
+import { emailsFor, isTested } from "@/lib/outreach-hospital";
+import { AddProvider, BulkIntro } from "../SprintClient";
 import { DueLabel, SprintHeader, StagePill, card } from "../parts";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +56,7 @@ export default async function SprintProvidersPage({ params, searchParams }: { pa
     <div className="flex h-full flex-col">
       <TopBar title={a.sprint.name} subtitle="Every provider on the sprint, and whose list it is on." />
       <div className="flex-1 space-y-5 overflow-y-auto p-6">
-        <SprintHeader slug={slug} tab="providers" total={s.total} target={s.target} week={s.week} signedThisWeek={s.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} />
+        <SprintHeader slug={slug} tab="providers" total={s.total} target={s.target} week={s.week} signedThisWeek={s.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} steer={a.steer} />
 
         <div className="flex flex-wrap items-center gap-2">
           <form className="flex gap-2">
@@ -65,6 +66,9 @@ export default async function SprintProvidersPage({ params, searchParams }: { pa
           </form>
           <AddProvider slug={slug} members={members} steer={a.steer} />
         </div>
+        {a.steer && (
+          <BulkIntro slug={slug} tested={isTested(a.sprint, emailsFor(a.sprint).intro)} targetIds={rows.filter((r) => r.stage === "TARGET" && !r.linkSentAt).slice(0, 50).map((r) => r.id)} />
+        )}
         <div className="flex flex-wrap gap-1.5 text-xs">
           <Link href={link({ stage: undefined, page: undefined })} className={`rounded-full border px-2.5 py-1 ${!stage ? "border-[#0B3C5D] bg-[#0B3C5D] text-white" : "border-slate-300"}`}>
             All stages

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { handler } from "@/lib/api-handler";
 import { NEEDS, OUTCOMES, applyTouch, outcome, type OutcomeKey } from "@/lib/outreach";
 import { canWork, sprintAccess } from "@/lib/outreach-server";
+import { CONFIRMATION, isSuppressed, recipientFor, render, sendHospitalEmail } from "@/lib/outreach-hospital";
 
 // Log one contact with a provider. The outcome moves the stage and sets the
 // next action; the chase cadence and escalation run from here.
@@ -83,6 +84,24 @@ export const POST = handler(async (req: NextRequest, ctx: { params: Promise<{ sl
       },
     }),
   ]);
+
+  // The hospital hears it is done, from the platform, if the lead has
+  // automatic emails on. A failed email never fails the log.
+  if (b.outcome === "HANDED_OVER" && a.sprint.autoChaseOn) {
+    try {
+      const full = await prisma.sprintTarget.findUniqueOrThrow({ where: { id: t.id }, include: { hospital: { select: { name: true, contacts: { select: { email: true, name: true }, orderBy: { isPrimary: "desc" } } } } } });
+      const r = recipientFor(full);
+      if (r && !(await isSuppressed(r.email))) {
+        const client = a.sprint.clientName ?? a.sprint.name;
+        const sender = (session.user.name ?? "").replace(/^(Dr|Mr|Mrs|Ms)\.?\s+/i, "") || "The provider network team";
+        const m = { contact: full.signatoryName || r.name || "Sir or Madam", facility: full.hospital.name, client, sender, link: "" };
+        const res = await sendHospitalEmail({ to: r, subject: render(CONFIRMATION.subject, m), text: render(CONFIRMATION.body, m), senderName: `${sender} for ${client}`, replyTo: session.user.email ? { email: session.user.email, name: session.user.name } : null, tag: `sprint-${slug}-confirm` });
+        if (res.ok) await prisma.sprintTouch.create({ data: { targetId: t.id, actor: "SYSTEM", channel: "EMAIL", outcome: "CONFIRMED", spokeTo: r.email, stageFrom: eff.stage, stageTo: eff.stage } });
+      }
+    } catch (err) {
+      console.error("[sprint touch] confirmation email failed", err);
+    }
+  }
 
   return Response.json({ ok: true, touchId: touch.id, stage: eff.stage, nextAction: eff.nextAction, nextActionAt: eff.nextActionAt });
 });

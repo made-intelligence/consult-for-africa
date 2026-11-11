@@ -315,7 +315,7 @@ For ${o.clientName}`,
 
 // ---------------------------------------------------------------- check-ins
 
-type TouchRow = { channel: string; outcome: string; createdAt: Date; userId: string; target: { hospital: { name: string } } };
+type TouchRow = { channel: string; outcome: string; createdAt: Date; userId: string | null; target: { hospital: { name: string } } };
 
 export function checkInText(o: {
   touchesToday: TouchRow[];

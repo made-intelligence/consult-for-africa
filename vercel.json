@@ -83,6 +83,10 @@
     {
       "path": "/api/cron/staff-daily-summary",
       "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/sprint-chase",
+      "schedule": "0 8 * * 1-5"
     }
   ]
 }

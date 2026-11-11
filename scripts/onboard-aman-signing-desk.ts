@@ -53,12 +53,12 @@ const TASKS: T[] = [
   {
     assigneeId: GIDADO,
     assignerId: MATTHEW,
-    title: "Move the sprint's live pipeline onto the signing desk",
+    title: "Move the sprint's live pipeline onto the signing desk, and set up the hospital page",
     brief:
       `The signing desk (${DESK}) holds the 358 warm providers, split between Ruth, Favour and you: 119 in Mainland west are yours. It does not yet hold the work done since 2 November: Esther's pipeline, the SLAs that are out, and anything signed in the sprint. Until those are on it, the board under-counts and those chases do not run.\n\n` +
       "As runner you can see everyone's queue, reassign a provider, park one, and take the escalations: any SLA still unsigned on working day 8 lands in With the runner on the Board.",
     definitionOfDone:
-      "Every provider in the shared tracker that is not on the desk is added with Add a provider, on its owner's list, and logged at its real stage: SLA sent with the date it went out, Signed with the date it was signed. Signed in the sprint on the Board matches the shared tracker. A comment here with the number of rows moved, the number signed in the sprint, and the number of SLAs out. If more than 40 rows need moving, send the sheet to Debo as a file instead and they will be imported in one go. From Friday the 6pm roll-up is copied from the bottom of the Board.",
+      "Every provider in the shared tracker that is not on the desk is added with Add a provider, on its owner's list, and logged at its real stage: SLA sent with the date it went out, Signed with the date it was signed. Signed in the sprint on the Board matches the shared tracker. A comment here with the number of rows moved, the number signed in the sprint, and the number of SLAs out. If more than 40 rows need moving, send the sheet to Debo as a file instead and they will be imported in one go. From Friday the 6pm roll-up is copied from the bottom of the Board. In Settings: the agreement uploaded, Aman's documents checklist and the why-join lines entered, and each of the three emails sent to yourself as a test, once Matthew has confirmed the wording with Aman. Switch on automatic emails only after that.",
     dueDate: lagos("2026-11-12"),
     checkInAt: null,
     estimatedMinutes: 240,

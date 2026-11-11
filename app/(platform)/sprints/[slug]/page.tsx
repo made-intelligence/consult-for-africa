@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import TopBar from "@/components/platform/TopBar";
 import { whatsappLink } from "@/lib/hospital-sales";
+import { HOSPITAL_OUTCOMES, hospitalLink } from "@/lib/outreach-hospital";
 import { endOfLagosDay, fmtDay, outcome, startOfLagosDay, whatsappOpener } from "@/lib/outreach";
 import { queueFor, sprintAccess, type QueueTarget } from "@/lib/outreach-server";
 import { sprintStats } from "@/lib/outreach-stats";
@@ -36,7 +37,7 @@ export default async function SprintQueuePage({ params, searchParams }: { params
     <div className="flex h-full flex-col">
       <TopBar title={a.sprint.name} subtitle="Work down the list. Log every contact the same day." />
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
-        <SprintHeader slug={slug} tab="queue" total={stats.total} target={stats.target} week={stats.week} signedThisWeek={stats.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} />
+        <SprintHeader slug={slug} tab="queue" total={stats.total} target={stats.target} week={stats.week} signedThisWeek={stats.signedThisWeek} endsAt={a.sprint.endsAt} briefUrl={a.sprint.briefUrl} steer={a.steer} />
 
         {a.steer && (
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -124,7 +125,8 @@ function Section({ title, empty, children }: { title: string; empty: string; chi
 function Row({ t, slug, client, caller, dayStart, dayEnd }: { t: QueueTarget; slug: string; client: string | null; caller: string; dayStart: Date; dayEnd: Date }) {
   const phone = t.signatoryPhone ?? t.hospital.contacts.find((c) => c.phone)?.phone ?? null;
   const last = t.touches[0];
-  const wa = phone ? whatsappLink(phone.startsWith("+") ? phone : `+234${phone.replace(/\D/g, "").replace(/^0/, "")}`, whatsappOpener({ clientName: client ?? "", caller, signatory: t.signatoryName, hospital: t.hospital.name })) : null;
+  const text = `${whatsappOpener({ clientName: client ?? "", caller, signatory: t.signatoryName, hospital: t.hospital.name })}${t.token ? `\n\nEverything is on one page for ${t.hospital.name}, including the agreement: ${hospitalLink(t.token)}` : ""}`;
+  const wa = phone ? whatsappLink(phone.startsWith("+") ? phone : `+234${phone.replace(/\D/g, "").replace(/^0/, "")}`, text) : null;
   return (
     <div className={`${card} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`}>
       <Link href={`/sprints/${slug}/t/${t.id}`} className="min-w-0 flex-1">
@@ -132,6 +134,8 @@ function Row({ t, slug, client, caller, dayStart, dayEnd }: { t: QueueTarget; sl
           <span className="font-semibold text-[#0B3C5D]">{t.hospital.name}</span>
           <StagePill stage={t.stage} client={client} />
           {t.escalatedAt && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700">With the runner</span>}
+          {t.packReadyAt && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">Pack ready</span>}
+          {!t.packReadyAt && t.linkOpenedAt && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">Opened their page</span>}
         </div>
         <p className="mt-0.5 text-xs text-slate-500">
           {[t.hospital.category, t.hospital.lga, t.signatoryName ? `Signs: ${t.signatoryName}` : "Signatory not known yet"].filter(Boolean).join(" · ")}
@@ -141,7 +145,7 @@ function Row({ t, slug, client, caller, dayStart, dayEnd }: { t: QueueTarget; sl
         </p>
         {last && (
           <p className="mt-1 truncate text-xs text-slate-500">
-            Last: {outcome(last.outcome)?.label ?? last.outcome}, {fmtDay(last.createdAt)}
+            Last: {outcome(last.outcome)?.label ?? HOSPITAL_OUTCOMES[last.outcome] ?? last.outcome}, {fmtDay(last.createdAt)}
             {last.said ? ` · "${last.said}"` : ""}
           </p>
         )}

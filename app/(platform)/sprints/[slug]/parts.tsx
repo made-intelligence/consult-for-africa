@@ -11,9 +11,11 @@ export function SprintHeader({
   signedThisWeek,
   endsAt,
   briefUrl,
+  steer = false,
 }: {
   slug: string;
-  tab: "queue" | "board" | "providers";
+  tab: "queue" | "board" | "providers" | "settings";
+  steer?: boolean;
   total: number;
   target: number;
   week: { label: string; target: number } | null;
@@ -26,6 +28,7 @@ export function SprintHeader({
     { key: "queue", label: "My queue", href: `/sprints/${slug}` },
     { key: "board", label: "Board", href: `/sprints/${slug}/board` },
     { key: "providers", label: "All providers", href: `/sprints/${slug}/providers` },
+    ...(steer ? [{ key: "settings", label: "Settings", href: `/sprints/${slug}/settings` }] : []),
   ];
   return (
     <div className="space-y-4">
