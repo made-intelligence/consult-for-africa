@@ -26,6 +26,8 @@ export interface PaystackEvent {
     currency?: string;
     channel?: string;
     customer?: { customer_code?: string; email?: string };
+    /** Present on subscription.* events. */
+    subscription_code?: string;
     metadata?: {
       product?: string;
       type?: string;
@@ -326,13 +328,18 @@ export async function handleCadreSubscription(event: PaystackEvent): Promise<voi
   }
 
   if (event.event === "subscription.disable" || event.event === "subscription.not_renew") {
-    // These events carry no metadata, so the customer code is the only link
-    // back to a subscriber. An unknown code simply matches nothing.
-    const customerCode = event.data?.customer?.customer_code;
-    if (!customerCode) return;
+    // One Paystack account serves several products, and Paystack keeps one
+    // customer per email across all of them. A doctor on CadreHealth Pro who
+    // also turns off a Mezo MezoCare renewal shares the customer code, so the
+    // customer code must never decide this. Only the subscription code does:
+    // cancel a CadreHealth subscription only when we hold that exact code.
+    // CadreHealth Pro is charged per period, not as a Paystack subscription,
+    // so today no code is stored and these events are other products' to act on.
+    const subscriptionCode = event.data?.subscription_code;
+    if (!subscriptionCode) return;
 
     await prisma.cadreSubscription.updateMany({
-      where: { paystackCustomerCode: customerCode, plan: "PRO" },
+      where: { paystackSubCode: subscriptionCode, plan: "PRO" },
       data: { status: "CANCELLED", cancelledAt: new Date() },
     });
   }
