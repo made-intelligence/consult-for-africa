@@ -451,6 +451,11 @@ model User {
   estateRateChanges        EstateRateChange[]       @relation("EstateRateChanger")
   estateServicesRecorded   EstateGeneratorService[] @relation("EstateServiceRecorder")
   lyfeEnquiries            LyfeEnquiry[]            @relation("LyfeEnquiryOwner")
+
+  // Outreach sprints: the signing desk
+  sprintMemberships  SprintMember[]
+  sprintTargetsOwned SprintTarget[] @relation("SprintTargetOwner")
+  sprintTouches      SprintTouch[]
 }
 
 model ConsultantProfile {
@@ -3701,6 +3706,7 @@ model Hospital {
   productStages   HospitalProductStage[]
   campaignSends   SalesCampaignSend[]
   recoveryAccount RecoveryAccount?
+  sprintTargets   SprintTarget[]
 
   @@index([pipelineStage])
   @@index([distressTier])
@@ -8265,47 +8271,47 @@ model StaffMember {
   /// most hospitals here run well above it, so this is set per person.
   annualLeaveDays    Int       @default(20)
 
-  loginTokens       StaffLoginToken[]
-  leave             StaffLeaveRequest[]   @relation("StaffLeave")
-  leaveDecisions    StaffLeaveRequest[]   @relation("StaffLeaveDecisions")
-  notes             StaffNote[]           @relation("StaffNotes")
-  protocolProgress  ProtocolProgress[]    @relation("ProtocolProgress")
-  observations      ProtocolProgress[]    @relation("ProtocolObservations")
-  protocolApprovals Protocol[]            @relation("ProtocolApprovals")
-  taskCompletions   StaffTaskCompletion[] @relation("TaskCompletions")
-  taskFlags         StaffTaskFlag[]       @relation("TaskFlags")
-  flagResolutions   StaffTaskFlag[]       @relation("FlagResolutions")
-  scoreboardEntries ScoreboardEntry[]     @relation("ScoreboardEntries")
-  scoreboardAgreed  ScoreboardEntry[]     @relation("ScoreboardAgreements")
-  presenting        TrainingSession[]     @relation("TrainingPresenter")
-  trainingAttended  TrainingAttendance[]  @relation("TrainingAttendance")
-  safetyInvestigations SafetyReport[]    @relation("SafetyInvestigator")
-  shifts            StaffShift[]          @relation("StaffShifts")
-  teamId            String?
-  team              StaffTeam?            @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
-  teamsLed          StaffTeam[]           @relation("TeamLead")
-  huddlesLed        TeamHuddle[]          @relation("HuddleLead")
-  objectivesAgreed  Objective[]           @relation("ObjectiveAgreed")
-  krCheckIns        KeyResultCheckIn[]    @relation("KrCheckIns")
-  tariffFixesDone   TariffFix[]           @relation("TariffFixDone")
+  loginTokens          StaffLoginToken[]
+  leave                StaffLeaveRequest[]   @relation("StaffLeave")
+  leaveDecisions       StaffLeaveRequest[]   @relation("StaffLeaveDecisions")
+  notes                StaffNote[]           @relation("StaffNotes")
+  protocolProgress     ProtocolProgress[]    @relation("ProtocolProgress")
+  observations         ProtocolProgress[]    @relation("ProtocolObservations")
+  protocolApprovals    Protocol[]            @relation("ProtocolApprovals")
+  taskCompletions      StaffTaskCompletion[] @relation("TaskCompletions")
+  taskFlags            StaffTaskFlag[]       @relation("TaskFlags")
+  flagResolutions      StaffTaskFlag[]       @relation("FlagResolutions")
+  scoreboardEntries    ScoreboardEntry[]     @relation("ScoreboardEntries")
+  scoreboardAgreed     ScoreboardEntry[]     @relation("ScoreboardAgreements")
+  presenting           TrainingSession[]     @relation("TrainingPresenter")
+  trainingAttended     TrainingAttendance[]  @relation("TrainingAttendance")
+  safetyInvestigations SafetyReport[]        @relation("SafetyInvestigator")
+  shifts               StaffShift[]          @relation("StaffShifts")
+  teamId               String?
+  team                 StaffTeam?            @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  teamsLed             StaffTeam[]           @relation("TeamLead")
+  huddlesLed           TeamHuddle[]          @relation("HuddleLead")
+  objectivesAgreed     Objective[]           @relation("ObjectiveAgreed")
+  krCheckIns           KeyResultCheckIn[]    @relation("KrCheckIns")
+  tariffFixesDone      TariffFix[]           @relation("TariffFixDone")
   /// The role code in lib/haven-roles.ts this person holds (their job description).
-  roleCode          String?
-  lineManagerId     String?
-  lineManager       StaffMember?          @relation("LineManager", fields: [lineManagerId], references: [id], onDelete: SetNull)
-  directReports     StaffMember[]         @relation("LineManager")
-  personalObjectives PersonalObjective[]  @relation("ObjectiveOwner")
-  objectivesAgreedFor PersonalObjective[] @relation("ObjectiveAgreer")
-  objectiveUpdates  ObjectiveUpdate[]     @relation("ObjectiveUpdateBy")
-  oneToOnes         OneToOne[]            @relation("OneToOneStaff")
-  oneToOnesHeld     OneToOne[]            @relation("OneToOneManager")
-  appraisals        Appraisal[]           @relation("AppraisalStaff")
-  appraisalsDone    Appraisal[]           @relation("AppraisalManager")
-  leadTerms         LeadTerm[]            @relation("LeadTermHolder")
-  leaveCovering     StaffLeaveRequest[]   @relation("LeaveCover")
-  rotasEntered      StaffRota[]           @relation("RotasEntered")
-  dailyReturns      DailyReturn[]         @relation("DailyReturnsEntered")
-  decisionsRaised   DecisionRequest[]     @relation("DecisionsRaised")
-  decisionsMade     DecisionRequest[]     @relation("DecisionsMade")
+  roleCode             String?
+  lineManagerId        String?
+  lineManager          StaffMember?          @relation("LineManager", fields: [lineManagerId], references: [id], onDelete: SetNull)
+  directReports        StaffMember[]         @relation("LineManager")
+  personalObjectives   PersonalObjective[]   @relation("ObjectiveOwner")
+  objectivesAgreedFor  PersonalObjective[]   @relation("ObjectiveAgreer")
+  objectiveUpdates     ObjectiveUpdate[]     @relation("ObjectiveUpdateBy")
+  oneToOnes            OneToOne[]            @relation("OneToOneStaff")
+  oneToOnesHeld        OneToOne[]            @relation("OneToOneManager")
+  appraisals           Appraisal[]           @relation("AppraisalStaff")
+  appraisalsDone       Appraisal[]           @relation("AppraisalManager")
+  leadTerms            LeadTerm[]            @relation("LeadTermHolder")
+  leaveCovering        StaffLeaveRequest[]   @relation("LeaveCover")
+  rotasEntered         StaffRota[]           @relation("RotasEntered")
+  dailyReturns         DailyReturn[]         @relation("DailyReturnsEntered")
+  decisionsRaised      DecisionRequest[]     @relation("DecisionsRaised")
+  decisionsMade        DecisionRequest[]     @relation("DecisionsMade")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8596,15 +8602,15 @@ model ProtocolProgress {
 /// per person (StaffMember.teamId), so the cut is mutually exclusive by
 /// construction; nobody is in two and the sum of teams is the hospital.
 model StaffTeam {
-  id       String @id @default(cuid())
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  key      String
-  name     String
-  purpose  String? @db.Text
-  leadId   String?
-  lead     StaffMember? @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
-  sortOrder Int @default(0)
+  id        String       @id @default(cuid())
+  clientId  String
+  client    Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  key       String
+  name      String
+  purpose   String?      @db.Text
+  leadId    String?
+  lead      StaffMember? @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
+  sortOrder Int          @default(0)
 
   members    StaffMember[] @relation("TeamMembers")
   huddles    TeamHuddle[]
@@ -8622,20 +8628,20 @@ model StaffTeam {
 /// team; when the next term starts, both move to the next person. The admin
 /// allowance that goes with it is payroll and is not recorded here.
 model LeadTerm {
-  id           String      @id @default(cuid())
-  teamId       String
-  team         StaffTeam   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  staffId      String
-  staff        StaffMember @relation("LeadTermHolder", fields: [staffId], references: [id], onDelete: Cascade)
-  startsOn     DateTime
-  endsOn       DateTime
+  id                String      @id @default(cuid())
+  teamId            String
+  team              StaffTeam   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  staffId           String
+  staff             StaffMember @relation("LeadTermHolder", fields: [staffId], references: [id], onDelete: Cascade)
+  startsOn          DateTime
+  endsOn            DateTime
   /// The lead's own note to the next lead at the end of the term.
-  handoverNote String?     @db.Text
+  handoverNote      String?     @db.Text
   /// True if this term gave the person the SUPERVISOR tier, so it is taken
   /// back when the term ends and not otherwise.
-  grantedSupervisor Boolean @default(false)
-  endedAt      DateTime?
-  createdAt    DateTime    @default(now())
+  grantedSupervisor Boolean     @default(false)
+  endedAt           DateTime?
+  createdAt         DateTime    @default(now())
 
   @@index([teamId, startsOn])
 }
@@ -8643,17 +8649,17 @@ model LeadTerm {
 /// One team's ten-minute huddle on one day: who was there, one safety
 /// concern, today's focus, one blocker.
 model TeamHuddle {
-  id        String      @id @default(cuid())
+  id        String       @id @default(cuid())
   teamId    String
-  team      StaffTeam   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team      StaffTeam    @relation(fields: [teamId], references: [id], onDelete: Cascade)
   date      DateTime
   ledById   String?
   ledBy     StaffMember? @relation("HuddleLead", fields: [ledById], references: [id], onDelete: SetNull)
   attendees String[]
-  safety    String? @db.Text
-  focus     String? @db.Text
-  blocker   String? @db.Text
-  createdAt DateTime @default(now())
+  safety    String?      @db.Text
+  focus     String?      @db.Text
+  blocker   String?      @db.Text
+  createdAt DateTime     @default(now())
 
   @@unique([teamId, date])
 }
@@ -8675,24 +8681,24 @@ enum ObjectiveStatus {
 /// An objective for a quarter, at board or team level. Team objectives ladder
 /// to a board one through parentId. Never tied to pay: see the research memo.
 model Objective {
-  id         String          @id @default(cuid())
-  clientId   String
-  client     Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  level      ObjectiveLevel
-  teamId     String?
-  team       StaffTeam?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  parentId   String?
-  parent     Objective?      @relation("ObjectiveTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children   Objective[]     @relation("ObjectiveTree")
-  quarter    String
-  title      String
-  why        String?         @db.Text
-  status     ObjectiveStatus @default(DRAFT)
-  proposalNote String?       @db.Text
-  agreedById String?
-  agreedBy   StaffMember?    @relation("ObjectiveAgreed", fields: [agreedById], references: [id], onDelete: SetNull)
-  agreedAt   DateTime?
-  sortOrder  Int             @default(0)
+  id           String          @id @default(cuid())
+  clientId     String
+  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  level        ObjectiveLevel
+  teamId       String?
+  team         StaffTeam?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  parentId     String?
+  parent       Objective?      @relation("ObjectiveTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Objective[]     @relation("ObjectiveTree")
+  quarter      String
+  title        String
+  why          String?         @db.Text
+  status       ObjectiveStatus @default(DRAFT)
+  proposalNote String?         @db.Text
+  agreedById   String?
+  agreedBy     StaffMember?    @relation("ObjectiveAgreed", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt     DateTime?
+  sortOrder    Int             @default(0)
 
   keyResults KeyResult[]
 
@@ -8710,20 +8716,20 @@ enum KeyResultKind {
 }
 
 model KeyResult {
-  id          String        @id @default(cuid())
+  id          String             @id @default(cuid())
   objectiveId String
-  objective   Objective     @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
-  kind        KeyResultKind @default(RESULT)
+  objective   Objective          @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  kind        KeyResultKind      @default(RESULT)
   title       String
   baseline    String?
   target      String?
   current     String?
   /// 1 to 10: how sure the owner is it will be hit by quarter end.
   confidence  Int?
-  sortOrder   Int           @default(0)
+  sortOrder   Int                @default(0)
   checkIns    KeyResultCheckIn[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@index([objectiveId])
 }
@@ -8745,15 +8751,15 @@ model KeyResultCheckIn {
 /// A performance period, e.g. November 2026 to February 2027. Objectives are
 /// set for it, tracked monthly inside it and appraised at its end.
 model ReviewCycle {
-  id         String   @id @default(cuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  name       String
-  startsOn   DateTime
-  endsOn     DateTime
+  id                String    @id @default(cuid())
+  clientId          String
+  client            Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name              String
+  startsOn          DateTime
+  endsOn            DateTime
   /// Self-appraisal opens once this is set.
   appraisalOpenedAt DateTime?
-  closedAt   DateTime?
+  closedAt          DateTime?
 
   objectives PersonalObjective[]
   appraisals Appraisal[]
@@ -8774,25 +8780,25 @@ enum PersonalObjectiveStatus {
 /// is agreed with their line manager, tracked monthly and scored at appraisal.
 /// Never tied to pay.
 model PersonalObjective {
-  id          String       @id @default(cuid())
-  staffId     String
-  staff       StaffMember  @relation("ObjectiveOwner", fields: [staffId], references: [id], onDelete: Cascade)
-  cycleId     String
-  cycle       ReviewCycle  @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  id         String                  @id @default(cuid())
+  staffId    String
+  staff      StaffMember             @relation("ObjectiveOwner", fields: [staffId], references: [id], onDelete: Cascade)
+  cycleId    String
+  cycle      ReviewCycle             @relation(fields: [cycleId], references: [id], onDelete: Cascade)
   /// The role KPI it came from (lib/haven-roles.ts), or null if written fresh.
-  kpiCode     String?
-  title       String
-  target      String
+  kpiCode    String?
+  title      String
+  target     String
   /// H1 to H5: the hospital objectives it moves.
-  tags        String[]
-  weight      Float        @default(0.2)
-  status      PersonalObjectiveStatus @default(DRAFT)
-  agreedById  String?
-  agreedBy    StaffMember? @relation("ObjectiveAgreer", fields: [agreedById], references: [id], onDelete: SetNull)
-  agreedAt    DateTime?
-  sortOrder   Int          @default(0)
+  tags       String[]
+  weight     Float                   @default(0.2)
+  status     PersonalObjectiveStatus @default(DRAFT)
+  agreedById String?
+  agreedBy   StaffMember?            @relation("ObjectiveAgreer", fields: [agreedById], references: [id], onDelete: SetNull)
+  agreedAt   DateTime?
+  sortOrder  Int                     @default(0)
 
-  updates     ObjectiveUpdate[]
+  updates ObjectiveUpdate[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -8826,17 +8832,17 @@ model ObjectiveUpdate {
 
 /// A documented conversation between a person and their line manager.
 model OneToOne {
-  id        String      @id @default(cuid())
+  id        String       @id @default(cuid())
   staffId   String
-  staff     StaffMember @relation("OneToOneStaff", fields: [staffId], references: [id], onDelete: Cascade)
+  staff     StaffMember  @relation("OneToOneStaff", fields: [staffId], references: [id], onDelete: Cascade)
   managerId String?
   manager   StaffMember? @relation("OneToOneManager", fields: [managerId], references: [id], onDelete: SetNull)
   heldOn    DateTime
-  wentWell  String?     @db.Text
-  inTheWay  String?     @db.Text
-  support   String?     @db.Text
-  actions   String?     @db.Text
-  createdAt DateTime    @default(now())
+  wentWell  String?      @db.Text
+  inTheWay  String?      @db.Text
+  support   String?      @db.Text
+  actions   String?      @db.Text
+  createdAt DateTime     @default(now())
 
   @@index([staffId, heldOn])
 }
@@ -8883,18 +8889,18 @@ model Appraisal {
 /// until somebody in leadership or finance marks it done; while open it sits
 /// in their morning list and in the founders' Friday note.
 model TariffFix {
-  id         String       @id @default(cuid())
-  clientId   String
-  client     Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  code       String
-  title      String
-  detail     String       @db.Text
-  doneAt     DateTime?
-  doneById   String?
-  doneBy     StaffMember? @relation("TariffFixDone", fields: [doneById], references: [id], onDelete: SetNull)
-  doneNote   String?      @db.Text
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id        String       @id @default(cuid())
+  clientId  String
+  client    Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  code      String
+  title     String
+  detail    String       @db.Text
+  doneAt    DateTime?
+  doneById  String?
+  doneBy    StaffMember? @relation("TariffFixDone", fields: [doneById], references: [id], onDelete: SetNull)
+  doneNote  String?      @db.Text
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@unique([clientId, code])
 }
@@ -9296,7 +9302,7 @@ model DecisionRequest {
   decidedBy   StaffMember? @relation("DecisionsMade", fields: [decidedById], references: [id], onDelete: SetNull)
   decidedAt   DateTime?
   /// What she decided, in her words, for the person who asked.
-  decision    String?   @db.Text
+  decision    String?      @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -9757,4 +9763,176 @@ model WatchRun {
 
   @@index([watchId, startedAt])
   @@index([pendingRef, collectedAt])
+}
+
+/// A time-boxed drive to get a list of hospitals to one decision: sign a
+/// client's provider agreement (CLIENT_SIGNING, e.g. the Aman HMO sprint), or
+/// buy a CFA product (CFA_SALES). The stages, outcomes and chase cadence for
+/// each kind live in lib/outreach.ts, so a new sprint is a row, not a build.
+model OutreachSprint {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  kind          String // CLIENT_SIGNING | CFA_SALES
+  /// Who the provider signs with, as callers say it: "Aman HMO".
+  clientName    String?
+  /// CFA_SALES only: key from lib/hospital-sales.ts PRODUCTS.
+  product       String?
+  engagementId  String?
+  /// Signatures this sprint must add, and how many were signed before it began.
+  goal          Int
+  baseline      Int      @default(0)
+  startsAt      DateTime
+  endsAt        DateTime
+  /// [{ "from": "2026-11-02", "label": "Wk 1", "target": 20 }, ...]
+  weeklyTargets Json?
+  /// Where the brief lives, shown on the desk.
+  briefUrl      String?
+
+  // The hospital's side: what its private page shows and what it can return.
+  /// The agreement hospitals download, in private storage (never a public link).
+  agreementKey  String?
+  agreementName String?
+  /// One document per line, shown on the hospital's page.
+  checklist     String?  @db.Text
+  /// Two or three lines on why to join, confirmed with the client.
+  pitch         String?  @db.Text
+  /// { intro | sla | chase: { subject, body } }. Defaults live in lib/outreach-hospital.ts.
+  emails        Json?
+  /// Hashes of wording a sender has test-sent to themselves. Nothing goes to a
+  /// hospital in wording that is not in here.
+  testedHashes  String[] @default([])
+  /// The day 2/5/9/14 reminder emails. Off until the lead switches it on.
+  autoChaseOn   Boolean  @default(false)
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members SprintMember[]
+  targets SprintTarget[]
+}
+
+model SprintMember {
+  id        String         @id @default(cuid())
+  sprintId  String
+  sprint    OutreachSprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// LEAD sees everything and gets escalations last; RUNNER runs the day,
+  /// reassigns and takes escalations; CALLER works an owned list.
+  role      String // LEAD | RUNNER | CALLER
+  /// The patch this person calls, e.g. "Island and Lekki".
+  area      String?
+  createdAt DateTime       @default(now())
+
+  @@unique([sprintId, userId])
+}
+
+/// One hospital in one sprint. Exactly one owner: two people never call the
+/// same facility.
+model SprintTarget {
+  id         String         @id @default(cuid())
+  sprintId   String
+  sprint     OutreachSprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  hospitalId String
+  hospital   Hospital       @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  ownerId    String?
+  owner      User?          @relation("SprintTargetOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  stage    String  @default("TARGET")
+  /// Higher is called first.
+  priority Int     @default(0)
+  area     String?
+  source   String?
+  notes    String? @db.Text
+
+  /// The person who actually signs. Most chases fail because they reach the
+  /// front desk instead.
+  signatoryName  String?
+  signatoryRole  String?
+  signatoryPhone String?
+  signatoryEmail String?
+
+  nextAction     String?
+  nextActionAt   DateTime?
+  /// How many steps of the chase cadence are done since the agreement went out.
+  chaseStep      Int       @default(0)
+  sentAt         DateTime?
+  signedAt       DateTime?
+  docsAt         DateTime?
+  handedOverAt   DateTime?
+  escalatedAt    DateTime?
+  escalationNote String?   @db.Text
+  closedReason   String?   @db.Text
+
+  lastTouchAt DateTime?
+  touchCount  Int       @default(0)
+
+  /// The hospital's private page, /sign/<token>. 32 random bytes: the only credential.
+  token           String?   @unique
+  linkSentAt      DateTime?
+  linkOpenedAt    DateTime?
+  /// The hospital pressed "That is everything" on its page.
+  packReadyAt     DateTime?
+  autoChases      Int       @default(0)
+  lastAutoChaseAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  touches SprintTouch[]
+  files   SprintFile[]
+
+  @@unique([sprintId, hospitalId])
+  @@index([sprintId, ownerId, stage])
+  @@index([sprintId, nextActionAt])
+  @@index([sprintId, signedAt])
+}
+
+/// One contact: a call, WhatsApp, email or visit, and what came of it.
+/// `said` is the provider's own words. It is the raw material for selling to
+/// these hospitals later, so callers are asked for it on every touch.
+model SprintTouch {
+  id        String       @id @default(cuid())
+  targetId  String
+  target    SprintTarget @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  /// Null when the hospital did it on its page, or the system sent it.
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actor     String       @default("STAFF") // STAFF | HOSPITAL | SYSTEM
+  channel   String // CALL | WHATSAPP | EMAIL | VISIT | NOTE
+  outcome   String // key from lib/outreach.ts OUTCOMES
+  spokeTo   String?
+  said      String?      @db.Text
+  /// Need tags heard on the call: HMO_PAYMENTS, STAFFING, RECORDS, ...
+  needs     String[]     @default([])
+  note      String?      @db.Text
+  stageFrom String?
+  stageTo   String?
+  createdAt DateTime     @default(now())
+
+  @@index([targetId, createdAt])
+  @@index([userId, createdAt])
+}
+
+/// A file a hospital returned on its page: the signed agreement or a document.
+/// Stored under a random key with no filename in it, read back only through a
+/// short-lived signed link behind sign-in.
+model SprintFile {
+  id          String       @id @default(cuid())
+  targetId    String
+  target      SprintTarget @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  kind        String // AGREEMENT | DOCUMENT
+  key         String       @unique
+  fileName    String
+  contentType String
+  size        Int
+  signedBy    String?
+  /// Set when a lead or runner rejects it (unreadable, unsigned page, wrong document).
+  rejectedAt  DateTime?
+  rejectNote  String?
+  createdAt   DateTime     @default(now())
+
+  @@index([targetId, createdAt])
 }

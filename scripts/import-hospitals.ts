@@ -36,8 +36,8 @@ if (!file) {
 
 const HEADERS: Record<string, string[]> = {
   name: ["name", "provider", "hospital", "facility", "facility name", "hospital name", "provider name", "organisation", "organization"],
-  email: ["email", "e-mail", "email address", "emails"],
-  phone: ["phone", "telephone", "mobile", "phone number", "phone numbers", "contact number", "tel"],
+  email: ["email", "e-mail", "email address", "emails", "email address(es)", "email addresses"],
+  phone: ["phone", "telephone", "mobile", "phone number", "phone numbers", "phone number(s)", "contact number", "tel"],
   lga: ["lga", "area", "location", "target location", "local government"],
   city: ["city", "town"],
   state: ["state"],
