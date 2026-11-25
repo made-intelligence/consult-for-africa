@@ -392,7 +392,7 @@ export default async function ConsultPage({
               {LYFE_CONSULT.blurb}
             </p>
             <p className="mt-5 text-[15px]" style={{ color: C.bronze }}>
-              {LYFE_CONSULT.feeDisplay}, in person or by video. {LYFE_CONSULT.feeNote}{" "}
+              {LYFE_CONSULT.feeDisplay}, by video. {LYFE_CONSULT.feeNote}{" "}
               {open > 0
                 ? `${open} appointment${open === 1 ? "" : "s"} open. ${LYFE_CONSULT_SCHEDULE}.`
                 : "Her diary is full. Ask to be told when a half hour is released."}
