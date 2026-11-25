@@ -618,7 +618,7 @@ export const LYFE_PATHWAY_COPY = {
  *
  * This is the paid step in its place: her own clinic, her own diary, booked and
  * paid for in one sitting. It is a teleconsultation, which is what makes it
- * deliverable while she is abroad and what makes the two hours on a Tuesday
+ * deliverable while she is abroad and what makes the two hours on a Monday
  * real rather than aspirational.
  *
  * It sits ABOVE the clinic's own aesthetic consultation on purpose. The
@@ -631,16 +631,16 @@ export const LYFE_CONSULT = {
   fee: 150_000,
   feeDisplay: "₦150,000",
   minutes: 30,
-  /** 2 (Tuesday) and 3 (Wednesday), matching JavaScript's getDay. */
-  days: [2, 3] as const,
-  dayNames: "Tuesdays and Wednesdays",
-  startHour: 11,
-  endHour: 13,
-  hoursDisplay: "11am to 1pm",
+  /** 1 (Monday), matching JavaScript's getDay. Debo, 22 Nov 2026: she is in the US, video only, Mondays 3 to 5pm Lagos. */
+  days: [1] as const,
+  dayNames: "Mondays",
+  startHour: 15,
+  endHour: 17,
+  hoursDisplay: "3pm to 5pm",
   timezone: "WAT",
-  /** Four half hours across the two hours, so eight in a working week. */
+  /** Four half hours across the two hours, one day a week. */
   perDay: 4,
-  perWeek: 8,
+  perWeek: 4,
   label: "A consultation with Dr Kpaduwa",
   /**
    * Said in her own words rather than the clinic's, because the thing being
